@@ -1,0 +1,197 @@
+TAP version 13
+# {"environment":{"node":"v22.23.2","platform":"linux","arch":"x64","cpu":"Intel(R) Xeon(R) Processor @ 2.60GHz"},"threshold":null,"validateOneTwoThree":[{"unit":"microseconds","count":30,"min":33.203,"p50":44.325,"p95":572.971,"max":1137.502},{"unit":"microseconds","count":30,"min":60.214,"p50":99.224,"p95":950.152,"max":7619.857},{"unit":"microseconds","count":30,"min":87.678,"p50":124.331,"p95":648.276,"max":3961.516}],"indexRebuild":{"unit":"microseconds","count":30,"min":25.112,"p50":46.056,"p95":152.168,"max":288.11},"transaction":{"unit":"microseconds","count":30,"min":577.362,"p50":852.317,"p95":3472.408,"max":7152.509}}
+# Subtest: measurement-only multi-support costs
+ok 1 - measurement-only multi-support costs
+  ---
+  duration_ms: 66.959273
+  type: 'test'
+  ...
+# Subtest: one static FLOOR relation commits
+ok 2 - one static FLOOR relation commits
+  ---
+  duration_ms: 18.666798
+  type: 'test'
+  ...
+# Subtest: one ENTITY_OWNED seat relation commits
+ok 3 - one ENTITY_OWNED seat relation commits
+  ---
+  duration_ms: 4.25747
+  type: 'test'
+  ...
+# Subtest: floor plus elevated seat and floor plus wall commit
+ok 4 - floor plus elevated seat and floor plus wall commit
+  ---
+  duration_ms: 3.790647
+  type: 'test'
+  ...
+# Subtest: three supports commit canonically
+ok 5 - three supports commit canonically
+  ---
+  duration_ms: 2.814788
+  type: 'test'
+  ...
+# Subtest: attach B preserves A; detach and replace B preserve A byte-identically
+ok 6 - attach B preserves A; detach and replace B preserve A byte-identically
+  ---
+  duration_ms: 6.38489
+  type: 'test'
+  ...
+# Subtest: insertion order gives same state digest and index
+ok 7 - insertion order gives same state digest and index
+  ---
+  duration_ms: 15.847086
+  type: 'test'
+  ...
+# Subtest: derived index deterministic and divergence detected
+ok 8 - derived index deterministic and divergence detected
+  ---
+  duration_ms: 0.867309
+  type: 'test'
+  ...
+# Subtest: explicit one-way migration converts one valid singular relation and rejects ambiguity
+ok 9 - explicit one-way migration converts one valid singular relation and rejects ambiguity
+  ---
+  duration_ms: 0.705873
+  type: 'test'
+  ...
+# Subtest: event replay reconstructs exact multi-support digest; tamper/reorder fail
+ok 10 - event replay reconstructs exact multi-support digest; tamper/reorder fail
+  ---
+  duration_ms: 1.959618
+  type: 'test'
+  ...
+# Subtest: duplicate relationId rejects atomically
+ok 11 - duplicate relationId rejects atomically
+  ---
+  duration_ms: 0.754327
+  type: 'test'
+  ...
+# Subtest: missing relationId rejects atomically
+ok 12 - missing relationId rejects atomically
+  ---
+  duration_ms: 0.613043
+  type: 'test'
+  ...
+# Subtest: stale supported body rejects atomically
+ok 13 - stale supported body rejects atomically
+  ---
+  duration_ms: 0.435929
+  type: 'test'
+  ...
+# Subtest: wrong body digest rejects atomically
+ok 14 - wrong body digest rejects atomically
+  ---
+  duration_ms: 0.285239
+  type: 'test'
+  ...
+# Subtest: missing contactRegionRef rejects atomically
+ok 15 - missing contactRegionRef rejects atomically
+  ---
+  duration_ms: 0.348279
+  type: 'test'
+  ...
+# Subtest: stale contact digest rejects atomically
+ok 16 - stale contact digest rejects atomically
+  ---
+  duration_ms: 0.658804
+  type: 'test'
+  ...
+# Subtest: missing static surface rejects atomically
+ok 17 - missing static surface rejects atomically
+  ---
+  duration_ms: 0.41506
+  type: 'test'
+  ...
+# Subtest: stale SurfaceModel rejects atomically
+ok 18 - stale SurfaceModel rejects atomically
+  ---
+  duration_ms: 0.936569
+  type: 'test'
+  ...
+# Subtest: unsupported wall capability rejects atomically
+ok 19 - unsupported wall capability rejects atomically
+  ---
+  duration_ms: 0.532824
+  type: 'test'
+  ...
+# Subtest: missing owner rejects atomically
+ok 20 - missing owner rejects atomically
+  ---
+  duration_ms: 0.43081
+  type: 'test'
+  ...
+# Subtest: stale owner revision rejects atomically
+ok 21 - stale owner revision rejects atomically
+  ---
+  duration_ms: 0.356527
+  type: 'test'
+  ...
+# Subtest: stale owner body rejects atomically
+ok 22 - stale owner body rejects atomically
+  ---
+  duration_ms: 0.321942
+  type: 'test'
+  ...
+# Subtest: stale SupportSurface rejects atomically
+ok 23 - stale SupportSurface rejects atomically
+  ---
+  duration_ms: 0.267172
+  type: 'test'
+  ...
+# Subtest: wrong SupportSurface owner rejects atomically
+ok 24 - wrong SupportSurface owner rejects atomically
+  ---
+  duration_ms: 0.29707
+  type: 'test'
+  ...
+# Subtest: one valid one invalid rejects atomically
+ok 25 - one valid one invalid rejects atomically
+  ---
+  duration_ms: 0.801331
+  type: 'test'
+  ...
+# Subtest: detach nonexistent rejects atomically
+ok 26 - detach nonexistent rejects atomically
+  ---
+  duration_ms: 0.23816
+  type: 'test'
+  ...
+# Subtest: replace nonexistent rejects atomically
+ok 27 - replace nonexistent rejects atomically
+  ---
+  duration_ms: 0.283623
+  type: 'test'
+  ...
+# Subtest: owner removal with dependent rejects atomically
+ok 28 - owner removal with dependent rejects atomically
+  ---
+  duration_ms: 0.356118
+  type: 'test'
+  ...
+# Subtest: owner move without refreshed proof rejects atomically
+ok 29 - owner move without refreshed proof rejects atomically
+  ---
+  duration_ms: 0.32896
+  type: 'test'
+  ...
+# Subtest: body replacement carrying stale relations rejects atomically
+ok 30 - body replacement carrying stale relations rejects atomically
+  ---
+  duration_ms: 0.463818
+  type: 'test'
+  ...
+# Subtest: posture change carrying stale world proof rejects atomically
+ok 31 - posture change carrying stale world proof rejects atomically
+  ---
+  duration_ms: 0.386409
+  type: 'test'
+  ...
+1..31
+# tests 31
+# suites 0
+# pass 31
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 290.994441

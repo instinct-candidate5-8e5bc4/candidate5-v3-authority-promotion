@@ -1,0 +1,124 @@
+TAP version 13
+# Subtest: canonical refs are exact and stale ref fails closed
+ok 1 - canonical refs are exact and stale ref fails closed
+  ---
+  type: 'test'
+  ...
+# Subtest: independent authoritative roots preserve identity and authority
+ok 2 - independent authoritative roots preserve identity and authority
+  ---
+  type: 'test'
+  ...
+# Subtest: domain descriptor locks writers dependencies events and evidence
+ok 3 - domain descriptor locks writers dependencies events and evidence
+  ---
+  type: 'test'
+  ...
+# Subtest: exact School capability accepted
+ok 4 - exact School capability accepted
+  ---
+  type: 'test'
+  ...
+# Subtest: synagogue does not fall back to School
+ok 5 - synagogue does not fall back to School
+  ---
+  type: 'test'
+  ...
+# Subtest: road collision fails without road and vehicle capabilities
+ok 6 - road collision fails without road and vehicle capabilities
+  ---
+  type: 'test'
+  ...
+# Subtest: water scenario fails without implemented water volume
+ok 7 - water scenario fails without implemented water volume
+  ---
+  type: 'test'
+  ...
+# Subtest: contract-only rotation cannot satisfy implementation requirement
+ok 8 - contract-only rotation cannot satisfy implementation requirement
+  ---
+  type: 'test'
+  ...
+# Subtest: open semantic IDs and typed components do not infer capabilities
+ok 9 - open semantic IDs and typed components do not infer capabilities
+  ---
+  type: 'test'
+  ...
+# Subtest: entity components separate semantic and physical identity
+ok 10 - entity components separate semantic and physical identity
+  ---
+  type: 'test'
+  ...
+# Subtest: 0..N casualty manifests and independent refs are valid
+ok 11 - 0..N casualty manifests and independent refs are valid
+  ---
+  type: 'test'
+  ...
+# Subtest: actor role is independent from geometry
+ok 12 - actor role is independent from geometry
+  ---
+  type: 'test'
+  ...
+# Subtest: canonical quaternion removes scale and sign ambiguity exactly
+ok 13 - canonical quaternion removes scale and sign ambiguity exactly
+  ---
+  type: 'test'
+  ...
+# Subtest: rigid frame composition is exact and deterministic
+ok 14 - rigid frame composition is exact and deterministic
+  ---
+  type: 'test'
+  ...
+# Subtest: frame hierarchy is explicit and deterministic
+ok 15 - frame hierarchy is explicit and deterministic
+  ---
+  type: 'test'
+  ...
+# Subtest: ConstraintRelation is not SupportRelation and includes release lifecycle
+ok 16 - ConstraintRelation is not SupportRelation and includes release lifecycle
+  ---
+  type: 'test'
+  ...
+# Subtest: AccessibilityAssessment captures actor target objective region and blockers
+ok 17 - AccessibilityAssessment captures actor target objective region and blockers
+  ---
+  type: 'test'
+  ...
+# Subtest: hazard separates source truth and four potential effect bindings
+ok 18 - hazard separates source truth and four potential effect bindings
+  ---
+  type: 'test'
+  ...
+# Subtest: clinical hidden state is separate from exposed presentation
+ok 19 - clinical hidden state is separate from exposed presentation
+  ---
+  type: 'test'
+  ...
+# Subtest: progression emits typed intent to owning authority
+ok 20 - progression emits typed intent to owning authority
+  ---
+  type: 'test'
+  ...
+# Subtest: VisualBinding variant preserves exact semantic and physical identity
+ok 21 - VisualBinding variant preserves exact semantic and physical identity
+  ---
+  type: 'test'
+  ...
+# Subtest: dependency invalidation is deterministic and stale fails closed
+ok 22 - dependency invalidation is deterministic and stale fails closed
+  ---
+  type: 'test'
+  ...
+# Subtest: provenance never upgrades across domains
+ok 23 - provenance never upgrades across domains
+  ---
+  type: 'test'
+  ...
+1..23
+# tests 23
+# suites 0
+# pass 23
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0

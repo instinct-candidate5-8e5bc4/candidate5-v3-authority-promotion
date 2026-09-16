@@ -1,0 +1,185 @@
+TAP version 13
+# Subtest: canonical package validates and complete scene commits atomically
+ok 1 - canonical package validates and complete scene commits atomically
+  ---
+  duration_ms: 16.299851
+  type: 'test'
+  ...
+# Subtest: exact approved refs and MALE SUPINE locks preserved
+ok 2 - exact approved refs and MALE SUPINE locks preserved
+  ---
+  duration_ms: 0.275223
+  type: 'test'
+  ...
+# Subtest: seat materialization remains deterministic
+ok 3 - seat materialization remains deterministic
+  ---
+  duration_ms: 1.691928
+  type: 'test'
+  ...
+# Subtest: malformed rejects atomically
+ok 4 - malformed rejects atomically
+  ---
+  duration_ms: 0.949648
+  type: 'test'
+  ...
+# Subtest: wrong version rejects atomically
+ok 5 - wrong version rejects atomically
+  ---
+  duration_ms: 0.67967
+  type: 'test'
+  ...
+# Subtest: missing SurfaceModel rejects atomically
+ok 6 - missing SurfaceModel rejects atomically
+  ---
+  duration_ms: 1.555459
+  type: 'test'
+  ...
+# Subtest: stale SurfaceModel rejects atomically
+ok 7 - stale SurfaceModel rejects atomically
+  ---
+  duration_ms: 0.768127
+  type: 'test'
+  ...
+# Subtest: wrong SurfaceModel digest rejects atomically
+ok 8 - wrong SurfaceModel digest rejects atomically
+  ---
+  duration_ms: 0.728221
+  type: 'test'
+  ...
+# Subtest: missing surface rejects atomically
+ok 9 - missing surface rejects atomically
+  ---
+  duration_ms: 0.921155
+  type: 'test'
+  ...
+# Subtest: missing entity rejects atomically
+ok 10 - missing entity rejects atomically
+  ---
+  duration_ms: 0.89161
+  type: 'test'
+  ...
+# Subtest: duplicate entity rejects atomically
+ok 11 - duplicate entity rejects atomically
+  ---
+  duration_ms: 1.164841
+  type: 'test'
+  ...
+# Subtest: wrong bag body rejects atomically
+ok 12 - wrong bag body rejects atomically
+  ---
+  duration_ms: 0.867681
+  type: 'test'
+  ...
+# Subtest: wrong casualty body rejects atomically
+ok 13 - wrong casualty body rejects atomically
+  ---
+  duration_ms: 0.701714
+  type: 'test'
+  ...
+# Subtest: wrong profile rejects atomically
+ok 14 - wrong profile rejects atomically
+  ---
+  duration_ms: 0.59417
+  type: 'test'
+  ...
+# Subtest: wrong sex rejects atomically
+ok 15 - wrong sex rejects atomically
+  ---
+  duration_ms: 0.960451
+  type: 'test'
+  ...
+# Subtest: wrong posture rejects atomically
+ok 16 - wrong posture rejects atomically
+  ---
+  duration_ms: 0.702021
+  type: 'test'
+  ...
+# Subtest: missing chair rejects atomically
+ok 17 - missing chair rejects atomically
+  ---
+  duration_ms: 0.594191
+  type: 'test'
+  ...
+# Subtest: stale chair revision rejects atomically
+ok 18 - stale chair revision rejects atomically
+  ---
+  duration_ms: 0.672564
+  type: 'test'
+  ...
+# Subtest: wrong chair digest rejects atomically
+ok 19 - wrong chair digest rejects atomically
+  ---
+  duration_ms: 0.600191
+  type: 'test'
+  ...
+# Subtest: missing seat rejects atomically
+ok 20 - missing seat rejects atomically
+  ---
+  duration_ms: 0.596158
+  type: 'test'
+  ...
+# Subtest: stale seat rejects atomically
+ok 21 - stale seat rejects atomically
+  ---
+  duration_ms: 0.980445
+  type: 'test'
+  ...
+# Subtest: wrong seat owner rejects atomically
+ok 22 - wrong seat owner rejects atomically
+  ---
+  duration_ms: 0.604458
+  type: 'test'
+  ...
+# Subtest: dangling relation rejects atomically
+ok 23 - dangling relation rejects atomically
+  ---
+  duration_ms: 0.695238
+  type: 'test'
+  ...
+# Subtest: stale relation rejects atomically
+ok 24 - stale relation rejects atomically
+  ---
+  duration_ms: 0.737415
+  type: 'test'
+  ...
+# Subtest: omitted relation rejects atomically
+ok 25 - omitted relation rejects atomically
+  ---
+  duration_ms: 0.551208
+  type: 'test'
+  ...
+# Subtest: tampered package without reseal rejects digest
+ok 26 - tampered package without reseal rejects digest
+  ---
+  duration_ms: 0.741481
+  type: 'test'
+  ...
+# Subtest: geometry placement negative injections reject atomically
+ok 27 - geometry placement negative injections reject atomically
+  ---
+  duration_ms: 26.584254
+  type: 'test'
+  ...
+# Subtest: tampered event and reordered replay reject
+ok 28 - tampered event and reordered replay reject
+  ---
+  duration_ms: 4.165736
+  type: 'test'
+  ...
+# {"environment":{"node":"v22.23.2","platform":"linux","arch":"x64","cpu":"Intel(R) Xeon(R) Processor @ 2.60GHz"},"threshold":null,"packageValidation":{"unit":"microseconds","count":20,"min":439.314,"p50":690.006,"p95":8623.585,"max":8623.585},"fullAtomicInstantiationTransactionEventReplay":{"unit":"microseconds","count":20,"min":2235.653,"p50":2678.569,"p95":10876.549,"max":10876.549},"dependencyIndex":{"unit":"microseconds","count":20,"min":26.71,"p50":28.14,"p95":92.318,"max":92.318}}
+# Subtest: Gate D measurements only
+ok 29 - Gate D measurements only
+  ---
+  duration_ms: 92.083284
+  type: 'test'
+  ...
+1..29
+# tests 29
+# suites 0
+# pass 29
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 342.275701

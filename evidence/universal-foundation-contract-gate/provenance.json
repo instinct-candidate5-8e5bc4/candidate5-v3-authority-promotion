@@ -1,0 +1,9 @@
+{
+  "ownerInstructionMessageId": "wamid.HBgMOTcyNTMyNDkwMzUxFQIAEhgUM0E0NTAwMkNDMjU3OTg0MDQ1NEYA",
+  "ownerInstructionObservedAt": "2026-09-16T23:14:02+03:00",
+  "acceptedPreflightCheckpoint": "4827b9354ab4defd0ae0890efd68453effa6057e",
+  "lockedGateDCheckpoint": "a50f6274fc242f346e238d13af5d926a559fe5ab",
+  "lockedScenePackageDigest": "187cf1a4c0af01ef12087879f44eeb88a355499a860665e29cdb2f5ab0d06aec",
+  "classification": "AUTHORED_NEW_CONTRACTS_WITH_SYNTHETIC_PROOFS",
+  "reviewState": "AWAITING_REVIEW"
+}

@@ -1,0 +1,2 @@
+'use strict';const {digest}=require('./canonical'),{matches}=require('./refs');
+function invalidateDerived(derived,currentById){const stale=[...derived.dependencyRefs].filter(r=>!matches(r,currentById[r.id])).map(r=>r.id).sort();const x={invalidationVersion:'1.0.0',derivedId:derived.derivedId,status:stale.length?'INVALIDATED':'CURRENT',staleDependencyIds:stale};x.digest=digest(x,'digest');return Object.freeze(x)}module.exports={invalidateDerived};
