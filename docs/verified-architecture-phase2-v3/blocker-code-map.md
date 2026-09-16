@@ -1,0 +1,18 @@
+# Narrow-Phase Blocker-to-Code Map
+
+| Blocker | Current behavior/code | Why unsafe | Required invariant | Minimum correction | Proof test |
+|---|---|---|---|---|---|
+| Quantization intervals | `geometry.js` materializes corners but `sat/proj` uses exact rational centers | rounded/error uncertainty never enters decision | every predicate consumes authoritative coordinate intervals | interval vectors/projections sourced directly from materialization error; ambiguity contagious | REG-V3-QI-SAT-001 plus four-way boundary suites |
+| Convex axes | `geometry.js sat` uses shape axes and pairwise axes, but convex shape exposes only face normals | missing edge×edge separator can false-collide/pass dependent queries | complete unique face normals + all unique edge cross axes | validate/extract canonical topology edges, transform, cross/deduplicate | REG-V3-CONVEX-AXIS-001 |
+| Finite support | `evaluate.js CONTACT...` checks minimum plane distance only | outside contact polygon can PASS | all required contact-region points/edges plane-valid and contained in finite target polygon | target-local 2D interval projection + convex half-space containment | REG-V3-SUPPORT-POLY-001 |
+| Opening AABB | `evaluate.js BODY_VS_OPENING_BOUNDARY` compares world AABBs | rotated corner/boundary false PASS/FAIL | complete body cross-section in opening-local polygon and no boundary-solid intersection | transform geometry to opening basis, interval polygon test and solid query | REG-V3-OPENING-AABB-001 |
+| Containment AABB | `evaluate.js BODY_CONTAINMENT...` compares world AABBs | world bounds are not target half-spaces | every relevant child vertex interval definitely inside every oriented target half-space | oriented convex target planes, child interval dot predicates | REG-V3-CONTAINMENT-AABB-001 |
+| Contact normals | contact query only uses surface normal for distance | invalid facing can PASS | exact contact expected normal paired against physical target normal under FRONT_ONLY rule | authored contact-normal ref/geometry and interval dot classification | REG-V3-NORMAL-001 |
+| Boundary adversaries | opening edge exists; other predicates incomplete | a clean sub-proof can overwrite unknown | every authoritative boundary has legal/illegal/exact/crossing fixture | permanent four-way matrices per predicate | named regression set |
+| Promotion | V3 is direct experimental API only | routing would grant incomplete proof authority | no AABB-only, center-only, incomplete-axis, plane-only or incomplete-opening PASS path | complete all above, promotion audit, then and only then gateway route | post-routing full matrix |
+
+## Executable review finding
+
+The new exact interval arithmetic foundation passes canonical addition, subtraction, multiplication, negation, scalar, dot, projection and overlap classification tests. It does not make the current geometry authoritative because materialization currently cannot provide sound transformed-coordinate intervals from the accepted rotation representation: the Numeric Frame materializer records positional rounding at vector materialization, but V3 presently computes exact rational world corners and then materializes them. To prove an interval around each used coordinate, V3 must define the authority boundary consistently and carry exact source+fixed+error into every vector operation. Retrofitting intervals only around final scalar projections would miss correlated transform/axis uncertainty.
+
+This is an additive correctness problem, not a foundational identity/frame redesign. However it requires replacing the prototype decision predicates, not decorating them. Current evaluateV3 remains unrouted.

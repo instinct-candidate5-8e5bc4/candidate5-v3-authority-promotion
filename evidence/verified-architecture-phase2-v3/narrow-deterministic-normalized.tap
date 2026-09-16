@@ -1,0 +1,84 @@
+TAP version 13
+# Subtest: interval canonical validation
+ok 1 - interval canonical validation
+  ---
+  type: 'test'
+  ...
+# Subtest: interval add subtract negate multiply scalar exact
+ok 2 - interval add subtract negate multiply scalar exact
+  ---
+  type: 'test'
+  ...
+# Subtest: interval zero and comparisons
+ok 3 - interval zero and comparisons
+  ---
+  type: 'test'
+  ...
+# Subtest: interval dot and projection propagate uncertainty
+ok 4 - interval dot and projection propagate uncertainty
+  ---
+  type: 'test'
+  ...
+# Subtest: REG-V3-QI-SAT-001 uncertainty crossing cannot pass
+ok 5 - REG-V3-QI-SAT-001 uncertainty crossing cannot pass
+  ---
+  type: 'test'
+  ...
+# Subtest: V3 measurement only
+ok 6 - V3 measurement only
+  ---
+  type: 'test'
+  ...
+# Subtest: oriented body-vs-body separated touching penetrating rotated
+ok 7 - oriented body-vs-body separated touching penetrating rotated
+  ---
+  type: 'test'
+  ...
+# Subtest: compound children canonical and child-only collision fails
+ok 8 - compound children canonical and child-only collision fails
+  ---
+  type: 'test'
+  ...
+# Subtest: containment fully inside and outside
+ok 9 - containment fully inside and outside
+  ---
+  type: 'test'
+  ...
+# Subtest: explicit opening legal, edge ambiguous, too large
+ok 10 - explicit opening legal, edge ambiguous, too large
+  ---
+  type: 'test'
+  ...
+# Subtest: contact floor pass floating penetration and unsupported double-sided
+ok 11 - contact floor pass floating penetration and unsupported double-sided
+  ---
+  type: 'test'
+  ...
+# Subtest: broad tamper and swept fail closed with evidence limitations
+ok 12 - broad tamper and swept fail closed with evidence limitations
+  ---
+  type: 'test'
+  ...
+# Subtest: convex definitions validate topology and SAT
+ok 13 - convex definitions validate topology and SAT
+  ---
+  type: 'test'
+  ...
+# Subtest: synthetic local-world parent rotation invalidates old evidence
+ok 14 - synthetic local-world parent rotation invalidates old evidence
+  ---
+  type: 'test'
+  ...
+# Subtest: synthetic topology kinds cover tread riser landing levels only
+ok 15 - synthetic topology kinds cover tread riser landing levels only
+  ---
+  type: 'test'
+  ...
+1..15
+# tests 15
+# suites 0
+# pass 15
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
