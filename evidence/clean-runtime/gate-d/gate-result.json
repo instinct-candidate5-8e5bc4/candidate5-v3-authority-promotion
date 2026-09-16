@@ -1,0 +1,33 @@
+{
+  "gate": "GATE D SCHOOL PHYSICAL SCENE PACKAGE V2",
+  "result": "PASS",
+  "packageId": "SCHOOL_TREATMENT_ROOM_PHYSICAL_V2",
+  "packageDigest": "187cf1a4c0af01ef12087879f44eeb88a355499a860665e29cdb2f5ab0d06aec",
+  "startingWorldDigest": "5800a7574564c767a8c4a93acaa808fd59064416b391d1be1dd566e55fcc3a2f",
+  "finalWorldDigest": "fa1bbaa985a63a8bfa30c2bbd7fbaf14b2c4972d985815a093bdd68f7fe954ea",
+  "eventDigest": "35613a9d75d8802aa039450131467a20a5dc5c485500df9ffa80804c2669312a",
+  "replayDigest": "fa1bbaa985a63a8bfa30c2bbd7fbaf14b2c4972d985815a093bdd68f7fe954ea",
+  "revision": 1,
+  "eventSequence": 1,
+  "relationIds": [
+    "school:bag:floor",
+    "school:casualty:floor",
+    "school:chair:floor"
+  ],
+  "index": {
+    "static:school-surface-v1:floor": [
+      {
+        "relationId": "school:bag:floor",
+        "supportedEntityId": "school-medical-bag"
+      },
+      {
+        "relationId": "school:casualty:floor",
+        "supportedEntityId": "school-casualty-adult-v1"
+      },
+      {
+        "relationId": "school:chair:floor",
+        "supportedEntityId": "school-treatment-chair"
+      }
+    ]
+  }
+}

@@ -1,0 +1,191 @@
+TAP version 13
+# Subtest: Gate C exact chair and surface review envelopes admit only reviewed refs
+ok 1 - Gate C exact chair and surface review envelopes admit only reviewed refs
+  ---
+  duration_ms: 1.355961
+  type: 'test'
+  ...
+# Subtest: Gate C promotion changes envelopes only, not definition bytes/digests
+ok 2 - Gate C promotion changes envelopes only, not definition bytes/digests
+  ---
+  duration_ms: 0.440659
+  type: 'test'
+  ...
+# Subtest: one AUTHORED_NEW chair body validates and aggregate is derived
+ok 3 - one AUTHORED_NEW chair body validates and aggregate is derived
+  ---
+  duration_ms: 2.4965
+  type: 'test'
+  ...
+# Subtest: entity-owned seat validates and is not whole chair AABB
+ok 4 - entity-owned seat validates and is not whole chair AABB
+  ---
+  duration_ms: 1.543589
+  type: 'test'
+  ...
+# Subtest: local seat materialization is deterministic
+ok 5 - local seat materialization is deterministic
+  ---
+  duration_ms: 1.094287
+  type: 'test'
+  ...
+# Subtest: chair lifecycle remains separate VALIDATED pending USER_GATE_REVIEW
+ok 6 - chair lifecycle remains separate VALIDATED pending USER_GATE_REVIEW
+  ---
+  duration_ms: 0.396361
+  type: 'test'
+  ...
+# Subtest: legal chair placement passes Phase 2 and commits
+ok 7 - legal chair placement passes Phase 2 and commits
+  ---
+  duration_ms: 4.55982
+  type: 'test'
+  ...
+# Subtest: chair floating rejects atomically
+ok 8 - chair floating rejects atomically
+  ---
+  duration_ms: 1.575801
+  type: 'test'
+  ...
+# Subtest: chair wall rejects atomically
+ok 9 - chair wall rejects atomically
+  ---
+  duration_ms: 1.29943
+  type: 'test'
+  ...
+# Subtest: chair door rejects atomically
+ok 10 - chair door rejects atomically
+  ---
+  duration_ms: 1.499215
+  type: 'test'
+  ...
+# Subtest: chair partial-door rejects atomically
+ok 11 - chair partial-door rejects atomically
+  ---
+  duration_ms: 2.165332
+  type: 'test'
+  ...
+# Subtest: chair obstacle rejects atomically
+ok 12 - chair obstacle rejects atomically
+  ---
+  duration_ms: 1.623221
+  type: 'test'
+  ...
+# Subtest: chair partial-outside rejects atomically
+ok 13 - chair partial-outside rejects atomically
+  ---
+  duration_ms: 1.357788
+  type: 'test'
+  ...
+# Subtest: chair full-outside rejects atomically
+ok 14 - chair full-outside rejects atomically
+  ---
+  duration_ms: 1.312704
+  type: 'test'
+  ...
+# Subtest: stale chair body proof rejects closed
+ok 15 - stale chair body proof rejects closed
+  ---
+  duration_ms: 1.510431
+  type: 'test'
+  ...
+# Subtest: wrong-owner dependency rejects with no partial commit
+ok 16 - wrong-owner dependency rejects with no partial commit
+  ---
+  duration_ms: 1.309673
+  type: 'test'
+  ...
+# Subtest: wrong-surface-revision dependency rejects with no partial commit
+ok 17 - wrong-surface-revision dependency rejects with no partial commit
+  ---
+  duration_ms: 5.922035
+  type: 'test'
+  ...
+# Subtest: wrong-surface-digest dependency rejects with no partial commit
+ok 18 - wrong-surface-digest dependency rejects with no partial commit
+  ---
+  duration_ms: 0.824868
+  type: 'test'
+  ...
+# Subtest: wrong-owner-body dependency rejects with no partial commit
+ok 19 - wrong-owner-body dependency rejects with no partial commit
+  ---
+  duration_ms: 4.723778
+  type: 'test'
+  ...
+# Subtest: stale dependency world revision rejects
+ok 20 - stale dependency world revision rejects
+  ---
+  duration_ms: 0.920248
+  type: 'test'
+  ...
+# Subtest: missing owner surface and dangling relation reject
+ok 21 - missing owner surface and dangling relation reject
+  ---
+  duration_ms: 0.829776
+  type: 'test'
+  ...
+# Subtest: support-surface mutation with stale dependent fails closed
+ok 22 - support-surface mutation with stale dependent fails closed
+  ---
+  duration_ms: 2.134441
+  type: 'test'
+  ...
+# Subtest: ReplacePhysicalBody with dependent rejects atomically
+ok 23 - ReplacePhysicalBody with dependent rejects atomically
+  ---
+  duration_ms: 0.791142
+  type: 'test'
+  ...
+# Subtest: remove chair with dependent fails closed
+ok 24 - remove chair with dependent fails closed
+  ---
+  duration_ms: 1.114188
+  type: 'test'
+  ...
+# Subtest: move chair without dependent update fails closed, no auto-drop
+ok 25 - move chair without dependent update fails closed, no auto-drop
+  ---
+  duration_ms: 2.694158
+  type: 'test'
+  ...
+# Subtest: atomic legal chair + dependent transaction commits together
+ok 26 - atomic legal chair + dependent transaction commits together
+  ---
+  duration_ms: 9.961931
+  type: 'test'
+  ...
+# Subtest: atomic invalid pair rejects with exact unchanged state
+ok 27 - atomic invalid pair rejects with exact unchanged state
+  ---
+  duration_ms: 1.504777
+  type: 'test'
+  ...
+# Subtest: successful support transaction replays exact and event tamper/reorder fails
+ok 28 - successful support transaction replays exact and event tamper/reorder fails
+  ---
+  duration_ms: 3.161691
+  type: 'test'
+  ...
+# Subtest: transaction command insertion order gives same candidate state digest
+ok 29 - transaction command insertion order gives same candidate state digest
+  ---
+  duration_ms: 4.18474
+  type: 'test'
+  ...
+# {"environment":{"node":"v22.23.2","platform":"linux","arch":"x64","cpu":"Intel(R) Xeon(R) Processor @ 2.60GHz"},"threshold":null,"materialize":{"unit":"microseconds","count":30,"min":32.965,"p50":53.503,"p95":298.508,"max":650.303},"placement":{"unit":"microseconds","count":30,"min":671.986,"p50":993.841,"p95":4001.474,"max":8245.254},"transaction":{"unit":"microseconds","count":30,"min":1378.442,"p50":1661.607,"p95":7570.01,"max":9769.135},"replay":{"unit":"microseconds","count":30,"min":260.384,"p50":315.384,"p95":628.085,"max":702.892},"finalDigest":"359405d1a407a0560459b6081f1b3adb6f507c7ae9e1f927135f062fe0a6415f"}
+# Subtest: Gate C performance measurements have no threshold
+ok 30 - Gate C performance measurements have no threshold
+  ---
+  duration_ms: 125.646267
+  type: 'test'
+  ...
+1..30
+# tests 30
+# suites 0
+# pass 30
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 426.248507

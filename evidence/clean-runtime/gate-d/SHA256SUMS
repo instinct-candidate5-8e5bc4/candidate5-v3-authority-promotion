@@ -1,0 +1,17 @@
+79b16906a8bbc17a8dfb994f124c7be852fa8b56ae4aa204719b05b6f6139ca4  evidence/clean-runtime/gate-d/admission.tap
+1e351b95164a1f8144354a38e8e5522bd18283f499926f204137e473763628d0  evidence/clean-runtime/gate-d/authority-audit.json
+1e351b95164a1f8144354a38e8e5522bd18283f499926f204137e473763628d0  evidence/clean-runtime/gate-d/authority-audit.stdout.json
+80d6ba7510e06b78a51336b7ab2d7b4ef3131bfdd4f7acdb56e6d7a2841d6557  evidence/clean-runtime/gate-d/authority.tap
+41d1d282557a2011f0697b08b8b6d83f5dc52a0608dcf59a42bd9eaab2304286  evidence/clean-runtime/gate-d/deterministic-e2e.json
+2cd487f5cc9b14239c3f77a113abb22888ad030c3de72b48c390bfa5fae00003  evidence/clean-runtime/gate-d/gate-a.tap
+64f21d96607e4bde7c640e5b2b6bc3309831190881917f793719500086b397d9  evidence/clean-runtime/gate-d/gate-b.tap
+48bf6348ba6cb08379247d000399aea6c2b136f9450cf288216ff9476cb40478  evidence/clean-runtime/gate-d/gate-c.tap
+a22453da7c34c83c5bc0e2eaaa59eb9bd0b3c2a366d63e64c459f079c57c415a  evidence/clean-runtime/gate-d/gate-d.tap
+012bf5259e47152807b24f382573be3f8eb55e339abed30d07e26720cef31dbb  evidence/clean-runtime/gate-d/gate-result.json
+98910f73901b7ff3d9de3488ba60ea9cadc5d9c8338af46eb3b7638f62b121f2  evidence/clean-runtime/gate-d/multi-support.tap
+d3729df3445bc9957d7f59460b71b7b2d4c89a86189c1ee4025d99f12937a4dd  evidence/clean-runtime/gate-d/performance.json
+339c9ed6582e425cb9e8acbacd250499ff51236d451fa0655b042d82190f09f3  evidence/clean-runtime/gate-d/phase1.tap
+599952d84d10b02446104d38b3002b6d5cd3d4bd5c39341207a6424bff1f9004  evidence/clean-runtime/gate-d/phase2-v1.tap
+069d41e76687d0c3afca245ee0752a1b07631df9c9b44e05d4b640bf1b82fb2e  evidence/clean-runtime/gate-d/phase2-v2.tap
+c029788a57c6bc7bd532827f640d0bb5d0ce689fb9480f59fcf7eb8dbdc2c109  evidence/clean-runtime/gate-d/school.tap
+3c3dfb4eb538c27117e2f93bdbad5ef9369146fc702ec8284044a1e5f0a7761e  evidence/clean-runtime/gate-d/unknowns.json
