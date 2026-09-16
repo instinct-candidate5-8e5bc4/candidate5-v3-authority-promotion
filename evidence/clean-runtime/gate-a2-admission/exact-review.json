@@ -1,0 +1,27 @@
+{
+  "reviewId": "gate-b-user-review-ee04481",
+  "decision": "APPROVED_FOR_SLICE",
+  "scope": "SCHOOL_VERTICAL_SLICE|adult-v1|MALE|SUPINE_FLOOR|PHASE2_CONSERVATIVE_AGGREGATE_AABB",
+  "profileRef": {
+    "id": "adult-v1",
+    "revision": 1,
+    "digest": "f1d973b4cfbebdfa230fe0257ccfe9c11056a7d07e52c3701d1e6772311bcc41"
+  },
+  "postureRef": {
+    "id": "adult-v1/supine-floor",
+    "revision": 1,
+    "digest": "197a806537a3c9d9f629cf2a57d6db4031fa93ebea0618c2e18603f48301745e"
+  },
+  "bodyRef": {
+    "id": "casualty/adult-v1/supine-floor",
+    "revision": 1,
+    "digest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+  },
+  "authority": "USER_GATE_REVIEW",
+  "personalReviewerIdentityInvented": false,
+  "provenanceRefs": [
+    "whatsapp:wamid.HBgMOTcyNTMyNDkwMzUxFQIAEhgUM0FEMDQ1NDkwMjE2NTE5MzhCRjUA",
+    "whatsapp:wamid.HBgMOTcyNTMyNDkwMzUxFQIAEhgUM0FDNDY4QkM3OEZDOTg4QTNGRDMA",
+    "whatsapp:wamid.HBgMOTcyNTMyNDkwMzUxFQIAEhgUM0FFN0NBRDE3OTlGNDQzQjY2RDIA"
+  ]
+}

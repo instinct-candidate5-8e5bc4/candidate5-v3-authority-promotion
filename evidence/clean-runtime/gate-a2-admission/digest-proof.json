@@ -1,0 +1,11 @@
+{
+  "profileDefinitionBeforeAfterDigest": "f1d973b4cfbebdfa230fe0257ccfe9c11056a7d07e52c3701d1e6772311bcc41",
+  "postureDefinitionBeforeAfterDigest": "197a806537a3c9d9f629cf2a57d6db4031fa93ebea0618c2e18603f48301745e",
+  "bodyDefinitionBeforeAfterDigest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3",
+  "bodyEnvelopeDigests": {
+    "draft": "89497145f0710bc6f64feb967893bd85b2f55e6e199df667fc2cef91a69e1f3b",
+    "validated": "cc8cf619ceebca52141c494a7b5fb59f3bb68f4ee11d61744d5aa2abb805af72",
+    "reviewed": "9a37178a2392128a81c2ff37f5e8283d71b03d0b3cde539aed8d397afdb83145",
+    "verified": "708d80e04418c99a9c4adf093692dd590dfdb910ad7a7c4e1493bdc45a07f8da"
+  }
+}
