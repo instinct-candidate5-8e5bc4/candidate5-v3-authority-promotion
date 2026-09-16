@@ -1,0 +1,1118 @@
+{
+  "rows": [
+    {
+      "name": "legal",
+      "beforeDigest": "f1671e4c087daa4a6e5ffc2ebbf0dfe09de024b8c89a6550ab376d59bce4fda8",
+      "afterDigest": "551520b81d1d71573a60815c34d98d6ad791c5f35e83109b4374268f96f53727",
+      "status": "COMMITTED",
+      "worldRevision": 1,
+      "committedTransform": {
+        "positionMicrounits": [
+          -3000000,
+          175000,
+          1000000
+        ],
+        "orientation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scaleMicrounits": [
+          1000000,
+          1000000,
+          1000000
+        ]
+      },
+      "cleanFailure": null,
+      "underlyingPhase2Reason": "GEOMETRY_GATE_PASS",
+      "phase2Evidence": null,
+      "event": {
+        "eventType": "MutationCommitted",
+        "kind": "transaction",
+        "id": "tx:legal",
+        "worldId": "clean-school-world",
+        "priorWorldRevision": 0,
+        "priorStateDigest": "f1671e4c087daa4a6e5ffc2ebbf0dfe09de024b8c89a6550ab376d59bce4fda8",
+        "commandDigest": "d469a80e1e32bfe221ff392b581e6041ce17261eb507b6644f76d712baaa322e",
+        "newWorldRevision": 1,
+        "newStateDigest": "551520b81d1d71573a60815c34d98d6ad791c5f35e83109b4374268f96f53727",
+        "stateDelta": {
+          "entities": {
+            "school-medical-bag": {
+              "entityId": "school-medical-bag",
+              "entityTypeId": "school/medical-bag",
+              "revision": 2,
+              "lifecycleState": "ACTIVE",
+              "transform": {
+                "positionMicrounits": [
+                  -3000000,
+                  175000,
+                  1000000
+                ],
+                "orientation": [
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "scaleMicrounits": [
+                  1000000,
+                  1000000,
+                  1000000
+                ]
+              },
+              "parentEntityId": null,
+              "supportRelation": {
+                "surfaceId": "floor",
+                "surfaceModelRef": {
+                  "id": "school-surface-v1",
+                  "revision": 1,
+                  "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                  "classification": "RECOVERED",
+                  "lineageStatus": "RECOVERED",
+                  "sourceId": "evidence/verified-architecture-phase2/surface-models/school.json"
+                }
+              },
+              "physicalBodyRef": {
+                "recordId": "school-medical-bag-body",
+                "revision": 1,
+                "digest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+                "proofGeometryDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a"
+              },
+              "geometrySourceRef": {
+                "recordId": "index.html#school-bag-lockers",
+                "revision": 1,
+                "digest": "21ba7567961cbb9c022ab8a1f11359bf07049c506519a7656394cfc48fcc11ea",
+                "classification": "RECOVERED",
+                "lineageStatus": "RECOVERED"
+              },
+              "participatesIn": [
+                "collision",
+                "support"
+              ],
+              "postureStateId": "rigid",
+              "physicalState": {
+                "active": true,
+                "surfaceId": "floor",
+                "orientationUpDot": 1,
+                "supportNormalUpDot": 1
+              }
+            }
+          },
+          "physicalRelations": [],
+          "lifecycleState": "ACTIVE",
+          "surfaces": null,
+          "environmentPhysicalState": null
+        },
+        "sequence": 1,
+        "priorEventDigest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "eventDigest": "7dd582135e9076308a5545f9eb94407c18eb28e8295eb4662adc3d94d7a27413"
+      }
+    },
+    {
+      "name": "floating",
+      "beforeDigest": "f1671e4c087daa4a6e5ffc2ebbf0dfe09de024b8c89a6550ab376d59bce4fda8",
+      "afterDigest": "f1671e4c087daa4a6e5ffc2ebbf0dfe09de024b8c89a6550ab376d59bce4fda8",
+      "status": "REJECTED",
+      "worldRevision": 0,
+      "committedTransform": {
+        "positionMicrounits": [
+          -3000000,
+          175000,
+          1000000
+        ],
+        "orientation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scaleMicrounits": [
+          1000000,
+          1000000,
+          1000000
+        ]
+      },
+      "cleanFailure": "TRANSACTION_REJECTED",
+      "underlyingPhase2Reason": "CONTACT_GAP_FLOATING",
+      "phase2Evidence": {
+        "requestId": "floating",
+        "sceneId": "school",
+        "surfaceId": "floor",
+        "checkedGeometryDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+        "surfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+        "pixelEvidenceUsedAsAuthority": false,
+        "autoFixed": false,
+        "bounds": {
+          "minX": -3.275,
+          "maxX": -2.725,
+          "minY": 0.0050000000000000044,
+          "maxY": 0.355,
+          "minZ": 0.825,
+          "maxZ": 1.175
+        },
+        "contactGap": 0.0050000000000000044
+      },
+      "event": {
+        "eventType": "MutationRejected",
+        "kind": "transaction",
+        "id": "tx:floating",
+        "worldId": "clean-school-world",
+        "worldRevision": 0,
+        "stateDigest": "f1671e4c087daa4a6e5ffc2ebbf0dfe09de024b8c89a6550ab376d59bce4fda8",
+        "commandDigest": "ee4b90640bac60a14d7f76f4c2ea4eea930e2911d557a97b7ff3344d03626b61",
+        "failure": {
+          "code": "TRANSACTION_REJECTED",
+          "evidence": {
+            "cause": "GEOMETRY_PROOF_FAILED",
+            "detail": {
+              "legality": {
+                "outcome": "FAIL",
+                "evidence": {
+                  "adapterKind": "SCHOOL_PHASE2_GEOMETRY_ADAPTER",
+                  "request": {
+                    "requestId": "floating",
+                    "surfaceId": "floor",
+                    "surfaceModelRef": {
+                      "id": "school-surface-v1",
+                      "revision": 1,
+                      "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf"
+                    },
+                    "geometry": {
+                      "minX": -0.275,
+                      "maxX": 0.275,
+                      "minY": -0.175,
+                      "maxY": 0.175,
+                      "minZ": -0.175,
+                      "maxZ": 0.175
+                    },
+                    "geometryDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+                    "proofGeometryDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+                    "transform": {
+                      "x": -3,
+                      "y": 0.18,
+                      "z": 1
+                    },
+                    "orientationUpDot": 1,
+                    "supportNormalUpDot": 1,
+                    "evidenceRefs": [
+                      "source-range:school-bag-lockers",
+                      "authored-box-bounds:.55x.35x.35"
+                    ]
+                  },
+                  "requestDigest": "62c3e2a4aef33a9df6111c985e87ac4881a5564d21503484a986a1062243f4c6",
+                  "requestBytes": "{\"evidenceRefs\":[\"source-range:school-bag-lockers\",\"authored-box-bounds:.55x.35x.35\"],\"geometry\":{\"maxX\":0.275,\"maxY\":0.175,\"maxZ\":0.175,\"minX\":-0.275,\"minY\":-0.175,\"minZ\":-0.175},\"geometryDigest\":\"f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a\",\"orientationUpDot\":1,\"proofGeometryDigest\":\"f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a\",\"requestId\":\"floating\",\"supportNormalUpDot\":1,\"surfaceId\":\"floor\",\"surfaceModelRef\":{\"digest\":\"308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf\",\"id\":\"school-surface-v1\",\"revision\":1},\"transform\":{\"x\":-3,\"y\":0.18,\"z\":1}}",
+                  "sceneProvenance": {
+                    "sceneId": "school",
+                    "classification": "RECOVERED",
+                    "lineageStatus": "RECOVERED",
+                    "sourceId": "index.html",
+                    "revision": 1,
+                    "digest": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                    "sourceRangeId": "school-bag-lockers"
+                  },
+                  "bodyProvenance": {
+                    "classification": "RECOVERED",
+                    "lineageStatus": "RECOVERED",
+                    "sourceId": "index.html#school-bag-lockers",
+                    "revision": 1,
+                    "digest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a"
+                  },
+                  "surfaceProvenance": {
+                    "classification": "RECOVERED",
+                    "lineageStatus": "RECOVERED",
+                    "sourceId": "evidence/verified-architecture-phase2/surface-models/school.json",
+                    "revision": 1,
+                    "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                    "sourceEvidence": {
+                      "source": {
+                        "artifact": "index.html",
+                        "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                        "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                        "verification": "exact bytes at locked commit 30cb23e"
+                      },
+                      "panorama": "c85dc927ac565ed863f7f8e0bbaddd0fc66120b542630d3aa57e6163a5684361",
+                      "panoramaRole": "PIXEL_DIAGNOSTIC_ONLY",
+                      "geometryBindingStatus": "UNKNOWN"
+                    },
+                    "resolvedSurface": {
+                      "artifact": "index.html",
+                      "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                      "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                      "verification": "exact bytes at locked commit 30cb23e"
+                    }
+                  },
+                  "phase2ReasonCode": "CONTACT_GAP_FLOATING",
+                  "phase2Evidence": {
+                    "requestId": "floating",
+                    "sceneId": "school",
+                    "surfaceId": "floor",
+                    "checkedGeometryDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+                    "surfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                    "pixelEvidenceUsedAsAuthority": false,
+                    "autoFixed": false,
+                    "bounds": {
+                      "minX": -3.275,
+                      "maxX": -2.725,
+                      "minY": 0.0050000000000000044,
+                      "maxY": 0.355,
+                      "minZ": 0.825,
+                      "maxZ": 1.175
+                    },
+                    "contactGap": 0.0050000000000000044
+                  },
+                  "phase2ProofDigest": null
+                }
+              }
+            }
+          }
+        },
+        "sequence": 1,
+        "priorEventDigest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "eventDigest": "d19de731beaa7697e99bb0fbd03101c3379baacfa0ce1bfa476e43570ecb9708"
+      }
+    },
+    {
+      "name": "door",
+      "beforeDigest": "f1671e4c087daa4a6e5ffc2ebbf0dfe09de024b8c89a6550ab376d59bce4fda8",
+      "afterDigest": "f1671e4c087daa4a6e5ffc2ebbf0dfe09de024b8c89a6550ab376d59bce4fda8",
+      "status": "REJECTED",
+      "worldRevision": 0,
+      "committedTransform": {
+        "positionMicrounits": [
+          -3000000,
+          175000,
+          1000000
+        ],
+        "orientation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scaleMicrounits": [
+          1000000,
+          1000000,
+          1000000
+        ]
+      },
+      "cleanFailure": "TRANSACTION_REJECTED",
+      "underlyingPhase2Reason": "DOOR_OR_OPENING_PENETRATION",
+      "phase2Evidence": {
+        "requestId": "door",
+        "sceneId": "school",
+        "surfaceId": "floor",
+        "checkedGeometryDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+        "surfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+        "pixelEvidenceUsedAsAuthority": false,
+        "autoFixed": false,
+        "bounds": {
+          "minX": 5.125,
+          "maxX": 5.675000000000001,
+          "minY": 0,
+          "maxY": 0.35,
+          "minZ": -4.015,
+          "maxZ": -3.665
+        },
+        "intersectedSurfaceId": "door",
+        "intersectionVolumeId": "door-box"
+      },
+      "event": {
+        "eventType": "MutationRejected",
+        "kind": "transaction",
+        "id": "tx:door",
+        "worldId": "clean-school-world",
+        "worldRevision": 0,
+        "stateDigest": "f1671e4c087daa4a6e5ffc2ebbf0dfe09de024b8c89a6550ab376d59bce4fda8",
+        "commandDigest": "65919d316d8bd9da1467c2acca6aeeb1627246089d0b01cba87dcdeb550d1180",
+        "failure": {
+          "code": "TRANSACTION_REJECTED",
+          "evidence": {
+            "cause": "GEOMETRY_PROOF_FAILED",
+            "detail": {
+              "legality": {
+                "outcome": "FAIL",
+                "evidence": {
+                  "adapterKind": "SCHOOL_PHASE2_GEOMETRY_ADAPTER",
+                  "request": {
+                    "requestId": "door",
+                    "surfaceId": "floor",
+                    "surfaceModelRef": {
+                      "id": "school-surface-v1",
+                      "revision": 1,
+                      "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf"
+                    },
+                    "geometry": {
+                      "minX": -0.275,
+                      "maxX": 0.275,
+                      "minY": -0.175,
+                      "maxY": 0.175,
+                      "minZ": -0.175,
+                      "maxZ": 0.175
+                    },
+                    "geometryDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+                    "proofGeometryDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+                    "transform": {
+                      "x": 5.4,
+                      "y": 0.175,
+                      "z": -3.84
+                    },
+                    "orientationUpDot": 1,
+                    "supportNormalUpDot": 1,
+                    "evidenceRefs": [
+                      "source-range:school-bag-lockers",
+                      "authored-box-bounds:.55x.35x.35"
+                    ]
+                  },
+                  "requestDigest": "cc547453161fce754e26c7c8b01a9fcad0abdd64e6130cd3fec60adf40c5e839",
+                  "requestBytes": "{\"evidenceRefs\":[\"source-range:school-bag-lockers\",\"authored-box-bounds:.55x.35x.35\"],\"geometry\":{\"maxX\":0.275,\"maxY\":0.175,\"maxZ\":0.175,\"minX\":-0.275,\"minY\":-0.175,\"minZ\":-0.175},\"geometryDigest\":\"f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a\",\"orientationUpDot\":1,\"proofGeometryDigest\":\"f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a\",\"requestId\":\"door\",\"supportNormalUpDot\":1,\"surfaceId\":\"floor\",\"surfaceModelRef\":{\"digest\":\"308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf\",\"id\":\"school-surface-v1\",\"revision\":1},\"transform\":{\"x\":5.4,\"y\":0.175,\"z\":-3.84}}",
+                  "sceneProvenance": {
+                    "sceneId": "school",
+                    "classification": "RECOVERED",
+                    "lineageStatus": "RECOVERED",
+                    "sourceId": "index.html",
+                    "revision": 1,
+                    "digest": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                    "sourceRangeId": "school-bag-lockers"
+                  },
+                  "bodyProvenance": {
+                    "classification": "RECOVERED",
+                    "lineageStatus": "RECOVERED",
+                    "sourceId": "index.html#school-bag-lockers",
+                    "revision": 1,
+                    "digest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a"
+                  },
+                  "surfaceProvenance": {
+                    "classification": "RECOVERED",
+                    "lineageStatus": "RECOVERED",
+                    "sourceId": "evidence/verified-architecture-phase2/surface-models/school.json",
+                    "revision": 1,
+                    "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                    "sourceEvidence": {
+                      "source": {
+                        "artifact": "index.html",
+                        "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                        "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                        "verification": "exact bytes at locked commit 30cb23e"
+                      },
+                      "panorama": "c85dc927ac565ed863f7f8e0bbaddd0fc66120b542630d3aa57e6163a5684361",
+                      "panoramaRole": "PIXEL_DIAGNOSTIC_ONLY",
+                      "geometryBindingStatus": "UNKNOWN"
+                    },
+                    "resolvedSurface": {
+                      "artifact": "index.html",
+                      "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                      "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                      "verification": "exact bytes at locked commit 30cb23e"
+                    }
+                  },
+                  "phase2ReasonCode": "DOOR_OR_OPENING_PENETRATION",
+                  "phase2Evidence": {
+                    "requestId": "door",
+                    "sceneId": "school",
+                    "surfaceId": "floor",
+                    "checkedGeometryDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+                    "surfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                    "pixelEvidenceUsedAsAuthority": false,
+                    "autoFixed": false,
+                    "bounds": {
+                      "minX": 5.125,
+                      "maxX": 5.675000000000001,
+                      "minY": 0,
+                      "maxY": 0.35,
+                      "minZ": -4.015,
+                      "maxZ": -3.665
+                    },
+                    "intersectedSurfaceId": "door",
+                    "intersectionVolumeId": "door-box"
+                  },
+                  "phase2ProofDigest": null
+                }
+              }
+            }
+          }
+        },
+        "sequence": 1,
+        "priorEventDigest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "eventDigest": "f86bad983007d7f26c63ccba1d6bb9b029d44e32bbe112ed5989f8283870a9ab"
+      }
+    },
+    {
+      "name": "partial-door",
+      "beforeDigest": "f1671e4c087daa4a6e5ffc2ebbf0dfe09de024b8c89a6550ab376d59bce4fda8",
+      "afterDigest": "f1671e4c087daa4a6e5ffc2ebbf0dfe09de024b8c89a6550ab376d59bce4fda8",
+      "status": "REJECTED",
+      "worldRevision": 0,
+      "committedTransform": {
+        "positionMicrounits": [
+          -3000000,
+          175000,
+          1000000
+        ],
+        "orientation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scaleMicrounits": [
+          1000000,
+          1000000,
+          1000000
+        ]
+      },
+      "cleanFailure": "TRANSACTION_REJECTED",
+      "underlyingPhase2Reason": "DOOR_OR_OPENING_PENETRATION",
+      "phase2Evidence": {
+        "requestId": "partial-door",
+        "sceneId": "school",
+        "surfaceId": "floor",
+        "checkedGeometryDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+        "surfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+        "pixelEvidenceUsedAsAuthority": false,
+        "autoFixed": false,
+        "bounds": {
+          "minX": 4.225,
+          "maxX": 4.775,
+          "minY": 0,
+          "maxY": 0.35,
+          "minZ": -4.015,
+          "maxZ": -3.665
+        },
+        "intersectedSurfaceId": "door",
+        "intersectionVolumeId": "door-box"
+      },
+      "event": {
+        "eventType": "MutationRejected",
+        "kind": "transaction",
+        "id": "tx:partial-door",
+        "worldId": "clean-school-world",
+        "worldRevision": 0,
+        "stateDigest": "f1671e4c087daa4a6e5ffc2ebbf0dfe09de024b8c89a6550ab376d59bce4fda8",
+        "commandDigest": "8eb53a4899cd09b6d78398054dba8fa32a0c52811c752e187b0fafbf6c32c5f9",
+        "failure": {
+          "code": "TRANSACTION_REJECTED",
+          "evidence": {
+            "cause": "GEOMETRY_PROOF_FAILED",
+            "detail": {
+              "legality": {
+                "outcome": "FAIL",
+                "evidence": {
+                  "adapterKind": "SCHOOL_PHASE2_GEOMETRY_ADAPTER",
+                  "request": {
+                    "requestId": "partial-door",
+                    "surfaceId": "floor",
+                    "surfaceModelRef": {
+                      "id": "school-surface-v1",
+                      "revision": 1,
+                      "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf"
+                    },
+                    "geometry": {
+                      "minX": -0.275,
+                      "maxX": 0.275,
+                      "minY": -0.175,
+                      "maxY": 0.175,
+                      "minZ": -0.175,
+                      "maxZ": 0.175
+                    },
+                    "geometryDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+                    "proofGeometryDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+                    "transform": {
+                      "x": 4.5,
+                      "y": 0.175,
+                      "z": -3.84
+                    },
+                    "orientationUpDot": 1,
+                    "supportNormalUpDot": 1,
+                    "evidenceRefs": [
+                      "source-range:school-bag-lockers",
+                      "authored-box-bounds:.55x.35x.35"
+                    ]
+                  },
+                  "requestDigest": "f9fbae5b246a16863e657abaedc47e8169c78169e6fbdf02b3abec515196a457",
+                  "requestBytes": "{\"evidenceRefs\":[\"source-range:school-bag-lockers\",\"authored-box-bounds:.55x.35x.35\"],\"geometry\":{\"maxX\":0.275,\"maxY\":0.175,\"maxZ\":0.175,\"minX\":-0.275,\"minY\":-0.175,\"minZ\":-0.175},\"geometryDigest\":\"f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a\",\"orientationUpDot\":1,\"proofGeometryDigest\":\"f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a\",\"requestId\":\"partial-door\",\"supportNormalUpDot\":1,\"surfaceId\":\"floor\",\"surfaceModelRef\":{\"digest\":\"308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf\",\"id\":\"school-surface-v1\",\"revision\":1},\"transform\":{\"x\":4.5,\"y\":0.175,\"z\":-3.84}}",
+                  "sceneProvenance": {
+                    "sceneId": "school",
+                    "classification": "RECOVERED",
+                    "lineageStatus": "RECOVERED",
+                    "sourceId": "index.html",
+                    "revision": 1,
+                    "digest": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                    "sourceRangeId": "school-bag-lockers"
+                  },
+                  "bodyProvenance": {
+                    "classification": "RECOVERED",
+                    "lineageStatus": "RECOVERED",
+                    "sourceId": "index.html#school-bag-lockers",
+                    "revision": 1,
+                    "digest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a"
+                  },
+                  "surfaceProvenance": {
+                    "classification": "RECOVERED",
+                    "lineageStatus": "RECOVERED",
+                    "sourceId": "evidence/verified-architecture-phase2/surface-models/school.json",
+                    "revision": 1,
+                    "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                    "sourceEvidence": {
+                      "source": {
+                        "artifact": "index.html",
+                        "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                        "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                        "verification": "exact bytes at locked commit 30cb23e"
+                      },
+                      "panorama": "c85dc927ac565ed863f7f8e0bbaddd0fc66120b542630d3aa57e6163a5684361",
+                      "panoramaRole": "PIXEL_DIAGNOSTIC_ONLY",
+                      "geometryBindingStatus": "UNKNOWN"
+                    },
+                    "resolvedSurface": {
+                      "artifact": "index.html",
+                      "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                      "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                      "verification": "exact bytes at locked commit 30cb23e"
+                    }
+                  },
+                  "phase2ReasonCode": "DOOR_OR_OPENING_PENETRATION",
+                  "phase2Evidence": {
+                    "requestId": "partial-door",
+                    "sceneId": "school",
+                    "surfaceId": "floor",
+                    "checkedGeometryDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+                    "surfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                    "pixelEvidenceUsedAsAuthority": false,
+                    "autoFixed": false,
+                    "bounds": {
+                      "minX": 4.225,
+                      "maxX": 4.775,
+                      "minY": 0,
+                      "maxY": 0.35,
+                      "minZ": -4.015,
+                      "maxZ": -3.665
+                    },
+                    "intersectedSurfaceId": "door",
+                    "intersectionVolumeId": "door-box"
+                  },
+                  "phase2ProofDigest": null
+                }
+              }
+            }
+          }
+        },
+        "sequence": 1,
+        "priorEventDigest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "eventDigest": "7fbe5c187c2a1e1f85c05acb4c7d93bd0f1245b9a6a76dacaf4ab51cd68ba7e8"
+      }
+    },
+    {
+      "name": "locker",
+      "beforeDigest": "f1671e4c087daa4a6e5ffc2ebbf0dfe09de024b8c89a6550ab376d59bce4fda8",
+      "afterDigest": "f1671e4c087daa4a6e5ffc2ebbf0dfe09de024b8c89a6550ab376d59bce4fda8",
+      "status": "REJECTED",
+      "worldRevision": 0,
+      "committedTransform": {
+        "positionMicrounits": [
+          -3000000,
+          175000,
+          1000000
+        ],
+        "orientation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scaleMicrounits": [
+          1000000,
+          1000000,
+          1000000
+        ]
+      },
+      "cleanFailure": "TRANSACTION_REJECTED",
+      "underlyingPhase2Reason": "OBSTACLE_PENETRATION",
+      "phase2Evidence": {
+        "requestId": "locker",
+        "sceneId": "school",
+        "surfaceId": "floor",
+        "checkedGeometryDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+        "surfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+        "pixelEvidenceUsedAsAuthority": false,
+        "autoFixed": false,
+        "bounds": {
+          "minX": -4.275,
+          "maxX": -3.725,
+          "minY": 0,
+          "maxY": 0.35,
+          "minZ": -3.675,
+          "maxZ": -3.325
+        },
+        "intersectedSurfaceId": "locker-0",
+        "intersectionVolumeId": "locker-0-box"
+      },
+      "event": {
+        "eventType": "MutationRejected",
+        "kind": "transaction",
+        "id": "tx:locker",
+        "worldId": "clean-school-world",
+        "worldRevision": 0,
+        "stateDigest": "f1671e4c087daa4a6e5ffc2ebbf0dfe09de024b8c89a6550ab376d59bce4fda8",
+        "commandDigest": "8c8b52f94fba76da8c74f3344aa41dca0b4fd6c9ff5cad4d279f6f2a2098ff2f",
+        "failure": {
+          "code": "TRANSACTION_REJECTED",
+          "evidence": {
+            "cause": "GEOMETRY_PROOF_FAILED",
+            "detail": {
+              "legality": {
+                "outcome": "FAIL",
+                "evidence": {
+                  "adapterKind": "SCHOOL_PHASE2_GEOMETRY_ADAPTER",
+                  "request": {
+                    "requestId": "locker",
+                    "surfaceId": "floor",
+                    "surfaceModelRef": {
+                      "id": "school-surface-v1",
+                      "revision": 1,
+                      "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf"
+                    },
+                    "geometry": {
+                      "minX": -0.275,
+                      "maxX": 0.275,
+                      "minY": -0.175,
+                      "maxY": 0.175,
+                      "minZ": -0.175,
+                      "maxZ": 0.175
+                    },
+                    "geometryDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+                    "proofGeometryDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+                    "transform": {
+                      "x": -4,
+                      "y": 0.175,
+                      "z": -3.5
+                    },
+                    "orientationUpDot": 1,
+                    "supportNormalUpDot": 1,
+                    "evidenceRefs": [
+                      "source-range:school-bag-lockers",
+                      "authored-box-bounds:.55x.35x.35"
+                    ]
+                  },
+                  "requestDigest": "5525845a9791a246920e913ac3536ac6178af23d133c5ebd66844fa9a4bc89cb",
+                  "requestBytes": "{\"evidenceRefs\":[\"source-range:school-bag-lockers\",\"authored-box-bounds:.55x.35x.35\"],\"geometry\":{\"maxX\":0.275,\"maxY\":0.175,\"maxZ\":0.175,\"minX\":-0.275,\"minY\":-0.175,\"minZ\":-0.175},\"geometryDigest\":\"f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a\",\"orientationUpDot\":1,\"proofGeometryDigest\":\"f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a\",\"requestId\":\"locker\",\"supportNormalUpDot\":1,\"surfaceId\":\"floor\",\"surfaceModelRef\":{\"digest\":\"308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf\",\"id\":\"school-surface-v1\",\"revision\":1},\"transform\":{\"x\":-4,\"y\":0.175,\"z\":-3.5}}",
+                  "sceneProvenance": {
+                    "sceneId": "school",
+                    "classification": "RECOVERED",
+                    "lineageStatus": "RECOVERED",
+                    "sourceId": "index.html",
+                    "revision": 1,
+                    "digest": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                    "sourceRangeId": "school-bag-lockers"
+                  },
+                  "bodyProvenance": {
+                    "classification": "RECOVERED",
+                    "lineageStatus": "RECOVERED",
+                    "sourceId": "index.html#school-bag-lockers",
+                    "revision": 1,
+                    "digest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a"
+                  },
+                  "surfaceProvenance": {
+                    "classification": "RECOVERED",
+                    "lineageStatus": "RECOVERED",
+                    "sourceId": "evidence/verified-architecture-phase2/surface-models/school.json",
+                    "revision": 1,
+                    "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                    "sourceEvidence": {
+                      "source": {
+                        "artifact": "index.html",
+                        "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                        "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                        "verification": "exact bytes at locked commit 30cb23e"
+                      },
+                      "panorama": "c85dc927ac565ed863f7f8e0bbaddd0fc66120b542630d3aa57e6163a5684361",
+                      "panoramaRole": "PIXEL_DIAGNOSTIC_ONLY",
+                      "geometryBindingStatus": "UNKNOWN"
+                    },
+                    "resolvedSurface": {
+                      "artifact": "index.html",
+                      "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                      "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                      "verification": "exact bytes at locked commit 30cb23e"
+                    }
+                  },
+                  "phase2ReasonCode": "OBSTACLE_PENETRATION",
+                  "phase2Evidence": {
+                    "requestId": "locker",
+                    "sceneId": "school",
+                    "surfaceId": "floor",
+                    "checkedGeometryDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+                    "surfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                    "pixelEvidenceUsedAsAuthority": false,
+                    "autoFixed": false,
+                    "bounds": {
+                      "minX": -4.275,
+                      "maxX": -3.725,
+                      "minY": 0,
+                      "maxY": 0.35,
+                      "minZ": -3.675,
+                      "maxZ": -3.325
+                    },
+                    "intersectedSurfaceId": "locker-0",
+                    "intersectionVolumeId": "locker-0-box"
+                  },
+                  "phase2ProofDigest": null
+                }
+              }
+            }
+          }
+        },
+        "sequence": 1,
+        "priorEventDigest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "eventDigest": "9a87bcafc30ec746b469713251a2ae12a642d1bc926d6dfcb1ab4f37eda0f43b"
+      }
+    },
+    {
+      "name": "partial-outside",
+      "beforeDigest": "f1671e4c087daa4a6e5ffc2ebbf0dfe09de024b8c89a6550ab376d59bce4fda8",
+      "afterDigest": "f1671e4c087daa4a6e5ffc2ebbf0dfe09de024b8c89a6550ab376d59bce4fda8",
+      "status": "REJECTED",
+      "worldRevision": 0,
+      "committedTransform": {
+        "positionMicrounits": [
+          -3000000,
+          175000,
+          1000000
+        ],
+        "orientation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scaleMicrounits": [
+          1000000,
+          1000000,
+          1000000
+        ]
+      },
+      "cleanFailure": "TRANSACTION_REJECTED",
+      "underlyingPhase2Reason": "FOOTPRINT_PARTIALLY_OUTSIDE_LEGAL_REGION",
+      "phase2Evidence": {
+        "requestId": "partial-outside",
+        "sceneId": "school",
+        "surfaceId": "floor",
+        "checkedGeometryDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+        "surfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+        "pixelEvidenceUsedAsAuthority": false,
+        "autoFixed": false,
+        "bounds": {
+          "minX": -0.275,
+          "maxX": 0.275,
+          "minY": 0,
+          "maxY": 0.35,
+          "minZ": 5.7250000000000005,
+          "maxZ": 6.075
+        },
+        "allowedRegionIds": [
+          "floor-positive"
+        ]
+      },
+      "event": {
+        "eventType": "MutationRejected",
+        "kind": "transaction",
+        "id": "tx:partial-outside",
+        "worldId": "clean-school-world",
+        "worldRevision": 0,
+        "stateDigest": "f1671e4c087daa4a6e5ffc2ebbf0dfe09de024b8c89a6550ab376d59bce4fda8",
+        "commandDigest": "bf65274df361f2ce372b178bffd6e65f9685bcab9439459f023ad914ecfe7a66",
+        "failure": {
+          "code": "TRANSACTION_REJECTED",
+          "evidence": {
+            "cause": "GEOMETRY_PROOF_FAILED",
+            "detail": {
+              "legality": {
+                "outcome": "FAIL",
+                "evidence": {
+                  "adapterKind": "SCHOOL_PHASE2_GEOMETRY_ADAPTER",
+                  "request": {
+                    "requestId": "partial-outside",
+                    "surfaceId": "floor",
+                    "surfaceModelRef": {
+                      "id": "school-surface-v1",
+                      "revision": 1,
+                      "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf"
+                    },
+                    "geometry": {
+                      "minX": -0.275,
+                      "maxX": 0.275,
+                      "minY": -0.175,
+                      "maxY": 0.175,
+                      "minZ": -0.175,
+                      "maxZ": 0.175
+                    },
+                    "geometryDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+                    "proofGeometryDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+                    "transform": {
+                      "x": 0,
+                      "y": 0.175,
+                      "z": 5.9
+                    },
+                    "orientationUpDot": 1,
+                    "supportNormalUpDot": 1,
+                    "evidenceRefs": [
+                      "source-range:school-bag-lockers",
+                      "authored-box-bounds:.55x.35x.35"
+                    ]
+                  },
+                  "requestDigest": "551fc674151184010eab24815ffa83be8b85d69411167ae14f481b400316c65b",
+                  "requestBytes": "{\"evidenceRefs\":[\"source-range:school-bag-lockers\",\"authored-box-bounds:.55x.35x.35\"],\"geometry\":{\"maxX\":0.275,\"maxY\":0.175,\"maxZ\":0.175,\"minX\":-0.275,\"minY\":-0.175,\"minZ\":-0.175},\"geometryDigest\":\"f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a\",\"orientationUpDot\":1,\"proofGeometryDigest\":\"f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a\",\"requestId\":\"partial-outside\",\"supportNormalUpDot\":1,\"surfaceId\":\"floor\",\"surfaceModelRef\":{\"digest\":\"308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf\",\"id\":\"school-surface-v1\",\"revision\":1},\"transform\":{\"x\":0,\"y\":0.175,\"z\":5.9}}",
+                  "sceneProvenance": {
+                    "sceneId": "school",
+                    "classification": "RECOVERED",
+                    "lineageStatus": "RECOVERED",
+                    "sourceId": "index.html",
+                    "revision": 1,
+                    "digest": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                    "sourceRangeId": "school-bag-lockers"
+                  },
+                  "bodyProvenance": {
+                    "classification": "RECOVERED",
+                    "lineageStatus": "RECOVERED",
+                    "sourceId": "index.html#school-bag-lockers",
+                    "revision": 1,
+                    "digest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a"
+                  },
+                  "surfaceProvenance": {
+                    "classification": "RECOVERED",
+                    "lineageStatus": "RECOVERED",
+                    "sourceId": "evidence/verified-architecture-phase2/surface-models/school.json",
+                    "revision": 1,
+                    "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                    "sourceEvidence": {
+                      "source": {
+                        "artifact": "index.html",
+                        "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                        "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                        "verification": "exact bytes at locked commit 30cb23e"
+                      },
+                      "panorama": "c85dc927ac565ed863f7f8e0bbaddd0fc66120b542630d3aa57e6163a5684361",
+                      "panoramaRole": "PIXEL_DIAGNOSTIC_ONLY",
+                      "geometryBindingStatus": "UNKNOWN"
+                    },
+                    "resolvedSurface": {
+                      "artifact": "index.html",
+                      "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                      "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                      "verification": "exact bytes at locked commit 30cb23e"
+                    }
+                  },
+                  "phase2ReasonCode": "FOOTPRINT_PARTIALLY_OUTSIDE_LEGAL_REGION",
+                  "phase2Evidence": {
+                    "requestId": "partial-outside",
+                    "sceneId": "school",
+                    "surfaceId": "floor",
+                    "checkedGeometryDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+                    "surfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                    "pixelEvidenceUsedAsAuthority": false,
+                    "autoFixed": false,
+                    "bounds": {
+                      "minX": -0.275,
+                      "maxX": 0.275,
+                      "minY": 0,
+                      "maxY": 0.35,
+                      "minZ": 5.7250000000000005,
+                      "maxZ": 6.075
+                    },
+                    "allowedRegionIds": [
+                      "floor-positive"
+                    ]
+                  },
+                  "phase2ProofDigest": null
+                }
+              }
+            }
+          }
+        },
+        "sequence": 1,
+        "priorEventDigest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "eventDigest": "ee3d607172ccb2ff19b6b7e8f8821bc374aadfe4758f2c7331d8de52d186705e"
+      }
+    },
+    {
+      "name": "full-outside",
+      "beforeDigest": "f1671e4c087daa4a6e5ffc2ebbf0dfe09de024b8c89a6550ab376d59bce4fda8",
+      "afterDigest": "f1671e4c087daa4a6e5ffc2ebbf0dfe09de024b8c89a6550ab376d59bce4fda8",
+      "status": "REJECTED",
+      "worldRevision": 0,
+      "committedTransform": {
+        "positionMicrounits": [
+          -3000000,
+          175000,
+          1000000
+        ],
+        "orientation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scaleMicrounits": [
+          1000000,
+          1000000,
+          1000000
+        ]
+      },
+      "cleanFailure": "TRANSACTION_REJECTED",
+      "underlyingPhase2Reason": "FOOTPRINT_FULLY_OUTSIDE_LEGAL_REGION",
+      "phase2Evidence": {
+        "requestId": "full-outside",
+        "sceneId": "school",
+        "surfaceId": "floor",
+        "checkedGeometryDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+        "surfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+        "pixelEvidenceUsedAsAuthority": false,
+        "autoFixed": false,
+        "bounds": {
+          "minX": 7.725,
+          "maxX": 8.275,
+          "minY": 0,
+          "maxY": 0.35,
+          "minZ": 0.825,
+          "maxZ": 1.175
+        },
+        "allowedRegionIds": [
+          "floor-positive"
+        ]
+      },
+      "event": {
+        "eventType": "MutationRejected",
+        "kind": "transaction",
+        "id": "tx:full-outside",
+        "worldId": "clean-school-world",
+        "worldRevision": 0,
+        "stateDigest": "f1671e4c087daa4a6e5ffc2ebbf0dfe09de024b8c89a6550ab376d59bce4fda8",
+        "commandDigest": "5631e763dff46c83afdfc2967fe64f18a9d6d21800501e0cd1d979f5051e7f5c",
+        "failure": {
+          "code": "TRANSACTION_REJECTED",
+          "evidence": {
+            "cause": "GEOMETRY_PROOF_FAILED",
+            "detail": {
+              "legality": {
+                "outcome": "FAIL",
+                "evidence": {
+                  "adapterKind": "SCHOOL_PHASE2_GEOMETRY_ADAPTER",
+                  "request": {
+                    "requestId": "full-outside",
+                    "surfaceId": "floor",
+                    "surfaceModelRef": {
+                      "id": "school-surface-v1",
+                      "revision": 1,
+                      "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf"
+                    },
+                    "geometry": {
+                      "minX": -0.275,
+                      "maxX": 0.275,
+                      "minY": -0.175,
+                      "maxY": 0.175,
+                      "minZ": -0.175,
+                      "maxZ": 0.175
+                    },
+                    "geometryDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+                    "proofGeometryDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+                    "transform": {
+                      "x": 8,
+                      "y": 0.175,
+                      "z": 1
+                    },
+                    "orientationUpDot": 1,
+                    "supportNormalUpDot": 1,
+                    "evidenceRefs": [
+                      "source-range:school-bag-lockers",
+                      "authored-box-bounds:.55x.35x.35"
+                    ]
+                  },
+                  "requestDigest": "c8d06944392ed8c90bf9a91b2048636f5204915045beb3deee6d566d7511b170",
+                  "requestBytes": "{\"evidenceRefs\":[\"source-range:school-bag-lockers\",\"authored-box-bounds:.55x.35x.35\"],\"geometry\":{\"maxX\":0.275,\"maxY\":0.175,\"maxZ\":0.175,\"minX\":-0.275,\"minY\":-0.175,\"minZ\":-0.175},\"geometryDigest\":\"f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a\",\"orientationUpDot\":1,\"proofGeometryDigest\":\"f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a\",\"requestId\":\"full-outside\",\"supportNormalUpDot\":1,\"surfaceId\":\"floor\",\"surfaceModelRef\":{\"digest\":\"308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf\",\"id\":\"school-surface-v1\",\"revision\":1},\"transform\":{\"x\":8,\"y\":0.175,\"z\":1}}",
+                  "sceneProvenance": {
+                    "sceneId": "school",
+                    "classification": "RECOVERED",
+                    "lineageStatus": "RECOVERED",
+                    "sourceId": "index.html",
+                    "revision": 1,
+                    "digest": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                    "sourceRangeId": "school-bag-lockers"
+                  },
+                  "bodyProvenance": {
+                    "classification": "RECOVERED",
+                    "lineageStatus": "RECOVERED",
+                    "sourceId": "index.html#school-bag-lockers",
+                    "revision": 1,
+                    "digest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a"
+                  },
+                  "surfaceProvenance": {
+                    "classification": "RECOVERED",
+                    "lineageStatus": "RECOVERED",
+                    "sourceId": "evidence/verified-architecture-phase2/surface-models/school.json",
+                    "revision": 1,
+                    "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                    "sourceEvidence": {
+                      "source": {
+                        "artifact": "index.html",
+                        "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                        "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                        "verification": "exact bytes at locked commit 30cb23e"
+                      },
+                      "panorama": "c85dc927ac565ed863f7f8e0bbaddd0fc66120b542630d3aa57e6163a5684361",
+                      "panoramaRole": "PIXEL_DIAGNOSTIC_ONLY",
+                      "geometryBindingStatus": "UNKNOWN"
+                    },
+                    "resolvedSurface": {
+                      "artifact": "index.html",
+                      "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                      "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                      "verification": "exact bytes at locked commit 30cb23e"
+                    }
+                  },
+                  "phase2ReasonCode": "FOOTPRINT_FULLY_OUTSIDE_LEGAL_REGION",
+                  "phase2Evidence": {
+                    "requestId": "full-outside",
+                    "sceneId": "school",
+                    "surfaceId": "floor",
+                    "checkedGeometryDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+                    "surfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                    "pixelEvidenceUsedAsAuthority": false,
+                    "autoFixed": false,
+                    "bounds": {
+                      "minX": 7.725,
+                      "maxX": 8.275,
+                      "minY": 0,
+                      "maxY": 0.35,
+                      "minZ": 0.825,
+                      "maxZ": 1.175
+                    },
+                    "allowedRegionIds": [
+                      "floor-positive"
+                    ]
+                  },
+                  "phase2ProofDigest": null
+                }
+              }
+            }
+          }
+        },
+        "sequence": 1,
+        "priorEventDigest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "eventDigest": "5614084dc26b044ebaf1292901764ff24f4814a4cbd03a1f722a9ccc68945a27"
+      }
+    }
+  ],
+  "deterministicA": {
+    "stateBytes": "7b22636f6d6d69747465644576656e7453657175656e6365223a312c22656e746974696573223a7b227363686f6f6c2d6d65646963616c2d626167223a7b22656e746974794964223a227363686f6f6c2d6d65646963616c2d626167222c22656e74697479547970654964223a227363686f6f6c2f6d65646963616c2d626167222c2267656f6d65747279536f75726365526566223a7b22636c617373696669636174696f6e223a225245434f5645524544222c22646967657374223a2232316261373536373936316362623963303232616238613166313133353962663037303439633530363531396137363536333934636663343866636331316561222c226c696e65616765537461747573223a225245434f5645524544222c227265636f72644964223a22696e6465782e68746d6c237363686f6f6c2d6261672d6c6f636b657273222c227265766973696f6e223a317d2c226c6966656379636c655374617465223a22414354495645222c22706172656e74456e746974794964223a6e756c6c2c22706172746963697061746573496e223a5b22636f6c6c6973696f6e222c22737570706f7274225d2c22706879736963616c426f6479526566223a7b22646967657374223a2266333633306438363062626431393030633032366161333932363332636637333039373237336334623738393437343564393261633331626637356632633561222c2270726f6f6647656f6d65747279446967657374223a2266333633306438363062626431393030633032366161333932363332636637333039373237336334623738393437343564393261633331626637356632633561222c227265636f72644964223a227363686f6f6c2d6d65646963616c2d6261672d626f6479222c227265766973696f6e223a317d2c22706879736963616c5374617465223a7b22616374697665223a747275652c226f7269656e746174696f6e5570446f74223a312c22737570706f72744e6f726d616c5570446f74223a312c22737572666163654964223a22666c6f6f72227d2c22706f737475726553746174654964223a227269676964222c227265766973696f6e223a322c22737570706f727452656c6174696f6e223a7b22737572666163654964223a22666c6f6f72222c22737572666163654d6f64656c526566223a7b22636c617373696669636174696f6e223a225245434f5645524544222c22646967657374223a2233303839353166383431626439626537613536643564313465653138353263306366666536366233306432396436613334663761376461366262303535356366222c226964223a227363686f6f6c2d737572666163652d7631222c226c696e65616765537461747573223a225245434f5645524544222c227265766973696f6e223a312c22736f757263654964223a2265766964656e63652f76657269666965642d6172636869746563747572652d7068617365322f737572666163652d6d6f64656c732f7363686f6f6c2e6a736f6e227d7d2c227472616e73666f726d223a7b226f7269656e746174696f6e223a5b302c302c302c315d2c22706f736974696f6e4d6963726f756e697473223a5b2d333030303030302c3137353030302c313030303030305d2c227363616c654d6963726f756e697473223a5b313030303030302c313030303030302c313030303030305d7d7d7d2c22656e7669726f6e6d656e74506879736963616c5374617465223a6e756c6c2c226c6966656379636c655374617465223a22414354495645222c22706879736963616c52656c6174696f6e73223a5b5d2c227072696f725374617465446967657374223a2266313637316534633038376461613461366535666663326562626630646665303964653032346238633839613635353061623337366435396263653466646138222c227265766973696f6e223a312c227363656e65446566696e6974696f6e526566223a7b22636c617373696669636174696f6e223a225245434f5645524544222c22646967657374223a2265313935356638306430376165323636306234386663326663653663636136386461333065396465343834386536393165346661336661303532313931363138222c226c696e65616765537461747573223a225245434f5645524544222c227265766973696f6e223a312c227363656e654964223a227363686f6f6c222c22736f757263654964223a22696e6465782e68746d6c222c22736f7572636552616e67654964223a227363686f6f6c2d6261672d6c6f636b657273227d2c227374617465446967657374223a2235353135323062383164316437313537336136303831356333346439386436616437393163356633356538333130396234333734323638663936663533373237222c227375726661636573223a6e756c6c2c22776f726c644964223a22636c65616e2d7363686f6f6c2d776f726c64227d",
+    "eventBytes": "5b7b22636f6d6d616e64446967657374223a2261356365303362633766333065396233666638303738643732376433356133366536666164396130633662353432663866623062393564623133383531356138222c226576656e74446967657374223a2239306462396264646233386432356231396630623038636161326236313139373237373637663465613761376634333863663130366436613639376138363634222c226576656e7454797065223a224d75746174696f6e436f6d6d6974746564222c226964223a2274783a64657465726d696e6973746963222c226b696e64223a227472616e73616374696f6e222c226e65775374617465446967657374223a2235353135323062383164316437313537336136303831356333346439386436616437393163356633356538333130396234333734323638663936663533373237222c226e6577576f726c645265766973696f6e223a312c227072696f724576656e74446967657374223a2230303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030222c227072696f725374617465446967657374223a2266313637316534633038376461613461366535666663326562626630646665303964653032346238633839613635353061623337366435396263653466646138222c227072696f72576f726c645265766973696f6e223a302c2273657175656e6365223a312c22737461746544656c7461223a7b22656e746974696573223a7b227363686f6f6c2d6d65646963616c2d626167223a7b22656e746974794964223a227363686f6f6c2d6d65646963616c2d626167222c22656e74697479547970654964223a227363686f6f6c2f6d65646963616c2d626167222c2267656f6d65747279536f75726365526566223a7b22636c617373696669636174696f6e223a225245434f5645524544222c22646967657374223a2232316261373536373936316362623963303232616238613166313133353962663037303439633530363531396137363536333934636663343866636331316561222c226c696e65616765537461747573223a225245434f5645524544222c227265636f72644964223a22696e6465782e68746d6c237363686f6f6c2d6261672d6c6f636b657273222c227265766973696f6e223a317d2c226c6966656379636c655374617465223a22414354495645222c22706172656e74456e746974794964223a6e756c6c2c22706172746963697061746573496e223a5b22636f6c6c6973696f6e222c22737570706f7274225d2c22706879736963616c426f6479526566223a7b22646967657374223a2266333633306438363062626431393030633032366161333932363332636637333039373237336334623738393437343564393261633331626637356632633561222c2270726f6f6647656f6d65747279446967657374223a2266333633306438363062626431393030633032366161333932363332636637333039373237336334623738393437343564393261633331626637356632633561222c227265636f72644964223a227363686f6f6c2d6d65646963616c2d6261672d626f6479222c227265766973696f6e223a317d2c22706879736963616c5374617465223a7b22616374697665223a747275652c226f7269656e746174696f6e5570446f74223a312c22737570706f72744e6f726d616c5570446f74223a312c22737572666163654964223a22666c6f6f72227d2c22706f737475726553746174654964223a227269676964222c227265766973696f6e223a322c22737570706f727452656c6174696f6e223a7b22737572666163654964223a22666c6f6f72222c22737572666163654d6f64656c526566223a7b22636c617373696669636174696f6e223a225245434f5645524544222c22646967657374223a2233303839353166383431626439626537613536643564313465653138353263306366666536366233306432396436613334663761376461366262303535356366222c226964223a227363686f6f6c2d737572666163652d7631222c226c696e65616765537461747573223a225245434f5645524544222c227265766973696f6e223a312c22736f757263654964223a2265766964656e63652f76657269666965642d6172636869746563747572652d7068617365322f737572666163652d6d6f64656c732f7363686f6f6c2e6a736f6e227d7d2c227472616e73666f726d223a7b226f7269656e746174696f6e223a5b302c302c302c315d2c22706f736974696f6e4d6963726f756e697473223a5b2d333030303030302c3137353030302c313030303030305d2c227363616c654d6963726f756e697473223a5b313030303030302c313030303030302c313030303030305d7d7d7d2c22656e7669726f6e6d656e74506879736963616c5374617465223a6e756c6c2c226c6966656379636c655374617465223a22414354495645222c22706879736963616c52656c6174696f6e73223a5b5d2c227375726661636573223a6e756c6c7d2c22776f726c644964223a22636c65616e2d7363686f6f6c2d776f726c64227d5d",
+    "stateDigest": "551520b81d1d71573a60815c34d98d6ad791c5f35e83109b4374268f96f53727",
+    "eventDigest": "90db9bddb38d25b19f0b08caa2b6119727767f4ea7a7f438cf106d6a697a8664"
+  },
+  "deterministicB": {
+    "stateBytes": "7b22636f6d6d69747465644576656e7453657175656e6365223a312c22656e746974696573223a7b227363686f6f6c2d6d65646963616c2d626167223a7b22656e746974794964223a227363686f6f6c2d6d65646963616c2d626167222c22656e74697479547970654964223a227363686f6f6c2f6d65646963616c2d626167222c2267656f6d65747279536f75726365526566223a7b22636c617373696669636174696f6e223a225245434f5645524544222c22646967657374223a2232316261373536373936316362623963303232616238613166313133353962663037303439633530363531396137363536333934636663343866636331316561222c226c696e65616765537461747573223a225245434f5645524544222c227265636f72644964223a22696e6465782e68746d6c237363686f6f6c2d6261672d6c6f636b657273222c227265766973696f6e223a317d2c226c6966656379636c655374617465223a22414354495645222c22706172656e74456e746974794964223a6e756c6c2c22706172746963697061746573496e223a5b22636f6c6c6973696f6e222c22737570706f7274225d2c22706879736963616c426f6479526566223a7b22646967657374223a2266333633306438363062626431393030633032366161333932363332636637333039373237336334623738393437343564393261633331626637356632633561222c2270726f6f6647656f6d65747279446967657374223a2266333633306438363062626431393030633032366161333932363332636637333039373237336334623738393437343564393261633331626637356632633561222c227265636f72644964223a227363686f6f6c2d6d65646963616c2d6261672d626f6479222c227265766973696f6e223a317d2c22706879736963616c5374617465223a7b22616374697665223a747275652c226f7269656e746174696f6e5570446f74223a312c22737570706f72744e6f726d616c5570446f74223a312c22737572666163654964223a22666c6f6f72227d2c22706f737475726553746174654964223a227269676964222c227265766973696f6e223a322c22737570706f727452656c6174696f6e223a7b22737572666163654964223a22666c6f6f72222c22737572666163654d6f64656c526566223a7b22636c617373696669636174696f6e223a225245434f5645524544222c22646967657374223a2233303839353166383431626439626537613536643564313465653138353263306366666536366233306432396436613334663761376461366262303535356366222c226964223a227363686f6f6c2d737572666163652d7631222c226c696e65616765537461747573223a225245434f5645524544222c227265766973696f6e223a312c22736f757263654964223a2265766964656e63652f76657269666965642d6172636869746563747572652d7068617365322f737572666163652d6d6f64656c732f7363686f6f6c2e6a736f6e227d7d2c227472616e73666f726d223a7b226f7269656e746174696f6e223a5b302c302c302c315d2c22706f736974696f6e4d6963726f756e697473223a5b2d333030303030302c3137353030302c313030303030305d2c227363616c654d6963726f756e697473223a5b313030303030302c313030303030302c313030303030305d7d7d7d2c22656e7669726f6e6d656e74506879736963616c5374617465223a6e756c6c2c226c6966656379636c655374617465223a22414354495645222c22706879736963616c52656c6174696f6e73223a5b5d2c227072696f725374617465446967657374223a2266313637316534633038376461613461366535666663326562626630646665303964653032346238633839613635353061623337366435396263653466646138222c227265766973696f6e223a312c227363656e65446566696e6974696f6e526566223a7b22636c617373696669636174696f6e223a225245434f5645524544222c22646967657374223a2265313935356638306430376165323636306234386663326663653663636136386461333065396465343834386536393165346661336661303532313931363138222c226c696e65616765537461747573223a225245434f5645524544222c227265766973696f6e223a312c227363656e654964223a227363686f6f6c222c22736f757263654964223a22696e6465782e68746d6c222c22736f7572636552616e67654964223a227363686f6f6c2d6261672d6c6f636b657273227d2c227374617465446967657374223a2235353135323062383164316437313537336136303831356333346439386436616437393163356633356538333130396234333734323638663936663533373237222c227375726661636573223a6e756c6c2c22776f726c644964223a22636c65616e2d7363686f6f6c2d776f726c64227d",
+    "eventBytes": "5b7b22636f6d6d616e64446967657374223a2261356365303362633766333065396233666638303738643732376433356133366536666164396130633662353432663866623062393564623133383531356138222c226576656e74446967657374223a2239306462396264646233386432356231396630623038636161326236313139373237373637663465613761376634333863663130366436613639376138363634222c226576656e7454797065223a224d75746174696f6e436f6d6d6974746564222c226964223a2274783a64657465726d696e6973746963222c226b696e64223a227472616e73616374696f6e222c226e65775374617465446967657374223a2235353135323062383164316437313537336136303831356333346439386436616437393163356633356538333130396234333734323638663936663533373237222c226e6577576f726c645265766973696f6e223a312c227072696f724576656e74446967657374223a2230303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030222c227072696f725374617465446967657374223a2266313637316534633038376461613461366535666663326562626630646665303964653032346238633839613635353061623337366435396263653466646138222c227072696f72576f726c645265766973696f6e223a302c2273657175656e6365223a312c22737461746544656c7461223a7b22656e746974696573223a7b227363686f6f6c2d6d65646963616c2d626167223a7b22656e746974794964223a227363686f6f6c2d6d65646963616c2d626167222c22656e74697479547970654964223a227363686f6f6c2f6d65646963616c2d626167222c2267656f6d65747279536f75726365526566223a7b22636c617373696669636174696f6e223a225245434f5645524544222c22646967657374223a2232316261373536373936316362623963303232616238613166313133353962663037303439633530363531396137363536333934636663343866636331316561222c226c696e65616765537461747573223a225245434f5645524544222c227265636f72644964223a22696e6465782e68746d6c237363686f6f6c2d6261672d6c6f636b657273222c227265766973696f6e223a317d2c226c6966656379636c655374617465223a22414354495645222c22706172656e74456e746974794964223a6e756c6c2c22706172746963697061746573496e223a5b22636f6c6c6973696f6e222c22737570706f7274225d2c22706879736963616c426f6479526566223a7b22646967657374223a2266333633306438363062626431393030633032366161333932363332636637333039373237336334623738393437343564393261633331626637356632633561222c2270726f6f6647656f6d65747279446967657374223a2266333633306438363062626431393030633032366161333932363332636637333039373237336334623738393437343564393261633331626637356632633561222c227265636f72644964223a227363686f6f6c2d6d65646963616c2d6261672d626f6479222c227265766973696f6e223a317d2c22706879736963616c5374617465223a7b22616374697665223a747275652c226f7269656e746174696f6e5570446f74223a312c22737570706f72744e6f726d616c5570446f74223a312c22737572666163654964223a22666c6f6f72227d2c22706f737475726553746174654964223a227269676964222c227265766973696f6e223a322c22737570706f727452656c6174696f6e223a7b22737572666163654964223a22666c6f6f72222c22737572666163654d6f64656c526566223a7b22636c617373696669636174696f6e223a225245434f5645524544222c22646967657374223a2233303839353166383431626439626537613536643564313465653138353263306366666536366233306432396436613334663761376461366262303535356366222c226964223a227363686f6f6c2d737572666163652d7631222c226c696e65616765537461747573223a225245434f5645524544222c227265766973696f6e223a312c22736f757263654964223a2265766964656e63652f76657269666965642d6172636869746563747572652d7068617365322f737572666163652d6d6f64656c732f7363686f6f6c2e6a736f6e227d7d2c227472616e73666f726d223a7b226f7269656e746174696f6e223a5b302c302c302c315d2c22706f736974696f6e4d6963726f756e697473223a5b2d333030303030302c3137353030302c313030303030305d2c227363616c654d6963726f756e697473223a5b313030303030302c313030303030302c313030303030305d7d7d7d2c22656e7669726f6e6d656e74506879736963616c5374617465223a6e756c6c2c226c6966656379636c655374617465223a22414354495645222c22706879736963616c52656c6174696f6e73223a5b5d2c227375726661636573223a6e756c6c7d2c22776f726c644964223a22636c65616e2d7363686f6f6c2d776f726c64227d5d",
+    "stateDigest": "551520b81d1d71573a60815c34d98d6ad791c5f35e83109b4374268f96f53727",
+    "eventDigest": "90db9bddb38d25b19f0b08caa2b6119727767f4ea7a7f438cf106d6a697a8664"
+  }
+}
