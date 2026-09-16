@@ -1,0 +1,161 @@
+TAP version 13
+# Subtest: interval canonical validation
+ok 1 - interval canonical validation
+  ---
+  duration_ms: 1.820432
+  type: 'test'
+  ...
+# Subtest: interval add subtract negate multiply scalar exact
+ok 2 - interval add subtract negate multiply scalar exact
+  ---
+  duration_ms: 0.572914
+  type: 'test'
+  ...
+# Subtest: interval zero and comparisons
+ok 3 - interval zero and comparisons
+  ---
+  duration_ms: 0.293818
+  type: 'test'
+  ...
+# Subtest: interval dot and projection propagate uncertainty
+ok 4 - interval dot and projection propagate uncertainty
+  ---
+  duration_ms: 1.208791
+  type: 'test'
+  ...
+# Subtest: REG-V3-QI-SAT-001 uncertainty crossing cannot pass
+ok 5 - REG-V3-QI-SAT-001 uncertainty crossing cannot pass
+  ---
+  duration_ms: 0.198464
+  type: 'test'
+  ...
+# Subtest: REG-V3-DATAFLOW-001 MaterializedVertex retains exact fixed error interval lineage
+ok 6 - REG-V3-DATAFLOW-001 MaterializedVertex retains exact fixed error interval lineage
+  ---
+  duration_ms: 13.102936
+  type: 'test'
+  ...
+# Subtest: identity exact coordinate materialization has contained source
+ok 7 - identity exact coordinate materialization has contained source
+  ---
+  duration_ms: 0.870863
+  type: 'test'
+  ...
+# Subtest: REG-V3-STALE-001 parent mutation invalidates vertex and downstream bound
+ok 8 - REG-V3-STALE-001 parent mutation invalidates vertex and downstream bound
+  ---
+  duration_ms: 1.636138
+  type: 'test'
+  ...
+# Subtest: REG-V3-BROAD-001 interval broad bound encloses every component interval
+ok 9 - REG-V3-BROAD-001 interval broad bound encloses every component interval
+  ---
+  duration_ms: 2.6879
+  type: 'test'
+  ...
+# Subtest: REG-V3-EDGESET-001 complete canonical undirected edge extraction
+ok 10 - REG-V3-EDGESET-001 complete canonical undirected edge extraction
+  ---
+  duration_ms: 1.249422
+  type: 'test'
+  ...
+# Subtest: REG-V3-BASIS-001 physical basis deterministic and no visual input
+ok 11 - REG-V3-BASIS-001 physical basis deterministic and no visual input
+  ---
+  duration_ms: 0.976785
+  type: 'test'
+  ...
+# Subtest: REG-V3-PROJECTION-001 3D to target-local 2D retains uncertainty
+ok 12 - REG-V3-PROJECTION-001 3D to target-local 2D retains uncertainty
+  ---
+  duration_ms: 1.652219
+  type: 'test'
+  ...
+# Subtest: opening region data uses target-local projected interval vertices
+ok 13 - opening region data uses target-local projected interval vertices
+  ---
+  duration_ms: 3.360683
+  type: 'test'
+  ...
+# Subtest: REG-V3-NORMAL-DATA-001 exact normal provenance survives frame binding
+ok 14 - REG-V3-NORMAL-DATA-001 exact normal provenance survives frame binding
+  ---
+  duration_ms: 1.165395
+  type: 'test'
+  ...
+# Subtest: correlation matrix allows conservative ambiguity never naked points
+ok 15 - correlation matrix allows conservative ambiguity never naked points
+  ---
+  duration_ms: 2.221875
+  type: 'test'
+  ...
+# {"environment":{"node":"v22.23.2","platform":"linux","arch":"x64","cpu":"Intel(R) Xeon(R) Processor @ 2.60GHz"},"threshold":null,"obbBodyVsBody":{"unit":"microseconds","count":50,"p50":1239.1,"p95":3044.094,"max":13971.501,"status":"PASS","evidenceBytes":839,"candidatePairs":1,"satAxisCount":0},"primitiveCounts":{"bodies":2,"children":2},"cache":{"implemented":false,"hits":0,"misses":0},"bigInt":"bounded by accepted Numeric Frame Gate"}
+# Subtest: V3 measurement only
+ok 16 - V3 measurement only
+  ---
+  duration_ms: 85.824998
+  type: 'test'
+  ...
+# Subtest: oriented body-vs-body separated touching penetrating rotated
+ok 17 - oriented body-vs-body separated touching penetrating rotated
+  ---
+  duration_ms: 25.402811
+  type: 'test'
+  ...
+# Subtest: compound children canonical and child-only collision fails
+ok 18 - compound children canonical and child-only collision fails
+  ---
+  duration_ms: 6.190102
+  type: 'test'
+  ...
+# Subtest: containment fully inside and outside
+ok 19 - containment fully inside and outside
+  ---
+  duration_ms: 3.206711
+  type: 'test'
+  ...
+# Subtest: explicit opening legal, edge ambiguous, too large
+ok 20 - explicit opening legal, edge ambiguous, too large
+  ---
+  duration_ms: 4.260332
+  type: 'test'
+  ...
+# Subtest: contact floor pass floating penetration and unsupported double-sided
+ok 21 - contact floor pass floating penetration and unsupported double-sided
+  ---
+  duration_ms: 2.589785
+  type: 'test'
+  ...
+# Subtest: broad tamper and swept fail closed with evidence limitations
+ok 22 - broad tamper and swept fail closed with evidence limitations
+  ---
+  duration_ms: 0.284014
+  type: 'test'
+  ...
+# Subtest: convex definitions validate topology and SAT
+ok 23 - convex definitions validate topology and SAT
+  ---
+  duration_ms: 2.162265
+  type: 'test'
+  ...
+# Subtest: synthetic local-world parent rotation invalidates old evidence
+ok 24 - synthetic local-world parent rotation invalidates old evidence
+  ---
+  duration_ms: 2.088361
+  type: 'test'
+  ...
+# Subtest: synthetic topology kinds cover tread riser landing levels only
+ok 25 - synthetic topology kinds cover tread riser landing levels only
+  ---
+  duration_ms: 0.436567
+  type: 'test'
+  ...
+1..25
+# tests 25
+# suites 0
+# pass 25
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 405.123384
