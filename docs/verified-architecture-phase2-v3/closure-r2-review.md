@@ -20,13 +20,19 @@ Deterministic construction order: hash OpeningRegion and solids first; canonical
 
 Support legality consumes explicit ContactRegionDefinitions and canonical SupportRelations. Each REQUIRED relation produces its own proof containing pinned identity, materialization evidence, contact distance, physical-normal compatibility, finite-polygon predicates and a proof digest. OPTIONAL semantics remain unsupported and fail closed.
 
-Opening legality preflights the independently pinned owner, exact opening membership triple, opening back-reference, frames and every solid digest before geometry. Each body child then receives an opening-interior proof and SAT proof against every owner solid. Missing owner or child definitions are stale evidence, not empty space.
+A compound ContactRegion is accepted only through an affirmative `compoundChildRefs` commitment inside ContactRegionDefinition. Every child ref pins childId + geometry ID/revision/digest, must exactly match the compound definition, resolves to an explicit finite planar region, and produces an independent canonical child proof. An illegal child fails the relation; an ambiguous required child prevents PASS.
+
+Opening legality preflights the independently pinned owner, exact opening membership triple, opening back-reference, frames and every solid digest before geometry. Each body child then receives an opening-interior proof and accepted interval-SAT proof against every owner solid. Missing owner or child definitions are stale evidence, not empty space. Exact opening edge remains non-PASS.
 
 Containment and opening children are canonical-sorted. Definite outside/collision is distinguished from interval ambiguity; clear siblings cannot hide either.
 
+Finite planar physical records are validated before materialization for minimum unique vertices, degenerate edges, coplanarity, convex orientation, nonzero physical normal, sidedness and support capability. Oversized numeric materialization fails as `NUMERIC_OVERFLOW`.
+
 ## Mandatory regression set
 
-The focused gate includes exact IDs `REG-V3-SUPPORT-AMBIGUITY-001`, `REG-V3-OPENING-AMBIGUITY-001`, `REG-V3-CONTAINMENT-COMPOUND-001`, `REG-V3-SUPPORT-COMPOUND-001`, `REG-V3-STALE-SURFACE-001`, plus preserved `REG-V3-SUPPORT-POLY-001`, `REG-V3-NORMAL-001`, `REG-V3-CONTAINMENT-AABB-001`, and `REG-V3-OPENING-AABB-001`. The hostile `MISSING-BOUNDARY` case is permanent. R2 owner-pin tamper, membership tamper, back-reference tamper, missing pin, owner-ref ordering, old-revision/pin replay and missing-solid cases are permanent subtests.
+The focused gate includes exact IDs `REG-V3-SUPPORT-AMBIGUITY-001`, `REG-V3-OPENING-AMBIGUITY-001`, `REG-V3-CONTAINMENT-COMPOUND-001`, `REG-V3-SUPPORT-COMPOUND-001`, `REG-V3-STALE-SURFACE-001`, plus preserved `REG-V3-SUPPORT-POLY-001`, `REG-V3-NORMAL-001`, `REG-V3-CONTAINMENT-AABB-001`, and `REG-V3-OPENING-AABB-001`.
+
+The hostile `MISSING-BOUNDARY` case is permanent. R2 owner-pin tamper, membership tamper, back-reference tamper, missing pin, owner-ref ordering, old-revision/pin replay and missing-solid cases are permanent subtests. Additional matrices cover duplicate relation IDs, unsupported optional contacts, missing support capability, malformed/degenerate/non-convex polygons, zero normal, unsupported sidedness, forged geometry digest, numeric overflow and definite-failure-versus-ambiguity precedence. Opening regressions cover solid collision, exact edge, compound collision and compound ambiguity.
 
 ## Authority lock
 
@@ -47,7 +53,7 @@ This is not converted into a geometry PASS.
 ## UNKNOWN / risk ledger
 
 - Optional support relations remain unsupported.
-- ContactRegion geometry is currently affirmative finite planar geometry; arbitrary compound ContactRegion representations are not promoted by this closure. Multiple required contacts are represented as separate SupportRelations with separate proofs.
+- Compound ContactRegion is deliberately limited to explicitly pinned finite-planar children; arbitrary nested/other compound contact representations remain unsupported.
 - No continuous collision detection, friction/load/stability, water physics, entrapment/accessibility or clinical semantics.
 - Performance evidence is measurement-only; no threshold is asserted.
 - Historical static-boundaries policy requires the later explicit promotion-review decision already recorded by the project.
