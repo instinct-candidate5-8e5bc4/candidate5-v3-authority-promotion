@@ -1,0 +1,1 @@
+{"gate":"PHASE_2_V3_ORIENTED_GEOMETRY_DESIGN","result":"PASS_DESIGN_READY","primitiveDecision":"HYBRID_CONSERVATIVE_AABB_PLUS_TYPED_OBB_CONVEX_SAT_AND_FINITE_PLANAR_NARROW_PHASE","bodyVsBody":"INITIAL_V3_REQUIRED","motion":"DISCRETE_ONLY_CCD_FUTURE_UNSUPPORTED","phase2V3Implemented":false,"existingFoundationModified":false,"geometryGateCallSites":1,"stopAfterDesign":true}

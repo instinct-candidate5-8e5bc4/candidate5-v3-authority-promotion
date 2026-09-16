@@ -1,0 +1,76 @@
+TAP version 13
+# Subtest: physical identity is independent from visual identity
+ok 1 - physical identity is independent from visual identity
+  ---
+  duration_ms: 2.625229
+  type: 'test'
+  ...
+# Subtest: compound canonical order preserves child gaps and digest
+ok 2 - compound canonical order preserves child gaps and digest
+  ---
+  duration_ms: 8.349931
+  type: 'test'
+  ...
+# Subtest: query taxonomy is explicit
+ok 3 - query taxonomy is explicit
+  ---
+  duration_ms: 0.168124
+  type: 'test'
+  ...
+# Subtest: broad phase cannot produce final PASS
+ok 4 - broad phase cannot produce final PASS
+  ---
+  duration_ms: 0.303369
+  type: 'test'
+  ...
+# Subtest: error interval policy never turns ambiguity into PASS
+ok 5 - error interval policy never turns ambiguity into PASS
+  ---
+  duration_ms: 0.190649
+  type: 'test'
+  ...
+# Subtest: opening is explicit, not absence of solid
+ok 6 - opening is explicit, not absence of solid
+  ---
+  duration_ms: 0.24565
+  type: 'test'
+  ...
+# Subtest: finite surface separates normal geometry and semantic role
+ok 7 - finite surface separates normal geometry and semantic role
+  ---
+  duration_ms: 0.261576
+  type: 'test'
+  ...
+# Subtest: stale parent evidence invalidates materialization proof
+ok 8 - stale parent evidence invalidates materialization proof
+  ---
+  duration_ms: 0.247731
+  type: 'test'
+  ...
+# Subtest: externally specified 30 degrees remains unsupported without policy
+ok 9 - externally specified 30 degrees remains unsupported without policy
+  ---
+  duration_ms: 0.311539
+  type: 'test'
+  ...
+# Subtest: water/stability/constraint are not inferred from contact
+ok 10 - water/stability/constraint are not inferred from contact
+  ---
+  duration_ms: 0.376657
+  type: 'test'
+  ...
+# Subtest: discrete query declares continuous path unsupported
+ok 11 - discrete query declares continuous path unsupported
+  ---
+  duration_ms: 0.178153
+  type: 'test'
+  ...
+1..11
+# tests 11
+# suites 0
+# pass 11
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 79.272037
