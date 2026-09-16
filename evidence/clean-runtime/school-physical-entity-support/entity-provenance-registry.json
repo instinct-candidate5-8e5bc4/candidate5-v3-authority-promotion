@@ -1,0 +1,60 @@
+{
+  "scene": "school",
+  "entities": [
+    {
+      "definitionId": "school/medical-bag",
+      "bodyId": "school-medical-bag-body",
+      "bodyRevision": 1,
+      "bodyDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+      "source": "index.html#school-bag-lockers",
+      "sourceRangeDigest": "21ba7567961cbb9c022ab8a1f11359bf07049c506519a7656394cfc48fcc11ea",
+      "lineageStatus": "RECOVERED",
+      "dimensionsAuthoredUnits": [0.55, 0.35, 0.35],
+      "coordinateFrame": "axis-aligned authored School world coordinates",
+      "allowedPostures": ["rigid"],
+      "allowedSupports": ["floor"],
+      "status": "RECOVERED_OPERATIONAL_AT_PRIOR_LOCKED_GATE",
+      "unknowns": ["visible PNG to physical body binding"]
+    },
+    {
+      "definitionId": "school/casualty",
+      "bodyId": null,
+      "bodyRevision": null,
+      "bodyDigest": null,
+      "source": "recovered index.html, src/nextgen/posture-map.js, live human-clothed-rig.glb examination",
+      "lineageStatus": "UNKNOWN",
+      "dimensionsAuthoredUnits": null,
+      "coordinateFrame": "UNKNOWN",
+      "allowedPostures": [],
+      "allowedSupports": [],
+      "status": "MISSING_PHYSICAL_BODY",
+      "unknowns": [
+        "No authored collision body or complete footprint",
+        "No authoritative posture-specific physical dimensions",
+        "No posture-to-GLB physical correspondence",
+        "No authoritative GLB scale or coordinate frame",
+        "No visual-asset to physical-body binding"
+      ]
+    },
+    {
+      "definitionId": "school/support-object",
+      "bodyId": null,
+      "bodyRevision": null,
+      "bodyDigest": null,
+      "source": "recovered index.html School variant and locked Phase 2 School Surface Model",
+      "lineageStatus": "UNKNOWN",
+      "dimensionsAuthoredUnits": null,
+      "coordinateFrame": "UNKNOWN",
+      "supportSurface": null,
+      "allowedPostures": [],
+      "allowedSupports": [],
+      "status": "MISSING_SUPPORT_ENTITY_AND_SUPPORT_SURFACE",
+      "unknowns": [
+        "School variant 8 contains lockers and bag but no authored chair/bed/gurney",
+        "Other variant chairs/benches are not proven members of this School scene",
+        "Locked School Surface Model has no SUPPORT_SURFACE",
+        "No support region, plane, contact rules, revision or digest"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "source": "index.html",
+  "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+  "findings": [
+    {
+      "needle": "const casualtyLength=1.80,standingHeight=1.78;",
+      "byteOffsetUtf8": 183107,
+      "text": "const casualtyLength=1.80,standingHeight=1.78;"
+    },
+    {
+      "needle": "const patientAsset=postureResolution.asset;const supportedPose=false;",
+      "byteOffsetUtf8": 183154,
+      "text": "const patientAsset=postureResolution.asset;const supportedPose=false;"
+    },
+    {
+      "needle": "const postureGeometry=",
+      "byteOffsetUtf8": 185913,
+      "text": "const postureGeometry={seated:{ratio:893/1576,height:1.58,focus:1.38,bottom:1518/1576},recovery:{ratio:1498/1006,height:.78,focus:1.05,bottom:1},supine:{ratio:1525/993,height:1.18,focus:1.02,bottom:1},standing:{ratio:1126/1488,height:1.78,focus:1,bottom:1},'seated-chair':{ratio:893/1576,height:1.58,focus:1.12,bottom:1},'seated-floor':{ratio:1284/1021,height:1.05,focus:1.03,bottom:1},'supine-floor':{ratio:1413/726,height:.92,focus:1.02,bottom:1},'supine-gurney':{ratio:1251/951,height:1.18,focus:1.04,bottom:1},'recovery-floor':{ratio:1418/564,height:.72,focus:1.04,bottom:1}}[clinicalPose];const poseRatio=postureGeometry.ratio;const patientWorldHeight=postureGeometry.height;const apparentScale=patientProjection;const patientFocus=mobileLayout?1:postureGeometry.focus;const patientUniform=patientWorldHeight*patientProjection*patientFocus;patientPhoto.scale.set(patientUniform*poseRatio,patientUniform,1);"
+    },
+    {
+      "needle": "new GLTFLoader().load('./human-clothed-rig.glb'",
+      "byteOffsetUtf8": 199527,
+      "text": "new GLTFLoader().load('./human-clothed-rig.glb',g=>{const base=g.scene;const skins=[0xb98269,0x9d684f,0xc28c73,0x81513f,0xb4775c,0x996349];base.traverse(o=>{if(o.isMesh){const n=o.material?.name||'';let c=skins[variant%skins.length],rough=.78,metal=0;if(n==='Garment'){c=[0x244f69,0x32485d,0x315649,0x513946,0x35475c,0x3b543f][variant%6];rough=.9}else if(n==='Legs'){c=[0x202b35,0x28303a,0x302d2b,0x25353b][variant%4];rough=.94}else if(n==='Sclera_Cornea'){c=0xf1eee7;rough=.18}else if(n==='Iris'){c=[0x55716b,0x4c6375,0x5f4939][variant%3];rough=.35}else if(n==='Pupil'){c=0x101010}else if(n==='Mouth'){c=0x7d3e3f;rough=.65}o.material=new THREE.MeshStandardMaterial({color:c,roughness:rough,metalness:metal,transparent:n==='Sclera_Cornea',opacity:n==='Sclera_Cornea'?.96:1,side:THREE.DoubleSide});o.castShadow=true;o.receiveShadow=true}});base.scale.setScalar(.98+((scenario.age%5)*.018));patient.add(base);const other=SkeletonUtils.clone(base);other.traverse(o=>{if(o.isMesh){o.material=o.material.clone();const n=o.material?.name||'';if(!['Garment','Legs','Sclera_Cornea','Iris','Pupil','Mouth'].includes(n))o.material.color.setHex([0xc68d72,0x85533f,0xb97e62,0x714635,0xc18b70,0x94604c][variant%6])}});const personScale=.9+(variant%3)*.04;other.scale.setScalar(personScale);witness.add(other);const pose=(root,casualty=false)=>root.traverse(o=>{if(!o.isBone)return;const n=o.name;if(casualty&&n==='DEF-upper_arm.L')o.rotation.z-=.58;if(!casualty&&n==='DEF-upper_arm.L')o.rotation.z-=.34;if(casualty&&n==='DEF-upper_arm.R')o.rotation.z+=.58;if(!casualty&&n==='DEF-upper_arm.R')o.rotation.z+=.34;if(!casualty&&n==='DEF-forearm.L'){o.rotation.z-=.18;o.rotation.x-=.12};if(!casualty&&n==='DEF-forearm.R'){o.rotation.z+=.18;o.rotation.x-=.12};if(!casualty&&n==='DEF-spine')o.rotation.x+=(variant%3-1)*.035});pose(base,true);pose(other,false);base.traverse(o=>{if(o.isBone)patientBones[o.name]=o});other.traverse(o=>{if(o.isBone)witnessBones[o.name]=o});witnessHome=witness.position.clone();clothing(patient,[0x265a78,0x384e6b,0x315c50,0x5a3c48,0x384c63,0x415a43][variant%6],false);const female=false;clothing(witness,[0x70476b,0x5a4d38,0x405a63,0x4d4668,0x675346,0x593c57][variant%6],female);characterDetails(patient,'patient',isFemaleCasualty(),scenario.age,variant);characterDetails(witness,'witness',female,34+(variant*3%42),variant+2);witness.rotation.y=Math.atan2(patient.position.x-witness.position.x,patient.position.z-witness.position.z);patient.traverse(o=>{if(o.isMesh)o.visible=false});witness.traverse(o=>{if(o.isMesh)o.visible=false});"
+    },
+    {
+      "needle": "Fit both loaded rigs to the floor",
+      "byteOffsetUtf8": 202077,
+      "text": "// Fit both loaded rigs to the floor after all poses and accessories. This removes model-pivot assumptions."
+    },
+    {
+      "needle": "The casualty and photographed chair are one color-matched asset",
+      "byteOffsetUtf8": 207525,
+      "text": "// The casualty and photographed chair are one color-matched asset, so every contact point shares one perspective."
+    },
+    {
+      "needle": "if(baseVariant===8)",
+      "byteOffsetUtf8": 164008,
+      "text": "if(baseVariant===8){for(const x of [-4,-2,0,2,4])prop('Locker',[x,1.2,-3.5],[1,2.4,.55],0x3c6680);prop('School bag',[-3,.18,1],[.55,.35,.35],0x883d46)}"
+    },
+    {
+      "needle": "function detailedBench",
+      "byteOffsetUtf8": 157359,
+      "text": "function detailedBench(x,z,rot=0){const g=new THREE.Group();g.name='Detailed bench';for(let i=-2;i<=2;i++){const slat=new THREE.Mesh(new RoundedBoxGeometry(.34,.08,1.5,3,.025),new THREE.MeshStandardMaterial({color:0x7b593b,roughness:.72}));slat.position.set(i*.36,.55,0);slat.castShadow=true;g.add(slat);const back=slat.clone();back.rotation.x=.18;back.position.set(i*.36,1.02,-.34);g.add(back)}for(const x0 of [-.72,.72]){const leg=new THREE.Mesh(new THREE.CylinderGeometry(.055,.07,.56,14),metalMat(0x485155));leg.position.set(x0,.28,0);g.add(leg)}g.position.set(x,0,z);g.rotation.y=rot;scene.add(g);return g}"
+    }
+  ]
+}
