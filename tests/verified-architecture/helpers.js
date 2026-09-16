@@ -1,0 +1,1 @@
+'use strict'; const fs=require('node:fs');const path=require('node:path');function fixture(n){return JSON.parse(fs.readFileSync(path.join(__dirname,'fixtures',n),'utf8'));}module.exports={fixture,H:'0'.repeat(64)};

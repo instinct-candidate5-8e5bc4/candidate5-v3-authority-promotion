@@ -1,0 +1,1 @@
+'use strict'; const {ImmutableRegistry}=require('./immutable-registry'); const {validateEntityPackage}=require('./entity-package-contract'); class EntityPackageRegistry extends ImmutableRegistry{constructor(){super('ENTITY_PACKAGE',validateEntityPackage);}} module.exports={EntityPackageRegistry};

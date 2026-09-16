@@ -1,0 +1,127 @@
+{
+  "packageId": "scene-02",
+  "recordId": "scene-02",
+  "recordType": "SCENE_PACKAGE",
+  "schemaVersion": "1.0.0",
+  "revision": 1,
+  "packageDigest": "0000000000000000000000000000000000000000000000000000000000000000",
+  "lifecycleState": "CANDIDATE",
+  "placementReady": false,
+  "failureReasons": [
+    "SYNTHETIC_NON_READY"
+  ],
+  "exactSemanticIdentity": {
+    "semanticTypeId": "clinical-treatment-room",
+    "exactTraits": [
+      {
+        "key": "fixture",
+        "value": "scene-02"
+      }
+    ],
+    "semanticEvidenceRefs": [
+      "synthetic"
+    ]
+  },
+  "source": {
+    "sourceAssetRefs": [
+      {
+        "recordId": "scene-02-asset",
+        "revision": 1,
+        "contentDigest": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    ],
+    "lineageRootNodeIds": [
+      "scene-02-root"
+    ],
+    "provenanceEvidenceRefs": [
+      "synthetic"
+    ]
+  },
+  "visibleRepresentation": {
+    "assetRefs": [
+      {
+        "recordId": "scene-02-asset",
+        "revision": 1,
+        "contentDigest": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    ],
+    "renderGeometryRefs": [
+      {
+        "recordId": "scene-02-render",
+        "revision": 1,
+        "contentDigest": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    ]
+  },
+  "sceneGeometryRefs": [
+    {
+      "recordId": "scene-02-geometry",
+      "revision": 1,
+      "contentDigest": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "collisionGeometryRefs": [
+    {
+      "recordId": "scene-02-collision",
+      "revision": 1,
+      "contentDigest": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "occlusionGeometryRefs": [
+    {
+      "recordId": "scene-02-occlusion",
+      "revision": 1,
+      "contentDigest": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "navigationGeometryRefs": [
+    {
+      "recordId": "scene-02-nav",
+      "revision": 1,
+      "contentDigest": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "semanticEntityRefs": [
+    {
+      "recordId": "scene-02-semantic",
+      "revision": 1,
+      "contentDigest": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "surfaceModelRef": {
+    "surfaceModelId": "scene-02-surface",
+    "revision": 1,
+    "surfaceModelDigest": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "supportSurfaceIds": [
+    "floor",
+    "gurney"
+  ],
+  "cameraCalibrations": [
+    {
+      "cameraId": "camera-1",
+      "intrinsics": {},
+      "extrinsics": {},
+      "validEnvelopeRef": {
+        "recordId": "scene-02-camera-envelope",
+        "revision": 1,
+        "contentDigest": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "calibrationEvidenceRefs": [
+        "synthetic"
+      ]
+    }
+  ],
+  "sceneBindingProofRef": null,
+  "dynamicStateContractRef": null,
+  "capabilities": {
+    "planarSurfaces": true,
+    "curvedSurfaces": true,
+    "multiLevel": true,
+    "indoorOutdoor": "INDOOR",
+    "dynamicGeometry": false
+  },
+  "evidenceRefs": [
+    "synthetic"
+  ]
+}

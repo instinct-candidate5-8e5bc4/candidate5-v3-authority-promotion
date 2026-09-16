@@ -1,0 +1,1 @@
+'use strict'; const {ImmutableRegistry}=require('./immutable-registry'); const {validateSemanticEntity}=require('./semantic-contract'); class SemanticRegistry extends ImmutableRegistry{constructor(){super('SEMANTIC_ENTITY',validateSemanticEntity);}} module.exports={SemanticRegistry};

@@ -1,0 +1,1 @@
+'use strict'; const {ImmutableRegistry}=require('./immutable-registry'); const {validateAsset}=require('./asset-contract'); class AssetRegistry extends ImmutableRegistry{constructor(){super('ASSET',validateAsset);}} module.exports={AssetRegistry};

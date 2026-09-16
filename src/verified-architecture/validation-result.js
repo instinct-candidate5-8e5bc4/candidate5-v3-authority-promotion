@@ -1,0 +1,6 @@
+'use strict';
+const GATE_CATEGORIES=Object.freeze({
+'P1-G01':'CONTRACT_SCHEMA_INVALID','P1-G02':'ARTIFACT_REFERENCE_INVALID','P1-G03':'REPRESENTATION_CLASSIFICATION_INVALID','P1-G04':'REGISTRY_IMMUTABILITY_VIOLATION','P1-G05':'REFERENCE_GRAPH_INVALID','P1-G06':'SOURCE_LINEAGE_UNVERIFIED','P1-G07':'CERTIFICATE_WITHOUT_PROOF','P1-G08':'REPRESENTATION_GEOMETRY_BINDING_UNVERIFIED','P1-G09':'SEMANTIC_GEOMETRY_BINDING_MISSING','P1-G10':'CONTACT_GEOMETRY_BINDING_MISSING','P1-G11':'SCENE_PACKAGE_INVALID','P1-G12':'EXACT_VERIFIED_SCENE_NOT_FOUND','P1-G13':'SCALABILITY_ARCHITECTURE_FAILURE','P1-G14':'PHASE_1_READINESS_PROMOTION_FORBIDDEN','P1-G15':'AUDIT_EVIDENCE_INCOMPLETE','P1-G16':'SURFACE_MODEL_INVALID','P1-G17':'FOOTPRINT_PROOF_INVALID','P1-G18':'SURFACE_EVIDENCE_STALE_OR_INCOMPLETE'});
+function gate(gateId,result,checkedRefs=[],deterministicEvidence={},failureCategory=null){return Object.freeze({gateId,result,failureCategory:result==='FAIL'?(failureCategory||GATE_CATEGORIES[gateId]):null,checkedRefs:Object.freeze([...checkedRefs]),deterministicEvidence:Object.freeze({...deterministicEvidence})});}
+class ValidationError extends Error{constructor(gateId,message,subcategory){super(message);this.name='ValidationError';this.gateResult=gate(gateId,'FAIL',[],{message},subcategory);}}
+module.exports={GATE_CATEGORIES,gate,ValidationError};

@@ -1,0 +1,1 @@
+'use strict'; const RESULT=Object.freeze({placementReady:false,result:'NOT_PLACEMENT_READY',code:'PHASE_1_CERTIFICATION_NOT_AUTHORIZED'}); function evaluateReadiness(){return RESULT;}module.exports={evaluateReadiness,PHASE_1_READINESS_CEILING:RESULT};

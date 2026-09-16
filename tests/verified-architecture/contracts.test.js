@@ -1,0 +1,2 @@
+'use strict';const test=require('node:test');const assert=require('node:assert/strict');const A=require('../../src/verified-architecture');const {fixture}=require('./helpers');
+test('closed Phase 1 enums and scene contract',()=>{assert(!A.LIFECYCLE_STATES.includes('PLACEMENT_READY'));assert(!A.PROOF_STATUSES.includes('VERIFIED'));assert.equal(A.validateScenePackage(fixture('scene-01-planar-indoor.json')).placementReady,false);assert.throws(()=>A.validateScenePackage({...fixture('scene-01-planar-indoor.json'),placementReady:true}),e=>e.gateResult.gateId==='P1-G14');});

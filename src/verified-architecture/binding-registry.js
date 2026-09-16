@@ -1,0 +1,1 @@
+'use strict'; const {ImmutableRegistry}=require('./immutable-registry'); const {validateBindingProof}=require('./binding-contract'); class BindingRegistry extends ImmutableRegistry{constructor(){super('BINDING_PROOF',validateBindingProof);}} module.exports={BindingRegistry};

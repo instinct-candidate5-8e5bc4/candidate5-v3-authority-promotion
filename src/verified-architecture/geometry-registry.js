@@ -1,0 +1,1 @@
+'use strict'; const {ImmutableRegistry}=require('./immutable-registry'); const {validateGeometry}=require('./geometry-contract'); class GeometryRegistry extends ImmutableRegistry{constructor(){super('GEOMETRY',validateGeometry);}} module.exports={GeometryRegistry};

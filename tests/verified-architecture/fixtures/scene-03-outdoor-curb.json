@@ -1,0 +1,128 @@
+{
+  "packageId": "scene-03",
+  "recordId": "scene-03",
+  "recordType": "SCENE_PACKAGE",
+  "schemaVersion": "1.0.0",
+  "revision": 1,
+  "packageDigest": "0000000000000000000000000000000000000000000000000000000000000000",
+  "lifecycleState": "CANDIDATE",
+  "placementReady": false,
+  "failureReasons": [
+    "SYNTHETIC_NON_READY"
+  ],
+  "exactSemanticIdentity": {
+    "semanticTypeId": "road-traffic-accident-site",
+    "exactTraits": [
+      {
+        "key": "fixture",
+        "value": "scene-03"
+      }
+    ],
+    "semanticEvidenceRefs": [
+      "synthetic"
+    ]
+  },
+  "source": {
+    "sourceAssetRefs": [
+      {
+        "recordId": "scene-03-asset",
+        "revision": 1,
+        "contentDigest": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    ],
+    "lineageRootNodeIds": [
+      "scene-03-root"
+    ],
+    "provenanceEvidenceRefs": [
+      "synthetic"
+    ]
+  },
+  "visibleRepresentation": {
+    "assetRefs": [
+      {
+        "recordId": "scene-03-asset",
+        "revision": 1,
+        "contentDigest": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    ],
+    "renderGeometryRefs": [
+      {
+        "recordId": "scene-03-render",
+        "revision": 1,
+        "contentDigest": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    ]
+  },
+  "sceneGeometryRefs": [
+    {
+      "recordId": "scene-03-geometry",
+      "revision": 1,
+      "contentDigest": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "collisionGeometryRefs": [
+    {
+      "recordId": "scene-03-collision",
+      "revision": 1,
+      "contentDigest": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "occlusionGeometryRefs": [
+    {
+      "recordId": "scene-03-occlusion",
+      "revision": 1,
+      "contentDigest": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "navigationGeometryRefs": [
+    {
+      "recordId": "scene-03-nav",
+      "revision": 1,
+      "contentDigest": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "semanticEntityRefs": [
+    {
+      "recordId": "scene-03-semantic",
+      "revision": 1,
+      "contentDigest": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "surfaceModelRef": {
+    "surfaceModelId": "scene-03-surface",
+    "revision": 1,
+    "surfaceModelDigest": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "supportSurfaceIds": [
+    "road",
+    "curb",
+    "sidewalk"
+  ],
+  "cameraCalibrations": [
+    {
+      "cameraId": "camera-1",
+      "intrinsics": {},
+      "extrinsics": {},
+      "validEnvelopeRef": {
+        "recordId": "scene-03-camera-envelope",
+        "revision": 1,
+        "contentDigest": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "calibrationEvidenceRefs": [
+        "synthetic"
+      ]
+    }
+  ],
+  "sceneBindingProofRef": null,
+  "dynamicStateContractRef": null,
+  "capabilities": {
+    "planarSurfaces": false,
+    "curvedSurfaces": true,
+    "multiLevel": true,
+    "indoorOutdoor": "OUTDOOR",
+    "dynamicGeometry": false
+  },
+  "evidenceRefs": [
+    "synthetic"
+  ]
+}
