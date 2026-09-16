@@ -1,0 +1,12 @@
+{
+  "classification": {
+    "index.html": "RECOVERED_FROM_LIVE_PRODUCTION",
+    "src/nextgen": "RECOVERED_FROM_LIVE_PRODUCTION",
+    "sw.js": "RECOVERED_FROM_LIVE_PRODUCTION",
+    "llm-worker.js": "UNKNOWN_PRODUCTION_ENDPOINT_RETURNS_INDEX_HTML_DESPITE_JAVASCRIPT_HEADER",
+    "binaryAssets": "UNKNOWN_NOT_RECOVERED",
+    "lost0413182Differences": "UNKNOWN"
+  },
+  "productionIndexSha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+  "claim": "NOT_A_BYTE_FOR_BYTE_RECONSTRUCTION_OF_0413182"
+}
