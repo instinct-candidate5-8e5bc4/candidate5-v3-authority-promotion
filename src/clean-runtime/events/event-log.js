@@ -1,0 +1,3 @@
+'use strict';const {digest,canonicalBytes}=require('../contracts/canonical');
+class EventLog{#events=[];#fail=false;constructor({failAppend=false}={}){this.#fail=failAppend}append(draft){if(this.#fail)throw Error('EVENT_LOG_FAILURE');const event=Object.freeze({...structuredClone(draft),sequence:this.#events.length+1,priorEventDigest:this.#events.at(-1)?.eventDigest||'0'.repeat(64)});const final=Object.freeze({...event,eventDigest:digest(event)});this.#events.push(final);return final}snapshot(){return Object.freeze(this.#events.map(x=>Object.freeze(structuredClone(x))))}bytes(){return canonicalBytes(this.#events)}setFailureForTest(v){this.#fail=!!v}}
+module.exports={EventLog};

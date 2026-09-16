@@ -1,0 +1,3 @@
+'use strict';const {createInternalWorldStore}=require('./world/world-store');const {createWorldMutationAPI}=require('./mutation/world-mutation-api');const {EventLog}=require('./events/event-log');const {assertPort}=require('./mutation/physical-legality-port');
+function createAuthorityRuntime({initialWorld,legalityPort,eventLog=new EventLog()}){assertPort(legalityPort);const {publicStore,writer}=createInternalWorldStore(initialWorld);const api=createWorldMutationAPI({store:publicStore,writer,eventLog,legalityPort});return Object.freeze({worldMutationAPI:api,worldStore:publicStore})}
+module.exports={createAuthorityRuntime};

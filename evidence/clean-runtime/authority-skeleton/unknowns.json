@@ -1,0 +1,9 @@
+{
+  "unknowns": [
+    "Phase 2 Geometry Gate integration is not implemented; PhysicalLegalityPort is a deterministic test double only.",
+    "School geometry, real entity definitions and Surface Model adapter are not implemented.",
+    "Renderer, visuals, assets, NPC, persistence migration, mobile performance and legacy parity are outside this gate.",
+    "JavaScript closure/private-module isolation prevents public capability access under supported imports, but does not claim protection against a compromised process that rewrites loaded code.",
+    "Command-specific semantic completeness beyond the skeleton fields requires the next reviewed contract stage."
+  ]
+}

@@ -1,0 +1,5 @@
+'use strict';const {digest}=require('./canonical');
+const COMMAND_TYPES=Object.freeze(['SpawnEntity','RemoveEntity','SetTransform','ChangePosture','AttachSupport','DetachSupport','ReplacePhysicalBody','ChangePhysicalParticipation','ReparentEntity']);
+function command(x){if(!x||!x.commandId||!COMMAND_TYPES.includes(x.type)||!Number.isInteger(x.expectedWorldRevision))throw TypeError('INVALID_COMMAND');const c=structuredClone(x);c.commandDigest=digest({...c,commandDigest:undefined});return Object.freeze(c)}
+function transaction(x){if(!x||!x.transactionId||!Number.isInteger(x.expectedWorldRevision)||!Array.isArray(x.commands)||!x.commands.length)throw TypeError('INVALID_TRANSACTION');const commands=x.commands.map(command);if(new Set(commands.map(c=>c.commandId)).size!==commands.length)throw TypeError('DUPLICATE_COMMAND_ID');return Object.freeze({transactionId:x.transactionId,expectedWorldRevision:x.expectedWorldRevision,commands:Object.freeze(commands),transactionDigest:digest({transactionId:x.transactionId,expectedWorldRevision:x.expectedWorldRevision,commands})})}
+module.exports={COMMAND_TYPES,command,transaction};

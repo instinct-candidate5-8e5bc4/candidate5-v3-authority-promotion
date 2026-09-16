@@ -1,0 +1,25 @@
+{
+  "auditKind": "ACORN_AST_AUTHORITY_AUDIT",
+  "ecmaVersion": "latest",
+  "files": 11,
+  "parsedNodes": 2091,
+  "mutationOwnerModules": [
+    "world/world-store.js",
+    "mutation/world-mutation-api.js",
+    "contracts/world-state.js",
+    "events/replay.js",
+    "events/event-log.js"
+  ],
+  "internalOnlyModules": [
+    "world/world-store.js",
+    "mutation/world-mutation-api.js"
+  ],
+  "forbiddenDependencies": [
+    "three",
+    "src/nextgen",
+    "index.html",
+    "sw.js"
+  ],
+  "unauthorizedFindings": [],
+  "status": "PASS"
+}

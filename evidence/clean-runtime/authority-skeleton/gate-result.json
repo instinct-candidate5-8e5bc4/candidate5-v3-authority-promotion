@@ -1,0 +1,12 @@
+{
+  "gate": "Contract + Authority Skeleton",
+  "baseCommit": "c1889c7812fb2bb408671d47647ed36d2768fcf1",
+  "branch": "recovery/verified-architecture",
+  "cleanRuntimeTests": {"passed": 19, "failed": 0},
+  "inheritedPhase1TestsAt7020b41": {"passed": 13, "failed": 0},
+  "inheritedPhase2TestsAt7020b41": {"passed": 38, "failed": 0},
+  "astAuthorityAudit": "PASS",
+  "deterministicRepeatedFixture": "BYTE_IDENTICAL",
+  "legacyRuntimeDiff": [],
+  "scope": "synthetic contract and authority skeleton only"
+}
