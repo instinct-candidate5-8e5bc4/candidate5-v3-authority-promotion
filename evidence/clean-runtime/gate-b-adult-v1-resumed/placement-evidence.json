@@ -1,0 +1,2600 @@
+{
+  "rows": [
+    {
+      "name": "legal",
+      "status": "COMMITTED",
+      "beforeDigest": "ba7c8b4e7ff3a70eee46bdd5c49fa3a5a0ee7b21ee4a5e36846389d8e1084772",
+      "afterDigest": "0bcefc0609d6888dfa655aba6f19338c7508e72ae22e2264a2b6f106165bcd01",
+      "worldRevision": 1,
+      "cleanFailure": null,
+      "phase2Reason": "GEOMETRY_GATE_PASS",
+      "phase2Evidence": null,
+      "event": {
+        "eventType": "MutationCommitted",
+        "kind": "transaction",
+        "id": "tx:legal",
+        "worldId": "school-adult-v1-test",
+        "priorWorldRevision": 0,
+        "priorStateDigest": "ba7c8b4e7ff3a70eee46bdd5c49fa3a5a0ee7b21ee4a5e36846389d8e1084772",
+        "commandDigest": "890ace73a810cff4543ded85999a679fd6447cacd4459025562f82b1927fd606",
+        "newWorldRevision": 1,
+        "newStateDigest": "0bcefc0609d6888dfa655aba6f19338c7508e72ae22e2264a2b6f106165bcd01",
+        "stateDelta": {
+          "entities": {
+            "school-casualty-adult-v1": {
+              "entityId": "school-casualty-adult-v1",
+              "entityTypeId": "school/casualty",
+              "revision": 2,
+              "lifecycleState": "ACTIVE",
+              "transform": {
+                "positionMicrounits": [
+                  0,
+                  0,
+                  1000000
+                ],
+                "orientation": [
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "scaleMicrounits": [
+                  1000000,
+                  1000000,
+                  1000000
+                ]
+              },
+              "parentEntityId": null,
+              "supportRelation": null,
+              "physicalBodyRef": {
+                "recordId": "casualty/adult-v1/supine-floor",
+                "revision": 1,
+                "digest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3",
+                "proofGeometryDigest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+              },
+              "geometrySourceRef": {
+                "recordId": "DA-ADULT-V1-MALE-SUPINE-001",
+                "revision": 1,
+                "digest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3",
+                "classification": "AUTHORED_NEW",
+                "lineageStatus": "AUTHORED_NEW"
+              },
+              "participatesIn": [
+                "collision",
+                "support"
+              ],
+              "postureStateId": "adult-v1/supine-floor",
+              "physicalState": {
+                "active": true,
+                "surfaceId": "floor",
+                "orientationUpDot": 1,
+                "supportNormalUpDot": 1,
+                "profileRef": {
+                  "id": "adult-v1",
+                  "revision": 1,
+                  "digest": "f1d973b4cfbebdfa230fe0257ccfe9c11056a7d07e52c3701d1e6772311bcc41",
+                  "subjectSex": "MALE"
+                },
+                "postureRef": {
+                  "id": "adult-v1/supine-floor",
+                  "semanticType": "SUPINE_FLOOR",
+                  "revision": 1,
+                  "digest": "197a806537a3c9d9f629cf2a57d6db4031fa93ebea0618c2e18603f48301745e"
+                },
+                "supportCategory": {
+                  "supportCategoryId": "school/floor-v1",
+                  "supportSemanticType": "FLOOR",
+                  "provenanceStatus": "RECOVERED",
+                  "fixtureOnly": false
+                }
+              }
+            }
+          },
+          "physicalRelations": [],
+          "lifecycleState": "ACTIVE",
+          "surfaces": null,
+          "environmentPhysicalState": null
+        },
+        "sequence": 1,
+        "priorEventDigest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "eventDigest": "4a9b07660b93dbe5dd1eb3d1137d7a9d2ff1652c869c9c2bca3fd5fd3aad7ab1"
+      }
+    },
+    {
+      "name": "floating",
+      "status": "REJECTED",
+      "beforeDigest": "ba7c8b4e7ff3a70eee46bdd5c49fa3a5a0ee7b21ee4a5e36846389d8e1084772",
+      "afterDigest": "ba7c8b4e7ff3a70eee46bdd5c49fa3a5a0ee7b21ee4a5e36846389d8e1084772",
+      "worldRevision": 0,
+      "cleanFailure": {
+        "code": "TRANSACTION_REJECTED",
+        "evidence": {
+          "cause": "GEOMETRY_PROOF_FAILED",
+          "detail": {
+            "legality": {
+              "outcome": "FAIL",
+              "evidence": {
+                "adapterKind": "SCHOOL_PHASE2_GEOMETRY_ADAPTER",
+                "request": {
+                  "requestId": "floating",
+                  "surfaceId": "floor",
+                  "surfaceModelRef": {
+                    "id": "school-surface-v1",
+                    "revision": 1,
+                    "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf"
+                  },
+                  "geometry": {
+                    "minX": -0.33,
+                    "maxX": 0.33,
+                    "minY": 0,
+                    "maxY": 0.302,
+                    "minZ": -1.179,
+                    "maxZ": 0.767
+                  },
+                  "geometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                  "proofGeometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                  "transform": {
+                    "x": 0,
+                    "y": 0.01,
+                    "z": 1
+                  },
+                  "orientationUpDot": 1,
+                  "supportNormalUpDot": 1,
+                  "evidenceRefs": [
+                    "authoring-decision:DA-ADULT-V1-MALE-SUPINE-001",
+                    "body-digest:5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+                  ]
+                },
+                "requestDigest": "ec16c386c215e488b18120c647690325ef18533a4e7bd07714a92927f68e486f",
+                "requestBytes": "{\"evidenceRefs\":[\"authoring-decision:DA-ADULT-V1-MALE-SUPINE-001\",\"body-digest:5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3\"],\"geometry\":{\"maxX\":0.33,\"maxY\":0.302,\"maxZ\":0.767,\"minX\":-0.33,\"minY\":0,\"minZ\":-1.179},\"geometryDigest\":\"d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff\",\"orientationUpDot\":1,\"proofGeometryDigest\":\"d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff\",\"requestId\":\"floating\",\"supportNormalUpDot\":1,\"surfaceId\":\"floor\",\"surfaceModelRef\":{\"digest\":\"308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf\",\"id\":\"school-surface-v1\",\"revision\":1},\"transform\":{\"x\":0,\"y\":0.01,\"z\":1}}",
+                "sceneProvenance": {
+                  "sceneId": "school",
+                  "classification": "RECOVERED",
+                  "lineageStatus": "RECOVERED",
+                  "sourceId": "index.html",
+                  "revision": 1,
+                  "digest": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                  "sourceRangeId": "school-bag-lockers"
+                },
+                "bodyProvenance": {
+                  "classification": "AUTHORED_NEW",
+                  "lineageStatus": "AUTHORED_NEW",
+                  "sourceId": "DA-ADULT-V1-MALE-SUPINE-001",
+                  "revision": 1,
+                  "digest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+                },
+                "surfaceProvenance": {
+                  "classification": "RECOVERED",
+                  "lineageStatus": "RECOVERED",
+                  "sourceId": "evidence/verified-architecture-phase2/surface-models/school.json",
+                  "revision": 1,
+                  "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                  "sourceEvidence": {
+                    "source": {
+                      "artifact": "index.html",
+                      "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                      "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                      "verification": "exact bytes at locked commit 30cb23e"
+                    },
+                    "panorama": "c85dc927ac565ed863f7f8e0bbaddd0fc66120b542630d3aa57e6163a5684361",
+                    "panoramaRole": "PIXEL_DIAGNOSTIC_ONLY",
+                    "geometryBindingStatus": "UNKNOWN"
+                  },
+                  "resolvedSurface": {
+                    "artifact": "index.html",
+                    "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                    "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                    "verification": "exact bytes at locked commit 30cb23e"
+                  }
+                },
+                "phase2ReasonCode": "CONTACT_GAP_FLOATING",
+                "phase2Evidence": {
+                  "requestId": "floating",
+                  "sceneId": "school",
+                  "surfaceId": "floor",
+                  "checkedGeometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                  "surfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                  "pixelEvidenceUsedAsAuthority": false,
+                  "autoFixed": false,
+                  "bounds": {
+                    "minX": -0.33,
+                    "maxX": 0.33,
+                    "minY": 0.01,
+                    "maxY": 0.312,
+                    "minZ": -0.17900000000000005,
+                    "maxZ": 1.767
+                  },
+                  "contactGap": 0.01
+                },
+                "phase2ProofDigest": null
+              }
+            }
+          }
+        }
+      },
+      "phase2Reason": "CONTACT_GAP_FLOATING",
+      "phase2Evidence": {
+        "requestId": "floating",
+        "sceneId": "school",
+        "surfaceId": "floor",
+        "checkedGeometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+        "surfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+        "pixelEvidenceUsedAsAuthority": false,
+        "autoFixed": false,
+        "bounds": {
+          "minX": -0.33,
+          "maxX": 0.33,
+          "minY": 0.01,
+          "maxY": 0.312,
+          "minZ": -0.17900000000000005,
+          "maxZ": 1.767
+        },
+        "contactGap": 0.01
+      },
+      "event": {
+        "eventType": "MutationRejected",
+        "kind": "transaction",
+        "id": "tx:floating",
+        "worldId": "school-adult-v1-test",
+        "worldRevision": 0,
+        "stateDigest": "ba7c8b4e7ff3a70eee46bdd5c49fa3a5a0ee7b21ee4a5e36846389d8e1084772",
+        "commandDigest": "877b639649d0c64074b890f401b14ed60c3b53dc153a902814734f2a21ff9ea1",
+        "failure": {
+          "code": "TRANSACTION_REJECTED",
+          "evidence": {
+            "cause": "GEOMETRY_PROOF_FAILED",
+            "detail": {
+              "legality": {
+                "outcome": "FAIL",
+                "evidence": {
+                  "adapterKind": "SCHOOL_PHASE2_GEOMETRY_ADAPTER",
+                  "request": {
+                    "requestId": "floating",
+                    "surfaceId": "floor",
+                    "surfaceModelRef": {
+                      "id": "school-surface-v1",
+                      "revision": 1,
+                      "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf"
+                    },
+                    "geometry": {
+                      "minX": -0.33,
+                      "maxX": 0.33,
+                      "minY": 0,
+                      "maxY": 0.302,
+                      "minZ": -1.179,
+                      "maxZ": 0.767
+                    },
+                    "geometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                    "proofGeometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                    "transform": {
+                      "x": 0,
+                      "y": 0.01,
+                      "z": 1
+                    },
+                    "orientationUpDot": 1,
+                    "supportNormalUpDot": 1,
+                    "evidenceRefs": [
+                      "authoring-decision:DA-ADULT-V1-MALE-SUPINE-001",
+                      "body-digest:5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+                    ]
+                  },
+                  "requestDigest": "ec16c386c215e488b18120c647690325ef18533a4e7bd07714a92927f68e486f",
+                  "requestBytes": "{\"evidenceRefs\":[\"authoring-decision:DA-ADULT-V1-MALE-SUPINE-001\",\"body-digest:5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3\"],\"geometry\":{\"maxX\":0.33,\"maxY\":0.302,\"maxZ\":0.767,\"minX\":-0.33,\"minY\":0,\"minZ\":-1.179},\"geometryDigest\":\"d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff\",\"orientationUpDot\":1,\"proofGeometryDigest\":\"d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff\",\"requestId\":\"floating\",\"supportNormalUpDot\":1,\"surfaceId\":\"floor\",\"surfaceModelRef\":{\"digest\":\"308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf\",\"id\":\"school-surface-v1\",\"revision\":1},\"transform\":{\"x\":0,\"y\":0.01,\"z\":1}}",
+                  "sceneProvenance": {
+                    "sceneId": "school",
+                    "classification": "RECOVERED",
+                    "lineageStatus": "RECOVERED",
+                    "sourceId": "index.html",
+                    "revision": 1,
+                    "digest": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                    "sourceRangeId": "school-bag-lockers"
+                  },
+                  "bodyProvenance": {
+                    "classification": "AUTHORED_NEW",
+                    "lineageStatus": "AUTHORED_NEW",
+                    "sourceId": "DA-ADULT-V1-MALE-SUPINE-001",
+                    "revision": 1,
+                    "digest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+                  },
+                  "surfaceProvenance": {
+                    "classification": "RECOVERED",
+                    "lineageStatus": "RECOVERED",
+                    "sourceId": "evidence/verified-architecture-phase2/surface-models/school.json",
+                    "revision": 1,
+                    "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                    "sourceEvidence": {
+                      "source": {
+                        "artifact": "index.html",
+                        "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                        "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                        "verification": "exact bytes at locked commit 30cb23e"
+                      },
+                      "panorama": "c85dc927ac565ed863f7f8e0bbaddd0fc66120b542630d3aa57e6163a5684361",
+                      "panoramaRole": "PIXEL_DIAGNOSTIC_ONLY",
+                      "geometryBindingStatus": "UNKNOWN"
+                    },
+                    "resolvedSurface": {
+                      "artifact": "index.html",
+                      "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                      "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                      "verification": "exact bytes at locked commit 30cb23e"
+                    }
+                  },
+                  "phase2ReasonCode": "CONTACT_GAP_FLOATING",
+                  "phase2Evidence": {
+                    "requestId": "floating",
+                    "sceneId": "school",
+                    "surfaceId": "floor",
+                    "checkedGeometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                    "surfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                    "pixelEvidenceUsedAsAuthority": false,
+                    "autoFixed": false,
+                    "bounds": {
+                      "minX": -0.33,
+                      "maxX": 0.33,
+                      "minY": 0.01,
+                      "maxY": 0.312,
+                      "minZ": -0.17900000000000005,
+                      "maxZ": 1.767
+                    },
+                    "contactGap": 0.01
+                  },
+                  "phase2ProofDigest": null
+                }
+              }
+            }
+          }
+        },
+        "sequence": 1,
+        "priorEventDigest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "eventDigest": "edfb0d893161135f75a0454ef973884b79a6a0e61ff2ecbedeb42dad9b3184a6"
+      }
+    },
+    {
+      "name": "wall",
+      "status": "REJECTED",
+      "beforeDigest": "ba7c8b4e7ff3a70eee46bdd5c49fa3a5a0ee7b21ee4a5e36846389d8e1084772",
+      "afterDigest": "ba7c8b4e7ff3a70eee46bdd5c49fa3a5a0ee7b21ee4a5e36846389d8e1084772",
+      "worldRevision": 0,
+      "cleanFailure": {
+        "code": "TRANSACTION_REJECTED",
+        "evidence": {
+          "cause": "GEOMETRY_PROOF_FAILED",
+          "detail": {
+            "legality": {
+              "outcome": "FAIL",
+              "evidence": {
+                "adapterKind": "SCHOOL_PHASE2_GEOMETRY_ADAPTER",
+                "request": {
+                  "requestId": "wall",
+                  "surfaceId": "floor",
+                  "surfaceModelRef": {
+                    "id": "school-surface-v1",
+                    "revision": 1,
+                    "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf"
+                  },
+                  "geometry": {
+                    "minX": -0.33,
+                    "maxX": 0.33,
+                    "minY": 0,
+                    "maxY": 0.302,
+                    "minZ": -1.179,
+                    "maxZ": 0.767
+                  },
+                  "geometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                  "proofGeometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                  "transform": {
+                    "x": 6.8,
+                    "y": 0,
+                    "z": 1
+                  },
+                  "orientationUpDot": 1,
+                  "supportNormalUpDot": 1,
+                  "evidenceRefs": [
+                    "authoring-decision:DA-ADULT-V1-MALE-SUPINE-001",
+                    "body-digest:5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+                  ]
+                },
+                "requestDigest": "f671008b47ceaed9b93fbecb48e11764c7c573bbfa6c6045d7c8ca02e164d567",
+                "requestBytes": "{\"evidenceRefs\":[\"authoring-decision:DA-ADULT-V1-MALE-SUPINE-001\",\"body-digest:5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3\"],\"geometry\":{\"maxX\":0.33,\"maxY\":0.302,\"maxZ\":0.767,\"minX\":-0.33,\"minY\":0,\"minZ\":-1.179},\"geometryDigest\":\"d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff\",\"orientationUpDot\":1,\"proofGeometryDigest\":\"d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff\",\"requestId\":\"wall\",\"supportNormalUpDot\":1,\"surfaceId\":\"floor\",\"surfaceModelRef\":{\"digest\":\"308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf\",\"id\":\"school-surface-v1\",\"revision\":1},\"transform\":{\"x\":6.8,\"y\":0,\"z\":1}}",
+                "sceneProvenance": {
+                  "sceneId": "school",
+                  "classification": "RECOVERED",
+                  "lineageStatus": "RECOVERED",
+                  "sourceId": "index.html",
+                  "revision": 1,
+                  "digest": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                  "sourceRangeId": "school-bag-lockers"
+                },
+                "bodyProvenance": {
+                  "classification": "AUTHORED_NEW",
+                  "lineageStatus": "AUTHORED_NEW",
+                  "sourceId": "DA-ADULT-V1-MALE-SUPINE-001",
+                  "revision": 1,
+                  "digest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+                },
+                "surfaceProvenance": {
+                  "classification": "RECOVERED",
+                  "lineageStatus": "RECOVERED",
+                  "sourceId": "evidence/verified-architecture-phase2/surface-models/school.json",
+                  "revision": 1,
+                  "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                  "sourceEvidence": {
+                    "source": {
+                      "artifact": "index.html",
+                      "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                      "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                      "verification": "exact bytes at locked commit 30cb23e"
+                    },
+                    "panorama": "c85dc927ac565ed863f7f8e0bbaddd0fc66120b542630d3aa57e6163a5684361",
+                    "panoramaRole": "PIXEL_DIAGNOSTIC_ONLY",
+                    "geometryBindingStatus": "UNKNOWN"
+                  },
+                  "resolvedSurface": {
+                    "artifact": "index.html",
+                    "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                    "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                    "verification": "exact bytes at locked commit 30cb23e"
+                  }
+                },
+                "phase2ReasonCode": "WALL_PENETRATION",
+                "phase2Evidence": {
+                  "requestId": "wall",
+                  "sceneId": "school",
+                  "surfaceId": "floor",
+                  "checkedGeometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                  "surfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                  "pixelEvidenceUsedAsAuthority": false,
+                  "autoFixed": false,
+                  "bounds": {
+                    "minX": 6.47,
+                    "maxX": 7.13,
+                    "minY": 0,
+                    "maxY": 0.302,
+                    "minZ": -0.17900000000000005,
+                    "maxZ": 1.767
+                  },
+                  "intersectedSurfaceId": "right-wall",
+                  "intersectionVolumeId": "right-wall-box"
+                },
+                "phase2ProofDigest": null
+              }
+            }
+          }
+        }
+      },
+      "phase2Reason": "WALL_PENETRATION",
+      "phase2Evidence": {
+        "requestId": "wall",
+        "sceneId": "school",
+        "surfaceId": "floor",
+        "checkedGeometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+        "surfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+        "pixelEvidenceUsedAsAuthority": false,
+        "autoFixed": false,
+        "bounds": {
+          "minX": 6.47,
+          "maxX": 7.13,
+          "minY": 0,
+          "maxY": 0.302,
+          "minZ": -0.17900000000000005,
+          "maxZ": 1.767
+        },
+        "intersectedSurfaceId": "right-wall",
+        "intersectionVolumeId": "right-wall-box"
+      },
+      "event": {
+        "eventType": "MutationRejected",
+        "kind": "transaction",
+        "id": "tx:wall",
+        "worldId": "school-adult-v1-test",
+        "worldRevision": 0,
+        "stateDigest": "ba7c8b4e7ff3a70eee46bdd5c49fa3a5a0ee7b21ee4a5e36846389d8e1084772",
+        "commandDigest": "dd07af352bcd7b765ccf994b6b775a02108177bd50f6f038c6d6e4e11460a080",
+        "failure": {
+          "code": "TRANSACTION_REJECTED",
+          "evidence": {
+            "cause": "GEOMETRY_PROOF_FAILED",
+            "detail": {
+              "legality": {
+                "outcome": "FAIL",
+                "evidence": {
+                  "adapterKind": "SCHOOL_PHASE2_GEOMETRY_ADAPTER",
+                  "request": {
+                    "requestId": "wall",
+                    "surfaceId": "floor",
+                    "surfaceModelRef": {
+                      "id": "school-surface-v1",
+                      "revision": 1,
+                      "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf"
+                    },
+                    "geometry": {
+                      "minX": -0.33,
+                      "maxX": 0.33,
+                      "minY": 0,
+                      "maxY": 0.302,
+                      "minZ": -1.179,
+                      "maxZ": 0.767
+                    },
+                    "geometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                    "proofGeometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                    "transform": {
+                      "x": 6.8,
+                      "y": 0,
+                      "z": 1
+                    },
+                    "orientationUpDot": 1,
+                    "supportNormalUpDot": 1,
+                    "evidenceRefs": [
+                      "authoring-decision:DA-ADULT-V1-MALE-SUPINE-001",
+                      "body-digest:5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+                    ]
+                  },
+                  "requestDigest": "f671008b47ceaed9b93fbecb48e11764c7c573bbfa6c6045d7c8ca02e164d567",
+                  "requestBytes": "{\"evidenceRefs\":[\"authoring-decision:DA-ADULT-V1-MALE-SUPINE-001\",\"body-digest:5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3\"],\"geometry\":{\"maxX\":0.33,\"maxY\":0.302,\"maxZ\":0.767,\"minX\":-0.33,\"minY\":0,\"minZ\":-1.179},\"geometryDigest\":\"d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff\",\"orientationUpDot\":1,\"proofGeometryDigest\":\"d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff\",\"requestId\":\"wall\",\"supportNormalUpDot\":1,\"surfaceId\":\"floor\",\"surfaceModelRef\":{\"digest\":\"308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf\",\"id\":\"school-surface-v1\",\"revision\":1},\"transform\":{\"x\":6.8,\"y\":0,\"z\":1}}",
+                  "sceneProvenance": {
+                    "sceneId": "school",
+                    "classification": "RECOVERED",
+                    "lineageStatus": "RECOVERED",
+                    "sourceId": "index.html",
+                    "revision": 1,
+                    "digest": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                    "sourceRangeId": "school-bag-lockers"
+                  },
+                  "bodyProvenance": {
+                    "classification": "AUTHORED_NEW",
+                    "lineageStatus": "AUTHORED_NEW",
+                    "sourceId": "DA-ADULT-V1-MALE-SUPINE-001",
+                    "revision": 1,
+                    "digest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+                  },
+                  "surfaceProvenance": {
+                    "classification": "RECOVERED",
+                    "lineageStatus": "RECOVERED",
+                    "sourceId": "evidence/verified-architecture-phase2/surface-models/school.json",
+                    "revision": 1,
+                    "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                    "sourceEvidence": {
+                      "source": {
+                        "artifact": "index.html",
+                        "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                        "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                        "verification": "exact bytes at locked commit 30cb23e"
+                      },
+                      "panorama": "c85dc927ac565ed863f7f8e0bbaddd0fc66120b542630d3aa57e6163a5684361",
+                      "panoramaRole": "PIXEL_DIAGNOSTIC_ONLY",
+                      "geometryBindingStatus": "UNKNOWN"
+                    },
+                    "resolvedSurface": {
+                      "artifact": "index.html",
+                      "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                      "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                      "verification": "exact bytes at locked commit 30cb23e"
+                    }
+                  },
+                  "phase2ReasonCode": "WALL_PENETRATION",
+                  "phase2Evidence": {
+                    "requestId": "wall",
+                    "sceneId": "school",
+                    "surfaceId": "floor",
+                    "checkedGeometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                    "surfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                    "pixelEvidenceUsedAsAuthority": false,
+                    "autoFixed": false,
+                    "bounds": {
+                      "minX": 6.47,
+                      "maxX": 7.13,
+                      "minY": 0,
+                      "maxY": 0.302,
+                      "minZ": -0.17900000000000005,
+                      "maxZ": 1.767
+                    },
+                    "intersectedSurfaceId": "right-wall",
+                    "intersectionVolumeId": "right-wall-box"
+                  },
+                  "phase2ProofDigest": null
+                }
+              }
+            }
+          }
+        },
+        "sequence": 1,
+        "priorEventDigest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "eventDigest": "7ab3817c2a9f755e7178991204869579138317c007ce197bcfe0563ff9706e02"
+      }
+    },
+    {
+      "name": "door",
+      "status": "REJECTED",
+      "beforeDigest": "ba7c8b4e7ff3a70eee46bdd5c49fa3a5a0ee7b21ee4a5e36846389d8e1084772",
+      "afterDigest": "ba7c8b4e7ff3a70eee46bdd5c49fa3a5a0ee7b21ee4a5e36846389d8e1084772",
+      "worldRevision": 0,
+      "cleanFailure": {
+        "code": "TRANSACTION_REJECTED",
+        "evidence": {
+          "cause": "GEOMETRY_PROOF_FAILED",
+          "detail": {
+            "legality": {
+              "outcome": "FAIL",
+              "evidence": {
+                "adapterKind": "SCHOOL_PHASE2_GEOMETRY_ADAPTER",
+                "request": {
+                  "requestId": "door",
+                  "surfaceId": "floor",
+                  "surfaceModelRef": {
+                    "id": "school-surface-v1",
+                    "revision": 1,
+                    "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf"
+                  },
+                  "geometry": {
+                    "minX": -0.33,
+                    "maxX": 0.33,
+                    "minY": 0,
+                    "maxY": 0.302,
+                    "minZ": -1.179,
+                    "maxZ": 0.767
+                  },
+                  "geometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                  "proofGeometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                  "transform": {
+                    "x": 5.4,
+                    "y": 0,
+                    "z": -3.2
+                  },
+                  "orientationUpDot": 1,
+                  "supportNormalUpDot": 1,
+                  "evidenceRefs": [
+                    "authoring-decision:DA-ADULT-V1-MALE-SUPINE-001",
+                    "body-digest:5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+                  ]
+                },
+                "requestDigest": "38443ec7a24b261020dedb32f4d0d7bcc7dfacd0e4b5155b59d99bfc1573c957",
+                "requestBytes": "{\"evidenceRefs\":[\"authoring-decision:DA-ADULT-V1-MALE-SUPINE-001\",\"body-digest:5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3\"],\"geometry\":{\"maxX\":0.33,\"maxY\":0.302,\"maxZ\":0.767,\"minX\":-0.33,\"minY\":0,\"minZ\":-1.179},\"geometryDigest\":\"d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff\",\"orientationUpDot\":1,\"proofGeometryDigest\":\"d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff\",\"requestId\":\"door\",\"supportNormalUpDot\":1,\"surfaceId\":\"floor\",\"surfaceModelRef\":{\"digest\":\"308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf\",\"id\":\"school-surface-v1\",\"revision\":1},\"transform\":{\"x\":5.4,\"y\":0,\"z\":-3.2}}",
+                "sceneProvenance": {
+                  "sceneId": "school",
+                  "classification": "RECOVERED",
+                  "lineageStatus": "RECOVERED",
+                  "sourceId": "index.html",
+                  "revision": 1,
+                  "digest": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                  "sourceRangeId": "school-bag-lockers"
+                },
+                "bodyProvenance": {
+                  "classification": "AUTHORED_NEW",
+                  "lineageStatus": "AUTHORED_NEW",
+                  "sourceId": "DA-ADULT-V1-MALE-SUPINE-001",
+                  "revision": 1,
+                  "digest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+                },
+                "surfaceProvenance": {
+                  "classification": "RECOVERED",
+                  "lineageStatus": "RECOVERED",
+                  "sourceId": "evidence/verified-architecture-phase2/surface-models/school.json",
+                  "revision": 1,
+                  "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                  "sourceEvidence": {
+                    "source": {
+                      "artifact": "index.html",
+                      "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                      "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                      "verification": "exact bytes at locked commit 30cb23e"
+                    },
+                    "panorama": "c85dc927ac565ed863f7f8e0bbaddd0fc66120b542630d3aa57e6163a5684361",
+                    "panoramaRole": "PIXEL_DIAGNOSTIC_ONLY",
+                    "geometryBindingStatus": "UNKNOWN"
+                  },
+                  "resolvedSurface": {
+                    "artifact": "index.html",
+                    "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                    "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                    "verification": "exact bytes at locked commit 30cb23e"
+                  }
+                },
+                "phase2ReasonCode": "DOOR_OR_OPENING_PENETRATION",
+                "phase2Evidence": {
+                  "requestId": "door",
+                  "sceneId": "school",
+                  "surfaceId": "floor",
+                  "checkedGeometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                  "surfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                  "pixelEvidenceUsedAsAuthority": false,
+                  "autoFixed": false,
+                  "bounds": {
+                    "minX": 5.07,
+                    "maxX": 5.73,
+                    "minY": 0,
+                    "maxY": 0.302,
+                    "minZ": -4.3790000000000004,
+                    "maxZ": -2.4330000000000003
+                  },
+                  "intersectedSurfaceId": "door",
+                  "intersectionVolumeId": "door-box"
+                },
+                "phase2ProofDigest": null
+              }
+            }
+          }
+        }
+      },
+      "phase2Reason": "DOOR_OR_OPENING_PENETRATION",
+      "phase2Evidence": {
+        "requestId": "door",
+        "sceneId": "school",
+        "surfaceId": "floor",
+        "checkedGeometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+        "surfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+        "pixelEvidenceUsedAsAuthority": false,
+        "autoFixed": false,
+        "bounds": {
+          "minX": 5.07,
+          "maxX": 5.73,
+          "minY": 0,
+          "maxY": 0.302,
+          "minZ": -4.3790000000000004,
+          "maxZ": -2.4330000000000003
+        },
+        "intersectedSurfaceId": "door",
+        "intersectionVolumeId": "door-box"
+      },
+      "event": {
+        "eventType": "MutationRejected",
+        "kind": "transaction",
+        "id": "tx:door",
+        "worldId": "school-adult-v1-test",
+        "worldRevision": 0,
+        "stateDigest": "ba7c8b4e7ff3a70eee46bdd5c49fa3a5a0ee7b21ee4a5e36846389d8e1084772",
+        "commandDigest": "65a5497265db5b24617c92cae339bc91570edfadc1591c2f8609495671ad258b",
+        "failure": {
+          "code": "TRANSACTION_REJECTED",
+          "evidence": {
+            "cause": "GEOMETRY_PROOF_FAILED",
+            "detail": {
+              "legality": {
+                "outcome": "FAIL",
+                "evidence": {
+                  "adapterKind": "SCHOOL_PHASE2_GEOMETRY_ADAPTER",
+                  "request": {
+                    "requestId": "door",
+                    "surfaceId": "floor",
+                    "surfaceModelRef": {
+                      "id": "school-surface-v1",
+                      "revision": 1,
+                      "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf"
+                    },
+                    "geometry": {
+                      "minX": -0.33,
+                      "maxX": 0.33,
+                      "minY": 0,
+                      "maxY": 0.302,
+                      "minZ": -1.179,
+                      "maxZ": 0.767
+                    },
+                    "geometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                    "proofGeometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                    "transform": {
+                      "x": 5.4,
+                      "y": 0,
+                      "z": -3.2
+                    },
+                    "orientationUpDot": 1,
+                    "supportNormalUpDot": 1,
+                    "evidenceRefs": [
+                      "authoring-decision:DA-ADULT-V1-MALE-SUPINE-001",
+                      "body-digest:5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+                    ]
+                  },
+                  "requestDigest": "38443ec7a24b261020dedb32f4d0d7bcc7dfacd0e4b5155b59d99bfc1573c957",
+                  "requestBytes": "{\"evidenceRefs\":[\"authoring-decision:DA-ADULT-V1-MALE-SUPINE-001\",\"body-digest:5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3\"],\"geometry\":{\"maxX\":0.33,\"maxY\":0.302,\"maxZ\":0.767,\"minX\":-0.33,\"minY\":0,\"minZ\":-1.179},\"geometryDigest\":\"d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff\",\"orientationUpDot\":1,\"proofGeometryDigest\":\"d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff\",\"requestId\":\"door\",\"supportNormalUpDot\":1,\"surfaceId\":\"floor\",\"surfaceModelRef\":{\"digest\":\"308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf\",\"id\":\"school-surface-v1\",\"revision\":1},\"transform\":{\"x\":5.4,\"y\":0,\"z\":-3.2}}",
+                  "sceneProvenance": {
+                    "sceneId": "school",
+                    "classification": "RECOVERED",
+                    "lineageStatus": "RECOVERED",
+                    "sourceId": "index.html",
+                    "revision": 1,
+                    "digest": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                    "sourceRangeId": "school-bag-lockers"
+                  },
+                  "bodyProvenance": {
+                    "classification": "AUTHORED_NEW",
+                    "lineageStatus": "AUTHORED_NEW",
+                    "sourceId": "DA-ADULT-V1-MALE-SUPINE-001",
+                    "revision": 1,
+                    "digest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+                  },
+                  "surfaceProvenance": {
+                    "classification": "RECOVERED",
+                    "lineageStatus": "RECOVERED",
+                    "sourceId": "evidence/verified-architecture-phase2/surface-models/school.json",
+                    "revision": 1,
+                    "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                    "sourceEvidence": {
+                      "source": {
+                        "artifact": "index.html",
+                        "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                        "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                        "verification": "exact bytes at locked commit 30cb23e"
+                      },
+                      "panorama": "c85dc927ac565ed863f7f8e0bbaddd0fc66120b542630d3aa57e6163a5684361",
+                      "panoramaRole": "PIXEL_DIAGNOSTIC_ONLY",
+                      "geometryBindingStatus": "UNKNOWN"
+                    },
+                    "resolvedSurface": {
+                      "artifact": "index.html",
+                      "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                      "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                      "verification": "exact bytes at locked commit 30cb23e"
+                    }
+                  },
+                  "phase2ReasonCode": "DOOR_OR_OPENING_PENETRATION",
+                  "phase2Evidence": {
+                    "requestId": "door",
+                    "sceneId": "school",
+                    "surfaceId": "floor",
+                    "checkedGeometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                    "surfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                    "pixelEvidenceUsedAsAuthority": false,
+                    "autoFixed": false,
+                    "bounds": {
+                      "minX": 5.07,
+                      "maxX": 5.73,
+                      "minY": 0,
+                      "maxY": 0.302,
+                      "minZ": -4.3790000000000004,
+                      "maxZ": -2.4330000000000003
+                    },
+                    "intersectedSurfaceId": "door",
+                    "intersectionVolumeId": "door-box"
+                  },
+                  "phase2ProofDigest": null
+                }
+              }
+            }
+          }
+        },
+        "sequence": 1,
+        "priorEventDigest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "eventDigest": "3fc175037324d20f6cb7ac795e9ceb0d350114b95fcd63393c74414fa8cfa672"
+      }
+    },
+    {
+      "name": "partial-door",
+      "status": "REJECTED",
+      "beforeDigest": "ba7c8b4e7ff3a70eee46bdd5c49fa3a5a0ee7b21ee4a5e36846389d8e1084772",
+      "afterDigest": "ba7c8b4e7ff3a70eee46bdd5c49fa3a5a0ee7b21ee4a5e36846389d8e1084772",
+      "worldRevision": 0,
+      "cleanFailure": {
+        "code": "TRANSACTION_REJECTED",
+        "evidence": {
+          "cause": "GEOMETRY_PROOF_FAILED",
+          "detail": {
+            "legality": {
+              "outcome": "FAIL",
+              "evidence": {
+                "adapterKind": "SCHOOL_PHASE2_GEOMETRY_ADAPTER",
+                "request": {
+                  "requestId": "partial-door",
+                  "surfaceId": "floor",
+                  "surfaceModelRef": {
+                    "id": "school-surface-v1",
+                    "revision": 1,
+                    "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf"
+                  },
+                  "geometry": {
+                    "minX": -0.33,
+                    "maxX": 0.33,
+                    "minY": 0,
+                    "maxY": 0.302,
+                    "minZ": -1.179,
+                    "maxZ": 0.767
+                  },
+                  "geometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                  "proofGeometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                  "transform": {
+                    "x": 4.5,
+                    "y": 0,
+                    "z": -3.2
+                  },
+                  "orientationUpDot": 1,
+                  "supportNormalUpDot": 1,
+                  "evidenceRefs": [
+                    "authoring-decision:DA-ADULT-V1-MALE-SUPINE-001",
+                    "body-digest:5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+                  ]
+                },
+                "requestDigest": "96e6bd3400a827522cfbb494ee41406a933e364fd71090b0025091c1a7804af2",
+                "requestBytes": "{\"evidenceRefs\":[\"authoring-decision:DA-ADULT-V1-MALE-SUPINE-001\",\"body-digest:5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3\"],\"geometry\":{\"maxX\":0.33,\"maxY\":0.302,\"maxZ\":0.767,\"minX\":-0.33,\"minY\":0,\"minZ\":-1.179},\"geometryDigest\":\"d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff\",\"orientationUpDot\":1,\"proofGeometryDigest\":\"d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff\",\"requestId\":\"partial-door\",\"supportNormalUpDot\":1,\"surfaceId\":\"floor\",\"surfaceModelRef\":{\"digest\":\"308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf\",\"id\":\"school-surface-v1\",\"revision\":1},\"transform\":{\"x\":4.5,\"y\":0,\"z\":-3.2}}",
+                "sceneProvenance": {
+                  "sceneId": "school",
+                  "classification": "RECOVERED",
+                  "lineageStatus": "RECOVERED",
+                  "sourceId": "index.html",
+                  "revision": 1,
+                  "digest": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                  "sourceRangeId": "school-bag-lockers"
+                },
+                "bodyProvenance": {
+                  "classification": "AUTHORED_NEW",
+                  "lineageStatus": "AUTHORED_NEW",
+                  "sourceId": "DA-ADULT-V1-MALE-SUPINE-001",
+                  "revision": 1,
+                  "digest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+                },
+                "surfaceProvenance": {
+                  "classification": "RECOVERED",
+                  "lineageStatus": "RECOVERED",
+                  "sourceId": "evidence/verified-architecture-phase2/surface-models/school.json",
+                  "revision": 1,
+                  "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                  "sourceEvidence": {
+                    "source": {
+                      "artifact": "index.html",
+                      "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                      "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                      "verification": "exact bytes at locked commit 30cb23e"
+                    },
+                    "panorama": "c85dc927ac565ed863f7f8e0bbaddd0fc66120b542630d3aa57e6163a5684361",
+                    "panoramaRole": "PIXEL_DIAGNOSTIC_ONLY",
+                    "geometryBindingStatus": "UNKNOWN"
+                  },
+                  "resolvedSurface": {
+                    "artifact": "index.html",
+                    "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                    "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                    "verification": "exact bytes at locked commit 30cb23e"
+                  }
+                },
+                "phase2ReasonCode": "DOOR_OR_OPENING_PENETRATION",
+                "phase2Evidence": {
+                  "requestId": "partial-door",
+                  "sceneId": "school",
+                  "surfaceId": "floor",
+                  "checkedGeometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                  "surfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                  "pixelEvidenceUsedAsAuthority": false,
+                  "autoFixed": false,
+                  "bounds": {
+                    "minX": 4.17,
+                    "maxX": 4.83,
+                    "minY": 0,
+                    "maxY": 0.302,
+                    "minZ": -4.3790000000000004,
+                    "maxZ": -2.4330000000000003
+                  },
+                  "intersectedSurfaceId": "door",
+                  "intersectionVolumeId": "door-box"
+                },
+                "phase2ProofDigest": null
+              }
+            }
+          }
+        }
+      },
+      "phase2Reason": "DOOR_OR_OPENING_PENETRATION",
+      "phase2Evidence": {
+        "requestId": "partial-door",
+        "sceneId": "school",
+        "surfaceId": "floor",
+        "checkedGeometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+        "surfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+        "pixelEvidenceUsedAsAuthority": false,
+        "autoFixed": false,
+        "bounds": {
+          "minX": 4.17,
+          "maxX": 4.83,
+          "minY": 0,
+          "maxY": 0.302,
+          "minZ": -4.3790000000000004,
+          "maxZ": -2.4330000000000003
+        },
+        "intersectedSurfaceId": "door",
+        "intersectionVolumeId": "door-box"
+      },
+      "event": {
+        "eventType": "MutationRejected",
+        "kind": "transaction",
+        "id": "tx:partial-door",
+        "worldId": "school-adult-v1-test",
+        "worldRevision": 0,
+        "stateDigest": "ba7c8b4e7ff3a70eee46bdd5c49fa3a5a0ee7b21ee4a5e36846389d8e1084772",
+        "commandDigest": "e0c292221b10c06cfa1b3d8ac9e5665fec9fb1797500127ecb6af3f43a64f71e",
+        "failure": {
+          "code": "TRANSACTION_REJECTED",
+          "evidence": {
+            "cause": "GEOMETRY_PROOF_FAILED",
+            "detail": {
+              "legality": {
+                "outcome": "FAIL",
+                "evidence": {
+                  "adapterKind": "SCHOOL_PHASE2_GEOMETRY_ADAPTER",
+                  "request": {
+                    "requestId": "partial-door",
+                    "surfaceId": "floor",
+                    "surfaceModelRef": {
+                      "id": "school-surface-v1",
+                      "revision": 1,
+                      "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf"
+                    },
+                    "geometry": {
+                      "minX": -0.33,
+                      "maxX": 0.33,
+                      "minY": 0,
+                      "maxY": 0.302,
+                      "minZ": -1.179,
+                      "maxZ": 0.767
+                    },
+                    "geometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                    "proofGeometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                    "transform": {
+                      "x": 4.5,
+                      "y": 0,
+                      "z": -3.2
+                    },
+                    "orientationUpDot": 1,
+                    "supportNormalUpDot": 1,
+                    "evidenceRefs": [
+                      "authoring-decision:DA-ADULT-V1-MALE-SUPINE-001",
+                      "body-digest:5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+                    ]
+                  },
+                  "requestDigest": "96e6bd3400a827522cfbb494ee41406a933e364fd71090b0025091c1a7804af2",
+                  "requestBytes": "{\"evidenceRefs\":[\"authoring-decision:DA-ADULT-V1-MALE-SUPINE-001\",\"body-digest:5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3\"],\"geometry\":{\"maxX\":0.33,\"maxY\":0.302,\"maxZ\":0.767,\"minX\":-0.33,\"minY\":0,\"minZ\":-1.179},\"geometryDigest\":\"d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff\",\"orientationUpDot\":1,\"proofGeometryDigest\":\"d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff\",\"requestId\":\"partial-door\",\"supportNormalUpDot\":1,\"surfaceId\":\"floor\",\"surfaceModelRef\":{\"digest\":\"308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf\",\"id\":\"school-surface-v1\",\"revision\":1},\"transform\":{\"x\":4.5,\"y\":0,\"z\":-3.2}}",
+                  "sceneProvenance": {
+                    "sceneId": "school",
+                    "classification": "RECOVERED",
+                    "lineageStatus": "RECOVERED",
+                    "sourceId": "index.html",
+                    "revision": 1,
+                    "digest": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                    "sourceRangeId": "school-bag-lockers"
+                  },
+                  "bodyProvenance": {
+                    "classification": "AUTHORED_NEW",
+                    "lineageStatus": "AUTHORED_NEW",
+                    "sourceId": "DA-ADULT-V1-MALE-SUPINE-001",
+                    "revision": 1,
+                    "digest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+                  },
+                  "surfaceProvenance": {
+                    "classification": "RECOVERED",
+                    "lineageStatus": "RECOVERED",
+                    "sourceId": "evidence/verified-architecture-phase2/surface-models/school.json",
+                    "revision": 1,
+                    "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                    "sourceEvidence": {
+                      "source": {
+                        "artifact": "index.html",
+                        "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                        "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                        "verification": "exact bytes at locked commit 30cb23e"
+                      },
+                      "panorama": "c85dc927ac565ed863f7f8e0bbaddd0fc66120b542630d3aa57e6163a5684361",
+                      "panoramaRole": "PIXEL_DIAGNOSTIC_ONLY",
+                      "geometryBindingStatus": "UNKNOWN"
+                    },
+                    "resolvedSurface": {
+                      "artifact": "index.html",
+                      "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                      "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                      "verification": "exact bytes at locked commit 30cb23e"
+                    }
+                  },
+                  "phase2ReasonCode": "DOOR_OR_OPENING_PENETRATION",
+                  "phase2Evidence": {
+                    "requestId": "partial-door",
+                    "sceneId": "school",
+                    "surfaceId": "floor",
+                    "checkedGeometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                    "surfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                    "pixelEvidenceUsedAsAuthority": false,
+                    "autoFixed": false,
+                    "bounds": {
+                      "minX": 4.17,
+                      "maxX": 4.83,
+                      "minY": 0,
+                      "maxY": 0.302,
+                      "minZ": -4.3790000000000004,
+                      "maxZ": -2.4330000000000003
+                    },
+                    "intersectedSurfaceId": "door",
+                    "intersectionVolumeId": "door-box"
+                  },
+                  "phase2ProofDigest": null
+                }
+              }
+            }
+          }
+        },
+        "sequence": 1,
+        "priorEventDigest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "eventDigest": "7ec565fe5c64882047e26c6fbf73c9254e64022bd6342aa9911b937e9da66bef"
+      }
+    },
+    {
+      "name": "locker",
+      "status": "REJECTED",
+      "beforeDigest": "ba7c8b4e7ff3a70eee46bdd5c49fa3a5a0ee7b21ee4a5e36846389d8e1084772",
+      "afterDigest": "ba7c8b4e7ff3a70eee46bdd5c49fa3a5a0ee7b21ee4a5e36846389d8e1084772",
+      "worldRevision": 0,
+      "cleanFailure": {
+        "code": "TRANSACTION_REJECTED",
+        "evidence": {
+          "cause": "GEOMETRY_PROOF_FAILED",
+          "detail": {
+            "legality": {
+              "outcome": "FAIL",
+              "evidence": {
+                "adapterKind": "SCHOOL_PHASE2_GEOMETRY_ADAPTER",
+                "request": {
+                  "requestId": "locker",
+                  "surfaceId": "floor",
+                  "surfaceModelRef": {
+                    "id": "school-surface-v1",
+                    "revision": 1,
+                    "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf"
+                  },
+                  "geometry": {
+                    "minX": -0.33,
+                    "maxX": 0.33,
+                    "minY": 0,
+                    "maxY": 0.302,
+                    "minZ": -1.179,
+                    "maxZ": 0.767
+                  },
+                  "geometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                  "proofGeometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                  "transform": {
+                    "x": -4,
+                    "y": 0,
+                    "z": -3
+                  },
+                  "orientationUpDot": 1,
+                  "supportNormalUpDot": 1,
+                  "evidenceRefs": [
+                    "authoring-decision:DA-ADULT-V1-MALE-SUPINE-001",
+                    "body-digest:5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+                  ]
+                },
+                "requestDigest": "0a9ad1e00e87ae9cc16fcc1ace6b8e0fdc668dc61f7b1e72c3ab2baf47461f8d",
+                "requestBytes": "{\"evidenceRefs\":[\"authoring-decision:DA-ADULT-V1-MALE-SUPINE-001\",\"body-digest:5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3\"],\"geometry\":{\"maxX\":0.33,\"maxY\":0.302,\"maxZ\":0.767,\"minX\":-0.33,\"minY\":0,\"minZ\":-1.179},\"geometryDigest\":\"d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff\",\"orientationUpDot\":1,\"proofGeometryDigest\":\"d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff\",\"requestId\":\"locker\",\"supportNormalUpDot\":1,\"surfaceId\":\"floor\",\"surfaceModelRef\":{\"digest\":\"308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf\",\"id\":\"school-surface-v1\",\"revision\":1},\"transform\":{\"x\":-4,\"y\":0,\"z\":-3}}",
+                "sceneProvenance": {
+                  "sceneId": "school",
+                  "classification": "RECOVERED",
+                  "lineageStatus": "RECOVERED",
+                  "sourceId": "index.html",
+                  "revision": 1,
+                  "digest": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                  "sourceRangeId": "school-bag-lockers"
+                },
+                "bodyProvenance": {
+                  "classification": "AUTHORED_NEW",
+                  "lineageStatus": "AUTHORED_NEW",
+                  "sourceId": "DA-ADULT-V1-MALE-SUPINE-001",
+                  "revision": 1,
+                  "digest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+                },
+                "surfaceProvenance": {
+                  "classification": "RECOVERED",
+                  "lineageStatus": "RECOVERED",
+                  "sourceId": "evidence/verified-architecture-phase2/surface-models/school.json",
+                  "revision": 1,
+                  "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                  "sourceEvidence": {
+                    "source": {
+                      "artifact": "index.html",
+                      "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                      "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                      "verification": "exact bytes at locked commit 30cb23e"
+                    },
+                    "panorama": "c85dc927ac565ed863f7f8e0bbaddd0fc66120b542630d3aa57e6163a5684361",
+                    "panoramaRole": "PIXEL_DIAGNOSTIC_ONLY",
+                    "geometryBindingStatus": "UNKNOWN"
+                  },
+                  "resolvedSurface": {
+                    "artifact": "index.html",
+                    "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                    "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                    "verification": "exact bytes at locked commit 30cb23e"
+                  }
+                },
+                "phase2ReasonCode": "OBSTACLE_PENETRATION",
+                "phase2Evidence": {
+                  "requestId": "locker",
+                  "sceneId": "school",
+                  "surfaceId": "floor",
+                  "checkedGeometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                  "surfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                  "pixelEvidenceUsedAsAuthority": false,
+                  "autoFixed": false,
+                  "bounds": {
+                    "minX": -4.33,
+                    "maxX": -3.67,
+                    "minY": 0,
+                    "maxY": 0.302,
+                    "minZ": -4.179,
+                    "maxZ": -2.233
+                  },
+                  "intersectedSurfaceId": "locker-0",
+                  "intersectionVolumeId": "locker-0-box"
+                },
+                "phase2ProofDigest": null
+              }
+            }
+          }
+        }
+      },
+      "phase2Reason": "OBSTACLE_PENETRATION",
+      "phase2Evidence": {
+        "requestId": "locker",
+        "sceneId": "school",
+        "surfaceId": "floor",
+        "checkedGeometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+        "surfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+        "pixelEvidenceUsedAsAuthority": false,
+        "autoFixed": false,
+        "bounds": {
+          "minX": -4.33,
+          "maxX": -3.67,
+          "minY": 0,
+          "maxY": 0.302,
+          "minZ": -4.179,
+          "maxZ": -2.233
+        },
+        "intersectedSurfaceId": "locker-0",
+        "intersectionVolumeId": "locker-0-box"
+      },
+      "event": {
+        "eventType": "MutationRejected",
+        "kind": "transaction",
+        "id": "tx:locker",
+        "worldId": "school-adult-v1-test",
+        "worldRevision": 0,
+        "stateDigest": "ba7c8b4e7ff3a70eee46bdd5c49fa3a5a0ee7b21ee4a5e36846389d8e1084772",
+        "commandDigest": "b782da8f43867f9a359141ad42a29cb7a3e5847941dd9b35776c686aa8377657",
+        "failure": {
+          "code": "TRANSACTION_REJECTED",
+          "evidence": {
+            "cause": "GEOMETRY_PROOF_FAILED",
+            "detail": {
+              "legality": {
+                "outcome": "FAIL",
+                "evidence": {
+                  "adapterKind": "SCHOOL_PHASE2_GEOMETRY_ADAPTER",
+                  "request": {
+                    "requestId": "locker",
+                    "surfaceId": "floor",
+                    "surfaceModelRef": {
+                      "id": "school-surface-v1",
+                      "revision": 1,
+                      "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf"
+                    },
+                    "geometry": {
+                      "minX": -0.33,
+                      "maxX": 0.33,
+                      "minY": 0,
+                      "maxY": 0.302,
+                      "minZ": -1.179,
+                      "maxZ": 0.767
+                    },
+                    "geometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                    "proofGeometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                    "transform": {
+                      "x": -4,
+                      "y": 0,
+                      "z": -3
+                    },
+                    "orientationUpDot": 1,
+                    "supportNormalUpDot": 1,
+                    "evidenceRefs": [
+                      "authoring-decision:DA-ADULT-V1-MALE-SUPINE-001",
+                      "body-digest:5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+                    ]
+                  },
+                  "requestDigest": "0a9ad1e00e87ae9cc16fcc1ace6b8e0fdc668dc61f7b1e72c3ab2baf47461f8d",
+                  "requestBytes": "{\"evidenceRefs\":[\"authoring-decision:DA-ADULT-V1-MALE-SUPINE-001\",\"body-digest:5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3\"],\"geometry\":{\"maxX\":0.33,\"maxY\":0.302,\"maxZ\":0.767,\"minX\":-0.33,\"minY\":0,\"minZ\":-1.179},\"geometryDigest\":\"d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff\",\"orientationUpDot\":1,\"proofGeometryDigest\":\"d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff\",\"requestId\":\"locker\",\"supportNormalUpDot\":1,\"surfaceId\":\"floor\",\"surfaceModelRef\":{\"digest\":\"308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf\",\"id\":\"school-surface-v1\",\"revision\":1},\"transform\":{\"x\":-4,\"y\":0,\"z\":-3}}",
+                  "sceneProvenance": {
+                    "sceneId": "school",
+                    "classification": "RECOVERED",
+                    "lineageStatus": "RECOVERED",
+                    "sourceId": "index.html",
+                    "revision": 1,
+                    "digest": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                    "sourceRangeId": "school-bag-lockers"
+                  },
+                  "bodyProvenance": {
+                    "classification": "AUTHORED_NEW",
+                    "lineageStatus": "AUTHORED_NEW",
+                    "sourceId": "DA-ADULT-V1-MALE-SUPINE-001",
+                    "revision": 1,
+                    "digest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+                  },
+                  "surfaceProvenance": {
+                    "classification": "RECOVERED",
+                    "lineageStatus": "RECOVERED",
+                    "sourceId": "evidence/verified-architecture-phase2/surface-models/school.json",
+                    "revision": 1,
+                    "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                    "sourceEvidence": {
+                      "source": {
+                        "artifact": "index.html",
+                        "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                        "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                        "verification": "exact bytes at locked commit 30cb23e"
+                      },
+                      "panorama": "c85dc927ac565ed863f7f8e0bbaddd0fc66120b542630d3aa57e6163a5684361",
+                      "panoramaRole": "PIXEL_DIAGNOSTIC_ONLY",
+                      "geometryBindingStatus": "UNKNOWN"
+                    },
+                    "resolvedSurface": {
+                      "artifact": "index.html",
+                      "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                      "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                      "verification": "exact bytes at locked commit 30cb23e"
+                    }
+                  },
+                  "phase2ReasonCode": "OBSTACLE_PENETRATION",
+                  "phase2Evidence": {
+                    "requestId": "locker",
+                    "sceneId": "school",
+                    "surfaceId": "floor",
+                    "checkedGeometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                    "surfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                    "pixelEvidenceUsedAsAuthority": false,
+                    "autoFixed": false,
+                    "bounds": {
+                      "minX": -4.33,
+                      "maxX": -3.67,
+                      "minY": 0,
+                      "maxY": 0.302,
+                      "minZ": -4.179,
+                      "maxZ": -2.233
+                    },
+                    "intersectedSurfaceId": "locker-0",
+                    "intersectionVolumeId": "locker-0-box"
+                  },
+                  "phase2ProofDigest": null
+                }
+              }
+            }
+          }
+        },
+        "sequence": 1,
+        "priorEventDigest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "eventDigest": "74079aedaee4c7826fffeb2c196a36eb061502e7762a56d1b85cc08883d75635"
+      }
+    },
+    {
+      "name": "partial-outside",
+      "status": "REJECTED",
+      "beforeDigest": "ba7c8b4e7ff3a70eee46bdd5c49fa3a5a0ee7b21ee4a5e36846389d8e1084772",
+      "afterDigest": "ba7c8b4e7ff3a70eee46bdd5c49fa3a5a0ee7b21ee4a5e36846389d8e1084772",
+      "worldRevision": 0,
+      "cleanFailure": {
+        "code": "TRANSACTION_REJECTED",
+        "evidence": {
+          "cause": "GEOMETRY_PROOF_FAILED",
+          "detail": {
+            "legality": {
+              "outcome": "FAIL",
+              "evidence": {
+                "adapterKind": "SCHOOL_PHASE2_GEOMETRY_ADAPTER",
+                "request": {
+                  "requestId": "partial-outside",
+                  "surfaceId": "floor",
+                  "surfaceModelRef": {
+                    "id": "school-surface-v1",
+                    "revision": 1,
+                    "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf"
+                  },
+                  "geometry": {
+                    "minX": -0.33,
+                    "maxX": 0.33,
+                    "minY": 0,
+                    "maxY": 0.302,
+                    "minZ": -1.179,
+                    "maxZ": 0.767
+                  },
+                  "geometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                  "proofGeometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                  "transform": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 5.5
+                  },
+                  "orientationUpDot": 1,
+                  "supportNormalUpDot": 1,
+                  "evidenceRefs": [
+                    "authoring-decision:DA-ADULT-V1-MALE-SUPINE-001",
+                    "body-digest:5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+                  ]
+                },
+                "requestDigest": "d0e6802145f4bd9789283a9a8c79dd2e1d9d5f4aa44ec64dcd4e16b08ca184f6",
+                "requestBytes": "{\"evidenceRefs\":[\"authoring-decision:DA-ADULT-V1-MALE-SUPINE-001\",\"body-digest:5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3\"],\"geometry\":{\"maxX\":0.33,\"maxY\":0.302,\"maxZ\":0.767,\"minX\":-0.33,\"minY\":0,\"minZ\":-1.179},\"geometryDigest\":\"d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff\",\"orientationUpDot\":1,\"proofGeometryDigest\":\"d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff\",\"requestId\":\"partial-outside\",\"supportNormalUpDot\":1,\"surfaceId\":\"floor\",\"surfaceModelRef\":{\"digest\":\"308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf\",\"id\":\"school-surface-v1\",\"revision\":1},\"transform\":{\"x\":0,\"y\":0,\"z\":5.5}}",
+                "sceneProvenance": {
+                  "sceneId": "school",
+                  "classification": "RECOVERED",
+                  "lineageStatus": "RECOVERED",
+                  "sourceId": "index.html",
+                  "revision": 1,
+                  "digest": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                  "sourceRangeId": "school-bag-lockers"
+                },
+                "bodyProvenance": {
+                  "classification": "AUTHORED_NEW",
+                  "lineageStatus": "AUTHORED_NEW",
+                  "sourceId": "DA-ADULT-V1-MALE-SUPINE-001",
+                  "revision": 1,
+                  "digest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+                },
+                "surfaceProvenance": {
+                  "classification": "RECOVERED",
+                  "lineageStatus": "RECOVERED",
+                  "sourceId": "evidence/verified-architecture-phase2/surface-models/school.json",
+                  "revision": 1,
+                  "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                  "sourceEvidence": {
+                    "source": {
+                      "artifact": "index.html",
+                      "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                      "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                      "verification": "exact bytes at locked commit 30cb23e"
+                    },
+                    "panorama": "c85dc927ac565ed863f7f8e0bbaddd0fc66120b542630d3aa57e6163a5684361",
+                    "panoramaRole": "PIXEL_DIAGNOSTIC_ONLY",
+                    "geometryBindingStatus": "UNKNOWN"
+                  },
+                  "resolvedSurface": {
+                    "artifact": "index.html",
+                    "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                    "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                    "verification": "exact bytes at locked commit 30cb23e"
+                  }
+                },
+                "phase2ReasonCode": "FOOTPRINT_PARTIALLY_OUTSIDE_LEGAL_REGION",
+                "phase2Evidence": {
+                  "requestId": "partial-outside",
+                  "sceneId": "school",
+                  "surfaceId": "floor",
+                  "checkedGeometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                  "surfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                  "pixelEvidenceUsedAsAuthority": false,
+                  "autoFixed": false,
+                  "bounds": {
+                    "minX": -0.33,
+                    "maxX": 0.33,
+                    "minY": 0,
+                    "maxY": 0.302,
+                    "minZ": 4.321,
+                    "maxZ": 6.267
+                  },
+                  "allowedRegionIds": [
+                    "floor-positive"
+                  ]
+                },
+                "phase2ProofDigest": null
+              }
+            }
+          }
+        }
+      },
+      "phase2Reason": "FOOTPRINT_PARTIALLY_OUTSIDE_LEGAL_REGION",
+      "phase2Evidence": {
+        "requestId": "partial-outside",
+        "sceneId": "school",
+        "surfaceId": "floor",
+        "checkedGeometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+        "surfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+        "pixelEvidenceUsedAsAuthority": false,
+        "autoFixed": false,
+        "bounds": {
+          "minX": -0.33,
+          "maxX": 0.33,
+          "minY": 0,
+          "maxY": 0.302,
+          "minZ": 4.321,
+          "maxZ": 6.267
+        },
+        "allowedRegionIds": [
+          "floor-positive"
+        ]
+      },
+      "event": {
+        "eventType": "MutationRejected",
+        "kind": "transaction",
+        "id": "tx:partial-outside",
+        "worldId": "school-adult-v1-test",
+        "worldRevision": 0,
+        "stateDigest": "ba7c8b4e7ff3a70eee46bdd5c49fa3a5a0ee7b21ee4a5e36846389d8e1084772",
+        "commandDigest": "3e7cecfdaa7231f8be058a3499b4cab3d739404c133fb1ddd2a53ffba3223b40",
+        "failure": {
+          "code": "TRANSACTION_REJECTED",
+          "evidence": {
+            "cause": "GEOMETRY_PROOF_FAILED",
+            "detail": {
+              "legality": {
+                "outcome": "FAIL",
+                "evidence": {
+                  "adapterKind": "SCHOOL_PHASE2_GEOMETRY_ADAPTER",
+                  "request": {
+                    "requestId": "partial-outside",
+                    "surfaceId": "floor",
+                    "surfaceModelRef": {
+                      "id": "school-surface-v1",
+                      "revision": 1,
+                      "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf"
+                    },
+                    "geometry": {
+                      "minX": -0.33,
+                      "maxX": 0.33,
+                      "minY": 0,
+                      "maxY": 0.302,
+                      "minZ": -1.179,
+                      "maxZ": 0.767
+                    },
+                    "geometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                    "proofGeometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                    "transform": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 5.5
+                    },
+                    "orientationUpDot": 1,
+                    "supportNormalUpDot": 1,
+                    "evidenceRefs": [
+                      "authoring-decision:DA-ADULT-V1-MALE-SUPINE-001",
+                      "body-digest:5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+                    ]
+                  },
+                  "requestDigest": "d0e6802145f4bd9789283a9a8c79dd2e1d9d5f4aa44ec64dcd4e16b08ca184f6",
+                  "requestBytes": "{\"evidenceRefs\":[\"authoring-decision:DA-ADULT-V1-MALE-SUPINE-001\",\"body-digest:5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3\"],\"geometry\":{\"maxX\":0.33,\"maxY\":0.302,\"maxZ\":0.767,\"minX\":-0.33,\"minY\":0,\"minZ\":-1.179},\"geometryDigest\":\"d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff\",\"orientationUpDot\":1,\"proofGeometryDigest\":\"d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff\",\"requestId\":\"partial-outside\",\"supportNormalUpDot\":1,\"surfaceId\":\"floor\",\"surfaceModelRef\":{\"digest\":\"308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf\",\"id\":\"school-surface-v1\",\"revision\":1},\"transform\":{\"x\":0,\"y\":0,\"z\":5.5}}",
+                  "sceneProvenance": {
+                    "sceneId": "school",
+                    "classification": "RECOVERED",
+                    "lineageStatus": "RECOVERED",
+                    "sourceId": "index.html",
+                    "revision": 1,
+                    "digest": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                    "sourceRangeId": "school-bag-lockers"
+                  },
+                  "bodyProvenance": {
+                    "classification": "AUTHORED_NEW",
+                    "lineageStatus": "AUTHORED_NEW",
+                    "sourceId": "DA-ADULT-V1-MALE-SUPINE-001",
+                    "revision": 1,
+                    "digest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+                  },
+                  "surfaceProvenance": {
+                    "classification": "RECOVERED",
+                    "lineageStatus": "RECOVERED",
+                    "sourceId": "evidence/verified-architecture-phase2/surface-models/school.json",
+                    "revision": 1,
+                    "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                    "sourceEvidence": {
+                      "source": {
+                        "artifact": "index.html",
+                        "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                        "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                        "verification": "exact bytes at locked commit 30cb23e"
+                      },
+                      "panorama": "c85dc927ac565ed863f7f8e0bbaddd0fc66120b542630d3aa57e6163a5684361",
+                      "panoramaRole": "PIXEL_DIAGNOSTIC_ONLY",
+                      "geometryBindingStatus": "UNKNOWN"
+                    },
+                    "resolvedSurface": {
+                      "artifact": "index.html",
+                      "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                      "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                      "verification": "exact bytes at locked commit 30cb23e"
+                    }
+                  },
+                  "phase2ReasonCode": "FOOTPRINT_PARTIALLY_OUTSIDE_LEGAL_REGION",
+                  "phase2Evidence": {
+                    "requestId": "partial-outside",
+                    "sceneId": "school",
+                    "surfaceId": "floor",
+                    "checkedGeometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                    "surfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                    "pixelEvidenceUsedAsAuthority": false,
+                    "autoFixed": false,
+                    "bounds": {
+                      "minX": -0.33,
+                      "maxX": 0.33,
+                      "minY": 0,
+                      "maxY": 0.302,
+                      "minZ": 4.321,
+                      "maxZ": 6.267
+                    },
+                    "allowedRegionIds": [
+                      "floor-positive"
+                    ]
+                  },
+                  "phase2ProofDigest": null
+                }
+              }
+            }
+          }
+        },
+        "sequence": 1,
+        "priorEventDigest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "eventDigest": "120ce8d8272b51fa89386c8b230b3f9a649043de3c02727f17a9cdc8e787f0f5"
+      }
+    },
+    {
+      "name": "full-outside",
+      "status": "REJECTED",
+      "beforeDigest": "ba7c8b4e7ff3a70eee46bdd5c49fa3a5a0ee7b21ee4a5e36846389d8e1084772",
+      "afterDigest": "ba7c8b4e7ff3a70eee46bdd5c49fa3a5a0ee7b21ee4a5e36846389d8e1084772",
+      "worldRevision": 0,
+      "cleanFailure": {
+        "code": "TRANSACTION_REJECTED",
+        "evidence": {
+          "cause": "GEOMETRY_PROOF_FAILED",
+          "detail": {
+            "legality": {
+              "outcome": "FAIL",
+              "evidence": {
+                "adapterKind": "SCHOOL_PHASE2_GEOMETRY_ADAPTER",
+                "request": {
+                  "requestId": "full-outside",
+                  "surfaceId": "floor",
+                  "surfaceModelRef": {
+                    "id": "school-surface-v1",
+                    "revision": 1,
+                    "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf"
+                  },
+                  "geometry": {
+                    "minX": -0.33,
+                    "maxX": 0.33,
+                    "minY": 0,
+                    "maxY": 0.302,
+                    "minZ": -1.179,
+                    "maxZ": 0.767
+                  },
+                  "geometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                  "proofGeometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                  "transform": {
+                    "x": 8,
+                    "y": 0,
+                    "z": 1
+                  },
+                  "orientationUpDot": 1,
+                  "supportNormalUpDot": 1,
+                  "evidenceRefs": [
+                    "authoring-decision:DA-ADULT-V1-MALE-SUPINE-001",
+                    "body-digest:5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+                  ]
+                },
+                "requestDigest": "97b58668c3d1b847b4a267f08a417a4125c88cab23920d8335de52d94883ec86",
+                "requestBytes": "{\"evidenceRefs\":[\"authoring-decision:DA-ADULT-V1-MALE-SUPINE-001\",\"body-digest:5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3\"],\"geometry\":{\"maxX\":0.33,\"maxY\":0.302,\"maxZ\":0.767,\"minX\":-0.33,\"minY\":0,\"minZ\":-1.179},\"geometryDigest\":\"d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff\",\"orientationUpDot\":1,\"proofGeometryDigest\":\"d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff\",\"requestId\":\"full-outside\",\"supportNormalUpDot\":1,\"surfaceId\":\"floor\",\"surfaceModelRef\":{\"digest\":\"308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf\",\"id\":\"school-surface-v1\",\"revision\":1},\"transform\":{\"x\":8,\"y\":0,\"z\":1}}",
+                "sceneProvenance": {
+                  "sceneId": "school",
+                  "classification": "RECOVERED",
+                  "lineageStatus": "RECOVERED",
+                  "sourceId": "index.html",
+                  "revision": 1,
+                  "digest": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                  "sourceRangeId": "school-bag-lockers"
+                },
+                "bodyProvenance": {
+                  "classification": "AUTHORED_NEW",
+                  "lineageStatus": "AUTHORED_NEW",
+                  "sourceId": "DA-ADULT-V1-MALE-SUPINE-001",
+                  "revision": 1,
+                  "digest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+                },
+                "surfaceProvenance": {
+                  "classification": "RECOVERED",
+                  "lineageStatus": "RECOVERED",
+                  "sourceId": "evidence/verified-architecture-phase2/surface-models/school.json",
+                  "revision": 1,
+                  "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                  "sourceEvidence": {
+                    "source": {
+                      "artifact": "index.html",
+                      "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                      "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                      "verification": "exact bytes at locked commit 30cb23e"
+                    },
+                    "panorama": "c85dc927ac565ed863f7f8e0bbaddd0fc66120b542630d3aa57e6163a5684361",
+                    "panoramaRole": "PIXEL_DIAGNOSTIC_ONLY",
+                    "geometryBindingStatus": "UNKNOWN"
+                  },
+                  "resolvedSurface": {
+                    "artifact": "index.html",
+                    "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                    "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                    "verification": "exact bytes at locked commit 30cb23e"
+                  }
+                },
+                "phase2ReasonCode": "FOOTPRINT_FULLY_OUTSIDE_LEGAL_REGION",
+                "phase2Evidence": {
+                  "requestId": "full-outside",
+                  "sceneId": "school",
+                  "surfaceId": "floor",
+                  "checkedGeometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                  "surfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                  "pixelEvidenceUsedAsAuthority": false,
+                  "autoFixed": false,
+                  "bounds": {
+                    "minX": 7.67,
+                    "maxX": 8.33,
+                    "minY": 0,
+                    "maxY": 0.302,
+                    "minZ": -0.17900000000000005,
+                    "maxZ": 1.767
+                  },
+                  "allowedRegionIds": [
+                    "floor-positive"
+                  ]
+                },
+                "phase2ProofDigest": null
+              }
+            }
+          }
+        }
+      },
+      "phase2Reason": "FOOTPRINT_FULLY_OUTSIDE_LEGAL_REGION",
+      "phase2Evidence": {
+        "requestId": "full-outside",
+        "sceneId": "school",
+        "surfaceId": "floor",
+        "checkedGeometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+        "surfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+        "pixelEvidenceUsedAsAuthority": false,
+        "autoFixed": false,
+        "bounds": {
+          "minX": 7.67,
+          "maxX": 8.33,
+          "minY": 0,
+          "maxY": 0.302,
+          "minZ": -0.17900000000000005,
+          "maxZ": 1.767
+        },
+        "allowedRegionIds": [
+          "floor-positive"
+        ]
+      },
+      "event": {
+        "eventType": "MutationRejected",
+        "kind": "transaction",
+        "id": "tx:full-outside",
+        "worldId": "school-adult-v1-test",
+        "worldRevision": 0,
+        "stateDigest": "ba7c8b4e7ff3a70eee46bdd5c49fa3a5a0ee7b21ee4a5e36846389d8e1084772",
+        "commandDigest": "77a85fb5db4a8d8d55357131c8b0a0b8751315819ddd1b7bea3444d65c2102a9",
+        "failure": {
+          "code": "TRANSACTION_REJECTED",
+          "evidence": {
+            "cause": "GEOMETRY_PROOF_FAILED",
+            "detail": {
+              "legality": {
+                "outcome": "FAIL",
+                "evidence": {
+                  "adapterKind": "SCHOOL_PHASE2_GEOMETRY_ADAPTER",
+                  "request": {
+                    "requestId": "full-outside",
+                    "surfaceId": "floor",
+                    "surfaceModelRef": {
+                      "id": "school-surface-v1",
+                      "revision": 1,
+                      "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf"
+                    },
+                    "geometry": {
+                      "minX": -0.33,
+                      "maxX": 0.33,
+                      "minY": 0,
+                      "maxY": 0.302,
+                      "minZ": -1.179,
+                      "maxZ": 0.767
+                    },
+                    "geometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                    "proofGeometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                    "transform": {
+                      "x": 8,
+                      "y": 0,
+                      "z": 1
+                    },
+                    "orientationUpDot": 1,
+                    "supportNormalUpDot": 1,
+                    "evidenceRefs": [
+                      "authoring-decision:DA-ADULT-V1-MALE-SUPINE-001",
+                      "body-digest:5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+                    ]
+                  },
+                  "requestDigest": "97b58668c3d1b847b4a267f08a417a4125c88cab23920d8335de52d94883ec86",
+                  "requestBytes": "{\"evidenceRefs\":[\"authoring-decision:DA-ADULT-V1-MALE-SUPINE-001\",\"body-digest:5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3\"],\"geometry\":{\"maxX\":0.33,\"maxY\":0.302,\"maxZ\":0.767,\"minX\":-0.33,\"minY\":0,\"minZ\":-1.179},\"geometryDigest\":\"d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff\",\"orientationUpDot\":1,\"proofGeometryDigest\":\"d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff\",\"requestId\":\"full-outside\",\"supportNormalUpDot\":1,\"surfaceId\":\"floor\",\"surfaceModelRef\":{\"digest\":\"308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf\",\"id\":\"school-surface-v1\",\"revision\":1},\"transform\":{\"x\":8,\"y\":0,\"z\":1}}",
+                  "sceneProvenance": {
+                    "sceneId": "school",
+                    "classification": "RECOVERED",
+                    "lineageStatus": "RECOVERED",
+                    "sourceId": "index.html",
+                    "revision": 1,
+                    "digest": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                    "sourceRangeId": "school-bag-lockers"
+                  },
+                  "bodyProvenance": {
+                    "classification": "AUTHORED_NEW",
+                    "lineageStatus": "AUTHORED_NEW",
+                    "sourceId": "DA-ADULT-V1-MALE-SUPINE-001",
+                    "revision": 1,
+                    "digest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+                  },
+                  "surfaceProvenance": {
+                    "classification": "RECOVERED",
+                    "lineageStatus": "RECOVERED",
+                    "sourceId": "evidence/verified-architecture-phase2/surface-models/school.json",
+                    "revision": 1,
+                    "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                    "sourceEvidence": {
+                      "source": {
+                        "artifact": "index.html",
+                        "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                        "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                        "verification": "exact bytes at locked commit 30cb23e"
+                      },
+                      "panorama": "c85dc927ac565ed863f7f8e0bbaddd0fc66120b542630d3aa57e6163a5684361",
+                      "panoramaRole": "PIXEL_DIAGNOSTIC_ONLY",
+                      "geometryBindingStatus": "UNKNOWN"
+                    },
+                    "resolvedSurface": {
+                      "artifact": "index.html",
+                      "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                      "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                      "verification": "exact bytes at locked commit 30cb23e"
+                    }
+                  },
+                  "phase2ReasonCode": "FOOTPRINT_FULLY_OUTSIDE_LEGAL_REGION",
+                  "phase2Evidence": {
+                    "requestId": "full-outside",
+                    "sceneId": "school",
+                    "surfaceId": "floor",
+                    "checkedGeometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+                    "surfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+                    "pixelEvidenceUsedAsAuthority": false,
+                    "autoFixed": false,
+                    "bounds": {
+                      "minX": 7.67,
+                      "maxX": 8.33,
+                      "minY": 0,
+                      "maxY": 0.302,
+                      "minZ": -0.17900000000000005,
+                      "maxZ": 1.767
+                    },
+                    "allowedRegionIds": [
+                      "floor-positive"
+                    ]
+                  },
+                  "phase2ProofDigest": null
+                }
+              }
+            }
+          }
+        },
+        "sequence": 1,
+        "priorEventDigest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "eventDigest": "bcc6921f814da5076be05b83a1c24f334232e60224dcaef4fa82b0aa8ed4b143"
+      }
+    }
+  ],
+  "deterministicA": {
+    "profile": {
+      "schemaVersion": "1.0.0",
+      "profileDefinitionId": "adult-v1",
+      "profileRevision": 1,
+      "subjectSex": "MALE",
+      "status": "AUTHORED_NEW_DRAFT",
+      "profileDigest": "f1d973b4cfbebdfa230fe0257ccfe9c11056a7d07e52c3701d1e6772311bcc41"
+    },
+    "posture": {
+      "schemaVersion": "1.0.0",
+      "postureDefinitionId": "adult-v1/supine-floor",
+      "postureRevision": 1,
+      "profileId": "adult-v1",
+      "postureSemanticType": "SUPINE_FLOOR",
+      "bodyRef": {
+        "id": "casualty/adult-v1/supine-floor",
+        "revision": 1,
+        "digest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+      },
+      "contactExpectations": [
+        {
+          "contactRegionId": "head-floor-contact"
+        },
+        {
+          "contactRegionId": "left-arm-floor-contact"
+        },
+        {
+          "contactRegionId": "legs-floor-contact"
+        },
+        {
+          "contactRegionId": "right-arm-floor-contact"
+        },
+        {
+          "contactRegionId": "torso-floor-contact"
+        }
+      ],
+      "supportCategories": [
+        {
+          "supportCategoryId": "school/floor-v1",
+          "supportSemanticType": "FLOOR",
+          "provenanceStatus": "RECOVERED",
+          "fixtureOnly": false
+        }
+      ],
+      "orientationConstraints": {
+        "mode": "IDENTITY_ONLY",
+        "canonical": [
+          0,
+          0,
+          0,
+          1000000
+        ]
+      },
+      "status": "AUTHORED_NEW_DRAFT",
+      "canonicalDigest": "197a806537a3c9d9f629cf2a57d6db4031fa93ebea0618c2e18603f48301745e"
+    },
+    "body": {
+      "schemaVersion": "1.0.0",
+      "bodyDefinitionId": "casualty/adult-v1/supine-floor",
+      "bodyRevision": 1,
+      "semanticType": "casualty-physical-body",
+      "profileId": "adult-v1",
+      "postureDefinitionId": "adult-v1/supine-floor",
+      "postureSemanticType": "SUPINE_FLOOR",
+      "units": {
+        "linear": "MICROUNIT",
+        "microunitsPerAuthoredUnit": 1000000
+      },
+      "coordinateFrame": {
+        "handedness": "RIGHT_HANDED",
+        "axes": {
+          "x": "ENTITY_RIGHT",
+          "y": "UP",
+          "z": "ENTITY_FORWARD"
+        },
+        "upAxis": "Y",
+        "forwardDirection": "+Z",
+        "transformOrder": "SCALE_ROTATE_TRANSLATE"
+      },
+      "localOrigin": {
+        "kind": "AUTHOR_DECLARED_CONTACT_FRAME",
+        "positionMicrounits": [
+          0,
+          0,
+          0
+        ]
+      },
+      "orientationContract": {
+        "mode": "IDENTITY_ONLY",
+        "canonical": [
+          0,
+          0,
+          0,
+          1000000
+        ]
+      },
+      "components": [
+        {
+          "componentId": "head",
+          "primitiveType": "AABB",
+          "localTransform": {
+            "translationMicrounits": [
+              0,
+              120000,
+              647000
+            ],
+            "orientation": [
+              0,
+              0,
+              0,
+              1000000
+            ]
+          },
+          "dimensionsMicrounits": [
+            240000,
+            240000,
+            240000
+          ],
+          "participationRole": "BOTH"
+        },
+        {
+          "componentId": "left-arm",
+          "primitiveType": "AABB",
+          "localTransform": {
+            "translationMicrounits": [
+              -305000,
+              90000,
+              227000
+            ],
+            "orientation": [
+              0,
+              0,
+              0,
+              1000000
+            ]
+          },
+          "dimensionsMicrounits": [
+            50000,
+            180000,
+            700000
+          ],
+          "participationRole": "BOTH"
+        },
+        {
+          "componentId": "legs",
+          "primitiveType": "AABB",
+          "localTransform": {
+            "translationMicrounits": [
+              0,
+              110000,
+              -651000
+            ],
+            "orientation": [
+              0,
+              0,
+              0,
+              1000000
+            ]
+          },
+          "dimensionsMicrounits": [
+            460000,
+            220000,
+            1056000
+          ],
+          "participationRole": "BOTH"
+        },
+        {
+          "componentId": "right-arm",
+          "primitiveType": "AABB",
+          "localTransform": {
+            "translationMicrounits": [
+              305000,
+              90000,
+              227000
+            ],
+            "orientation": [
+              0,
+              0,
+              0,
+              1000000
+            ]
+          },
+          "dimensionsMicrounits": [
+            50000,
+            180000,
+            700000
+          ],
+          "participationRole": "BOTH"
+        },
+        {
+          "componentId": "torso",
+          "primitiveType": "AABB",
+          "localTransform": {
+            "translationMicrounits": [
+              0,
+              151000,
+              202000
+            ],
+            "orientation": [
+              0,
+              0,
+              0,
+              1000000
+            ]
+          },
+          "dimensionsMicrounits": [
+            560000,
+            302000,
+            650000
+          ],
+          "participationRole": "BOTH"
+        }
+      ],
+      "aggregateBounds": {
+        "minX": -330000,
+        "maxX": 330000,
+        "minY": 0,
+        "maxY": 302000,
+        "minZ": -1179000,
+        "maxZ": 767000
+      },
+      "phase2Projection": {
+        "kind": "CONSERVATIVE_AGGREGATE_AABB",
+        "bounds": {
+          "minX": -330000,
+          "maxX": 330000,
+          "minY": 0,
+          "maxY": 302000,
+          "minZ": -1179000,
+          "maxZ": 767000
+        },
+        "falseRejectionDiagnostic": {
+          "classification": "CONSERVATIVE_AGGREGATE_FALSE_REJECTION_CANDIDATE",
+          "nativeCompoundEvaluationPerformed": false
+        }
+      },
+      "footprint": {
+        "kind": "XZ_RECT_UNION",
+        "regions": [
+          {
+            "regionId": "head-footprint",
+            "minX": -120000,
+            "maxX": 120000,
+            "minZ": 527000,
+            "maxZ": 767000
+          },
+          {
+            "regionId": "left-arm-footprint",
+            "minX": -330000,
+            "maxX": -280000,
+            "minZ": -123000,
+            "maxZ": 577000
+          },
+          {
+            "regionId": "legs-footprint",
+            "minX": -230000,
+            "maxX": 230000,
+            "minZ": -1179000,
+            "maxZ": -123000
+          },
+          {
+            "regionId": "right-arm-footprint",
+            "minX": 280000,
+            "maxX": 330000,
+            "minZ": -123000,
+            "maxZ": 577000
+          },
+          {
+            "regionId": "torso-footprint",
+            "minX": -280000,
+            "maxX": 280000,
+            "minZ": -123000,
+            "maxZ": 527000
+          }
+        ]
+      },
+      "contactRegions": [
+        {
+          "contactRegionId": "head-floor-contact",
+          "kind": "HORIZONTAL_XZ_RECT",
+          "planeY": 0,
+          "region": {
+            "minX": -120000,
+            "maxX": 120000,
+            "minZ": 527000,
+            "maxZ": 767000
+          }
+        },
+        {
+          "contactRegionId": "left-arm-floor-contact",
+          "kind": "HORIZONTAL_XZ_RECT",
+          "planeY": 0,
+          "region": {
+            "minX": -330000,
+            "maxX": -280000,
+            "minZ": -123000,
+            "maxZ": 577000
+          }
+        },
+        {
+          "contactRegionId": "legs-floor-contact",
+          "kind": "HORIZONTAL_XZ_RECT",
+          "planeY": 0,
+          "region": {
+            "minX": -230000,
+            "maxX": 230000,
+            "minZ": -1179000,
+            "maxZ": -123000
+          }
+        },
+        {
+          "contactRegionId": "right-arm-floor-contact",
+          "kind": "HORIZONTAL_XZ_RECT",
+          "planeY": 0,
+          "region": {
+            "minX": 280000,
+            "maxX": 330000,
+            "minZ": -123000,
+            "maxZ": 577000
+          }
+        },
+        {
+          "contactRegionId": "torso-floor-contact",
+          "kind": "HORIZONTAL_XZ_RECT",
+          "planeY": 0,
+          "region": {
+            "minX": -280000,
+            "maxX": 280000,
+            "minZ": -123000,
+            "maxZ": 527000
+          }
+        }
+      ],
+      "supportCategories": [
+        {
+          "supportCategoryId": "school/floor-v1",
+          "supportSemanticType": "FLOOR",
+          "provenanceStatus": "RECOVERED",
+          "fixtureOnly": false
+        }
+      ],
+      "geometrySource": {
+        "classification": "AUTHORED_NEW",
+        "sourceId": "DA-ADULT-V1-MALE-SUPINE-001"
+      },
+      "authoringProvenance": {
+        "decisionId": "DA-ADULT-V1-MALE-SUPINE-001",
+        "sourceReferenceEvidenceRefs": [
+          "NASA-OCHMO-HB-004-REV-A-TABLE-1:REFERENCE_ONLY",
+          "LEGACY_VISUALS_EXCLUDED"
+        ]
+      },
+      "validationEvidenceRefs": [],
+      "reviewEvidenceRefs": [],
+      "status": "AUTHORED_NEW_DRAFT",
+      "canonicalDigest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+    },
+    "stateBytes": "7b22636f6d6d69747465644576656e7453657175656e6365223a312c22656e746974696573223a7b227363686f6f6c2d63617375616c74792d6164756c742d7631223a7b22656e746974794964223a227363686f6f6c2d63617375616c74792d6164756c742d7631222c22656e74697479547970654964223a227363686f6f6c2f63617375616c7479222c2267656f6d65747279536f75726365526566223a7b22636c617373696669636174696f6e223a22415554484f5245445f4e4557222c22646967657374223a2235633365616138323431323033386431366364653262616665353534376135646230633538666462323337646138356663653437383637393036333938316433222c226c696e65616765537461747573223a22415554484f5245445f4e4557222c227265636f72644964223a2244412d4144554c542d56312d4d414c452d535550494e452d303031222c227265766973696f6e223a317d2c226c6966656379636c655374617465223a22414354495645222c22706172656e74456e746974794964223a6e756c6c2c22706172746963697061746573496e223a5b22636f6c6c6973696f6e222c22737570706f7274225d2c22706879736963616c426f6479526566223a7b22646967657374223a2235633365616138323431323033386431366364653262616665353534376135646230633538666462323337646138356663653437383637393036333938316433222c2270726f6f6647656f6d65747279446967657374223a2235633365616138323431323033386431366364653262616665353534376135646230633538666462323337646138356663653437383637393036333938316433222c227265636f72644964223a2263617375616c74792f6164756c742d76312f737570696e652d666c6f6f72222c227265766973696f6e223a317d2c22706879736963616c5374617465223a7b22616374697665223a747275652c226f7269656e746174696f6e5570446f74223a312c22706f7374757265526566223a7b22646967657374223a2231393761383036353337613363396439663632396366326135376436646234303331666139336562656130363138633265313836303366343833303137343565222c226964223a226164756c742d76312f737570696e652d666c6f6f72222c227265766973696f6e223a312c2273656d616e74696354797065223a22535550494e455f464c4f4f52227d2c2270726f66696c65526566223a7b22646967657374223a2266316439373362346366626562646661323330666530323537636366653963313130353661376430376535326333373031643165363737323331316263633431222c226964223a226164756c742d7631222c227265766973696f6e223a312c227375626a656374536578223a224d414c45227d2c22737570706f727443617465676f7279223a7b22666978747572654f6e6c79223a66616c73652c2270726f76656e616e6365537461747573223a225245434f5645524544222c22737570706f727443617465676f72794964223a227363686f6f6c2f666c6f6f722d7631222c22737570706f727453656d616e74696354797065223a22464c4f4f52227d2c22737570706f72744e6f726d616c5570446f74223a312c22737572666163654964223a22666c6f6f72227d2c22706f737475726553746174654964223a226164756c742d76312f737570696e652d666c6f6f72222c227265766973696f6e223a322c22737570706f727452656c6174696f6e223a6e756c6c2c227472616e73666f726d223a7b226f7269656e746174696f6e223a5b302c302c302c315d2c22706f736974696f6e4d6963726f756e697473223a5b302c302c313030303030305d2c227363616c654d6963726f756e697473223a5b313030303030302c313030303030302c313030303030305d7d7d7d2c22656e7669726f6e6d656e74506879736963616c5374617465223a6e756c6c2c226c6966656379636c655374617465223a22414354495645222c22706879736963616c52656c6174696f6e73223a5b5d2c227072696f725374617465446967657374223a2262613763386234653766663361373065656534366264643563343966613361356130656537623231656534613565333638343633383964386531303834373732222c227265766973696f6e223a312c227363656e65446566696e6974696f6e526566223a7b22636c617373696669636174696f6e223a225245434f5645524544222c22646967657374223a2265313935356638306430376165323636306234386663326663653663636136386461333065396465343834386536393165346661336661303532313931363138222c226c696e65616765537461747573223a225245434f5645524544222c227265766973696f6e223a312c227363656e654964223a227363686f6f6c222c22736f757263654964223a22696e6465782e68746d6c222c22736f7572636552616e67654964223a227363686f6f6c2d6261672d6c6f636b657273227d2c227374617465446967657374223a2230626365666330363039643638383864666136353561626136663139333338633735303865373261653232653232363461326236663130363136356263643031222c227375726661636573223a6e756c6c2c22776f726c644964223a227363686f6f6c2d6164756c742d76312d74657374227d",
+    "eventBytes": "5b7b22636f6d6d616e64446967657374223a2230656565373062626230343332396136326463613033306161643464313164333539653861643665346532643864333530323163663634343365346266376463222c226576656e74446967657374223a2262373137376133343163313237356238663061326565313632383339643139633266333335316664396532653061643264383438303363303734346262336662222c226576656e7454797065223a224d75746174696f6e436f6d6d6974746564222c226964223a2274783a646574222c226b696e64223a227472616e73616374696f6e222c226e65775374617465446967657374223a2230626365666330363039643638383864666136353561626136663139333338633735303865373261653232653232363461326236663130363136356263643031222c226e6577576f726c645265766973696f6e223a312c227072696f724576656e74446967657374223a2230303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030222c227072696f725374617465446967657374223a2262613763386234653766663361373065656534366264643563343966613361356130656537623231656534613565333638343633383964386531303834373732222c227072696f72576f726c645265766973696f6e223a302c2273657175656e6365223a312c22737461746544656c7461223a7b22656e746974696573223a7b227363686f6f6c2d63617375616c74792d6164756c742d7631223a7b22656e746974794964223a227363686f6f6c2d63617375616c74792d6164756c742d7631222c22656e74697479547970654964223a227363686f6f6c2f63617375616c7479222c2267656f6d65747279536f75726365526566223a7b22636c617373696669636174696f6e223a22415554484f5245445f4e4557222c22646967657374223a2235633365616138323431323033386431366364653262616665353534376135646230633538666462323337646138356663653437383637393036333938316433222c226c696e65616765537461747573223a22415554484f5245445f4e4557222c227265636f72644964223a2244412d4144554c542d56312d4d414c452d535550494e452d303031222c227265766973696f6e223a317d2c226c6966656379636c655374617465223a22414354495645222c22706172656e74456e746974794964223a6e756c6c2c22706172746963697061746573496e223a5b22636f6c6c6973696f6e222c22737570706f7274225d2c22706879736963616c426f6479526566223a7b22646967657374223a2235633365616138323431323033386431366364653262616665353534376135646230633538666462323337646138356663653437383637393036333938316433222c2270726f6f6647656f6d65747279446967657374223a2235633365616138323431323033386431366364653262616665353534376135646230633538666462323337646138356663653437383637393036333938316433222c227265636f72644964223a2263617375616c74792f6164756c742d76312f737570696e652d666c6f6f72222c227265766973696f6e223a317d2c22706879736963616c5374617465223a7b22616374697665223a747275652c226f7269656e746174696f6e5570446f74223a312c22706f7374757265526566223a7b22646967657374223a2231393761383036353337613363396439663632396366326135376436646234303331666139336562656130363138633265313836303366343833303137343565222c226964223a226164756c742d76312f737570696e652d666c6f6f72222c227265766973696f6e223a312c2273656d616e74696354797065223a22535550494e455f464c4f4f52227d2c2270726f66696c65526566223a7b22646967657374223a2266316439373362346366626562646661323330666530323537636366653963313130353661376430376535326333373031643165363737323331316263633431222c226964223a226164756c742d7631222c227265766973696f6e223a312c227375626a656374536578223a224d414c45227d2c22737570706f727443617465676f7279223a7b22666978747572654f6e6c79223a66616c73652c2270726f76656e616e6365537461747573223a225245434f5645524544222c22737570706f727443617465676f72794964223a227363686f6f6c2f666c6f6f722d7631222c22737570706f727453656d616e74696354797065223a22464c4f4f52227d2c22737570706f72744e6f726d616c5570446f74223a312c22737572666163654964223a22666c6f6f72227d2c22706f737475726553746174654964223a226164756c742d76312f737570696e652d666c6f6f72222c227265766973696f6e223a322c22737570706f727452656c6174696f6e223a6e756c6c2c227472616e73666f726d223a7b226f7269656e746174696f6e223a5b302c302c302c315d2c22706f736974696f6e4d6963726f756e697473223a5b302c302c313030303030305d2c227363616c654d6963726f756e697473223a5b313030303030302c313030303030302c313030303030305d7d7d7d2c22656e7669726f6e6d656e74506879736963616c5374617465223a6e756c6c2c226c6966656379636c655374617465223a22414354495645222c22706879736963616c52656c6174696f6e73223a5b5d2c227375726661636573223a6e756c6c7d2c22776f726c644964223a227363686f6f6c2d6164756c742d76312d74657374227d5d"
+  },
+  "deterministicB": {
+    "profile": {
+      "schemaVersion": "1.0.0",
+      "profileDefinitionId": "adult-v1",
+      "profileRevision": 1,
+      "subjectSex": "MALE",
+      "status": "AUTHORED_NEW_DRAFT",
+      "profileDigest": "f1d973b4cfbebdfa230fe0257ccfe9c11056a7d07e52c3701d1e6772311bcc41"
+    },
+    "posture": {
+      "schemaVersion": "1.0.0",
+      "postureDefinitionId": "adult-v1/supine-floor",
+      "postureRevision": 1,
+      "profileId": "adult-v1",
+      "postureSemanticType": "SUPINE_FLOOR",
+      "bodyRef": {
+        "id": "casualty/adult-v1/supine-floor",
+        "revision": 1,
+        "digest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+      },
+      "contactExpectations": [
+        {
+          "contactRegionId": "head-floor-contact"
+        },
+        {
+          "contactRegionId": "left-arm-floor-contact"
+        },
+        {
+          "contactRegionId": "legs-floor-contact"
+        },
+        {
+          "contactRegionId": "right-arm-floor-contact"
+        },
+        {
+          "contactRegionId": "torso-floor-contact"
+        }
+      ],
+      "supportCategories": [
+        {
+          "supportCategoryId": "school/floor-v1",
+          "supportSemanticType": "FLOOR",
+          "provenanceStatus": "RECOVERED",
+          "fixtureOnly": false
+        }
+      ],
+      "orientationConstraints": {
+        "mode": "IDENTITY_ONLY",
+        "canonical": [
+          0,
+          0,
+          0,
+          1000000
+        ]
+      },
+      "status": "AUTHORED_NEW_DRAFT",
+      "canonicalDigest": "197a806537a3c9d9f629cf2a57d6db4031fa93ebea0618c2e18603f48301745e"
+    },
+    "body": {
+      "schemaVersion": "1.0.0",
+      "bodyDefinitionId": "casualty/adult-v1/supine-floor",
+      "bodyRevision": 1,
+      "semanticType": "casualty-physical-body",
+      "profileId": "adult-v1",
+      "postureDefinitionId": "adult-v1/supine-floor",
+      "postureSemanticType": "SUPINE_FLOOR",
+      "units": {
+        "linear": "MICROUNIT",
+        "microunitsPerAuthoredUnit": 1000000
+      },
+      "coordinateFrame": {
+        "handedness": "RIGHT_HANDED",
+        "axes": {
+          "x": "ENTITY_RIGHT",
+          "y": "UP",
+          "z": "ENTITY_FORWARD"
+        },
+        "upAxis": "Y",
+        "forwardDirection": "+Z",
+        "transformOrder": "SCALE_ROTATE_TRANSLATE"
+      },
+      "localOrigin": {
+        "kind": "AUTHOR_DECLARED_CONTACT_FRAME",
+        "positionMicrounits": [
+          0,
+          0,
+          0
+        ]
+      },
+      "orientationContract": {
+        "mode": "IDENTITY_ONLY",
+        "canonical": [
+          0,
+          0,
+          0,
+          1000000
+        ]
+      },
+      "components": [
+        {
+          "componentId": "head",
+          "primitiveType": "AABB",
+          "localTransform": {
+            "translationMicrounits": [
+              0,
+              120000,
+              647000
+            ],
+            "orientation": [
+              0,
+              0,
+              0,
+              1000000
+            ]
+          },
+          "dimensionsMicrounits": [
+            240000,
+            240000,
+            240000
+          ],
+          "participationRole": "BOTH"
+        },
+        {
+          "componentId": "left-arm",
+          "primitiveType": "AABB",
+          "localTransform": {
+            "translationMicrounits": [
+              -305000,
+              90000,
+              227000
+            ],
+            "orientation": [
+              0,
+              0,
+              0,
+              1000000
+            ]
+          },
+          "dimensionsMicrounits": [
+            50000,
+            180000,
+            700000
+          ],
+          "participationRole": "BOTH"
+        },
+        {
+          "componentId": "legs",
+          "primitiveType": "AABB",
+          "localTransform": {
+            "translationMicrounits": [
+              0,
+              110000,
+              -651000
+            ],
+            "orientation": [
+              0,
+              0,
+              0,
+              1000000
+            ]
+          },
+          "dimensionsMicrounits": [
+            460000,
+            220000,
+            1056000
+          ],
+          "participationRole": "BOTH"
+        },
+        {
+          "componentId": "right-arm",
+          "primitiveType": "AABB",
+          "localTransform": {
+            "translationMicrounits": [
+              305000,
+              90000,
+              227000
+            ],
+            "orientation": [
+              0,
+              0,
+              0,
+              1000000
+            ]
+          },
+          "dimensionsMicrounits": [
+            50000,
+            180000,
+            700000
+          ],
+          "participationRole": "BOTH"
+        },
+        {
+          "componentId": "torso",
+          "primitiveType": "AABB",
+          "localTransform": {
+            "translationMicrounits": [
+              0,
+              151000,
+              202000
+            ],
+            "orientation": [
+              0,
+              0,
+              0,
+              1000000
+            ]
+          },
+          "dimensionsMicrounits": [
+            560000,
+            302000,
+            650000
+          ],
+          "participationRole": "BOTH"
+        }
+      ],
+      "aggregateBounds": {
+        "minX": -330000,
+        "maxX": 330000,
+        "minY": 0,
+        "maxY": 302000,
+        "minZ": -1179000,
+        "maxZ": 767000
+      },
+      "phase2Projection": {
+        "kind": "CONSERVATIVE_AGGREGATE_AABB",
+        "bounds": {
+          "minX": -330000,
+          "maxX": 330000,
+          "minY": 0,
+          "maxY": 302000,
+          "minZ": -1179000,
+          "maxZ": 767000
+        },
+        "falseRejectionDiagnostic": {
+          "classification": "CONSERVATIVE_AGGREGATE_FALSE_REJECTION_CANDIDATE",
+          "nativeCompoundEvaluationPerformed": false
+        }
+      },
+      "footprint": {
+        "kind": "XZ_RECT_UNION",
+        "regions": [
+          {
+            "regionId": "head-footprint",
+            "minX": -120000,
+            "maxX": 120000,
+            "minZ": 527000,
+            "maxZ": 767000
+          },
+          {
+            "regionId": "left-arm-footprint",
+            "minX": -330000,
+            "maxX": -280000,
+            "minZ": -123000,
+            "maxZ": 577000
+          },
+          {
+            "regionId": "legs-footprint",
+            "minX": -230000,
+            "maxX": 230000,
+            "minZ": -1179000,
+            "maxZ": -123000
+          },
+          {
+            "regionId": "right-arm-footprint",
+            "minX": 280000,
+            "maxX": 330000,
+            "minZ": -123000,
+            "maxZ": 577000
+          },
+          {
+            "regionId": "torso-footprint",
+            "minX": -280000,
+            "maxX": 280000,
+            "minZ": -123000,
+            "maxZ": 527000
+          }
+        ]
+      },
+      "contactRegions": [
+        {
+          "contactRegionId": "head-floor-contact",
+          "kind": "HORIZONTAL_XZ_RECT",
+          "planeY": 0,
+          "region": {
+            "minX": -120000,
+            "maxX": 120000,
+            "minZ": 527000,
+            "maxZ": 767000
+          }
+        },
+        {
+          "contactRegionId": "left-arm-floor-contact",
+          "kind": "HORIZONTAL_XZ_RECT",
+          "planeY": 0,
+          "region": {
+            "minX": -330000,
+            "maxX": -280000,
+            "minZ": -123000,
+            "maxZ": 577000
+          }
+        },
+        {
+          "contactRegionId": "legs-floor-contact",
+          "kind": "HORIZONTAL_XZ_RECT",
+          "planeY": 0,
+          "region": {
+            "minX": -230000,
+            "maxX": 230000,
+            "minZ": -1179000,
+            "maxZ": -123000
+          }
+        },
+        {
+          "contactRegionId": "right-arm-floor-contact",
+          "kind": "HORIZONTAL_XZ_RECT",
+          "planeY": 0,
+          "region": {
+            "minX": 280000,
+            "maxX": 330000,
+            "minZ": -123000,
+            "maxZ": 577000
+          }
+        },
+        {
+          "contactRegionId": "torso-floor-contact",
+          "kind": "HORIZONTAL_XZ_RECT",
+          "planeY": 0,
+          "region": {
+            "minX": -280000,
+            "maxX": 280000,
+            "minZ": -123000,
+            "maxZ": 527000
+          }
+        }
+      ],
+      "supportCategories": [
+        {
+          "supportCategoryId": "school/floor-v1",
+          "supportSemanticType": "FLOOR",
+          "provenanceStatus": "RECOVERED",
+          "fixtureOnly": false
+        }
+      ],
+      "geometrySource": {
+        "classification": "AUTHORED_NEW",
+        "sourceId": "DA-ADULT-V1-MALE-SUPINE-001"
+      },
+      "authoringProvenance": {
+        "decisionId": "DA-ADULT-V1-MALE-SUPINE-001",
+        "sourceReferenceEvidenceRefs": [
+          "NASA-OCHMO-HB-004-REV-A-TABLE-1:REFERENCE_ONLY",
+          "LEGACY_VISUALS_EXCLUDED"
+        ]
+      },
+      "validationEvidenceRefs": [],
+      "reviewEvidenceRefs": [],
+      "status": "AUTHORED_NEW_DRAFT",
+      "canonicalDigest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+    },
+    "stateBytes": "7b22636f6d6d69747465644576656e7453657175656e6365223a312c22656e746974696573223a7b227363686f6f6c2d63617375616c74792d6164756c742d7631223a7b22656e746974794964223a227363686f6f6c2d63617375616c74792d6164756c742d7631222c22656e74697479547970654964223a227363686f6f6c2f63617375616c7479222c2267656f6d65747279536f75726365526566223a7b22636c617373696669636174696f6e223a22415554484f5245445f4e4557222c22646967657374223a2235633365616138323431323033386431366364653262616665353534376135646230633538666462323337646138356663653437383637393036333938316433222c226c696e65616765537461747573223a22415554484f5245445f4e4557222c227265636f72644964223a2244412d4144554c542d56312d4d414c452d535550494e452d303031222c227265766973696f6e223a317d2c226c6966656379636c655374617465223a22414354495645222c22706172656e74456e746974794964223a6e756c6c2c22706172746963697061746573496e223a5b22636f6c6c6973696f6e222c22737570706f7274225d2c22706879736963616c426f6479526566223a7b22646967657374223a2235633365616138323431323033386431366364653262616665353534376135646230633538666462323337646138356663653437383637393036333938316433222c2270726f6f6647656f6d65747279446967657374223a2235633365616138323431323033386431366364653262616665353534376135646230633538666462323337646138356663653437383637393036333938316433222c227265636f72644964223a2263617375616c74792f6164756c742d76312f737570696e652d666c6f6f72222c227265766973696f6e223a317d2c22706879736963616c5374617465223a7b22616374697665223a747275652c226f7269656e746174696f6e5570446f74223a312c22706f7374757265526566223a7b22646967657374223a2231393761383036353337613363396439663632396366326135376436646234303331666139336562656130363138633265313836303366343833303137343565222c226964223a226164756c742d76312f737570696e652d666c6f6f72222c227265766973696f6e223a312c2273656d616e74696354797065223a22535550494e455f464c4f4f52227d2c2270726f66696c65526566223a7b22646967657374223a2266316439373362346366626562646661323330666530323537636366653963313130353661376430376535326333373031643165363737323331316263633431222c226964223a226164756c742d7631222c227265766973696f6e223a312c227375626a656374536578223a224d414c45227d2c22737570706f727443617465676f7279223a7b22666978747572654f6e6c79223a66616c73652c2270726f76656e616e6365537461747573223a225245434f5645524544222c22737570706f727443617465676f72794964223a227363686f6f6c2f666c6f6f722d7631222c22737570706f727453656d616e74696354797065223a22464c4f4f52227d2c22737570706f72744e6f726d616c5570446f74223a312c22737572666163654964223a22666c6f6f72227d2c22706f737475726553746174654964223a226164756c742d76312f737570696e652d666c6f6f72222c227265766973696f6e223a322c22737570706f727452656c6174696f6e223a6e756c6c2c227472616e73666f726d223a7b226f7269656e746174696f6e223a5b302c302c302c315d2c22706f736974696f6e4d6963726f756e697473223a5b302c302c313030303030305d2c227363616c654d6963726f756e697473223a5b313030303030302c313030303030302c313030303030305d7d7d7d2c22656e7669726f6e6d656e74506879736963616c5374617465223a6e756c6c2c226c6966656379636c655374617465223a22414354495645222c22706879736963616c52656c6174696f6e73223a5b5d2c227072696f725374617465446967657374223a2262613763386234653766663361373065656534366264643563343966613361356130656537623231656534613565333638343633383964386531303834373732222c227265766973696f6e223a312c227363656e65446566696e6974696f6e526566223a7b22636c617373696669636174696f6e223a225245434f5645524544222c22646967657374223a2265313935356638306430376165323636306234386663326663653663636136386461333065396465343834386536393165346661336661303532313931363138222c226c696e65616765537461747573223a225245434f5645524544222c227265766973696f6e223a312c227363656e654964223a227363686f6f6c222c22736f757263654964223a22696e6465782e68746d6c222c22736f7572636552616e67654964223a227363686f6f6c2d6261672d6c6f636b657273227d2c227374617465446967657374223a2230626365666330363039643638383864666136353561626136663139333338633735303865373261653232653232363461326236663130363136356263643031222c227375726661636573223a6e756c6c2c22776f726c644964223a227363686f6f6c2d6164756c742d76312d74657374227d",
+    "eventBytes": "5b7b22636f6d6d616e64446967657374223a2230656565373062626230343332396136326463613033306161643464313164333539653861643665346532643864333530323163663634343365346266376463222c226576656e74446967657374223a2262373137376133343163313237356238663061326565313632383339643139633266333335316664396532653061643264383438303363303734346262336662222c226576656e7454797065223a224d75746174696f6e436f6d6d6974746564222c226964223a2274783a646574222c226b696e64223a227472616e73616374696f6e222c226e65775374617465446967657374223a2230626365666330363039643638383864666136353561626136663139333338633735303865373261653232653232363461326236663130363136356263643031222c226e6577576f726c645265766973696f6e223a312c227072696f724576656e74446967657374223a2230303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030222c227072696f725374617465446967657374223a2262613763386234653766663361373065656534366264643563343966613361356130656537623231656534613565333638343633383964386531303834373732222c227072696f72576f726c645265766973696f6e223a302c2273657175656e6365223a312c22737461746544656c7461223a7b22656e746974696573223a7b227363686f6f6c2d63617375616c74792d6164756c742d7631223a7b22656e746974794964223a227363686f6f6c2d63617375616c74792d6164756c742d7631222c22656e74697479547970654964223a227363686f6f6c2f63617375616c7479222c2267656f6d65747279536f75726365526566223a7b22636c617373696669636174696f6e223a22415554484f5245445f4e4557222c22646967657374223a2235633365616138323431323033386431366364653262616665353534376135646230633538666462323337646138356663653437383637393036333938316433222c226c696e65616765537461747573223a22415554484f5245445f4e4557222c227265636f72644964223a2244412d4144554c542d56312d4d414c452d535550494e452d303031222c227265766973696f6e223a317d2c226c6966656379636c655374617465223a22414354495645222c22706172656e74456e746974794964223a6e756c6c2c22706172746963697061746573496e223a5b22636f6c6c6973696f6e222c22737570706f7274225d2c22706879736963616c426f6479526566223a7b22646967657374223a2235633365616138323431323033386431366364653262616665353534376135646230633538666462323337646138356663653437383637393036333938316433222c2270726f6f6647656f6d65747279446967657374223a2235633365616138323431323033386431366364653262616665353534376135646230633538666462323337646138356663653437383637393036333938316433222c227265636f72644964223a2263617375616c74792f6164756c742d76312f737570696e652d666c6f6f72222c227265766973696f6e223a317d2c22706879736963616c5374617465223a7b22616374697665223a747275652c226f7269656e746174696f6e5570446f74223a312c22706f7374757265526566223a7b22646967657374223a2231393761383036353337613363396439663632396366326135376436646234303331666139336562656130363138633265313836303366343833303137343565222c226964223a226164756c742d76312f737570696e652d666c6f6f72222c227265766973696f6e223a312c2273656d616e74696354797065223a22535550494e455f464c4f4f52227d2c2270726f66696c65526566223a7b22646967657374223a2266316439373362346366626562646661323330666530323537636366653963313130353661376430376535326333373031643165363737323331316263633431222c226964223a226164756c742d7631222c227265766973696f6e223a312c227375626a656374536578223a224d414c45227d2c22737570706f727443617465676f7279223a7b22666978747572654f6e6c79223a66616c73652c2270726f76656e616e6365537461747573223a225245434f5645524544222c22737570706f727443617465676f72794964223a227363686f6f6c2f666c6f6f722d7631222c22737570706f727453656d616e74696354797065223a22464c4f4f52227d2c22737570706f72744e6f726d616c5570446f74223a312c22737572666163654964223a22666c6f6f72227d2c22706f737475726553746174654964223a226164756c742d76312f737570696e652d666c6f6f72222c227265766973696f6e223a322c22737570706f727452656c6174696f6e223a6e756c6c2c227472616e73666f726d223a7b226f7269656e746174696f6e223a5b302c302c302c315d2c22706f736974696f6e4d6963726f756e697473223a5b302c302c313030303030305d2c227363616c654d6963726f756e697473223a5b313030303030302c313030303030302c313030303030305d7d7d7d2c22656e7669726f6e6d656e74506879736963616c5374617465223a6e756c6c2c226c6966656379636c655374617465223a22414354495645222c22706879736963616c52656c6174696f6e73223a5b5d2c227375726661636573223a6e756c6c7d2c22776f726c644964223a227363686f6f6c2d6164756c742d76312d74657374227d5d"
+  }
+}
