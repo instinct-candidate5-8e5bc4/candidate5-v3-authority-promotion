@@ -1,0 +1,1531 @@
+{
+  "baseCommit": "7020b41e9067f5c58fb094cb126cd9ddc014ab72",
+  "inventoryDigest": "42861648998e3f88a062c54338448828f92cabca8f90af3604b92ea7a8d44334",
+  "counts": {
+    "allClassifiedSites": 344,
+    "authoritativePhysicalWriteCandidates": 336,
+    "directScalarWrites": 62,
+    "transformMutatorCalls": 99,
+    "sceneMembershipReparent": 129,
+    "geometryMutationPaths": 12,
+    "persistenceRecoveryReplayPhysicalWrites": 59,
+    "computedDynamicWrites": 6,
+    "instrumentable": 241,
+    "ambiguous": 99,
+    "uninstrumentable": 0,
+    "libraryOnly": 0,
+    "diagnosticOnly": 8,
+    "physicalFiles": 9,
+    "physicalFunctions": 80,
+    "independentMutationEntryPoints": 80,
+    "writesOutsideCentralBoundary": 336,
+    "geometryGateBypassCandidates": 336,
+    "legacyDebugRecoveryPersistenceRelated": 59,
+    "runtimeEssential": 277
+  },
+  "mutationDispersion": {
+    "files": 9,
+    "functions": 80,
+    "entryPoints": 80,
+    "outsideCentralBoundary": 336,
+    "geometryGateBypassCandidates": 336,
+    "legacyDebugRecoveryPersistence": 59,
+    "runtimeEssential": 277
+  },
+  "legacyMap": [
+    {
+      "legacyPathId": "L-01",
+      "phase1AuditPresent": true,
+      "matchingStaticPathCount": 35,
+      "representativeStaticPaths": [
+        {
+          "staticPathId": "SP-45b6e57ec2751b9d4dd0",
+          "file": "index.html",
+          "start": 132448,
+          "end": 132508,
+          "sourceRangeSha256": "835bb302ae98d253143b3f02d2bdd0e67ca1548431b49700e273d329685f29b2",
+          "operation": "SCENE_MEMBERSHIP_OR_REPARENT",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-43d5031baa6302aa5097",
+          "file": "index.html",
+          "start": 132585,
+          "end": 132600,
+          "sourceRangeSha256": "0875af1c569037f3ceba2c880ee3589322d21d8998eec7cb9a8f3729a92d8af1",
+          "operation": "SCENE_MEMBERSHIP_OR_REPARENT",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-a6a54400cd106da981c8",
+          "file": "index.html",
+          "start": 132805,
+          "end": 132819,
+          "sourceRangeSha256": "ec55ed93bfdc10cda4cd0cf238dd7bcdb05d0977107e983b596a336422153dd6",
+          "operation": "SCENE_MEMBERSHIP_OR_REPARENT",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-51fdea9c6b3d55bd9d64",
+          "file": "index.html",
+          "start": 132893,
+          "end": 132907,
+          "sourceRangeSha256": "f0acd0c83fc973fc7119b30ef2de9f009cead4d9c934eeb7b13a0a26b789d79f",
+          "operation": "SCENE_MEMBERSHIP_OR_REPARENT",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-f5282d4909c6be150bb9",
+          "file": "index.html",
+          "start": 132993,
+          "end": 133014,
+          "sourceRangeSha256": "58d47c48254e2c2b821b66c878bd1a1642de7351417304aa15d3690fad861302",
+          "operation": "SCENE_MEMBERSHIP_OR_REPARENT",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-e324a3fb1be940f6c803",
+          "file": "index.html",
+          "start": 133236,
+          "end": 133248,
+          "sourceRangeSha256": "2b376e1bbd8a5447625f246ecde9857d9e5655da67777bf65183dcb6b9061afd",
+          "operation": "SCENE_MEMBERSHIP_OR_REPARENT",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:1899-2066"
+        },
+        {
+          "staticPathId": "SP-94d69f34d0329d8999a8",
+          "file": "index.html",
+          "start": 133758,
+          "end": 133770,
+          "sourceRangeSha256": "e827c819c3914e2e176dca921ead787df1d44c704c63801f47cee8bc7a473db8",
+          "operation": "SCENE_MEMBERSHIP_OR_REPARENT",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-ca3ee762882c3cd4dfe3",
+          "file": "index.html",
+          "start": 136221,
+          "end": 136233,
+          "sourceRangeSha256": "2b376e1bbd8a5447625f246ecde9857d9e5655da67777bf65183dcb6b9061afd",
+          "operation": "SCENE_MEMBERSHIP_OR_REPARENT",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:4821-5051"
+        },
+        {
+          "staticPathId": "SP-e2e505d471aa7630153e",
+          "file": "index.html",
+          "start": 136406,
+          "end": 136418,
+          "sourceRangeSha256": "2b376e1bbd8a5447625f246ecde9857d9e5655da67777bf65183dcb6b9061afd",
+          "operation": "SCENE_MEMBERSHIP_OR_REPARENT",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:5052-5236"
+        },
+        {
+          "staticPathId": "SP-80228ce8da49fa4ab466",
+          "file": "index.html",
+          "start": 136852,
+          "end": 136864,
+          "sourceRangeSha256": "2b376e1bbd8a5447625f246ecde9857d9e5655da67777bf65183dcb6b9061afd",
+          "operation": "SCENE_MEMBERSHIP_OR_REPARENT",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:5516-5682"
+        },
+        {
+          "staticPathId": "SP-19615be2524fbe30dc85",
+          "file": "index.html",
+          "start": 139599,
+          "end": 139616,
+          "sourceRangeSha256": "89f1a1ce9beb9c61cc49458b7492907f64a52526de986f43aee500ea3bc5ba7a",
+          "operation": "SCENE_MEMBERSHIP_OR_REPARENT",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:7906-8439"
+        },
+        {
+          "staticPathId": "SP-b42fdc104c67df36cc2d",
+          "file": "index.html",
+          "start": 140221,
+          "end": 140233,
+          "sourceRangeSha256": "e827c819c3914e2e176dca921ead787df1d44c704c63801f47cee8bc7a473db8",
+          "operation": "SCENE_MEMBERSHIP_OR_REPARENT",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:8440-9051"
+        },
+        {
+          "staticPathId": "SP-352e7803ed9d5597a1bf",
+          "file": "index.html",
+          "start": 140899,
+          "end": 140911,
+          "sourceRangeSha256": "e827c819c3914e2e176dca921ead787df1d44c704c63801f47cee8bc7a473db8",
+          "operation": "SCENE_MEMBERSHIP_OR_REPARENT",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:9052-9729"
+        },
+        {
+          "staticPathId": "SP-81ff46500a9e93c4e2ac",
+          "file": "index.html",
+          "start": 141363,
+          "end": 141375,
+          "sourceRangeSha256": "e827c819c3914e2e176dca921ead787df1d44c704c63801f47cee8bc7a473db8",
+          "operation": "SCENE_MEMBERSHIP_OR_REPARENT",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:9730-10193"
+        },
+        {
+          "staticPathId": "SP-2da8300e543a8667da62",
+          "file": "index.html",
+          "start": 141945,
+          "end": 141957,
+          "sourceRangeSha256": "e827c819c3914e2e176dca921ead787df1d44c704c63801f47cee8bc7a473db8",
+          "operation": "SCENE_MEMBERSHIP_OR_REPARENT",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:10194-10775"
+        },
+        {
+          "staticPathId": "SP-69676ed95147805b92e8",
+          "file": "index.html",
+          "start": 142381,
+          "end": 142397,
+          "sourceRangeSha256": "63f9986f1cb793752a0fb06dd9aab48dd3864ef2c95c6fadf494d9ab01cf87af",
+          "operation": "SCENE_MEMBERSHIP_OR_REPARENT",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:11010-11424"
+        },
+        {
+          "staticPathId": "SP-020db7940f7aa707fa42",
+          "file": "index.html",
+          "start": 143934,
+          "end": 143946,
+          "sourceRangeSha256": "e827c819c3914e2e176dca921ead787df1d44c704c63801f47cee8bc7a473db8",
+          "operation": "SCENE_MEMBERSHIP_OR_REPARENT",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:11912-12764"
+        },
+        {
+          "staticPathId": "SP-e1929a06a560c42d9972",
+          "file": "index.html",
+          "start": 144640,
+          "end": 144652,
+          "sourceRangeSha256": "e827c819c3914e2e176dca921ead787df1d44c704c63801f47cee8bc7a473db8",
+          "operation": "SCENE_MEMBERSHIP_OR_REPARENT",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:12765-13470"
+        },
+        {
+          "staticPathId": "SP-d0f38f08c06daafd6de7",
+          "file": "index.html",
+          "start": 145078,
+          "end": 145090,
+          "sourceRangeSha256": "e827c819c3914e2e176dca921ead787df1d44c704c63801f47cee8bc7a473db8",
+          "operation": "SCENE_MEMBERSHIP_OR_REPARENT",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:13471-13908"
+        },
+        {
+          "staticPathId": "SP-8e88ce693e1e13e4a123",
+          "file": "index.html",
+          "start": 148798,
+          "end": 148820,
+          "sourceRangeSha256": "a8e4423eb54690191fffacb352538132e8816da2ba4f844dd7bef84eb874fd7e",
+          "operation": "SCENE_MEMBERSHIP_OR_REPARENT",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-e1b20b9c2369dfd9ebf8",
+          "file": "index.html",
+          "start": 151384,
+          "end": 151400,
+          "sourceRangeSha256": "7c5614705ef99ac6762614ec5a0773ba4d23e1bdd0fb5d297401bcdd9b6375a4",
+          "operation": "SCENE_MEMBERSHIP_OR_REPARENT",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-814cfa2a563fa3bbca8f",
+          "file": "index.html",
+          "start": 153461,
+          "end": 153476,
+          "sourceRangeSha256": "35a9d69f36a713d2ebd86098a3826f19218eecb04335f395267397794dd8d051",
+          "operation": "SCENE_MEMBERSHIP_OR_REPARENT__LEGACY_DEBUG_RECOVERY_PERSISTENCE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-7f1dcd7ef0b67f9a517b",
+          "file": "index.html",
+          "start": 157022,
+          "end": 157041,
+          "sourceRangeSha256": "81c9383c9bffe8413a7eef4372677932fa16981275d20f36b1b8caba63690c18",
+          "operation": "SCENE_MEMBERSHIP_OR_REPARENT__LEGACY_DEBUG_RECOVERY_PERSISTENCE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-cda82152835f5ea28dd8",
+          "file": "index.html",
+          "start": 158952,
+          "end": 158969,
+          "sourceRangeSha256": "2ccc169f3ce5fc995ac5eb61fbf3a3e832572e38259c9cc4252a12428720e4fa",
+          "operation": "SCENE_MEMBERSHIP_OR_REPARENT__LEGACY_DEBUG_RECOVERY_PERSISTENCE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-9de8950f02faeb2fe73f",
+          "file": "index.html",
+          "start": 159157,
+          "end": 159172,
+          "sourceRangeSha256": "ef71f272517a4ea0c2a9a91902f775427359cf7da315eadc3875b8d96a553f02",
+          "operation": "SCENE_MEMBERSHIP_OR_REPARENT",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        }
+      ],
+      "expectedTrigger": "boot",
+      "migrationRelevance": "AUTHORITATIVE_API_MIGRATION_CANDIDATE",
+      "notObserved": true
+    },
+    {
+      "legacyPathId": "L-02",
+      "phase1AuditPresent": true,
+      "matchingStaticPathCount": 0,
+      "representativeStaticPaths": [],
+      "expectedTrigger": "async GLB load",
+      "migrationRelevance": "AUTHORITATIVE_API_MIGRATION_CANDIDATE",
+      "notObserved": true
+    },
+    {
+      "legacyPathId": "L-03",
+      "phase1AuditPresent": true,
+      "matchingStaticPathCount": 10,
+      "representativeStaticPaths": [
+        {
+          "staticPathId": "SP-6cdb928963f026c31f25",
+          "file": "index.html",
+          "start": 163042,
+          "end": 163108,
+          "sourceRangeSha256": "5479e71fc27b76b54fdbf2c94340e0d89ff97b65d243517c02840e9f91a1298a",
+          "operation": "TRANSFORM_MUTATOR_CALL",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-978f1f1f725b01c3d905",
+          "file": "index.html",
+          "start": 168193,
+          "end": 168258,
+          "sourceRangeSha256": "fc71e4c823f3f75e3d26eeb26f2d4e170a9d44f6bcfdec65d187cdcb28ea29f4",
+          "operation": "TRANSFORM_MUTATOR_CALL",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-0b65ad32864bee1c119a",
+          "file": "index.html",
+          "start": 169752,
+          "end": 169811,
+          "sourceRangeSha256": "e29fb227081bf536d50621bf90bf91042319a7bb68ffa864cd818c2e6d8ba8a7",
+          "operation": "DIRECT_SCALAR_WRITE__LEGACY_DEBUG_RECOVERY_PERSISTENCE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-035f7b57e246b898825c",
+          "file": "index.html",
+          "start": 169902,
+          "end": 169970,
+          "sourceRangeSha256": "de077b3c97f8c35661d224dfb2b769abf47f98991ade0008c56b8b7f70fd1b41",
+          "operation": "TRANSFORM_MUTATOR_CALL__LEGACY_DEBUG_RECOVERY_PERSISTENCE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-ff52f404ec3af19ffde4",
+          "file": "index.html",
+          "start": 172629,
+          "end": 172655,
+          "sourceRangeSha256": "302cd866b529bc536f61d9f6a947b0b2b473d0c750b602ca2a4404fd9e3a7c17",
+          "operation": "VISIBILITY_STATE_WRITE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-78636e6f6ce5c2f764db",
+          "file": "index.html",
+          "start": 183299,
+          "end": 183405,
+          "sourceRangeSha256": "627a48e62fb39b731d109a06b9bf524e6fa85256e98ce414952074b383e4f3c7",
+          "operation": "DIRECT_SCALAR_WRITE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:49818-53659"
+        },
+        {
+          "staticPathId": "SP-24b09536d02572c3db63",
+          "file": "index.html",
+          "start": 188828,
+          "end": 188863,
+          "sourceRangeSha256": "6f40b2480e1fd5df75464e38e3072549c9d05f2e5e75b22d37ce1e301484fbf6",
+          "operation": "VISIBILITY_STATE_WRITE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-68476b6be905147cb54b",
+          "file": "index.html",
+          "start": 203365,
+          "end": 203445,
+          "sourceRangeSha256": "9ecfa01ef88b800a786e350d2d82e174bd738b4f71a1d08bbaa8e7c5b6b0363c",
+          "operation": "TRANSFORM_MUTATOR_CALL",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:70369-73775"
+        },
+        {
+          "staticPathId": "SP-b8b1dc71127e4b0a8a04",
+          "file": "index.html",
+          "start": 203560,
+          "end": 203612,
+          "sourceRangeSha256": "deb5585d81b79c1cf3b3279de18e33edc6744fef0a17c30a733283848785b18f",
+          "operation": "TRANSFORM_OR_MATRIX_WRITE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:70369-73775"
+        },
+        {
+          "staticPathId": "SP-7e00e0cba674526279fd",
+          "file": "src/nextgen/multi-casualty.js",
+          "start": 2002,
+          "end": 2035,
+          "sourceRangeSha256": "c55b152b1d388a809ca1d3b348eab2b7cf101d30a039a22ee694ebab99d468b1",
+          "operation": "DYNAMIC_OR_REFLECTIVE_WRITE",
+          "physical": false,
+          "instrumentability": "AMBIGUOUS",
+          "enclosingFunction": "multi-casualty.js:1963-2148"
+        }
+      ],
+      "expectedTrigger": "boot casualty",
+      "migrationRelevance": "AUTHORITATIVE_API_MIGRATION_CANDIDATE",
+      "notObserved": true
+    },
+    {
+      "legacyPathId": "L-04",
+      "phase1AuditPresent": true,
+      "matchingStaticPathCount": 0,
+      "representativeStaticPaths": [],
+      "expectedTrigger": "boot support",
+      "migrationRelevance": "AUTHORITATIVE_API_MIGRATION_CANDIDATE",
+      "notObserved": true
+    },
+    {
+      "legacyPathId": "L-05",
+      "phase1AuditPresent": true,
+      "matchingStaticPathCount": 30,
+      "representativeStaticPaths": [
+        {
+          "staticPathId": "SP-7c5966dd789f8a7bd407",
+          "file": "index.html",
+          "start": 162846,
+          "end": 162872,
+          "sourceRangeSha256": "5e5e5b1b651f36a96985743d040691ce8348c77cc466145a980c9fc0d78e8506",
+          "operation": "SCENE_MEMBERSHIP_OR_REPARENT",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-85d213b09a98d003fc16",
+          "file": "index.html",
+          "start": 163252,
+          "end": 163459,
+          "sourceRangeSha256": "86fdb8edd40fd90f2e1cf644f98f340cce110126ea7a286fc0e7329dea1f9557",
+          "operation": "TRANSFORM_MUTATOR_CALL",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-6d689e469f03afd1ff6b",
+          "file": "index.html",
+          "start": 168354,
+          "end": 168434,
+          "sourceRangeSha256": "f5a8ad31a941b4e1197d86f3bf51530fdf410c00de97576f1ab11cc29ff29ba0",
+          "operation": "TRANSFORM_MUTATOR_CALL__LEGACY_DEBUG_RECOVERY_PERSISTENCE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-8668a56030aa81da302b",
+          "file": "index.html",
+          "start": 169812,
+          "end": 169835,
+          "sourceRangeSha256": "508077634da88d03740aaa79e17a1ccdcc8cc8942880402479d74610dfad2226",
+          "operation": "DIRECT_SCALAR_WRITE__LEGACY_DEBUG_RECOVERY_PERSISTENCE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-311463bc901b11fd97e2",
+          "file": "index.html",
+          "start": 169873,
+          "end": 169901,
+          "sourceRangeSha256": "e268f214a5bd3da45bbfadbe6648cf7046372b7d39678d1f141a8bd95890c1e9",
+          "operation": "DIRECT_SCALAR_WRITE__LEGACY_DEBUG_RECOVERY_PERSISTENCE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-f967899cd38c497b54c2",
+          "file": "index.html",
+          "start": 169971,
+          "end": 170009,
+          "sourceRangeSha256": "00cccedcfadce995d92f68fa785cc5de867e79292e7ee5a473d7b0bc30db8231",
+          "operation": "TRANSFORM_MUTATOR_CALL__LEGACY_DEBUG_RECOVERY_PERSISTENCE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-fb0c2453bf4990eade93",
+          "file": "index.html",
+          "start": 182239,
+          "end": 182257,
+          "sourceRangeSha256": "55fc35e1c58114212a1c5fee7a8472799169fbd4f7a994e2ededaef3c0e79772",
+          "operation": "SCENE_MEMBERSHIP_OR_REPARENT",
+          "physical": true,
+          "instrumentability": "AMBIGUOUS",
+          "enclosingFunction": "inline-36:49818-53659"
+        },
+        {
+          "staticPathId": "SP-78636e6f6ce5c2f764db",
+          "file": "index.html",
+          "start": 183299,
+          "end": 183405,
+          "sourceRangeSha256": "627a48e62fb39b731d109a06b9bf524e6fa85256e98ce414952074b383e4f3c7",
+          "operation": "DIRECT_SCALAR_WRITE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:49818-53659"
+        },
+        {
+          "staticPathId": "SP-974b2cd7a14f36afbe7a",
+          "file": "index.html",
+          "start": 188864,
+          "end": 188899,
+          "sourceRangeSha256": "dac91f8ad3d2f9aefd8a89a35711c822e3af1f01cfcc1958789cc7d6df28ec4b",
+          "operation": "VISIBILITY_STATE_WRITE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-0ad61b5b4730b6569d6a",
+          "file": "index.html",
+          "start": 194885,
+          "end": 194980,
+          "sourceRangeSha256": "7866aa82f66d480098071ca600f307e24c8d5cd19456065b90f4c5b4608e3ebe",
+          "operation": "TRANSFORM_MUTATOR_CALL",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:63188-64097"
+        },
+        {
+          "staticPathId": "SP-02bfc28d38683144f6d8",
+          "file": "index.html",
+          "start": 201993,
+          "end": 202047,
+          "sourceRangeSha256": "ff95e35505a502d9b99c44b1f8fb5291416db96f2aa0fb9d03754d07e4661c74",
+          "operation": "TRANSFORM_MUTATOR_CALL",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:70369-73775"
+        },
+        {
+          "staticPathId": "SP-fe0bd62690b27bd8e893",
+          "file": "index.html",
+          "start": 202075,
+          "end": 202099,
+          "sourceRangeSha256": "afda0150055c06f0de9b82252d40cab5724c9e76065ae3e8075e882bc8a54140",
+          "operation": "DIRECT_SCALAR_WRITE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:70369-73775"
+        },
+        {
+          "staticPathId": "SP-7266470d5287203ee6f3",
+          "file": "index.html",
+          "start": 202100,
+          "end": 202124,
+          "sourceRangeSha256": "2fa7948a31cc3703202b1b3b3bc0715655a9b07c2ee4cca3bb2ddf8c866595a3",
+          "operation": "DIRECT_SCALAR_WRITE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:70369-73775"
+        },
+        {
+          "staticPathId": "SP-cf591b93bd263d7b1b52",
+          "file": "index.html",
+          "start": 202152,
+          "end": 202173,
+          "sourceRangeSha256": "93e9989aa843becc2c9a6a5377b5d6086a9d53a2c2c949c7fa69f461ab29c398",
+          "operation": "VISIBILITY_STATE_WRITE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:70369-73775"
+        },
+        {
+          "staticPathId": "SP-8ea30b24a4a282e8ac8e",
+          "file": "index.html",
+          "start": 202206,
+          "end": 202226,
+          "sourceRangeSha256": "d56aba386fa5c9fc54d7cff76ab4e4d694259658e8672abe01e8fccbe07a7f63",
+          "operation": "VISIBILITY_STATE_WRITE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:70369-73775"
+        },
+        {
+          "staticPathId": "SP-57d9f3a7cf7fcb430b0a",
+          "file": "index.html",
+          "start": 202227,
+          "end": 202266,
+          "sourceRangeSha256": "f56fd44e62fea2aaed9a1126abd30504f71223a537a424abc42d3aba22aaad51",
+          "operation": "TRANSFORM_MUTATOR_CALL",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:70369-73775"
+        },
+        {
+          "staticPathId": "SP-dd1084889a370c75d7e0",
+          "file": "index.html",
+          "start": 202267,
+          "end": 202315,
+          "sourceRangeSha256": "eb73a560902c160176577a8bb65370aa8fe88738416ef08fcb7f3233e35802ad",
+          "operation": "DIRECT_SCALAR_WRITE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:70369-73775"
+        },
+        {
+          "staticPathId": "SP-ecf0c92de563c8c9f07f",
+          "file": "index.html",
+          "start": 202461,
+          "end": 202546,
+          "sourceRangeSha256": "91acc705d1c8913735bddbd80ac1c6046d16e982eb1b46b43d00af91723ea81e",
+          "operation": "DIRECT_SCALAR_WRITE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:70369-73775"
+        },
+        {
+          "staticPathId": "SP-890c3b396e6390e98136",
+          "file": "index.html",
+          "start": 202547,
+          "end": 202611,
+          "sourceRangeSha256": "bd91f7bdcac69f6b03a057c064f6aa731c8cf9d3aa8bf45fa3dff5bf84d0ce18",
+          "operation": "DIRECT_SCALAR_WRITE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:70369-73775"
+        },
+        {
+          "staticPathId": "SP-300dd358a39c56115b80",
+          "file": "index.html",
+          "start": 202641,
+          "end": 202705,
+          "sourceRangeSha256": "7fd2e94f538f821cc1c123bf8503ac24bc3637cd2f8090a55f48416ee84f89eb",
+          "operation": "DIRECT_SCALAR_WRITE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:70369-73775"
+        },
+        {
+          "staticPathId": "SP-dd4fc959800b1e2b239b",
+          "file": "index.html",
+          "start": 202706,
+          "end": 202745,
+          "sourceRangeSha256": "719f8fc9613d77aceabc2619f8d4f86f31b8b33e84f5f6de376e03c467a6276c",
+          "operation": "DIRECT_SCALAR_WRITE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:70369-73775"
+        },
+        {
+          "staticPathId": "SP-db64ef95cf315ea67d7d",
+          "file": "index.html",
+          "start": 202779,
+          "end": 202852,
+          "sourceRangeSha256": "58418969abcc79bd9f9d7062823350022516db9cd2a110db0989a9c57e3b9c9a",
+          "operation": "DIRECT_SCALAR_WRITE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:70369-73775"
+        },
+        {
+          "staticPathId": "SP-fa4f18652f2b3098b285",
+          "file": "index.html",
+          "start": 202886,
+          "end": 202960,
+          "sourceRangeSha256": "2a91540f5036cf4cd5d3d168b500a354316d4a62d33f7e7b22d8d7bedc5a7845",
+          "operation": "DIRECT_SCALAR_WRITE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:70369-73775"
+        },
+        {
+          "staticPathId": "SP-da8bd2686cff851561f5",
+          "file": "index.html",
+          "start": 202961,
+          "end": 203003,
+          "sourceRangeSha256": "88bd5a95c7e8e78363b5aec0d295c855317f254995a765c6a6c5a8f03c43b22e",
+          "operation": "DIRECT_SCALAR_WRITE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:70369-73775"
+        },
+        {
+          "staticPathId": "SP-551a5a040f6fd3483aad",
+          "file": "index.html",
+          "start": 203004,
+          "end": 203202,
+          "sourceRangeSha256": "ca55daed39f436d139a5596727c0156a357d00dd08327198add54a8bb2fca1ac",
+          "operation": "DIRECT_SCALAR_WRITE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:70369-73775"
+        }
+      ],
+      "expectedTrigger": "boot witness",
+      "migrationRelevance": "AUTHORITATIVE_API_MIGRATION_CANDIDATE",
+      "notObserved": true
+    },
+    {
+      "legacyPathId": "L-06",
+      "phase1AuditPresent": true,
+      "matchingStaticPathCount": 2,
+      "representativeStaticPaths": [
+        {
+          "staticPathId": "SP-9cb0914fc827fdb8e492",
+          "file": "index.html",
+          "start": 185625,
+          "end": 185652,
+          "sourceRangeSha256": "87fd789be50a120d43c2543019eb463b65104ed5fb2bac1f09e05d18ab5f806a",
+          "operation": "TRANSFORM_MUTATOR_CALL",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-fd041951621565d61071",
+          "file": "index.html",
+          "start": 188900,
+          "end": 188931,
+          "sourceRangeSha256": "1715cfb4de54f6a4220a13b618515fd0cd3644702db7aa5f6c7d54e74a4cb90f",
+          "operation": "VISIBILITY_STATE_WRITE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        }
+      ],
+      "expectedTrigger": "boot/layout bag",
+      "migrationRelevance": "AUTHORITATIVE_API_MIGRATION_CANDIDATE",
+      "notObserved": true
+    },
+    {
+      "legacyPathId": "L-07",
+      "phase1AuditPresent": true,
+      "matchingStaticPathCount": 5,
+      "representativeStaticPaths": [
+        {
+          "staticPathId": "SP-391301514388da30ca94",
+          "file": "index.html",
+          "start": 131877,
+          "end": 131928,
+          "sourceRangeSha256": "c266d185c9c16e7b5c0e169a4331c5fd9e326d7b6c57695f7bbcaa2269da707f",
+          "operation": "TRANSFORM_MUTATOR_CALL",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-6cdb928963f026c31f25",
+          "file": "index.html",
+          "start": 163042,
+          "end": 163108,
+          "sourceRangeSha256": "5479e71fc27b76b54fdbf2c94340e0d89ff97b65d243517c02840e9f91a1298a",
+          "operation": "TRANSFORM_MUTATOR_CALL",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-85d213b09a98d003fc16",
+          "file": "index.html",
+          "start": 163252,
+          "end": 163459,
+          "sourceRangeSha256": "86fdb8edd40fd90f2e1cf644f98f340cce110126ea7a286fc0e7329dea1f9557",
+          "operation": "TRANSFORM_MUTATOR_CALL",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-40eafa09b21f6d472c59",
+          "file": "index.html",
+          "start": 167253,
+          "end": 167320,
+          "sourceRangeSha256": "4b66b4fa9738fc70034443150f60a41f1c5581da6e0f22287726289c90ffb49f",
+          "operation": "TRANSFORM_MUTATOR_CALL__LEGACY_DEBUG_RECOVERY_PERSISTENCE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-c78946005dd62cb5fb99",
+          "file": "index.html",
+          "start": 173522,
+          "end": 173580,
+          "sourceRangeSha256": "ebb74559987233784c0a3e5e1c2a32496a3e436aef01daef593530b1437ef698",
+          "operation": "TRANSFORM_MUTATOR_CALL",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        }
+      ],
+      "expectedTrigger": "mobile/resize",
+      "migrationRelevance": "AUTHORITATIVE_API_MIGRATION_CANDIDATE",
+      "notObserved": true
+    },
+    {
+      "legacyPathId": "L-08",
+      "phase1AuditPresent": true,
+      "matchingStaticPathCount": 5,
+      "representativeStaticPaths": [
+        {
+          "staticPathId": "SP-02bfc28d38683144f6d8",
+          "file": "index.html",
+          "start": 201993,
+          "end": 202047,
+          "sourceRangeSha256": "ff95e35505a502d9b99c44b1f8fb5291416db96f2aa0fb9d03754d07e4661c74",
+          "operation": "TRANSFORM_MUTATOR_CALL",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:70369-73775"
+        },
+        {
+          "staticPathId": "SP-a4d10f509362c788b9c9",
+          "file": "src/nextgen/npc-state.js",
+          "start": 2014,
+          "end": 2059,
+          "sourceRangeSha256": "67de28caeeca42933edffa88c5e9e9085c9f29e30cf85cf3b320f0807b3c7136",
+          "operation": "TRANSFORM_OR_MATRIX_WRITE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "npc-state.js:1909-2106"
+        },
+        {
+          "staticPathId": "SP-1e94df42c9545cb52312",
+          "file": "src/nextgen/npc-state.js",
+          "start": 2489,
+          "end": 2541,
+          "sourceRangeSha256": "b258d3b6883a8aa86dd3d44961b8762a29e78416c729da1a1bd359a7bd913d65",
+          "operation": "DYNAMIC_OR_REFLECTIVE_WRITE",
+          "physical": false,
+          "instrumentability": "AMBIGUOUS",
+          "enclosingFunction": "npc-state.js:2456-3775"
+        },
+        {
+          "staticPathId": "SP-3bbfc319268203a3fb45",
+          "file": "src/nextgen/npc-state.js",
+          "start": 3489,
+          "end": 3526,
+          "sourceRangeSha256": "a65482c5cb324bde801fd5b67f6bfe6b4636bff54a2e55b7b6e08719774dfaae",
+          "operation": "TRANSFORM_OR_MATRIX_WRITE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "npc-state.js:2456-3775"
+        },
+        {
+          "staticPathId": "SP-2a9dab4a5f24380fb3a7",
+          "file": "src/nextgen/persistence.js",
+          "start": 9784,
+          "end": 9824,
+          "sourceRangeSha256": "dab8e772d4815455596e2d705d494a2f203e01b0c73f5fcb93d98f5f710dcc85",
+          "operation": "TRANSFORM_OR_MATRIX_WRITE__LEGACY_DEBUG_RECOVERY_PERSISTENCE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "persistence.js:9328-10002"
+        }
+      ],
+      "expectedTrigger": "NPC event",
+      "migrationRelevance": "AUTHORITATIVE_API_MIGRATION_CANDIDATE",
+      "notObserved": true
+    },
+    {
+      "legacyPathId": "L-09",
+      "phase1AuditPresent": true,
+      "matchingStaticPathCount": 6,
+      "representativeStaticPaths": [
+        {
+          "staticPathId": "SP-02bfc28d38683144f6d8",
+          "file": "index.html",
+          "start": 201993,
+          "end": 202047,
+          "sourceRangeSha256": "ff95e35505a502d9b99c44b1f8fb5291416db96f2aa0fb9d03754d07e4661c74",
+          "operation": "TRANSFORM_MUTATOR_CALL",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:70369-73775"
+        },
+        {
+          "staticPathId": "SP-57d9f3a7cf7fcb430b0a",
+          "file": "index.html",
+          "start": 202227,
+          "end": 202266,
+          "sourceRangeSha256": "f56fd44e62fea2aaed9a1126abd30504f71223a537a424abc42d3aba22aaad51",
+          "operation": "TRANSFORM_MUTATOR_CALL",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:70369-73775"
+        },
+        {
+          "staticPathId": "SP-a4d10f509362c788b9c9",
+          "file": "src/nextgen/npc-state.js",
+          "start": 2014,
+          "end": 2059,
+          "sourceRangeSha256": "67de28caeeca42933edffa88c5e9e9085c9f29e30cf85cf3b320f0807b3c7136",
+          "operation": "TRANSFORM_OR_MATRIX_WRITE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "npc-state.js:1909-2106"
+        },
+        {
+          "staticPathId": "SP-1e94df42c9545cb52312",
+          "file": "src/nextgen/npc-state.js",
+          "start": 2489,
+          "end": 2541,
+          "sourceRangeSha256": "b258d3b6883a8aa86dd3d44961b8762a29e78416c729da1a1bd359a7bd913d65",
+          "operation": "DYNAMIC_OR_REFLECTIVE_WRITE",
+          "physical": false,
+          "instrumentability": "AMBIGUOUS",
+          "enclosingFunction": "npc-state.js:2456-3775"
+        },
+        {
+          "staticPathId": "SP-3bbfc319268203a3fb45",
+          "file": "src/nextgen/npc-state.js",
+          "start": 3489,
+          "end": 3526,
+          "sourceRangeSha256": "a65482c5cb324bde801fd5b67f6bfe6b4636bff54a2e55b7b6e08719774dfaae",
+          "operation": "TRANSFORM_OR_MATRIX_WRITE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "npc-state.js:2456-3775"
+        },
+        {
+          "staticPathId": "SP-2a9dab4a5f24380fb3a7",
+          "file": "src/nextgen/persistence.js",
+          "start": 9784,
+          "end": 9824,
+          "sourceRangeSha256": "dab8e772d4815455596e2d705d494a2f203e01b0c73f5fcb93d98f5f710dcc85",
+          "operation": "TRANSFORM_OR_MATRIX_WRITE__LEGACY_DEBUG_RECOVERY_PERSISTENCE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "persistence.js:9328-10002"
+        }
+      ],
+      "expectedTrigger": "animation",
+      "migrationRelevance": "AUTHORITATIVE_API_MIGRATION_CANDIDATE",
+      "notObserved": true
+    },
+    {
+      "legacyPathId": "L-10",
+      "phase1AuditPresent": true,
+      "matchingStaticPathCount": 3,
+      "representativeStaticPaths": [
+        {
+          "staticPathId": "SP-035f7b57e246b898825c",
+          "file": "index.html",
+          "start": 169902,
+          "end": 169970,
+          "sourceRangeSha256": "de077b3c97f8c35661d224dfb2b769abf47f98991ade0008c56b8b7f70fd1b41",
+          "operation": "TRANSFORM_MUTATOR_CALL__LEGACY_DEBUG_RECOVERY_PERSISTENCE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-f967899cd38c497b54c2",
+          "file": "index.html",
+          "start": 169971,
+          "end": 170009,
+          "sourceRangeSha256": "00cccedcfadce995d92f68fa785cc5de867e79292e7ee5a473d7b0bc30db8231",
+          "operation": "TRANSFORM_MUTATOR_CALL__LEGACY_DEBUG_RECOVERY_PERSISTENCE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-7e00e0cba674526279fd",
+          "file": "src/nextgen/multi-casualty.js",
+          "start": 2002,
+          "end": 2035,
+          "sourceRangeSha256": "c55b152b1d388a809ca1d3b348eab2b7cf101d30a039a22ee694ebab99d468b1",
+          "operation": "DYNAMIC_OR_REFLECTIVE_WRITE",
+          "physical": false,
+          "instrumentability": "AMBIGUOUS",
+          "enclosingFunction": "multi-casualty.js:1963-2148"
+        }
+      ],
+      "expectedTrigger": "multi-casualty",
+      "migrationRelevance": "AUTHORITATIVE_API_MIGRATION_CANDIDATE",
+      "notObserved": true
+    },
+    {
+      "legacyPathId": "L-11",
+      "phase1AuditPresent": true,
+      "matchingStaticPathCount": 2,
+      "representativeStaticPaths": [
+        {
+          "staticPathId": "SP-f66697f130d15ffa5138",
+          "file": "index.html",
+          "start": 162873,
+          "end": 162900,
+          "sourceRangeSha256": "f2354d195edb70b5f5d7c4aa92a23fb4c6abe8c2d47ce85998fc48b2f5ccd45a",
+          "operation": "SCENE_MEMBERSHIP_OR_REPARENT",
+          "physical": true,
+          "instrumentability": "AMBIGUOUS",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-dd7325d545eb3b2c0c5c",
+          "file": "index.html",
+          "start": 201881,
+          "end": 201922,
+          "sourceRangeSha256": "a9e839a8bd33673fe01b61160e8ffd54d3fe01664c0b2d02a88ef40724706216",
+          "operation": "DIRECT_SCALAR_WRITE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:70369-73775"
+        }
+      ],
+      "expectedTrigger": "treatment",
+      "migrationRelevance": "AUTHORITATIVE_API_MIGRATION_CANDIDATE",
+      "notObserved": true
+    },
+    {
+      "legacyPathId": "L-12",
+      "phase1AuditPresent": true,
+      "matchingStaticPathCount": 1,
+      "representativeStaticPaths": [
+        {
+          "staticPathId": "SP-e1d0e2b13a96d8ea429a",
+          "file": "index.html",
+          "start": 71674,
+          "end": 71710,
+          "sourceRangeSha256": "d52d9adfb38475d8154377335ffade44c41f9387422c537ac20774044ff626c4",
+          "operation": "SCENE_MEMBERSHIP_OR_REPARENT",
+          "physical": true,
+          "instrumentability": "AMBIGUOUS",
+          "enclosingFunction": "inline-32:29843-30088"
+        }
+      ],
+      "expectedTrigger": "exam",
+      "migrationRelevance": "AUTHORITATIVE_API_MIGRATION_CANDIDATE",
+      "notObserved": true
+    },
+    {
+      "legacyPathId": "L-13",
+      "phase1AuditPresent": true,
+      "matchingStaticPathCount": 19,
+      "representativeStaticPaths": [
+        {
+          "staticPathId": "SP-b4138320a35f10379343",
+          "file": "index.html",
+          "start": 128030,
+          "end": 128160,
+          "sourceRangeSha256": "de4953a382385c3d1860eee3edc9ec2493d14167ae3f64b2c1064ef225eb5d8b",
+          "operation": "GEOMETRY_MUTATOR_CALL__LEGACY_DEBUG_RECOVERY_PERSISTENCE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-33:2-3596"
+        },
+        {
+          "staticPathId": "SP-997c4e633fe2de1cc841",
+          "file": "index.html",
+          "start": 128161,
+          "end": 128220,
+          "sourceRangeSha256": "98f331933d5f44ed9a53c3c6eef8e397c8d0fe75ac86e9bf4d03c89dbfc5c6be",
+          "operation": "GEOMETRY_MUTATOR_CALL__LEGACY_DEBUG_RECOVERY_PERSISTENCE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-33:2-3596"
+        },
+        {
+          "staticPathId": "SP-04cb1174b5544d06a21a",
+          "file": "index.html",
+          "start": 173233,
+          "end": 173264,
+          "sourceRangeSha256": "d40c69f04d509f36c050086330d8c121f4b554e9b3c9a6f91daefbdd2b3c07cc",
+          "operation": "DIRECT_SCALAR_WRITE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-e76fcc486d6aad47766d",
+          "file": "index.html",
+          "start": 173265,
+          "end": 173306,
+          "sourceRangeSha256": "046d580c463ed7d99b13b1d3cbf61d1965382ecc3e46de48deec24a5f796af04",
+          "operation": "TRANSFORM_MUTATOR_CALL",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-5e58427a64672c0296a3",
+          "file": "index.html",
+          "start": 173307,
+          "end": 173340,
+          "sourceRangeSha256": "1363e45ff8a498c252651d82775f83f9f89b09a09784176bf41f894ec2a541a2",
+          "operation": "VISIBILITY_STATE_WRITE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-067a8b317e5100f1cb16",
+          "file": "index.html",
+          "start": 173341,
+          "end": 173362,
+          "sourceRangeSha256": "cf6cb8cd6df9c5614f9de5badd3398900acb2a33c049513aaddb188353c1576e",
+          "operation": "SCENE_MEMBERSHIP_OR_REPARENT",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-9e9c1c47d0e07d8c47a8",
+          "file": "index.html",
+          "start": 183644,
+          "end": 183673,
+          "sourceRangeSha256": "cc876e84e03d98bd070fd6f582c7761d4ab97d2cad00090b785816c5f6653bfa",
+          "operation": "DERIVED_RECOMPUTATION",
+          "physical": false,
+          "instrumentability": "DIAGNOSTIC_ONLY",
+          "enclosingFunction": "inline-36:52447-53657"
+        },
+        {
+          "staticPathId": "SP-41af20c5b6c1a862acdf",
+          "file": "index.html",
+          "start": 183876,
+          "end": 183906,
+          "sourceRangeSha256": "51f2608205061fd7b05f9702850785d2fbc5bf7a15c7e9fa659b6b80fb76a940",
+          "operation": "DERIVED_RECOMPUTATION",
+          "physical": false,
+          "instrumentability": "DIAGNOSTIC_ONLY",
+          "enclosingFunction": "inline-36:52447-53657"
+        },
+        {
+          "staticPathId": "SP-21f171b9560df9338582",
+          "file": "index.html",
+          "start": 183908,
+          "end": 183937,
+          "sourceRangeSha256": "cc876e84e03d98bd070fd6f582c7761d4ab97d2cad00090b785816c5f6653bfa",
+          "operation": "DERIVED_RECOMPUTATION",
+          "physical": false,
+          "instrumentability": "DIAGNOSTIC_ONLY",
+          "enclosingFunction": "inline-36:52447-53657"
+        },
+        {
+          "staticPathId": "SP-f8d7aef41be4de41e263",
+          "file": "index.html",
+          "start": 184598,
+          "end": 184627,
+          "sourceRangeSha256": "cc876e84e03d98bd070fd6f582c7761d4ab97d2cad00090b785816c5f6653bfa",
+          "operation": "DERIVED_RECOMPUTATION",
+          "physical": false,
+          "instrumentability": "DIAGNOSTIC_ONLY",
+          "enclosingFunction": "inline-36:52447-53657"
+        },
+        {
+          "staticPathId": "SP-47ae6684126d42b87b3e",
+          "file": "index.html",
+          "start": 192484,
+          "end": 192502,
+          "sourceRangeSha256": "cbe0b5ebfe306f7e5107f714d17d616b741eee9786c0f8ac86efb57145afcf2e",
+          "operation": "SCENE_MEMBERSHIP_OR_REPARENT",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-0079751ceb63c3119e2d",
+          "file": "index.html",
+          "start": 192824,
+          "end": 192841,
+          "sourceRangeSha256": "e4c418269cae79e0df62e01cd563b0c5683def2f03b76602344a4794b7852716",
+          "operation": "SCENE_MEMBERSHIP_OR_REPARENT",
+          "physical": true,
+          "instrumentability": "AMBIGUOUS",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-8ec38d65059c88fc0532",
+          "file": "index.html",
+          "start": 193155,
+          "end": 193180,
+          "sourceRangeSha256": "a4013fc3241f25550c63ba7f69907ef35fe73055b4dd4bed5657f2d1bb365272",
+          "operation": "SCENE_MEMBERSHIP_OR_REPARENT",
+          "physical": true,
+          "instrumentability": "AMBIGUOUS",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-cc4decdf161453da8480",
+          "file": "index.html",
+          "start": 193484,
+          "end": 193506,
+          "sourceRangeSha256": "82dc4402808279e1cd96844113bd9d7571241ebb8c25929a9de571840653c636",
+          "operation": "SCENE_MEMBERSHIP_OR_REPARENT__LEGACY_DEBUG_RECOVERY_PERSISTENCE",
+          "physical": true,
+          "instrumentability": "AMBIGUOUS",
+          "enclosingFunction": "inline-36:TOP_LEVEL"
+        },
+        {
+          "staticPathId": "SP-41eb6920eae0c7e9e1f5",
+          "file": "index.html",
+          "start": 193961,
+          "end": 194005,
+          "sourceRangeSha256": "65eb32a25ea107c35b422784e30b78180ac867f31a71916629a1463526cf905f",
+          "operation": "VISIBILITY_STATE_WRITE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:62581-63118"
+        },
+        {
+          "staticPathId": "SP-4182ad740c3d8a029b94",
+          "file": "index.html",
+          "start": 194006,
+          "end": 194045,
+          "sourceRangeSha256": "fc4a57d70d6fe6458be4edb7c136a36de41507e6a157c7c3e90cb235e5023577",
+          "operation": "VISIBILITY_STATE_WRITE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:62581-63118"
+        },
+        {
+          "staticPathId": "SP-519bbfcb28fb480fa27d",
+          "file": "index.html",
+          "start": 194046,
+          "end": 194098,
+          "sourceRangeSha256": "1a58e9b77e2cd181e230c21dd44f076965968f26dea57cde9c2242d6b3607e57",
+          "operation": "TRANSFORM_MUTATOR_CALL",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:62581-63118"
+        },
+        {
+          "staticPathId": "SP-66bd4f049f7d0f127804",
+          "file": "index.html",
+          "start": 194099,
+          "end": 194151,
+          "sourceRangeSha256": "96d9656552e420f56c5ab80a42eb386851e0fc690454b02446c29a299a6351e4",
+          "operation": "VISIBILITY_STATE_WRITE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:62581-63118"
+        },
+        {
+          "staticPathId": "SP-a9864f38b2d3fa9d4433",
+          "file": "index.html",
+          "start": 204895,
+          "end": 204936,
+          "sourceRangeSha256": "046d580c463ed7d99b13b1d3cbf61d1965382ecc3e46de48deec24a5f796af04",
+          "operation": "TRANSFORM_MUTATOR_CALL__LEGACY_DEBUG_RECOVERY_PERSISTENCE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:70369-73775"
+        }
+      ],
+      "expectedTrigger": "world event",
+      "migrationRelevance": "AUTHORITATIVE_API_MIGRATION_CANDIDATE",
+      "notObserved": true
+    },
+    {
+      "legacyPathId": "L-14",
+      "phase1AuditPresent": true,
+      "matchingStaticPathCount": 0,
+      "representativeStaticPaths": [],
+      "expectedTrigger": "contact/approval",
+      "migrationRelevance": "DIAGNOSTIC_OR_LEGACY_ONLY",
+      "notObserved": true
+    },
+    {
+      "legacyPathId": "L-15",
+      "phase1AuditPresent": true,
+      "matchingStaticPathCount": 1,
+      "representativeStaticPaths": [
+        {
+          "staticPathId": "SP-551a5a040f6fd3483aad",
+          "file": "index.html",
+          "start": 203004,
+          "end": 203202,
+          "sourceRangeSha256": "ca55daed39f436d139a5596727c0156a357d00dd08327198add54a8bb2fca1ac",
+          "operation": "DIRECT_SCALAR_WRITE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-36:70369-73775"
+        }
+      ],
+      "expectedTrigger": "diagnostic",
+      "migrationRelevance": "DIAGNOSTIC_OR_LEGACY_ONLY",
+      "notObserved": true
+    },
+    {
+      "legacyPathId": "L-16",
+      "phase1AuditPresent": true,
+      "matchingStaticPathCount": 0,
+      "representativeStaticPaths": [],
+      "expectedTrigger": "click",
+      "migrationRelevance": "DIAGNOSTIC_OR_LEGACY_ONLY",
+      "notObserved": true
+    },
+    {
+      "legacyPathId": "L-17",
+      "phase1AuditPresent": true,
+      "matchingStaticPathCount": 4,
+      "representativeStaticPaths": [
+        {
+          "staticPathId": "SP-37acbcaf3c409d7fe665",
+          "file": "index.html",
+          "start": 98849,
+          "end": 98906,
+          "sourceRangeSha256": "dcb182c1b3d64830a8f9602fac26de5e286b059f10eb632b00525ccb441d0046",
+          "operation": "SCENE_MEMBERSHIP_OR_REPARENT__LEGACY_DEBUG_RECOVERY_PERSISTENCE",
+          "physical": true,
+          "instrumentability": "AMBIGUOUS",
+          "enclosingFunction": "inline-32:47768-58230"
+        },
+        {
+          "staticPathId": "SP-c35c0c328ac8987a1fd5",
+          "file": "index.html",
+          "start": 99210,
+          "end": 99270,
+          "sourceRangeSha256": "4135f4c849c3c9b93db4f26f4e0a92270825469a0698639ea8cebd5f32fd2d63",
+          "operation": "SCENE_MEMBERSHIP_OR_REPARENT__LEGACY_DEBUG_RECOVERY_PERSISTENCE",
+          "physical": true,
+          "instrumentability": "AMBIGUOUS",
+          "enclosingFunction": "inline-32:57583-57647"
+        },
+        {
+          "staticPathId": "SP-3a0597c918ad94c58deb",
+          "file": "index.html",
+          "start": 127949,
+          "end": 128029,
+          "sourceRangeSha256": "a4b9bb39347872c32b30cd7402ebfce3ee5dc2bf21756dba6d6c8a7f88b7d7ba",
+          "operation": "GEOMETRY_MUTATOR_CALL__LEGACY_DEBUG_RECOVERY_PERSISTENCE",
+          "physical": true,
+          "instrumentability": "INSTRUMENTABLE",
+          "enclosingFunction": "inline-33:2-3596"
+        },
+        {
+          "staticPathId": "SP-4ceb10f8fe2ed4301768",
+          "file": "index.html",
+          "start": 138442,
+          "end": 138500,
+          "sourceRangeSha256": "3bb1df081174e43c30e88ab2ea83271a54c94a41e56013b328fef79c788be6ff",
+          "operation": "SCENE_MEMBERSHIP_OR_REPARENT__LEGACY_DEBUG_RECOVERY_PERSISTENCE",
+          "physical": true,
+          "instrumentability": "AMBIGUOUS",
+          "enclosingFunction": "inline-36:7246-7308"
+        }
+      ],
+      "expectedTrigger": "debug/query",
+      "migrationRelevance": "AUTHORITATIVE_API_MIGRATION_CANDIDATE",
+      "notObserved": true
+    }
+  ],
+  "reuseMap": [
+    {
+      "component": "Phase 1 contracts/registries",
+      "classification": "REUSE_AS_IS",
+      "evidence": "Static inventory and locked provenance; exact transfer needs component review."
+    },
+    {
+      "component": "Phase 2 Geometry Gate",
+      "classification": "REUSE_AS_IS",
+      "evidence": "Static inventory and locked provenance; exact transfer needs component review."
+    },
+    {
+      "component": "Phase 2 Surface Models",
+      "classification": "REUSE_WITH_ADAPTER",
+      "evidence": "Static inventory and locked provenance; exact transfer needs component review."
+    },
+    {
+      "component": "environment catalog",
+      "classification": "REUSE_WITH_ADAPTER",
+      "evidence": "Static inventory and locked provenance; exact transfer needs component review."
+    },
+    {
+      "component": "posture definitions",
+      "classification": "REUSE_WITH_ADAPTER",
+      "evidence": "Static inventory and locked provenance; exact transfer needs component review."
+    },
+    {
+      "component": "NPC logic",
+      "classification": "REIMPLEMENT",
+      "evidence": "Static inventory and locked provenance; exact transfer needs component review."
+    },
+    {
+      "component": "multi-casualty logic",
+      "classification": "REIMPLEMENT",
+      "evidence": "Static inventory and locked provenance; exact transfer needs component review."
+    },
+    {
+      "component": "persistence/recovery",
+      "classification": "REIMPLEMENT",
+      "evidence": "Static inventory and locked provenance; exact transfer needs component review."
+    },
+    {
+      "component": "event system",
+      "classification": "REUSE_WITH_ADAPTER",
+      "evidence": "Static inventory and locked provenance; exact transfer needs component review."
+    },
+    {
+      "component": "scenario/case data",
+      "classification": "REUSE_WITH_ADAPTER",
+      "evidence": "Static inventory and locked provenance; exact transfer needs component review."
+    },
+    {
+      "component": "assets",
+      "classification": "UNKNOWN",
+      "evidence": "Static inventory and locked provenance; exact transfer needs component review."
+    },
+    {
+      "component": "legacy placement/surface maps",
+      "classification": "LEGACY_ONLY",
+      "evidence": "Static inventory and locked provenance; exact transfer needs component review."
+    }
+  ],
+  "authoritativeMutationAPIDesign": [
+    "WorldMutationAPI.request(command, exactIdentity, priorStateDigest)",
+    "validate identity, revision, state and source",
+    "Geometry Gate evaluates proposed physical change",
+    "on PASS only, apply one authoritative immutable world-state transition",
+    "emit deterministic event with prior/new state digests",
+    "update canonical world state; no alternate write path"
+  ],
+  "minimumVerticalSlice": {
+    "scene": "school only",
+    "webFirst": true,
+    "physicalTruth": [
+      "Scene/World",
+      "explicit floor/support/door/wall/obstacle Surface Model",
+      "casualty",
+      "bag/equipment",
+      "one support object",
+      "one NPC only if its mutation API use is justified",
+      "WorldMutationAPI",
+      "unchanged Geometry Gate",
+      "deterministic state/evidence log"
+    ],
+    "negativeProofs": [
+      "floating",
+      "door/opening placement",
+      "wall/obstacle penetration",
+      "outside legal surface"
+    ],
+    "visuals": "No visual improvement; representation separate from physical world truth."
+  },
+  "paths": {
+    "A": {
+      "name": "LEGACY_CONTINUATION",
+      "facts": {
+        "physicalSites": 336,
+        "files": 9,
+        "functions": 80,
+        "ambiguous": 99
+      },
+      "preserves": [
+        "existing runtime behavior",
+        "Phase 1/2"
+      ],
+      "risks": [
+        "transformed-copy fidelity",
+        "ambiguous writes",
+        "observer divergence",
+        "continued legacy dispersion"
+      ],
+      "testability": "Requires transformer qualification, A/B/C differential, checkpoints and replay.",
+      "mobile": "Instrumentation/streaming overhead remains unknown."
+    },
+    "B": {
+      "name": "CLEAN_PHYSICAL_RUNTIME",
+      "facts": {
+        "initialScenes": 1,
+        "legacyMigrationCandidates": 336
+      },
+      "preserves": [
+        "Phase 1 contracts",
+        "Phase 2 Geometry Gate",
+        "Surface evidence with adapter",
+        "case/catalog data after validation"
+      ],
+      "unnecessary": [
+        "AST runtime observation as long-term architecture",
+        "legacy direct placement paths"
+      ],
+      "risks": [
+        "new runtime implementation/migration",
+        "behavior parity",
+        "asset/visual binding UNKNOWN"
+      ],
+      "testability": "Central API gives direct deterministic mutation log and negative gates.",
+      "mobile": "Web-first budget can be designed from first slice; actual performance unknown."
+    }
+  },
+  "digest": "c80d1f668ae2cb116811027619d36e81c51dc940ebc48714d44987d23eb36e23"
+}

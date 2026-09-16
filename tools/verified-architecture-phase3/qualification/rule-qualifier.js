@@ -1,0 +1,8 @@
+'use strict';
+// Qualification helpers model hygienic lowering; they are never applied to simulator source.
+function assign(receiverThunk,keyThunk,valueThunk,emit){const receiver=receiverThunk();const key=keyThunk();const value=valueThunk();receiver[key]=value;emit({kind:'ASSIGN',receiver,key,before:'NOT_READ',after:value});return value;}
+function compound(receiverThunk,keyThunk,valueThunk,op,emit){const receiver=receiverThunk();const key=keyThunk();const before=receiver[key];const rhs=valueThunk();let after;if(op==='+=')after=before+rhs;else if(op==='-=')after=before-rhs;else if(op==='*=')after=before*rhs;else throw Error('UNINSTRUMENTABLE_OPERATOR');receiver[key]=after;emit({kind:'COMPOUND',receiver,key,before,after,operator:op});return after;}
+function update(receiverThunk,keyThunk,delta,prefix,emit){const receiver=receiverThunk();const key=keyThunk();const before=receiver[key];const after=before+delta;receiver[key]=after;emit({kind:'UPDATE',receiver,key,before,after,prefix});return prefix?after:before;}
+function mutator(receiverThunk,method,argsThunks,emit){const receiver=receiverThunk();const fn=receiver[method];const args=argsThunks.map(x=>x());let result;try{result=Reflect.apply(fn,receiver,args)}catch(error){emit({kind:'THROW',receiver,method,args,error});throw error}emit({kind:'MUTATOR',receiver,method,args,result});return result;}
+function classifySafety(f){if(f.usesSuper||f.usesPrivate||f.containsYield||f.containsAwaitInNonAsyncWrapper||f.optionalChainAssignment||f.destructuringSetter)return 'UNINSTRUMENTABLE';return 'QUALIFIABLE';}
+module.exports={assign,compound,update,mutator,classifySafety};
