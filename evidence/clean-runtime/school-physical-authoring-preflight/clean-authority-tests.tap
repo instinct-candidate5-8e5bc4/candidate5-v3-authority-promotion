@@ -1,0 +1,124 @@
+TAP version 13
+# Subtest: public exports exclude store/reducer/mutation capability
+ok 1 - public exports exclude store/reducer/mutation capability
+  ---
+  duration_ms: 1.312371
+  type: 'test'
+  ...
+# Subtest: forged capability and reflective public misuse fail structurally
+ok 2 - forged capability and reflective public misuse fail structurally
+  ---
+  duration_ms: 1.641793
+  type: 'test'
+  ...
+# Subtest: direct public state writes cannot change authority
+ok 3 - direct public state writes cannot change authority
+  ---
+  duration_ms: 2.181671
+  type: 'test'
+  ...
+# Subtest: structural sharing keeps unchanged entity and revises changed entity
+ok 4 - structural sharing keeps unchanged entity and revises changed entity
+  ---
+  duration_ms: 2.775573
+  type: 'test'
+  ...
+# Subtest: same fixture repeated is byte identical
+ok 5 - same fixture repeated is byte identical
+  ---
+  duration_ms: 5.229036
+  type: 'test'
+  ...
+# Subtest: initial plus committed events exactly replay final digest; rejected event changes no state
+ok 6 - initial plus committed events exactly replay final digest; rejected event changes no state
+  ---
+  duration_ms: 3.891308
+  type: 'test'
+  ...
+# Subtest: event log failure prevents commit
+ok 7 - event log failure prevents commit
+  ---
+  duration_ms: 0.662769
+  type: 'test'
+  ...
+# Subtest: tamper reorder and changed state digest fail replay
+ok 8 - tamper reorder and changed state digest fail replay
+  ---
+  duration_ms: 1.75883
+  type: 'test'
+  ...
+# Subtest: spawn commits immutable revision and event
+ok 9 - spawn commits immutable revision and event
+  ---
+  duration_ms: 3.952802
+  type: 'test'
+  ...
+# Subtest: legality FAIL cannot commit
+ok 10 - legality FAIL cannot commit
+  ---
+  duration_ms: 0.875177
+  type: 'test'
+  ...
+# Subtest: legality UNKNOWN cannot commit
+ok 11 - legality UNKNOWN cannot commit
+  ---
+  duration_ms: 1.540612
+  type: 'test'
+  ...
+# Subtest: invalid command and stale revision reject
+ok 12 - invalid command and stale revision reject
+  ---
+  duration_ms: 0.80492
+  type: 'test'
+  ...
+# Subtest: invalid entity rejects atomically
+ok 13 - invalid entity rejects atomically
+  ---
+  duration_ms: 0.486627
+  type: 'test'
+  ...
+# Subtest: multi-command one failure rejects all
+ok 14 - multi-command one failure rejects all
+  ---
+  duration_ms: 0.478268
+  type: 'test'
+  ...
+# Subtest: duplicate command identity rejects
+ok 15 - duplicate command identity rejects
+  ---
+  duration_ms: 0.879915
+  type: 'test'
+  ...
+# Subtest: legality validates the proposed candidate rather than pre-command state
+ok 16 - legality validates the proposed candidate rather than pre-command state
+  ---
+  duration_ms: 0.603168
+  type: 'test'
+  ...
+# Subtest: transaction rejects command with mismatched expected revision atomically
+ok 17 - transaction rejects command with mismatched expected revision atomically
+  ---
+  duration_ms: 0.716776
+  type: 'test'
+  ...
+# Subtest: same logical insertion order gives identical bytes and digest
+ok 18 - same logical insertion order gives identical bytes and digest
+  ---
+  duration_ms: 2.253959
+  type: 'test'
+  ...
+# Subtest: world entity collection relation and nested values are deeply immutable
+ok 19 - world entity collection relation and nested values are deeply immutable
+  ---
+  duration_ms: 0.918429
+  type: 'test'
+  ...
+1..19
+# tests 19
+# suites 0
+# pass 19
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 369.20541

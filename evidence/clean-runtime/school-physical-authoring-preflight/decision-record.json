@@ -1,0 +1,13 @@
+{
+  "program": "SCHOOL PHYSICAL AUTHORING + PHASE 2 SUPPORT EXTENSION PREFLIGHT",
+  "result": "DESIGN_READY_WITH_BOUNDED_PHASE2_PROFILE",
+  "newTruthStatus": "AUTHORED_NEW_DRAFT",
+  "recommendedCasualtyRepresentation": "posture-specific compound AABBs with conservative aggregate AABB Phase 2 projection",
+  "firstPosture": "SUPINE_FLOOR",
+  "futurePosture": "SEATED_ON_SUPPORT",
+  "recommendedSupport": "new fixed treatment chair authored for School ScenePackage V2",
+  "phase2ChangeRequiredForBoundedV1": false,
+  "boundedV1Constraints": ["identity orientation", "horizontal rectangular support surface", "translation only", "conservative aggregate AABB"],
+  "futurePhase2Gaps": ["rotated entity-owned surfaces", "native compound/capsule/hull evaluation", "non-horizontal planes", "multiple contact surfaces"],
+  "implementationPerformed": false
+}
