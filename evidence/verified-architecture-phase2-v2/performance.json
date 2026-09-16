@@ -1,0 +1,1 @@
+{"environment":{"node":"v22.23.2","platform":"linux","arch":"x64","cpu":"Intel(R) Xeon(R) Processor @ 2.60GHz"},"threshold":null,"evaluateThreeContacts":{"unit":"microseconds","count":100,"min":165.312,"p50":233.421,"p95":848.968,"max":1386.155}}

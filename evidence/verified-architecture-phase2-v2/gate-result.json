@@ -1,0 +1,16 @@
+{
+  "gate": "PHASE 2 MULTI-SUPPORT EXTENSION V2",
+  "result": "PASS",
+  "version": "2.0.0",
+  "example": {
+    "requestDigest": "ed5ca117dddcb3fb8c6693cb69c63bc9072236b351750191f076885c7d1d3b42",
+    "proofDigest": "3e53df9bdd401e3fcd0ed60163d2943e822df4cc01709eeec3b180f61c0edd31",
+    "relations": [
+      "a",
+      "b"
+    ]
+  },
+  "v1ImplementationChanged": false,
+  "cleanRuntimeMultiSupportImplemented": false,
+  "geometryGateCleanRuntimeCallSites": 1
+}

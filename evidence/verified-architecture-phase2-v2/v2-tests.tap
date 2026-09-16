@@ -1,0 +1,227 @@
+TAP version 13
+# {"environment":{"node":"v22.23.2","platform":"linux","arch":"x64","cpu":"Intel(R) Xeon(R) Processor @ 2.60GHz"},"threshold":null,"evaluateThreeContacts":{"unit":"microseconds","count":100,"min":165.078,"p50":223.127,"p95":614.34,"max":4559.75}}
+# Subtest: V2 measurement only, no threshold
+ok 1 - V2 measurement only, no threshold
+  ---
+  duration_ms: 47.177323
+  type: 'test'
+  ...
+# Subtest: single required floor contact passes with global and per-relation evidence
+ok 2 - single required floor contact passes with global and per-relation evidence
+  ---
+  duration_ms: 17.739359
+  type: 'test'
+  ...
+# Subtest: floor plus elevated support at different height passes
+ok 3 - floor plus elevated support at different height passes
+  ---
+  duration_ms: 3.990264
+  type: 'test'
+  ...
+# Subtest: floor plus support-capable WALL passes without relabeling wall
+ok 4 - floor plus support-capable WALL passes without relabeling wall
+  ---
+  duration_ms: 1.694457
+  type: 'test'
+  ...
+# Subtest: three independent contacts pass with independent evidence
+ok 5 - three independent contacts pass with independent evidence
+  ---
+  duration_ms: 3.868092
+  type: 'test'
+  ...
+# Subtest: contact insertion order changes neither request identity nor result evidence
+ok 6 - contact insertion order changes neither request identity nor result evidence
+  ---
+  duration_ms: 8.257789
+  type: 'test'
+  ...
+# Subtest: V1 sent to V2 fails deterministically
+ok 7 - V1 sent to V2 fails deterministically
+  ---
+  duration_ms: 1.778454
+  type: 'test'
+  ...
+# Subtest: malformed fails deterministically
+ok 8 - malformed fails deterministically
+  ---
+  duration_ms: 0.943432
+  type: 'test'
+  ...
+# Subtest: missing body geometry fails deterministically
+ok 9 - missing body geometry fails deterministically
+  ---
+  duration_ms: 1.075373
+  type: 'test'
+  ...
+# Subtest: wrong body geometry digest fails deterministically
+ok 10 - wrong body geometry digest fails deterministically
+  ---
+  duration_ms: 1.693278
+  type: 'test'
+  ...
+# Subtest: stale body contact ref fails deterministically
+ok 11 - stale body contact ref fails deterministically
+  ---
+  duration_ms: 2.066341
+  type: 'test'
+  ...
+# Subtest: missing contact region fails deterministically
+ok 12 - missing contact region fails deterministically
+  ---
+  duration_ms: 1.097743
+  type: 'test'
+  ...
+# Subtest: wrong region digest fails deterministically
+ok 13 - wrong region digest fails deterministically
+  ---
+  duration_ms: 1.27065
+  type: 'test'
+  ...
+# Subtest: duplicate relation id fails deterministically
+ok 14 - duplicate relation id fails deterministically
+  ---
+  duration_ms: 1.062297
+  type: 'test'
+  ...
+# Subtest: zero required contacts fails deterministically
+ok 15 - zero required contacts fails deterministically
+  ---
+  duration_ms: 0.745709
+  type: 'test'
+  ...
+# Subtest: stale SurfaceModel ref fails deterministically
+ok 16 - stale SurfaceModel ref fails deterministically
+  ---
+  duration_ms: 1.425126
+  type: 'test'
+  ...
+# Subtest: stale contact SurfaceModel fails deterministically
+ok 17 - stale contact SurfaceModel fails deterministically
+  ---
+  duration_ms: 0.953636
+  type: 'test'
+  ...
+# Subtest: missing surface fails deterministically
+ok 18 - missing surface fails deterministically
+  ---
+  duration_ms: 1.026268
+  type: 'test'
+  ...
+# Subtest: wrong semantic type fails deterministically
+ok 19 - wrong semantic type fails deterministically
+  ---
+  duration_ms: 0.961853
+  type: 'test'
+  ...
+# Subtest: unsupported wall capability fails deterministically
+ok 20 - unsupported wall capability fails deterministically
+  ---
+  duration_ms: 1.205161
+  type: 'test'
+  ...
+# Subtest: wrong normal fails deterministically
+ok 21 - wrong normal fails deterministically
+  ---
+  duration_ms: 1.494468
+  type: 'test'
+  ...
+# Subtest: floating contact fails deterministically
+ok 22 - floating contact fails deterministically
+  ---
+  duration_ms: 1.065744
+  type: 'test'
+  ...
+# Subtest: excessive penetration fails deterministically
+ok 23 - excessive penetration fails deterministically
+  ---
+  duration_ms: 1.218323
+  type: 'test'
+  ...
+# Subtest: contact outside support region fails deterministically
+ok 24 - contact outside support region fails deterministically
+  ---
+  duration_ms: 1.389639
+  type: 'test'
+  ...
+# Subtest: V2 sent to V1 cannot be interpreted as V1 PASS
+ok 25 - V2 sent to V1 cannot be interpreted as V1 PASS
+  ---
+  duration_ms: 1.420954
+  type: 'test'
+  ...
+# Subtest: legal contact cannot hide illegal wall penetration
+ok 26 - legal contact cannot hide illegal wall penetration
+  ---
+  duration_ms: 0.806526
+  type: 'test'
+  ...
+# Subtest: legal contact cannot hide door penetration
+ok 27 - legal contact cannot hide door penetration
+  ---
+  duration_ms: 0.592479
+  type: 'test'
+  ...
+# Subtest: legal contact cannot hide obstacle penetration
+ok 28 - legal contact cannot hide obstacle penetration
+  ---
+  duration_ms: 0.834822
+  type: 'test'
+  ...
+# Subtest: one valid plus one invalid contact fails whole request and preserves completed evidence
+ok 29 - one valid plus one invalid contact fails whole request and preserves completed evidence
+  ---
+  duration_ms: 1.051759
+  type: 'test'
+  ...
+# Subtest: three contacts middle invalid fails by canonical relation order
+ok 30 - three contacts middle invalid fails by canonical relation order
+  ---
+  duration_ms: 2.282811
+  type: 'test'
+  ...
+# Subtest: tampered result evidence does not verify
+ok 31 - tampered result evidence does not verify
+  ---
+  duration_ms: 1.116684
+  type: 'test'
+  ...
+# Subtest: geometry mutation after proof rejects
+ok 32 - geometry mutation after proof rejects
+  ---
+  duration_ms: 1.129455
+  type: 'test'
+  ...
+# Subtest: floor FAIL plus chair PASS rejects whole request
+ok 33 - floor FAIL plus chair PASS rejects whole request
+  ---
+  duration_ms: 1.219852
+  type: 'test'
+  ...
+# Subtest: floor PASS plus wall UNKNOWN capability rejects whole request
+ok 34 - floor PASS plus wall UNKNOWN capability rejects whole request
+  ---
+  duration_ms: 1.143271
+  type: 'test'
+  ...
+# Subtest: wall gap and penetration have exact deterministic reasons
+ok 35 - wall gap and penetration have exact deterministic reasons
+  ---
+  duration_ms: 2.81435
+  type: 'test'
+  ...
+# Subtest: stale wall surface-model ref and wrong wall region fail
+ok 36 - stale wall surface-model ref and wrong wall region fail
+  ---
+  duration_ms: 2.205447
+  type: 'test'
+  ...
+1..36
+# tests 36
+# suites 0
+# pass 36
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 275.820875

@@ -1,0 +1,244 @@
+TAP version 13
+# Subtest: valid synthetic compound derives conservative aggregate and digest
+ok 1 - valid synthetic compound derives conservative aggregate and digest
+  ---
+  duration_ms: 4.406272
+  type: 'test'
+  ...
+# Subtest: malformed rejects closed
+ok 2 - malformed rejects closed
+  ---
+  duration_ms: 0.327712
+  type: 'test'
+  ...
+# Subtest: unknown primitive rejects closed
+ok 3 - unknown primitive rejects closed
+  ---
+  duration_ms: 0.24535
+  type: 'test'
+  ...
+# Subtest: nonfinite rejects closed
+ok 4 - nonfinite rejects closed
+  ---
+  duration_ms: 0.283259
+  type: 'test'
+  ...
+# Subtest: overflow rejects closed
+ok 5 - overflow rejects closed
+  ---
+  duration_ms: 0.266072
+  type: 'test'
+  ...
+# Subtest: zero dimension rejects closed
+ok 6 - zero dimension rejects closed
+  ---
+  duration_ms: 0.217981
+  type: 'test'
+  ...
+# Subtest: negative dimension rejects closed
+ok 7 - negative dimension rejects closed
+  ---
+  duration_ms: 0.246141
+  type: 'test'
+  ...
+# Subtest: bad frame rejects closed
+ok 8 - bad frame rejects closed
+  ---
+  duration_ms: 0.15754
+  type: 'test'
+  ...
+# Subtest: bad origin rejects closed
+ok 9 - bad origin rejects closed
+  ---
+  duration_ms: 0.741208
+  type: 'test'
+  ...
+# Subtest: duplicate component rejects closed
+ok 10 - duplicate component rejects closed
+  ---
+  duration_ms: 0.507749
+  type: 'test'
+  ...
+# Subtest: aggregate mismatch rejects closed
+ok 11 - aggregate mismatch rejects closed
+  ---
+  duration_ms: 0.268346
+  type: 'test'
+  ...
+# Subtest: bad footprint rejects closed
+ok 12 - bad footprint rejects closed
+  ---
+  duration_ms: 0.188762
+  type: 'test'
+  ...
+# Subtest: bad contact rejects closed
+ok 13 - bad contact rejects closed
+  ---
+  duration_ms: 0.169516
+  type: 'test'
+  ...
+# Subtest: unknown support rejects closed
+ok 14 - unknown support rejects closed
+  ---
+  duration_ms: 0.183377
+  type: 'test'
+  ...
+# Subtest: rotated body rejects closed
+ok 15 - rotated body rejects closed
+  ---
+  duration_ms: 0.161177
+  type: 'test'
+  ...
+# Subtest: digest mismatch rejects closed
+ok 16 - digest mismatch rejects closed
+  ---
+  duration_ms: 0.35504
+  type: 'test'
+  ...
+# Subtest: valid posture binds exact body revision
+ok 17 - valid posture binds exact body revision
+  ---
+  duration_ms: 1.980745
+  type: 'test'
+  ...
+# Subtest: meaningful change requires new revision and invalidates old proof
+ok 18 - meaningful change requires new revision and invalidates old proof
+  ---
+  duration_ms: 1.080219
+  type: 'test'
+  ...
+# Subtest: logical object insertion order is canonical byte identical
+ok 19 - logical object insertion order is canonical byte identical
+  ---
+  duration_ms: 1.053044
+  type: 'test'
+  ...
+# Subtest: real School floor is a general FLOOR with separate scene ID and provenance
+ok 20 - real School floor is a general FLOOR with separate scene ID and provenance
+  ---
+  duration_ms: 1.53997
+  type: 'test'
+  ...
+# Subtest: synthetic fixture floor remains explicitly fixture-only UNKNOWN provenance
+ok 21 - synthetic fixture floor remains explicitly fixture-only UNKNOWN provenance
+  ---
+  duration_ms: 0.469488
+  type: 'test'
+  ...
+# Subtest: unknown semantic rejects
+ok 22 - unknown semantic rejects
+  ---
+  duration_ms: 0.208541
+  type: 'test'
+  ...
+# Subtest: semantic/provenance confusion rejects
+ok 23 - semantic/provenance confusion rejects
+  ---
+  duration_ms: 0.128405
+  type: 'test'
+  ...
+# Subtest: malformed category rejects
+ok 24 - malformed category rejects
+  ---
+  duration_ms: 0.152519
+  type: 'test'
+  ...
+# Subtest: fallback attempt rejects
+ok 25 - fallback attempt rejects
+  ---
+  duration_ms: 0.106838
+  type: 'test'
+  ...
+# Subtest: SUPINE_FLOOR semantic is exact and machine ID remains lowercase
+ok 26 - SUPINE_FLOOR semantic is exact and machine ID remains lowercase
+  ---
+  duration_ms: 1.384671
+  type: 'test'
+  ...
+# Subtest: invalid definition ID, unknown/missing semantic, and aliases fail closed
+ok 27 - invalid definition ID, unknown/missing semantic, and aliases fail closed
+  ---
+  duration_ms: 0.497497
+  type: 'test'
+  ...
+# Subtest: posture validator rejects semantic/body ambiguity
+ok 28 - posture validator rejects semantic/body ambiguity
+  ---
+  duration_ms: 1.095481
+  type: 'test'
+  ...
+# Subtest: support and posture semantic changes change canonical body digest and stale old proof
+ok 29 - support and posture semantic changes change canonical body digest and stale old proof
+  ---
+  duration_ms: 2.428836
+  type: 'test'
+  ...
+# Subtest: male-only Gate B requirement is explicit profile semantics, not body geometry
+ok 30 - male-only Gate B requirement is explicit profile semantics, not body geometry
+  ---
+  duration_ms: 0.282522
+  type: 'test'
+  ...
+# Subtest: unknown or inferred subject sex fails closed
+ok 31 - unknown or inferred subject sex fails closed
+  ---
+  duration_ms: 0.129094
+  type: 'test'
+  ...
+# Subtest: new semantic fields are insertion-order independent
+ok 32 - new semantic fields are insertion-order independent
+  ---
+  duration_ms: 0.244596
+  type: 'test'
+  ...
+# Subtest: valid synthetic support entity and horizontal surface materialize deterministically
+ok 33 - valid synthetic support entity and horizontal surface materialize deterministically
+  ---
+  duration_ms: 5.435057
+  type: 'test'
+  ...
+# Subtest: rotated support rejects
+ok 34 - rotated support rejects
+  ---
+  duration_ms: 0.903958
+  type: 'test'
+  ...
+# Subtest: non-horizontal support rejects
+ok 35 - non-horizontal support rejects
+  ---
+  duration_ms: 0.710269
+  type: 'test'
+  ...
+# Subtest: stale owner/body references reject
+ok 36 - stale owner/body references reject
+  ---
+  duration_ms: 0.796012
+  type: 'test'
+  ...
+# Subtest: legacy embedded lifecycle transition is disabled to leave envelope as sole truth
+ok 37 - legacy embedded lifecycle transition is disabled to leave envelope as sole truth
+  ---
+  duration_ms: 1.819237
+  type: 'test'
+  ...
+# Subtest: legacy embedded review record is disabled to leave envelope as sole truth
+ok 38 - legacy embedded review record is disabled to leave envelope as sole truth
+  ---
+  duration_ms: 0.163652
+  type: 'test'
+  ...
+# Subtest: validator cannot accept pre-claimed VERIFIED status
+ok 39 - validator cannot accept pre-claimed VERIFIED status
+  ---
+  duration_ms: 0.296501
+  type: 'test'
+  ...
+1..39
+# tests 39
+# suites 0
+# pass 39
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 229.026283
