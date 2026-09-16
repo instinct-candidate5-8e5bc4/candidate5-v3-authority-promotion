@@ -1,0 +1,4 @@
+'use strict';const test=require('node:test'),assert=require('node:assert/strict');
+function wrap(obj,key,sink){const original=obj[key];obj[key]=function(...args){let result;try{result=Reflect.apply(original,this,args)}catch(e){sink.push(['throw',this,args,e.message]);throw e}sink.push(['return',this,args,result]);return result};}
+test('receiver arguments single call return and order preserved',()=>{let calls=0,order=[],sink=[],o={x:2,m(a){calls++;order.push('original');return this.x+a}};wrap(o,'m',sink);order.push('before');const r=o.m(3);order.push('after');assert.equal(r,5);assert.equal(calls,1);assert.equal(sink[0][1],o);assert.deepEqual(sink[0][2],[3]);assert.deepEqual(order,['before','original','after']);});
+test('thrown exception identity preserved',()=>{const error=new Error('x'),sink=[],o={m(){throw error}};wrap(o,'m',sink);assert.throws(()=>o.m(),e=>e===error);assert.equal(sink[0][0],'throw');});

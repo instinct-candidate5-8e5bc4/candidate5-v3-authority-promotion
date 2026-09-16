@@ -1,0 +1,47 @@
+{
+  "gate": "PHASE_3_INTEGRATION_TOUCHPOINT_GATE",
+  "result": "FAIL_HARD_STOP",
+  "baseCommit": "7020b41e9067f5c58fb094cb126cd9ddc014ab72",
+  "parentCheckpoint": "5f0f77456b9e84590f3dc749ba88dc65b3041a4e",
+  "reasonCode": "OBSERVER_ON_RUN_UNRESPONSIVE_UNBOUNDED_EVIDENCE_CAPTURE",
+  "approvedIndexDiffSavedAs": "index-html-attempt.diff",
+  "indexBaseSha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+  "indexAttemptSha256": "64671e1a7b8ee637180c003812e579d3f50ce1ab240d004baab1c9e767187b27",
+  "indexRollbackSha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+  "rollbackRestoredExactBase": true,
+  "preloadSha256": "acca72f25d85b9863a008940d79d259c6f3ea95061d48251f8e90d47555efc1f",
+  "harnessCombinedSha256": "55a23ffe00f9d15d45a67cde297ccbd61aa20ffc563f6cb42d6a08d37a4f6adb",
+  "bootCoverage": "NOT_PROVEN",
+  "observerOffOnDifferential": "FAIL_NOT_COMPLETED",
+  "performance": {
+    "result": "FAIL",
+    "fact": "CDP evaluation timed out twice, including after increasing the timeout from 10 to 45 seconds.",
+    "diagnosis": "The no-sampling observer appends full before/after matrices, child lists, geometry metadata and events on high-frequency update/render paths without bounds. The ON page became unresponsive to state extraction.",
+    "frameTimeFps": null,
+    "cpuReliable": null,
+    "memoryGrowth": null,
+    "eventCountRate": null,
+    "serializedEvidenceBytes": null
+  },
+  "productionExclusion": {
+    "design": "localhost plus explicit p3ObserverGate query token",
+    "proof": "NOT_COMPLETED_BECAUSE_ON_RUN_FAILED",
+    "productionArtifactNegativeProof": "NOT_PROVEN"
+  },
+  "wrapperSemanticsUnitTests": "2_PASS_0_FAIL",
+  "staticReconciliation": "BLOCKED_BEFORE_RECONCILIATION",
+  "captureReplay": "NOT_STARTED",
+  "sourceRuntimeFinalState": "index.html rolled back to exact Phase 2 bytes; no runtime touchpoint remains",
+  "unknownNotObservedBlocked": [
+    "Boot-before-first-mutation coverage remains UNKNOWN.",
+    "Application-visible OFF/ON equivalence remains BLOCKED.",
+    "Observer cost distribution remains BLOCKED; observed symptom is unacceptable unresponsiveness.",
+    "L-01 through L-17 and additional static paths remain NOT_OBSERVED in this gate.",
+    "Production exclusion and negative artifact proof are not complete and therefore not accepted."
+  ],
+  "inheritedTests": {
+    "phase1Current": "13_PASS_0_FAIL",
+    "phase2AtExactLockedCommit7020b41e": "38_PASS_0_FAIL",
+    "note": "The Phase 2 static boundary suite is intentionally evaluated at its locked commit; running it on a later-phase tree rejects later-phase paths by design."
+  }
+}
