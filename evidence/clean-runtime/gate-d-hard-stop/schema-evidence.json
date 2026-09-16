@@ -1,0 +1,20 @@
+{
+  "result": "HARD_STOP",
+  "blockingRequirement": "MULTI_SUPPORT_FUTURE_COMPATIBILITY_LOCK",
+  "facts": [
+    {"path":"src/clean-runtime/mutation/world-mutation-api.js","fact":"AttachSupport assigns one entity.supportRelation and DetachSupport nulls it"},
+    {"path":"src/clean-runtime/mutation/support-dependencies.js","fact":"each indexed relation must equal the entity's one supportRelation"},
+    {"path":"src/clean-runtime/school/school-geometry-adapter.js","fact":"adapter resolves one supportRelation and one Phase 2 surface request"},
+    {"path":"src/clean-runtime/contracts/world-state.js","fact":"entity schema preserves but does not define a multi-support collection"}
+  ],
+  "unsupportedRequiredCases": [
+    "floor + chair simultaneous support",
+    "floor + wall simultaneous support",
+    "other explicit multi-contact postures"
+  ],
+  "implementationPerformed": false,
+  "scenePackageV2Created": false,
+  "phase1Changed": false,
+  "phase2Changed": false,
+  "legacyOrProductionChanged": false
+}
