@@ -1,0 +1,71 @@
+TAP version 13
+# {"environment":{"node":"v22.23.2","platform":"linux","arch":"x64","cpu":"Intel(R) Xeon(R) Processor @ 2.60GHz"},"threshold":null,"obbBodyVsBody":{"unit":"microseconds","count":50,"p50":1842.345,"p95":2345.036,"max":13459.052,"status":"PASS","evidenceBytes":839,"candidatePairs":1,"satAxisCount":0},"primitiveCounts":{"bodies":2,"children":2},"cache":{"implemented":false,"hits":0,"misses":0},"bigInt":"bounded by accepted Numeric Frame Gate"}
+# Subtest: V3 measurement only
+ok 1 - V3 measurement only
+  ---
+  duration_ms: 103.552121
+  type: 'test'
+  ...
+# Subtest: oriented body-vs-body separated touching penetrating rotated
+ok 2 - oriented body-vs-body separated touching penetrating rotated
+  ---
+  duration_ms: 24.197096
+  type: 'test'
+  ...
+# Subtest: compound children canonical and child-only collision fails
+ok 3 - compound children canonical and child-only collision fails
+  ---
+  duration_ms: 5.022974
+  type: 'test'
+  ...
+# Subtest: containment fully inside and outside
+ok 4 - containment fully inside and outside
+  ---
+  duration_ms: 3.497973
+  type: 'test'
+  ...
+# Subtest: explicit opening legal, edge ambiguous, too large
+ok 5 - explicit opening legal, edge ambiguous, too large
+  ---
+  duration_ms: 4.217232
+  type: 'test'
+  ...
+# Subtest: contact floor pass floating penetration and unsupported double-sided
+ok 6 - contact floor pass floating penetration and unsupported double-sided
+  ---
+  duration_ms: 2.416389
+  type: 'test'
+  ...
+# Subtest: broad tamper and swept fail closed with evidence limitations
+ok 7 - broad tamper and swept fail closed with evidence limitations
+  ---
+  duration_ms: 0.291838
+  type: 'test'
+  ...
+# Subtest: convex definitions validate topology and SAT
+ok 8 - convex definitions validate topology and SAT
+  ---
+  duration_ms: 2.049212
+  type: 'test'
+  ...
+# Subtest: synthetic local-world parent rotation invalidates old evidence
+ok 9 - synthetic local-world parent rotation invalidates old evidence
+  ---
+  duration_ms: 2.095245
+  type: 'test'
+  ...
+# Subtest: synthetic topology kinds cover tread riser landing levels only
+ok 10 - synthetic topology kinds cover tread riser landing levels only
+  ---
+  duration_ms: 0.436608
+  type: 'test'
+  ...
+1..10
+# tests 10
+# suites 0
+# pass 10
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 280.066633

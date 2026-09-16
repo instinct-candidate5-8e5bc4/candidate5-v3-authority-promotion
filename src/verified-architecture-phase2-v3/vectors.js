@@ -1,0 +1,4 @@
+'use strict';const X=require('./fraction');const {matrix}=require('../numeric-frame-rotation/rotation');
+const V=(x,y,z)=>[x,y,z],add=(a,b)=>a.map((x,i)=>X.add(x,b[i])),sub=(a,b)=>a.map((x,i)=>X.sub(x,b[i])),scale=(a,s)=>a.map(x=>X.mul(x,s)),dot=(a,b)=>a.reduce((z,x,i)=>X.add(z,X.mul(x,b[i])),X.zero()),cross=(a,b)=>V(X.sub(X.mul(a[1],b[2]),X.mul(a[2],b[1])),X.sub(X.mul(a[2],b[0]),X.mul(a[0],b[2])),X.sub(X.mul(a[0],b[1]),X.mul(a[1],b[0]))),isZero=a=>a.every(x=>x.n===0n),key=a=>{let x=a;if(x.find(v=>v.n!==0n)?.n<0n)x=x.map(X.neg);return x.map(X.str).join(',')};
+function rotate(v,q){const m=matrix(q),d=X.F(m.denominator);return m.numerators.map(r=>r.reduce((z,n,i)=>X.add(z,X.mul(X.F(n),v[i])),X.zero())).map(x=>X.mul(x,X.F(1n,d.n)))}
+module.exports={V,add,sub,scale,dot,cross,isZero,key,rotate};

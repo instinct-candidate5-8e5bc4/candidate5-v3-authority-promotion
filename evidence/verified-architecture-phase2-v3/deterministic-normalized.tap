@@ -1,0 +1,59 @@
+TAP version 13
+# Subtest: V3 measurement only
+ok 1 - V3 measurement only
+  ---
+  type: 'test'
+  ...
+# Subtest: oriented body-vs-body separated touching penetrating rotated
+ok 2 - oriented body-vs-body separated touching penetrating rotated
+  ---
+  type: 'test'
+  ...
+# Subtest: compound children canonical and child-only collision fails
+ok 3 - compound children canonical and child-only collision fails
+  ---
+  type: 'test'
+  ...
+# Subtest: containment fully inside and outside
+ok 4 - containment fully inside and outside
+  ---
+  type: 'test'
+  ...
+# Subtest: explicit opening legal, edge ambiguous, too large
+ok 5 - explicit opening legal, edge ambiguous, too large
+  ---
+  type: 'test'
+  ...
+# Subtest: contact floor pass floating penetration and unsupported double-sided
+ok 6 - contact floor pass floating penetration and unsupported double-sided
+  ---
+  type: 'test'
+  ...
+# Subtest: broad tamper and swept fail closed with evidence limitations
+ok 7 - broad tamper and swept fail closed with evidence limitations
+  ---
+  type: 'test'
+  ...
+# Subtest: convex definitions validate topology and SAT
+ok 8 - convex definitions validate topology and SAT
+  ---
+  type: 'test'
+  ...
+# Subtest: synthetic local-world parent rotation invalidates old evidence
+ok 9 - synthetic local-world parent rotation invalidates old evidence
+  ---
+  type: 'test'
+  ...
+# Subtest: synthetic topology kinds cover tread riser landing levels only
+ok 10 - synthetic topology kinds cover tread riser landing levels only
+  ---
+  type: 'test'
+  ...
+1..10
+# tests 10
+# suites 0
+# pass 10
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
