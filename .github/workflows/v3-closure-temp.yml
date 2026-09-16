@@ -10,10 +10,15 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: 22}
       - name: focused
-        run: node --test tests/verified-architecture-phase2-v3/*.test.js | tee focused.tap
+        shell: bash
+        run: |
+          set -o pipefail
+          node --test tests/verified-architecture-phase2-v3/*.test.js | tee focused.tap
       - name: broad
         if: always()
+        shell: bash
         run: |
+          set -o pipefail
           files=$(find tests -name '*.test.js' -print | sort | tr '\n' ' ')
           node --test $files | tee broad.tap
       - uses: actions/upload-artifact@v4
