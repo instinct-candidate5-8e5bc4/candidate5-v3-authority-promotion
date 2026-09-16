@@ -1,0 +1,161 @@
+{
+  "generatedFrom": "30cb23e9b5747ea9af09fa5478f4175b3296c605",
+  "placementReady": false,
+  "rows": [
+    {
+      "scene": "school",
+      "case": "legal-positive",
+      "result": {
+        "placementReady": false,
+        "result": "PASS",
+        "reasonCode": "GEOMETRY_GATE_PASS",
+        "evidence": {
+          "requestId": "school-positive",
+          "sceneId": "school",
+          "surfaceId": "floor",
+          "checkedGeometryDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+          "surfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+          "pixelEvidenceUsedAsAuthority": false,
+          "autoFixed": false,
+          "bounds": {
+            "minX": -3.275,
+            "maxX": -2.725,
+            "minY": 0,
+            "maxY": 0.35,
+            "minZ": 0.825,
+            "maxZ": 1.175
+          },
+          "allowedRegionIds": [
+            "floor-positive"
+          ],
+          "contactRuleId": "full-footprint-floor",
+          "fullFootprintEvaluated": true,
+          "geometryGateBinding": true
+        },
+        "proofDigest": "07d6d0d93fadbfc9012681a1d5a22fc62d80204b93e21bf34f1497773125ac48"
+      }
+    },
+    {
+      "scene": "clinic",
+      "case": "legal-positive",
+      "result": {
+        "placementReady": false,
+        "result": "PASS",
+        "reasonCode": "GEOMETRY_GATE_PASS",
+        "evidence": {
+          "requestId": "clinic-positive",
+          "sceneId": "clinic",
+          "surfaceId": "floor",
+          "checkedGeometryDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+          "surfaceModelDigest": "dc7c9821d6006b26886bd6780b8800894db061ad6a068363bc5605a3fafeb191",
+          "pixelEvidenceUsedAsAuthority": false,
+          "autoFixed": false,
+          "bounds": {
+            "minX": -0.275,
+            "maxX": 0.275,
+            "minY": 0,
+            "maxY": 0.35,
+            "minZ": 0.825,
+            "maxZ": 1.175
+          },
+          "allowedRegionIds": [
+            "floor-positive"
+          ],
+          "contactRuleId": "full-footprint-floor",
+          "fullFootprintEvaluated": true,
+          "geometryGateBinding": true
+        },
+        "proofDigest": "578b38d43f453ced159729f8a63ce38547538bfcd406915be004c47f4e42299a"
+      }
+    },
+    {
+      "scene": "urban",
+      "case": "legal-positive",
+      "result": {
+        "placementReady": false,
+        "result": "PASS",
+        "reasonCode": "GEOMETRY_GATE_PASS",
+        "evidence": {
+          "requestId": "urban-positive",
+          "sceneId": "urban",
+          "surfaceId": "road",
+          "checkedGeometryDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+          "surfaceModelDigest": "a0b574da73edfaf043336b0f545a993f342e1650a464e3b3ecaef0010015151e",
+          "pixelEvidenceUsedAsAuthority": false,
+          "autoFixed": false,
+          "bounds": {
+            "minX": -0.275,
+            "maxX": 0.275,
+            "minY": 0.08000000000000002,
+            "maxY": 0.43,
+            "minZ": -3.175,
+            "maxZ": -2.825
+          },
+          "allowedRegionIds": [
+            "road-positive"
+          ],
+          "contactRuleId": "full-footprint-road",
+          "fullFootprintEvaluated": true,
+          "geometryGateBinding": true
+        },
+        "proofDigest": "203e550d0005db714189a0eda0d31eb341e1df30f81befbe872b75944ac4fb87"
+      }
+    },
+    {
+      "scene": "school",
+      "case": "floating-bag-original-y",
+      "result": {
+        "placementReady": false,
+        "result": "FAIL",
+        "reasonCode": "CONTACT_GAP_FLOATING",
+        "evidence": {
+          "requestId": "floating-bag",
+          "sceneId": "school",
+          "surfaceId": "floor",
+          "checkedGeometryDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+          "surfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+          "pixelEvidenceUsedAsAuthority": false,
+          "autoFixed": false,
+          "bounds": {
+            "minX": -3.275,
+            "maxX": -2.725,
+            "minY": 0.0050000000000000044,
+            "maxY": 0.355,
+            "minZ": 0.825,
+            "maxZ": 1.175
+          },
+          "contactGap": 0.0050000000000000044
+        }
+      }
+    },
+    {
+      "scene": "school",
+      "case": "door-region",
+      "result": {
+        "placementReady": false,
+        "result": "FAIL",
+        "reasonCode": "DOOR_OR_OPENING_PENETRATION",
+        "evidence": {
+          "requestId": "door-region",
+          "sceneId": "school",
+          "surfaceId": "floor",
+          "checkedGeometryDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+          "surfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+          "pixelEvidenceUsedAsAuthority": false,
+          "autoFixed": false,
+          "bounds": {
+            "minX": 5.125,
+            "maxX": 5.675000000000001,
+            "minY": 0,
+            "maxY": 0.35,
+            "minZ": -4.015,
+            "maxZ": -3.665
+          },
+          "intersectedSurfaceId": "door",
+          "intersectionVolumeId": "door-box"
+        }
+      }
+    }
+  ],
+  "canonicalDigest": "c6c867ab8588ad9b23317fcbd7675789d490065e1fc9d839144eb3bd1073828f"
+}

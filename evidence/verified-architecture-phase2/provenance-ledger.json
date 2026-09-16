@@ -1,0 +1,38 @@
+{
+  "lockedBase": "30cb23e9b5747ea9af09fa5478f4175b3296c605",
+  "sourceIndexSha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+  "artifacts": [
+    {
+      "scene": "school",
+      "url": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas/school_hall.jpg",
+      "byteLength": 934936,
+      "sha256": "c85dc927ac565ed863f7f8e0bbaddd0fc66120b542630d3aa57e6163a5684361",
+      "classification": "VERIFIED_BYTES_ROLE_DIAGNOSTIC_GEOMETRY_BINDING_UNKNOWN"
+    },
+    {
+      "scene": "clinic",
+      "url": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas/hospital_room.jpg",
+      "byteLength": 353637,
+      "sha256": "a2e7e57e6c2b3c4c4fd175968833753e7891b73536831e27bb154de047bfb490",
+      "classification": "VERIFIED_BYTES_ROLE_DIAGNOSTIC_GEOMETRY_BINDING_UNKNOWN"
+    },
+    {
+      "scene": "urban",
+      "url": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas/urban_street_01.jpg",
+      "byteLength": 2194103,
+      "sha256": "6dc7dc778dfe3c6a87beaf5b7c8d4bcaa491402f05ea677550f6775b57e815c8",
+      "classification": "VERIFIED_BYTES_ROLE_DIAGNOSTIC_GEOMETRY_BINDING_UNKNOWN"
+    },
+    {
+      "scene": "school-bag-visible",
+      "url": "https://ko-rishon-first-aid.pages.dev/assets/realistic/final-composites/bag.png",
+      "byteLength": 498962,
+      "sha256": "fc73f71600f2da19af44334760fcf1f495bab5037d66bc3bb23cfba1d0e33fda",
+      "classification": "VERIFIED_BYTES_VISIBLE_PHYSICAL_BINDING_UNKNOWN"
+    }
+  ],
+  "excluded": {
+    "industrial": "OUT_OF_LOCKED_SCOPE_UNPINNED_GEOMETRY",
+    "synagogue": "UNKNOWN_NO_RUNTIME_GEOMETRY_PAIR_NO_FALLBACK"
+  }
+}

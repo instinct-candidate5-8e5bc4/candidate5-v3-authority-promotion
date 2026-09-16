@@ -1,0 +1,4 @@
+'use strict';const path=require('node:path');const {load}=require('../../src/verified-architecture-phase2/evidence-loader');const {digest}=require('../../src/verified-architecture-phase2/canonical');
+const model=n=>load(path.join(__dirname,'../../evidence/verified-architecture-phase2/surface-models',n+'.json'));const BAG=Object.freeze({minX:-.275,maxX:.275,minY:-.175,maxY:.175,minZ:-.175,maxZ:.175});
+function request(m,over={}){const geometry=over.geometry||BAG;const geometryDigest=digest(geometry);return {requestId:'req',surfaceId:'floor',surfaceModelRef:{id:m.surfaceModelId,revision:m.revision,digest:m.surfaceModelDigest},geometry,geometryDigest,proofGeometryDigest:geometryDigest,transform:{x:-3,y:.175,z:1},orientationUpDot:1,supportNormalUpDot:1,evidenceRefs:['locked-source-range','geometry-bounds'],pixelEvidence:{role:'DIAGNOSTIC_ONLY'},...over};}
+module.exports={model,request,BAG,digest};

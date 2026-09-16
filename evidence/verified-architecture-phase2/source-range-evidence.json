@@ -1,0 +1,37 @@
+{
+  "source": "index.html",
+  "sourceSha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+  "classification": "RECOVERED_SOURCE_BYTES_VERIFIED_AT_LOCKED_COMMIT",
+  "extracts": [
+    {
+      "id": "base-room",
+      "byteOffsetUtf8": 150965,
+      "text": "box('floor',[0,-.06,0],[18,.12,18],0x555b59);box('back wall',[0,3,-4],[18,6,.16],0x163039);box('side wall left',[-7,3,0],[.16,6,12],0x132931);box('side wall right',[7,3,0],[.16,6,12],0x132931);",
+      "sha256": "af6d27f191a1e108d30a8869e27296ab1841b51d5196b8d562b8f47231839eed"
+    },
+    {
+      "id": "school-bag-lockers",
+      "byteOffsetUtf8": 164008,
+      "text": "if(baseVariant===8){for(const x of [-4,-2,0,2,4])prop('Locker',[x,1.2,-3.5],[1,2.4,.55],0x3c6680);prop('School bag',[-3,.18,1],[.55,.35,.35],0x883d46)}",
+      "sha256": "21ba7567961cbb9c022ab8a1f11359bf07049c506519a7656394cfc48fcc11ea"
+    },
+    {
+      "id": "clinic-cart",
+      "byteOffsetUtf8": 165275,
+      "text": "if(baseVariant===16){for(const x of [-4,-2.5])prop('Waiting chair',[x,.5,1],[.7,1,.7],0x4d7180);prop('Clinic cart',[4,.65,-2.5],[1.2,1.3,.6],0xe2ebea)}",
+      "sha256": "aee0b75f652c046f87378958ed2b11ca9923da8bae9b2f7d3f4a31e7cb809650"
+    },
+    {
+      "id": "outdoor-surfaces",
+      "byteOffsetUtf8": 166548,
+      "text": "const grass=prop('Ground',[0,-.005,-.4],[18,.08,17],0xffffff);",
+      "sha256": "e0b51abdc88ad0d44715a2bc441bc7d2778c244b1cda415135a03fecc9cc856e"
+    },
+    {
+      "id": "door",
+      "byteOffsetUtf8": 167869,
+      "text": "prop('Door',[5.4,1.45,-3.84],[1.35,2.9,.12],0x674b37);",
+      "sha256": "2d2996bd9385e6963993154e655cc75c5549b05e14a7d52fbec26d266c2a01a8"
+    }
+  ]
+}

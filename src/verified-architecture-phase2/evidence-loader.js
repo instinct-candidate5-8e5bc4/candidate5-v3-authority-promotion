@@ -1,0 +1,1 @@
+'use strict';const fs=require('node:fs');const {buildSurfaceModel}=require('./surface-model');function load(path){return buildSurfaceModel(JSON.parse(fs.readFileSync(path,'utf8')));}module.exports={load};

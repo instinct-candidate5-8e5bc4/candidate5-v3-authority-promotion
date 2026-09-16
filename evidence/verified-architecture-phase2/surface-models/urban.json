@@ -1,0 +1,135 @@
+{
+  "surfaceModelId": "urban-surface-v1",
+  "sceneId": "urban",
+  "schemaVersion": "2.0.0",
+  "revision": 1,
+  "sourceEvidence": {
+    "source": {
+      "artifact": "index.html",
+      "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+      "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+      "verification": "exact bytes at locked commit 30cb23e"
+    },
+    "panorama": "6dc7dc778dfe3c6a87beaf5b7c8d4bcaa491402f05ea677550f6775b57e815c8",
+    "panoramaRole": "PIXEL_DIAGNOSTIC_ONLY",
+    "geometryBindingStatus": "UNKNOWN"
+  },
+  "surfaces": [
+    {
+      "surfaceId": "road",
+      "type": "SUPPORT_SURFACE",
+      "region": {
+        "allowed": [
+          {
+            "regionId": "road-positive",
+            "minX": -9,
+            "maxX": 9,
+            "minZ": -4.5,
+            "maxZ": -1.5
+          }
+        ],
+        "volumes": []
+      },
+      "planeOrDepth": {
+        "kind": "PLANE",
+        "planeY": 0.08
+      },
+      "contactRules": [
+        {
+          "contactRuleId": "full-footprint-road",
+          "policy": "FULL_FOOTPRINT"
+        }
+      ],
+      "confidence": "AUTHORED_GEOMETRY_EXACT",
+      "provenance": {
+        "artifact": "index.html",
+        "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+        "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+        "verification": "exact bytes at locked commit 30cb23e"
+      }
+    },
+    {
+      "surfaceId": "sidewalk",
+      "type": "SUPPORT_SURFACE",
+      "region": {
+        "allowed": [
+          {
+            "regionId": "sidewalk-positive",
+            "minX": -9,
+            "maxX": 9,
+            "minZ": -1.36,
+            "maxZ": -0.74
+          }
+        ],
+        "volumes": []
+      },
+      "planeOrDepth": {
+        "kind": "PLANE",
+        "planeY": 0.18
+      },
+      "contactRules": [
+        {
+          "contactRuleId": "full-footprint-sidewalk",
+          "policy": "FULL_FOOTPRINT"
+        }
+      ],
+      "confidence": "AUTHORED_GEOMETRY_EXACT",
+      "provenance": {
+        "artifact": "index.html",
+        "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+        "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+        "verification": "exact bytes at locked commit 30cb23e"
+      }
+    },
+    {
+      "surfaceId": "curb",
+      "type": "OBSTACLE",
+      "region": {
+        "allowed": [],
+        "volumes": [
+          {
+            "volumeId": "curb-box",
+            "minX": -9,
+            "maxX": 9,
+            "minY": 0.1,
+            "maxY": 0.24,
+            "minZ": -1.44,
+            "maxZ": -1.32
+          }
+        ]
+      },
+      "planeOrDepth": {
+        "kind": "BOX_DEPTH",
+        "planeY": 0.24
+      },
+      "contactRules": [],
+      "confidence": "AUTHORED_GEOMETRY_EXACT",
+      "provenance": {
+        "artifact": "index.html",
+        "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+        "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+        "verification": "exact bytes at locked commit 30cb23e"
+      }
+    },
+    {
+      "surfaceId": "ground-unknown",
+      "type": "UNKNOWN",
+      "region": {
+        "allowed": [],
+        "volumes": []
+      },
+      "planeOrDepth": {
+        "kind": "PLANE",
+        "planeY": 0.035
+      },
+      "contactRules": [],
+      "confidence": "UNVERIFIED_SUPPORT_SEMANTICS",
+      "provenance": {
+        "artifact": "index.html",
+        "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+        "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+        "verification": "exact bytes at locked commit 30cb23e"
+      }
+    }
+  ]
+}

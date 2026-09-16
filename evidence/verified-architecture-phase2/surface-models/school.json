@@ -1,0 +1,322 @@
+{
+  "surfaceModelId": "school-surface-v1",
+  "sceneId": "school",
+  "schemaVersion": "2.0.0",
+  "revision": 1,
+  "sourceEvidence": {
+    "source": {
+      "artifact": "index.html",
+      "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+      "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+      "verification": "exact bytes at locked commit 30cb23e"
+    },
+    "panorama": "c85dc927ac565ed863f7f8e0bbaddd0fc66120b542630d3aa57e6163a5684361",
+    "panoramaRole": "PIXEL_DIAGNOSTIC_ONLY",
+    "geometryBindingStatus": "UNKNOWN"
+  },
+  "surfaces": [
+    {
+      "surfaceId": "floor",
+      "type": "FLOOR",
+      "region": {
+        "allowed": [
+          {
+            "regionId": "floor-positive",
+            "minX": -7,
+            "maxX": 7,
+            "minZ": -4,
+            "maxZ": 6
+          }
+        ],
+        "volumes": []
+      },
+      "planeOrDepth": {
+        "kind": "PLANE",
+        "planeY": 0
+      },
+      "contactRules": [
+        {
+          "contactRuleId": "full-footprint-floor",
+          "policy": "FULL_FOOTPRINT"
+        }
+      ],
+      "confidence": "AUTHORED_GEOMETRY_EXACT",
+      "provenance": {
+        "artifact": "index.html",
+        "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+        "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+        "verification": "exact bytes at locked commit 30cb23e"
+      }
+    },
+    {
+      "surfaceId": "back-wall",
+      "type": "WALL",
+      "region": {
+        "allowed": [],
+        "volumes": [
+          {
+            "volumeId": "back-wall-box",
+            "minX": -9,
+            "maxX": 9,
+            "minY": 0,
+            "maxY": 6,
+            "minZ": -4.08,
+            "maxZ": -3.92
+          }
+        ]
+      },
+      "planeOrDepth": {
+        "kind": "BOX_DEPTH",
+        "planeY": 0
+      },
+      "contactRules": [],
+      "confidence": "AUTHORED_GEOMETRY_EXACT",
+      "provenance": {
+        "artifact": "index.html",
+        "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+        "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+        "verification": "exact bytes at locked commit 30cb23e"
+      }
+    },
+    {
+      "surfaceId": "left-wall",
+      "type": "WALL",
+      "region": {
+        "allowed": [],
+        "volumes": [
+          {
+            "volumeId": "left-wall-box",
+            "minX": -7.08,
+            "maxX": -6.92,
+            "minY": 0,
+            "maxY": 6,
+            "minZ": -6,
+            "maxZ": 6
+          }
+        ]
+      },
+      "planeOrDepth": {
+        "kind": "BOX_DEPTH",
+        "planeY": 0
+      },
+      "contactRules": [],
+      "confidence": "AUTHORED_GEOMETRY_EXACT",
+      "provenance": {
+        "artifact": "index.html",
+        "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+        "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+        "verification": "exact bytes at locked commit 30cb23e"
+      }
+    },
+    {
+      "surfaceId": "right-wall",
+      "type": "WALL",
+      "region": {
+        "allowed": [],
+        "volumes": [
+          {
+            "volumeId": "right-wall-box",
+            "minX": 6.92,
+            "maxX": 7.08,
+            "minY": 0,
+            "maxY": 6,
+            "minZ": -6,
+            "maxZ": 6
+          }
+        ]
+      },
+      "planeOrDepth": {
+        "kind": "BOX_DEPTH",
+        "planeY": 0
+      },
+      "contactRules": [],
+      "confidence": "AUTHORED_GEOMETRY_EXACT",
+      "provenance": {
+        "artifact": "index.html",
+        "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+        "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+        "verification": "exact bytes at locked commit 30cb23e"
+      }
+    },
+    {
+      "surfaceId": "door",
+      "type": "DOOR_OR_OPENING",
+      "region": {
+        "allowed": [],
+        "volumes": [
+          {
+            "volumeId": "door-box",
+            "minX": 4.725,
+            "maxX": 6.075,
+            "minY": 0,
+            "maxY": 2.9,
+            "minZ": -3.9,
+            "maxZ": -3.78
+          }
+        ]
+      },
+      "planeOrDepth": {
+        "kind": "BOX_DEPTH",
+        "planeY": 0
+      },
+      "contactRules": [],
+      "confidence": "AUTHORED_GEOMETRY_EXACT",
+      "provenance": {
+        "artifact": "index.html",
+        "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+        "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+        "verification": "exact bytes at locked commit 30cb23e"
+      }
+    },
+    {
+      "surfaceId": "locker-0",
+      "type": "OBSTACLE",
+      "region": {
+        "allowed": [],
+        "volumes": [
+          {
+            "volumeId": "locker-0-box",
+            "minX": -4.5,
+            "maxX": -3.5,
+            "minY": 0,
+            "maxY": 2.4,
+            "minZ": -3.775,
+            "maxZ": -3.225
+          }
+        ]
+      },
+      "planeOrDepth": {
+        "kind": "BOX_DEPTH",
+        "planeY": 0
+      },
+      "contactRules": [],
+      "confidence": "AUTHORED_GEOMETRY_EXACT",
+      "provenance": {
+        "artifact": "index.html",
+        "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+        "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+        "verification": "exact bytes at locked commit 30cb23e"
+      }
+    },
+    {
+      "surfaceId": "locker-1",
+      "type": "OBSTACLE",
+      "region": {
+        "allowed": [],
+        "volumes": [
+          {
+            "volumeId": "locker-1-box",
+            "minX": -2.5,
+            "maxX": -1.5,
+            "minY": 0,
+            "maxY": 2.4,
+            "minZ": -3.775,
+            "maxZ": -3.225
+          }
+        ]
+      },
+      "planeOrDepth": {
+        "kind": "BOX_DEPTH",
+        "planeY": 0
+      },
+      "contactRules": [],
+      "confidence": "AUTHORED_GEOMETRY_EXACT",
+      "provenance": {
+        "artifact": "index.html",
+        "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+        "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+        "verification": "exact bytes at locked commit 30cb23e"
+      }
+    },
+    {
+      "surfaceId": "locker-2",
+      "type": "OBSTACLE",
+      "region": {
+        "allowed": [],
+        "volumes": [
+          {
+            "volumeId": "locker-2-box",
+            "minX": -0.5,
+            "maxX": 0.5,
+            "minY": 0,
+            "maxY": 2.4,
+            "minZ": -3.775,
+            "maxZ": -3.225
+          }
+        ]
+      },
+      "planeOrDepth": {
+        "kind": "BOX_DEPTH",
+        "planeY": 0
+      },
+      "contactRules": [],
+      "confidence": "AUTHORED_GEOMETRY_EXACT",
+      "provenance": {
+        "artifact": "index.html",
+        "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+        "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+        "verification": "exact bytes at locked commit 30cb23e"
+      }
+    },
+    {
+      "surfaceId": "locker-3",
+      "type": "OBSTACLE",
+      "region": {
+        "allowed": [],
+        "volumes": [
+          {
+            "volumeId": "locker-3-box",
+            "minX": 1.5,
+            "maxX": 2.5,
+            "minY": 0,
+            "maxY": 2.4,
+            "minZ": -3.775,
+            "maxZ": -3.225
+          }
+        ]
+      },
+      "planeOrDepth": {
+        "kind": "BOX_DEPTH",
+        "planeY": 0
+      },
+      "contactRules": [],
+      "confidence": "AUTHORED_GEOMETRY_EXACT",
+      "provenance": {
+        "artifact": "index.html",
+        "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+        "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+        "verification": "exact bytes at locked commit 30cb23e"
+      }
+    },
+    {
+      "surfaceId": "locker-4",
+      "type": "OBSTACLE",
+      "region": {
+        "allowed": [],
+        "volumes": [
+          {
+            "volumeId": "locker-4-box",
+            "minX": 3.5,
+            "maxX": 4.5,
+            "minY": 0,
+            "maxY": 2.4,
+            "minZ": -3.775,
+            "maxZ": -3.225
+          }
+        ]
+      },
+      "planeOrDepth": {
+        "kind": "BOX_DEPTH",
+        "planeY": 0
+      },
+      "contactRules": [],
+      "confidence": "AUTHORED_GEOMETRY_EXACT",
+      "provenance": {
+        "artifact": "index.html",
+        "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+        "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+        "verification": "exact bytes at locked commit 30cb23e"
+      }
+    }
+  ]
+}
