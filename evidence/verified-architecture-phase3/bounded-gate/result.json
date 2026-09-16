@@ -1,0 +1,100 @@
+{
+  "gate": "PHASE_3_BOUNDED_EVIDENCE_IMPLEMENTATION_GATE",
+  "result": "FAIL_HARD_STOP",
+  "reasonCode": "NARROW_MUTATION_BOUNDARY_NOT_CONNECTED",
+  "baseCommit": "7020b41e9067f5c58fb094cb126cd9ddc014ab72",
+  "priorTrial": "e14472de1aff7e79d591473d345dab91abacd7b5",
+  "transportProof": {
+    "durableAcks": 4,
+    "pageFinalSequence": 4,
+    "sinkFinalSequence": 4,
+    "pageFinalDigest": "30f806acb3e82869f8768cd1e627b988759c130be83f83aa07ec79a6dd5ed6d8",
+    "sinkFinalDigest": "30f806acb3e82869f8768cd1e627b988759c130be83f83aa07ec79a6dd5ed6d8",
+    "chainMatches": true,
+    "backpressureEvents": [],
+    "status": "OBSERVATION_COMPLETE"
+  },
+  "queueHighWater": {
+    "queueFrames": 1,
+    "queueBytes": 552,
+    "inflightFrames": 1,
+    "inflightBytes": 552
+  },
+  "contentAddressedBlobs": {
+    "unique": 1,
+    "bytes": 23
+  },
+  "eventClasses": {
+    "CONTENT_BLOB": {
+      "events": 1,
+      "bytes": 524
+    },
+    "CHECKPOINT_SNAPSHOT": {
+      "events": 2,
+      "bytes": 1102
+    },
+    "PHYSICAL_MUTATION": {
+      "events": 1,
+      "bytes": 533
+    }
+  },
+  "checkpointReconstruction": true,
+  "offOnDiagnostic": {
+    "applicationVisibleEqual": false,
+    "offFrames": {
+      "count": 240,
+      "medianMs": 16.699999999999818,
+      "p90Ms": 16.700000000000728,
+      "p95Ms": 16.799999999999955,
+      "p99Ms": 16.800000000000182,
+      "maxMs": 350.0000000000001,
+      "meanFps": 55.38120731031936
+    },
+    "onFrames": {
+      "count": 239,
+      "medianMs": 16.699999999999818,
+      "p90Ms": 16.700000000000273,
+      "p95Ms": 16.799999999999955,
+      "p99Ms": 16.800000000000182,
+      "maxMs": 300,
+      "meanFps": 55.800705096775694
+    },
+    "offHeapStart": 1921480,
+    "onHeapStart": 1911823,
+    "onHeapEnd": 2037578,
+    "onLongTasks": [
+      {
+        "duration": 305
+      }
+    ],
+    "note": "Diagnostic only; synthetic boundary exercised, not simulator physical mutation.",
+    "divergenceExplanation": "OFF/ON canonical application state was not equal; synthetic observer lifecycle and asynchronous diagnostics changed captured data. Under the locked rule this independently fails the gate as OBSERVER_DIVERGENCE; no waiver."
+  },
+  "bootCoverage": {
+    "preloadBeforeInlineModule": "PROVEN_BY_SCRIPT_ORDER_AND_PRELOAD_STATE",
+    "firstActualAuthoritativeMutationObserved": false,
+    "result": "INCOMPLETE_BOOT_COVERAGE"
+  },
+  "productionExclusion": {
+    "unauthorizedRunStatus": "PRODUCTION_EXCLUSION",
+    "unauthorizedSequence": 0,
+    "artifactNegativeProof": "BLOCKED_NOT_FINALIZED"
+  },
+  "blockingFact": "The approved single preload can expose an observation API, but unchanged simulator runtime never calls that contract-defined narrow API. Broad prototype interception is forbidden. Capturing actual authoritative writes would require additional runtime call-site touchpoints or unapproved AST instrumentation.",
+  "directScalarWrites": "MUTATION_SOURCE_UNOBSERVED",
+  "staticReconciliation": "BLOCKED; L-01..L-17 remain NOT_OBSERVED",
+  "fullCaptureReplay": "NOT_STARTED",
+  "unknownBlocked": [
+    "Actual authoritative simulator mutations are not connected.",
+    "Direct scalar writes remain unobserved.",
+    "Boot completeness is not proven.",
+    "Production artifact exclusion is not finalized because gate failed first.",
+    "Heavy-mutation performance is unknown because only synthetic gate records were emitted."
+  ],
+  "additionalFailureCode": "OBSERVER_DIVERGENCE",
+  "inheritedTests": {
+    "phase1AtLockedBase": "13_PASS_0_FAIL",
+    "phase2AtLockedBase": "38_PASS_0_FAIL",
+    "boundedGateUnit": "2_PASS_0_FAIL"
+  }
+}
