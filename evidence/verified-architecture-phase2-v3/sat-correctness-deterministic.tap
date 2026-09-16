@@ -1,0 +1,179 @@
+TAP version 13
+# Subtest: interval canonical validation
+ok 1 - interval canonical validation
+  ---
+  type: 'test'
+  ...
+# Subtest: interval add subtract negate multiply scalar exact
+ok 2 - interval add subtract negate multiply scalar exact
+  ---
+  type: 'test'
+  ...
+# Subtest: interval zero and comparisons
+ok 3 - interval zero and comparisons
+  ---
+  type: 'test'
+  ...
+# Subtest: interval dot and projection propagate uncertainty
+ok 4 - interval dot and projection propagate uncertainty
+  ---
+  type: 'test'
+  ...
+# Subtest: REG-V3-QI-SAT-001 uncertainty crossing cannot pass
+ok 5 - REG-V3-QI-SAT-001 uncertainty crossing cannot pass
+  ---
+  type: 'test'
+  ...
+# Subtest: REG-V3-DATAFLOW-001 MaterializedVertex retains exact fixed error interval lineage
+ok 6 - REG-V3-DATAFLOW-001 MaterializedVertex retains exact fixed error interval lineage
+  ---
+  type: 'test'
+  ...
+# Subtest: identity exact coordinate materialization has contained source
+ok 7 - identity exact coordinate materialization has contained source
+  ---
+  type: 'test'
+  ...
+# Subtest: REG-V3-STALE-001 parent mutation invalidates vertex and downstream bound
+ok 8 - REG-V3-STALE-001 parent mutation invalidates vertex and downstream bound
+  ---
+  type: 'test'
+  ...
+# Subtest: REG-V3-BROAD-001 interval broad bound encloses every component interval
+ok 9 - REG-V3-BROAD-001 interval broad bound encloses every component interval
+  ---
+  type: 'test'
+  ...
+# Subtest: REG-V3-EDGESET-001 complete canonical undirected edge extraction
+ok 10 - REG-V3-EDGESET-001 complete canonical undirected edge extraction
+  ---
+  type: 'test'
+  ...
+# Subtest: REG-V3-BASIS-001 physical basis deterministic and no visual input
+ok 11 - REG-V3-BASIS-001 physical basis deterministic and no visual input
+  ---
+  type: 'test'
+  ...
+# Subtest: REG-V3-PROJECTION-001 3D to target-local 2D retains uncertainty
+ok 12 - REG-V3-PROJECTION-001 3D to target-local 2D retains uncertainty
+  ---
+  type: 'test'
+  ...
+# Subtest: opening region data uses target-local projected interval vertices
+ok 13 - opening region data uses target-local projected interval vertices
+  ---
+  type: 'test'
+  ...
+# Subtest: REG-V3-NORMAL-DATA-001 exact normal provenance survives frame binding
+ok 14 - REG-V3-NORMAL-DATA-001 exact normal provenance survives frame binding
+  ---
+  type: 'test'
+  ...
+# Subtest: correlation matrix allows conservative ambiguity never naked points
+ok 15 - correlation matrix allows conservative ambiguity never naked points
+  ---
+  type: 'test'
+  ...
+# Subtest: V3 measurement only
+ok 16 - V3 measurement only
+  ---
+  type: 'test'
+  ...
+# Subtest: REG-V3-SAT-DATAFLOW-001 OBB SAT vertices all interval-bearing
+ok 17 - REG-V3-SAT-DATAFLOW-001 OBB SAT vertices all interval-bearing
+  ---
+  type: 'test'
+  ...
+# Subtest: REG-V3-SAT-AXIS-001 complete canonical OBB axis family deduplicates parallels
+ok 18 - REG-V3-SAT-AXIS-001 complete canonical OBB axis family deduplicates parallels
+  ---
+  type: 'test'
+  ...
+# Subtest: OBB separated, touching and overlapping result model
+ok 19 - OBB separated, touching and overlapping result model
+  ---
+  type: 'test'
+  ...
+# Subtest: rotated, 90, upside-down and nested candidates deterministic
+ok 20 - rotated, 90, upside-down and nested candidates deterministic
+  ---
+  type: 'test'
+  ...
+# Subtest: REG-V3-SAT-INTERVAL-001 uncertain projections cannot PASS
+ok 21 - REG-V3-SAT-INTERVAL-001 uncertain projections cannot PASS
+  ---
+  type: 'test'
+  ...
+# Subtest: REG-V3-SAT-CORRELATION-001 widened shared uncertainty remains ambiguity
+ok 22 - REG-V3-SAT-CORRELATION-001 widened shared uncertainty remains ambiguity
+  ---
+  type: 'test'
+  ...
+# Subtest: convex topology and full face plus edge-cross axes
+ok 23 - convex topology and full face plus edge-cross axes
+  ---
+  type: 'test'
+  ...
+# Subtest: REG-V3-CONVEX-AXIS-001 candidate edge-cross family exists but actual separator fixture remains blocked
+ok 24 - REG-V3-CONVEX-AXIS-001 candidate edge-cross family exists but actual separator fixture remains blocked
+  ---
+  type: 'test'
+  ...
+# Subtest: REG-V3-BODY-BODY-001 order deterministic for clear rotated pair
+ok 25 - REG-V3-BODY-BODY-001 order deterministic for clear rotated pair
+  ---
+  type: 'test'
+  ...
+# Subtest: oriented body-vs-body separated touching penetrating rotated
+ok 26 - oriented body-vs-body separated touching penetrating rotated
+  ---
+  type: 'test'
+  ...
+# Subtest: compound children canonical and child-only collision fails
+ok 27 - compound children canonical and child-only collision fails
+  ---
+  type: 'test'
+  ...
+# Subtest: containment fully inside and outside
+ok 28 - containment fully inside and outside
+  ---
+  type: 'test'
+  ...
+# Subtest: explicit opening legal, edge ambiguous, too large
+ok 29 - explicit opening legal, edge ambiguous, too large
+  ---
+  type: 'test'
+  ...
+# Subtest: contact floor pass floating penetration and unsupported double-sided
+ok 30 - contact floor pass floating penetration and unsupported double-sided
+  ---
+  type: 'test'
+  ...
+# Subtest: broad tamper and swept fail closed with evidence limitations
+ok 31 - broad tamper and swept fail closed with evidence limitations
+  ---
+  type: 'test'
+  ...
+# Subtest: convex definitions validate topology and SAT
+ok 32 - convex definitions validate topology and SAT
+  ---
+  type: 'test'
+  ...
+# Subtest: synthetic local-world parent rotation invalidates old evidence
+ok 33 - synthetic local-world parent rotation invalidates old evidence
+  ---
+  type: 'test'
+  ...
+# Subtest: synthetic topology kinds cover tread riser landing levels only
+ok 34 - synthetic topology kinds cover tread riser landing levels only
+  ---
+  type: 'test'
+  ...
+1..34
+# tests 34
+# suites 0
+# pass 34
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
