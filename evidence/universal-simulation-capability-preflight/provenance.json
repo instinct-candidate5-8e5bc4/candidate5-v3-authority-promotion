@@ -1,0 +1,9 @@
+{
+  "ownerInstructionMessageId": "wamid.HBgMOTcyNTMyNDkwMzUxFQIAEhgUM0FGRTU5RDk4Njk4QUNDNDBBNEMA",
+  "ownerInstructionObservedAt": "2026-09-16T23:09:08+03:00",
+  "approvedGateDCheckpoint": "a50f6274fc242f346e238d13af5d926a559fe5ab",
+  "approvedScenePackageDigest": "187cf1a4c0af01ef12087879f44eeb88a355499a860665e29cdb2f5ab0d06aec",
+  "scope": "Universal simulation capability preflight: architecture/taxonomy/contracts only; no feature implementation",
+  "classification": "AUTHORED_NEW_DESIGN_PROPOSAL",
+  "approvalState": "AWAITING_REVIEW"
+}

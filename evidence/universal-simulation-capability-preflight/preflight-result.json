@@ -1,0 +1,19 @@
+{
+  "gate": "UNIVERSAL_SIMULATION_CAPABILITY_PREFLIGHT",
+  "scope": "ARCHITECTURE_TAXONOMY_CONTRACTS_ONLY",
+  "result": "HARD_STOP",
+  "designReadyForReview": true,
+  "visualVerticalSliceRisk": true,
+  "reason": "Visual implementation before domain-authority, semantic-capability, coordinate-frame/oriented-geometry and VisualBinding contracts are approved would harden School-specific and axis-aligned assumptions.",
+  "minimumBeforeVisuals": [
+    "domain authority graph and canonical cross-domain refs",
+    "semantic component and capability registries with fail-closed compatibility results",
+    "coordinate-frame/oriented-contact/multi-level extension contracts",
+    "independent Constraint, Accessibility, Environment/Hazard, Clinical/Presentation and Progression boundaries",
+    "VisualBinding and identity-preserving quality fallback contract",
+    "Visual Quality and Web Performance gate protocols"
+  ],
+  "implementationPerformed": false,
+  "currentApprovedPackageModified": false,
+  "stopAfterPreflight": true
+}
