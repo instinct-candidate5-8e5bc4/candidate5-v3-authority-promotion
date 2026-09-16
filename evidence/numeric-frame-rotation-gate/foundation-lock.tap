@@ -1,0 +1,148 @@
+TAP version 13
+# Subtest: canonical refs are exact and stale ref fails closed
+ok 1 - canonical refs are exact and stale ref fails closed
+  ---
+  duration_ms: 3.951702
+  type: 'test'
+  ...
+# Subtest: independent authoritative roots preserve identity and authority
+ok 2 - independent authoritative roots preserve identity and authority
+  ---
+  duration_ms: 0.938259
+  type: 'test'
+  ...
+# Subtest: domain descriptor locks writers dependencies events and evidence
+ok 3 - domain descriptor locks writers dependencies events and evidence
+  ---
+  duration_ms: 1.1115
+  type: 'test'
+  ...
+# Subtest: exact School capability accepted
+ok 4 - exact School capability accepted
+  ---
+  duration_ms: 0.74585
+  type: 'test'
+  ...
+# Subtest: synagogue does not fall back to School
+ok 5 - synagogue does not fall back to School
+  ---
+  duration_ms: 1.607505
+  type: 'test'
+  ...
+# Subtest: road collision fails without road and vehicle capabilities
+ok 6 - road collision fails without road and vehicle capabilities
+  ---
+  duration_ms: 21.224432
+  type: 'test'
+  ...
+# Subtest: water scenario fails without implemented water volume
+ok 7 - water scenario fails without implemented water volume
+  ---
+  duration_ms: 0.983804
+  type: 'test'
+  ...
+# Subtest: contract-only rotation cannot satisfy implementation requirement
+ok 8 - contract-only rotation cannot satisfy implementation requirement
+  ---
+  duration_ms: 0.572973
+  type: 'test'
+  ...
+# Subtest: open semantic IDs and typed components do not infer capabilities
+ok 9 - open semantic IDs and typed components do not infer capabilities
+  ---
+  duration_ms: 1.383062
+  type: 'test'
+  ...
+# Subtest: entity components separate semantic and physical identity
+ok 10 - entity components separate semantic and physical identity
+  ---
+  duration_ms: 1.255964
+  type: 'test'
+  ...
+# Subtest: 0..N casualty manifests and independent refs are valid
+ok 11 - 0..N casualty manifests and independent refs are valid
+  ---
+  duration_ms: 1.951227
+  type: 'test'
+  ...
+# Subtest: actor role is independent from geometry
+ok 12 - actor role is independent from geometry
+  ---
+  duration_ms: 0.87539
+  type: 'test'
+  ...
+# Subtest: canonical quaternion removes scale and sign ambiguity exactly
+ok 13 - canonical quaternion removes scale and sign ambiguity exactly
+  ---
+  duration_ms: 1.303288
+  type: 'test'
+  ...
+# Subtest: rigid frame composition is exact and deterministic
+ok 14 - rigid frame composition is exact and deterministic
+  ---
+  duration_ms: 0.900646
+  type: 'test'
+  ...
+# Subtest: frame hierarchy is explicit and deterministic
+ok 15 - frame hierarchy is explicit and deterministic
+  ---
+  duration_ms: 0.67865
+  type: 'test'
+  ...
+# Subtest: ConstraintRelation is not SupportRelation and includes release lifecycle
+ok 16 - ConstraintRelation is not SupportRelation and includes release lifecycle
+  ---
+  duration_ms: 0.664948
+  type: 'test'
+  ...
+# Subtest: AccessibilityAssessment captures actor target objective region and blockers
+ok 17 - AccessibilityAssessment captures actor target objective region and blockers
+  ---
+  duration_ms: 0.546662
+  type: 'test'
+  ...
+# Subtest: hazard separates source truth and four potential effect bindings
+ok 18 - hazard separates source truth and four potential effect bindings
+  ---
+  duration_ms: 0.708583
+  type: 'test'
+  ...
+# Subtest: clinical hidden state is separate from exposed presentation
+ok 19 - clinical hidden state is separate from exposed presentation
+  ---
+  duration_ms: 0.611382
+  type: 'test'
+  ...
+# Subtest: progression emits typed intent to owning authority
+ok 20 - progression emits typed intent to owning authority
+  ---
+  duration_ms: 0.377398
+  type: 'test'
+  ...
+# Subtest: VisualBinding variant preserves exact semantic and physical identity
+ok 21 - VisualBinding variant preserves exact semantic and physical identity
+  ---
+  duration_ms: 2.294379
+  type: 'test'
+  ...
+# Subtest: dependency invalidation is deterministic and stale fails closed
+ok 22 - dependency invalidation is deterministic and stale fails closed
+  ---
+  duration_ms: 0.734476
+  type: 'test'
+  ...
+# Subtest: provenance never upgrades across domains
+ok 23 - provenance never upgrades across domains
+  ---
+  duration_ms: 0.463665
+  type: 'test'
+  ...
+1..23
+# tests 23
+# suites 0
+# pass 23
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 188.117868

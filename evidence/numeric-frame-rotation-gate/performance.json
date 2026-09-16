@@ -1,0 +1,159 @@
+{
+  "environment": {
+    "node": "v22.23.2",
+    "platform": "linux",
+    "arch": "x64",
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.60GHz"
+  },
+  "threshold": null,
+  "limits": {
+    "translationBits": 63,
+    "quaternionComponentBits": 256,
+    "intermediateBits": 4096,
+    "frameDepth": 64,
+    "frameCount": 4096,
+    "fixedScale": "1000000"
+  },
+  "canonicalize": {
+    "unit": "microseconds",
+    "count": 200,
+    "p50": 2.064,
+    "p95": 2.688,
+    "max": 28.551
+  },
+  "matrix": {
+    "unit": "microseconds",
+    "count": 200,
+    "p50": 5.057,
+    "p95": 6.539,
+    "max": 158.237
+  },
+  "validateDepth64": {
+    "unit": "microseconds",
+    "count": 20,
+    "p50": 2170.564,
+    "p95": 2955.449,
+    "max": 2955.449
+  },
+  "reduction": {
+    "unit": "microseconds",
+    "count": 200,
+    "p50": 2.54,
+    "p95": 3.172,
+    "max": 56.106
+  },
+  "materialization": {
+    "unit": "microseconds",
+    "count": 200,
+    "p50": 8.078,
+    "p95": 13.082,
+    "max": 317.661
+  },
+  "digest": {
+    "unit": "microseconds",
+    "count": 200,
+    "p50": 2.376,
+    "p95": 4.173,
+    "max": 39.369
+  },
+  "growth": [
+    {
+      "depth": 1,
+      "maxNumeratorBits": 1,
+      "denominatorBits": 1,
+      "quaternionComponentBits": 3,
+      "approxCanonicalBytes": 436,
+      "resolve": {
+        "unit": "microseconds",
+        "count": 20,
+        "p50": 188.156,
+        "p95": 9060.55,
+        "max": 9060.55
+      }
+    },
+    {
+      "depth": 2,
+      "maxNumeratorBits": 6,
+      "denominatorBits": 4,
+      "quaternionComponentBits": 4,
+      "approxCanonicalBytes": 548,
+      "resolve": {
+        "unit": "microseconds",
+        "count": 20,
+        "p50": 374.127,
+        "p95": 2458.895,
+        "max": 2458.895
+      }
+    },
+    {
+      "depth": 4,
+      "maxNumeratorBits": 14,
+      "denominatorBits": 12,
+      "quaternionComponentBits": 8,
+      "approxCanonicalBytes": 775,
+      "resolve": {
+        "unit": "microseconds",
+        "count": 20,
+        "p50": 529.022,
+        "p95": 2953.83,
+        "max": 2953.83
+      }
+    },
+    {
+      "depth": 8,
+      "maxNumeratorBits": 30,
+      "denominatorBits": 28,
+      "quaternionComponentBits": 16,
+      "approxCanonicalBytes": 1229,
+      "resolve": {
+        "unit": "microseconds",
+        "count": 20,
+        "p50": 680.01,
+        "p95": 7166.575,
+        "max": 7166.575
+      }
+    },
+    {
+      "depth": 16,
+      "maxNumeratorBits": 63,
+      "denominatorBits": 59,
+      "quaternionComponentBits": 32,
+      "approxCanonicalBytes": 2140,
+      "resolve": {
+        "unit": "microseconds",
+        "count": 20,
+        "p50": 1398.927,
+        "p95": 7269.868,
+        "max": 7269.868
+      }
+    },
+    {
+      "depth": 32,
+      "maxNumeratorBits": 127,
+      "denominatorBits": 122,
+      "quaternionComponentBits": 63,
+      "approxCanonicalBytes": 3969,
+      "resolve": {
+        "unit": "microseconds",
+        "count": 20,
+        "p50": 3064.877,
+        "p95": 6046.974,
+        "max": 6046.974
+      }
+    },
+    {
+      "depth": 64,
+      "maxNumeratorBits": 254,
+      "denominatorBits": 247,
+      "quaternionComponentBits": 125,
+      "approxCanonicalBytes": 7622,
+      "resolve": {
+        "unit": "microseconds",
+        "count": 20,
+        "p50": 11063.275,
+        "p95": 16369.399,
+        "max": 16369.399
+      }
+    }
+  ]
+}

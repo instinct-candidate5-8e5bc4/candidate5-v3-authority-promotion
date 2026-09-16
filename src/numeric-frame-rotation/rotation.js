@@ -1,0 +1,5 @@
+'use strict';const {LIMITS,parse,gcd,checked,reduce}=require('./integer');
+function quaternion(q,{strict=false}={}){if(!Array.isArray(q)||q.length!==4)throw Error('MALFORMED_ROTATION');let x=q.map(s=>parse(s,{bits:LIMITS.quaternionComponentBits}));if(x.every(v=>v===0n))throw Error('ZERO_QUATERNION');let g=x.reduce(gcd);x=x.map(v=>v/g);if(x.find(v=>v!==0n)<0n)x=x.map(v=>-v);const out=x.map(String);if(strict&&JSON.stringify(out)!==JSON.stringify(q))throw Error('NONCANONICAL_ROTATION');return Object.freeze(out)}
+function multiply(a,b){const [w,x,y,z]=quaternion(a).map(BigInt),[W,X,Y,Z]=quaternion(b).map(BigInt);return quaternion([checked(w*W-x*X-y*Y-z*Z),checked(w*X+x*W+y*Z-z*Y),checked(w*Y-x*Z+y*W+z*X),checked(w*Z+x*Y-y*X+z*W)].map(String))}
+function matrix(q){const [w,x,y,z]=quaternion(q).map(BigInt),d=checked(w*w+x*x+y*y+z*z),n=[[w*w+x*x-y*y-z*z,2n*(x*y-w*z),2n*(x*z+w*y)],[2n*(x*y+w*z),w*w-x*x+y*y-z*z,2n*(y*z-w*x)],[2n*(x*z-w*y),2n*(y*z+w*x),w*w-x*x-y*y+z*z]].map(r=>r.map(v=>checked(v)));return Object.freeze({numerators:Object.freeze(n.map(r=>Object.freeze(r.map(String)))),denominator:String(d)})}
+module.exports={quaternion,multiply,matrix};

@@ -1,0 +1,104 @@
+TAP version 13
+# Subtest: microunit scale and integer bounds are locked
+ok 1 - microunit scale and integer bounds are locked
+  ---
+  type: 'test'
+  ...
+# Subtest: quaternion equivalence has one canonical encoding and digest
+ok 2 - quaternion equivalence has one canonical encoding and digest
+  ---
+  type: 'test'
+  ...
+# Subtest: strict quaternion rejects noncanonical and malformed forms
+ok 3 - strict quaternion rejects noncanonical and malformed forms
+  ---
+  type: 'test'
+  ...
+# Subtest: exact matrices cover identity, 90 and 180 axes, non-axis
+ok 4 - exact matrices cover identity, 90 and 180 axes, non-axis
+  ---
+  type: 'test'
+  ...
+# Subtest: rotation composition is canonical and exact
+ok 5 - rotation composition is canonical and exact
+  ---
+  type: 'test'
+  ...
+# Subtest: rounding ties-to-even exact positive negative symmetry
+ok 6 - rounding ties-to-even exact positive negative symmetry
+  ---
+  type: 'test'
+  ...
+# Subtest: materialization exposes exact errors and bound
+ok 7 - materialization exposes exact errors and bound
+  ---
+  type: 'test'
+  ...
+# Subtest: materialization overflow fails closed
+ok 8 - materialization overflow fails closed
+  ---
+  type: 'test'
+  ...
+# Subtest: frame graph validates one world and all frame kinds
+ok 9 - frame graph validates one world and all frame kinds
+  ---
+  type: 'test'
+  ...
+# Subtest: same graph insertion order and repeated resolve are byte identical
+ok 10 - same graph insertion order and repeated resolve are byte identical
+  ---
+  type: 'test'
+  ...
+# Subtest: exact mixed chain preserves local parent and world spaces
+ok 11 - exact mixed chain preserves local parent and world spaces
+  ---
+  type: 'test'
+  ...
+# Subtest: composition is exactly associative before quantization
+ok 12 - composition is exactly associative before quantization
+  ---
+  type: 'test'
+  ...
+# Subtest: oriented surface readiness representations
+ok 13 - oriented surface readiness representations
+  ---
+  type: 'test'
+  ...
+# Subtest: parent revision invalidates cached descendant snapshot
+ok 14 - parent revision invalidates cached descendant snapshot
+  ---
+  type: 'test'
+  ...
+# Subtest: graph negative matrix fails closed
+ok 15 - graph negative matrix fails closed
+  ---
+  type: 'test'
+  ...
+# Subtest: self direct and indirect cycles reject before digest interpretation
+ok 16 - self direct and indirect cycles reject before digest interpretation
+  ---
+  type: 'test'
+  ...
+# Subtest: unsafe number and malformed translation rejected
+ok 17 - unsafe number and malformed translation rejected
+  ---
+  type: 'test'
+  ...
+# Subtest: different transforms have different snapshot digests
+ok 18 - different transforms have different snapshot digests
+  ---
+  type: 'test'
+  ...
+# Subtest: measurement-only numeric substrate costs and rational growth
+ok 19 - measurement-only numeric substrate costs and rational growth
+  ---
+  type: 'test'
+  ...
+1..19
+# tests 19
+# suites 0
+# pass 19
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
