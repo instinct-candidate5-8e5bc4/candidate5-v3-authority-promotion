@@ -1,0 +1,1 @@
+{"$schema":"https://json-schema.org/draft/2020-12/schema","title":"Typed Support Category v1","type":"object","required":["supportCategoryId","supportSemanticType","provenanceStatus","fixtureOnly","categoryDigest"],"description":"Semantic kind is general FLOOR or SUPPORT_SURFACE; scene identity and provenance are separate."}

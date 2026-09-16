@@ -1,0 +1,1 @@
+{"$schema":"https://json-schema.org/draft/2020-12/schema","title":"Subject Profile Definition v1","type":"object","required":["schemaVersion","profileDefinitionId","profileRevision","subjectSex","status","profileDigest"],"description":"Subject classification belongs to profile/entity semantics, not collision geometry."}
