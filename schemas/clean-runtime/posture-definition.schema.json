@@ -1,0 +1,1 @@
+{"$schema":"https://json-schema.org/draft/2020-12/schema","title":"PostureDefinition v1","type":"object","required":["schemaVersion","postureDefinitionId","postureRevision","profileId","postureId","bodyRef","contactExpectations","allowedSupportTypes","orientationConstraints","status","canonicalDigest"],"additionalProperties":false}

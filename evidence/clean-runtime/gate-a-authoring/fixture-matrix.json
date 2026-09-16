@@ -1,0 +1,42 @@
+{
+  "syntheticOnly": true,
+  "positive": [
+    "compound AABB body",
+    "derived aggregate/projection",
+    "footprint",
+    "contact region",
+    "posture exact binding",
+    "support entity",
+    "support surface",
+    "deterministic materialization",
+    "revision change",
+    "canonical equality",
+    "review record"
+  ],
+  "negative": [
+    "malformed schema",
+    "unknown primitive",
+    "non-finite",
+    "overflow",
+    "zero dimension",
+    "negative dimension",
+    "invalid frame",
+    "invalid origin",
+    "duplicate component",
+    "aggregate mismatch",
+    "invalid footprint",
+    "invalid contact",
+    "unknown support",
+    "rotated body",
+    "rotated support",
+    "non-horizontal surface",
+    "stale body",
+    "stale owner",
+    "digest mismatch",
+    "review required",
+    "lifecycle bypass",
+    "pre-claimed verified status"
+  ],
+  "passed": 26,
+  "failed": 0
+}

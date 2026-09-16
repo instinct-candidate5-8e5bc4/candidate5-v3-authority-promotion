@@ -1,0 +1,1 @@
+{"$schema":"https://json-schema.org/draft/2020-12/schema","title":"PhysicalSupportEntity v1","type":"object","required":["schemaVersion","entityDefinitionId","entityRevision","semanticType","physicalBodyRef","transform","supportSurfaceRefs","dependencyPolicy","status","entityDigest"],"additionalProperties":false}
