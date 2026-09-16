@@ -1,0 +1,166 @@
+TAP version 13
+# Subtest: valid synthetic compound derives conservative aggregate and digest
+ok 1 - valid synthetic compound derives conservative aggregate and digest
+  ---
+  duration_ms: 7.750554
+  type: 'test'
+  ...
+# Subtest: malformed rejects closed
+ok 2 - malformed rejects closed
+  ---
+  duration_ms: 0.6282
+  type: 'test'
+  ...
+# Subtest: unknown primitive rejects closed
+ok 3 - unknown primitive rejects closed
+  ---
+  duration_ms: 0.398401
+  type: 'test'
+  ...
+# Subtest: nonfinite rejects closed
+ok 4 - nonfinite rejects closed
+  ---
+  duration_ms: 0.592884
+  type: 'test'
+  ...
+# Subtest: overflow rejects closed
+ok 5 - overflow rejects closed
+  ---
+  duration_ms: 0.365749
+  type: 'test'
+  ...
+# Subtest: zero dimension rejects closed
+ok 6 - zero dimension rejects closed
+  ---
+  duration_ms: 0.357362
+  type: 'test'
+  ...
+# Subtest: negative dimension rejects closed
+ok 7 - negative dimension rejects closed
+  ---
+  duration_ms: 0.427818
+  type: 'test'
+  ...
+# Subtest: bad frame rejects closed
+ok 8 - bad frame rejects closed
+  ---
+  duration_ms: 0.317355
+  type: 'test'
+  ...
+# Subtest: bad origin rejects closed
+ok 9 - bad origin rejects closed
+  ---
+  duration_ms: 0.895401
+  type: 'test'
+  ...
+# Subtest: duplicate component rejects closed
+ok 10 - duplicate component rejects closed
+  ---
+  duration_ms: 0.919371
+  type: 'test'
+  ...
+# Subtest: aggregate mismatch rejects closed
+ok 11 - aggregate mismatch rejects closed
+  ---
+  duration_ms: 0.422981
+  type: 'test'
+  ...
+# Subtest: bad footprint rejects closed
+ok 12 - bad footprint rejects closed
+  ---
+  duration_ms: 0.363823
+  type: 'test'
+  ...
+# Subtest: bad contact rejects closed
+ok 13 - bad contact rejects closed
+  ---
+  duration_ms: 0.280615
+  type: 'test'
+  ...
+# Subtest: unknown support rejects closed
+ok 14 - unknown support rejects closed
+  ---
+  duration_ms: 0.282162
+  type: 'test'
+  ...
+# Subtest: rotated body rejects closed
+ok 15 - rotated body rejects closed
+  ---
+  duration_ms: 0.250241
+  type: 'test'
+  ...
+# Subtest: digest mismatch rejects closed
+ok 16 - digest mismatch rejects closed
+  ---
+  duration_ms: 0.576135
+  type: 'test'
+  ...
+# Subtest: valid posture binds exact body revision
+ok 17 - valid posture binds exact body revision
+  ---
+  duration_ms: 1.357879
+  type: 'test'
+  ...
+# Subtest: meaningful change requires new revision and invalidates old proof
+ok 18 - meaningful change requires new revision and invalidates old proof
+  ---
+  duration_ms: 3.359195
+  type: 'test'
+  ...
+# Subtest: logical object insertion order is canonical byte identical
+ok 19 - logical object insertion order is canonical byte identical
+  ---
+  duration_ms: 1.767717
+  type: 'test'
+  ...
+# Subtest: valid synthetic support entity and horizontal surface materialize deterministically
+ok 20 - valid synthetic support entity and horizontal surface materialize deterministically
+  ---
+  duration_ms: 6.720468
+  type: 'test'
+  ...
+# Subtest: rotated support rejects
+ok 21 - rotated support rejects
+  ---
+  duration_ms: 1.090594
+  type: 'test'
+  ...
+# Subtest: non-horizontal support rejects
+ok 22 - non-horizontal support rejects
+  ---
+  duration_ms: 0.917035
+  type: 'test'
+  ...
+# Subtest: stale owner/body references reject
+ok 23 - stale owner/body references reject
+  ---
+  duration_ms: 0.685873
+  type: 'test'
+  ...
+# Subtest: review required before VERIFIED_FOR_SLICE
+ok 24 - review required before VERIFIED_FOR_SLICE
+  ---
+  duration_ms: 2.081967
+  type: 'test'
+  ...
+# Subtest: lifecycle is closed and evidence-gated
+ok 25 - lifecycle is closed and evidence-gated
+  ---
+  duration_ms: 2.277206
+  type: 'test'
+  ...
+# Subtest: validator cannot accept pre-claimed VERIFIED status
+ok 26 - validator cannot accept pre-claimed VERIFIED status
+  ---
+  duration_ms: 0.468005
+  type: 'test'
+  ...
+1..26
+# tests 26
+# suites 0
+# pass 26
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 283.031032

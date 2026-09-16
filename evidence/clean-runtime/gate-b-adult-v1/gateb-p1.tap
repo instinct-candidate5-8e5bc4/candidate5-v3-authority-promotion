@@ -1,0 +1,88 @@
+TAP version 13
+# Subtest: clinic fail-5930234b remains fail-closed before render without auto-fix
+ok 1 - clinic fail-5930234b remains fail-closed before render without auto-fix
+  ---
+  duration_ms: 2.342871
+  type: 'test'
+  ...
+# Subtest: closed Phase 1 enums and scene contract
+ok 2 - closed Phase 1 enums and scene contract
+  ---
+  duration_ms: 2.02927
+  type: 'test'
+  ...
+# Subtest: P1-G01 through P1-G18 have deterministic categories
+ok 3 - P1-G01 through P1-G18 have deterministic categories
+  ---
+  duration_ms: 1.929458
+  type: 'test'
+  ...
+# Subtest: existing runtime has no verified architecture connection
+ok 4 - existing runtime has no verified architecture connection
+  ---
+  duration_ms: 3.860375
+  type: 'test'
+  ...
+# Subtest: readiness cannot be promoted
+ok 5 - readiness cannot be promoted
+  ---
+  duration_ms: 5.216508
+  type: 'test'
+  ...
+# Subtest: immutable idempotent deterministic registry and import revalidation
+ok 6 - immutable idempotent deterministic registry and import revalidation
+  ---
+  duration_ms: 9.121465
+  type: 'test'
+  ...
+# Subtest: three scene shapes use one exact query path without fallback
+ok 7 - three scene shapes use one exact query path without fallback
+  ---
+  duration_ms: 24.354096
+  type: 'test'
+  ...
+# Subtest: architecture has no fixture identities, renderer types, placement constants or fallback methods
+ok 8 - architecture has no fixture identities, renderer types, placement constants or fallback methods
+  ---
+  duration_ms: 3.158719
+  type: 'test'
+  ...
+# Subtest: valid synthetic full-footprint shape
+ok 9 - valid synthetic full-footprint shape
+  ---
+  duration_ms: 1.567778
+  type: 'test'
+  ...
+# Subtest: origin legal but chair footprint intersects locker fails
+ok 10 - origin legal but chair footprint intersects locker fails
+  ---
+  duration_ms: 1.008946
+  type: 'test'
+  ...
+# Subtest: origin-only proof fails
+ok 11 - origin-only proof fails
+  ---
+  duration_ms: 0.317108
+  type: 'test'
+  ...
+# Subtest: absence of forbidden hit is not positive permission
+ok 12 - absence of forbidden hit is not positive permission
+  ---
+  duration_ms: 0.270001
+  type: 'test'
+  ...
+# Subtest: stale surface proof fails G18
+ok 13 - stale surface proof fails G18
+  ---
+  duration_ms: 0.416763
+  type: 'test'
+  ...
+1..13
+# tests 13
+# suites 0
+# pass 13
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 787.160484

@@ -1,0 +1,12 @@
+e87787e8a32803e73ec6f5ea165cce6fa118e858e3a839e972cec9a239b1113e  docs/clean-runtime-school/gate-b/locked-contract-gap-proposal.md
+70c5ce945950fd7cd7958ddf7b3838b24d44303748a0f173f61ac7b10dbd81e9  evidence/clean-runtime/gate-b-adult-v1/authority-audit.json
+66e245c8959485113d112faeb03490fbcccd12072f99b8d6b737ccf5a8e8b051  evidence/clean-runtime/gate-b-adult-v1/clean-authority-tests.tap
+2e4bb9ce433548f7f2f6261a8ac2e853442014ffd1e5ede7ed93ec62dc7cd768  evidence/clean-runtime/gate-b-adult-v1/gap-reproduction.json
+15b8fd04843fe256f8ad98fb705596d59d618d019cd902580f51c67500eb793c  evidence/clean-runtime/gate-b-adult-v1/gate-a-tests.tap
+5e397776b414ef827399ec9a81ec6d189b972cfe0f1cc5e42bbedf4534cd5937  evidence/clean-runtime/gate-b-adult-v1/gate-result.json
+5e47871ddd5cfd3eb5dcd6515a2c2b5d05ac12848d5f2e7f96e07ec149950f00  evidence/clean-runtime/gate-b-adult-v1/gateb-p1.tap
+20b80f22900e2ff0b47407b776721e5184c620853054ba8afccf577cb5e047fb  evidence/clean-runtime/gate-b-adult-v1/gateb-p2.tap
+e848dd2e997cbc3a0a4a0b3ae884b5bd3835ba73591a14cb08cd8dd454f0eb79  evidence/clean-runtime/gate-b-adult-v1/phase2-manifest-digest.txt
+aebcb64bb845f8dc2683124212bf049ee3fb22f41c180b5685ee72026a1fec8a  evidence/clean-runtime/gate-b-adult-v1/reproduction-output.json
+38a69fc8c5c6a706985705b284df0aeb655b997f19b3e8fed1a73c2164ee5b9c  evidence/clean-runtime/gate-b-adult-v1/school-adapter-tests.tap
+40cfe8797a631ea5d7e56da5a6e6d5ce9b26355753b5cdd780f0f4042facfe55  evidence/clean-runtime/gate-b-adult-v1/unknowns.json

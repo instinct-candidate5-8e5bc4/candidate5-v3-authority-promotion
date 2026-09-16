@@ -1,0 +1,18 @@
+{
+  "schoolFloor": {
+    "status": "REJECTED",
+    "failure": {
+      "code": "UNKNOWN_SUPPORT_TYPE",
+      "path": "allowedSupportTypes",
+      "detail": null
+    }
+  },
+  "semanticPosture": {
+    "status": "REJECTED",
+    "failure": {
+      "code": "INVALID_ID",
+      "path": "postureId",
+      "detail": null
+    }
+  }
+}

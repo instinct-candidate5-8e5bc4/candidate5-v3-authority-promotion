@@ -1,0 +1,20 @@
+{
+  "lockedGateACommit": "5c6ca4be9150090769e77f33da41a773d4723b3d",
+  "result": "HARD_STOP",
+  "reproductions": [
+    {
+      "input": "allowedSupportTypes: [SCHOOL_FLOOR]",
+      "lockedBehavior": "REJECTED / UNKNOWN_SUPPORT_TYPE",
+      "conflict": "Gate B requires real School floor; synthetic alias is prohibited"
+    },
+    {
+      "input": "postureId: SUPINE_FLOOR",
+      "lockedBehavior": "REJECTED / INVALID_ID",
+      "conflict": "Gate B requires exact semantic posture; lowercase alias is not authorized"
+    }
+  ],
+  "bodyAuthored": false,
+  "dimensionsCommitted": false,
+  "phase2Change": false,
+  "schoolAdapterChange": false
+}
