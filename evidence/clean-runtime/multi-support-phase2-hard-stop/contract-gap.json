@@ -1,0 +1,15 @@
+{
+  "gate":"MULTI-SUPPORT CONTRACT EXTENSION",
+  "result":"HARD_STOP",
+  "requiredNextGate":"PHASE_2_MULTI_SUPPORT_EXTENSION",
+  "lockedPhase2Modified":false,
+  "cleanRuntimeModified":false,
+  "blockingFacts":[
+    "Phase 2 request has one surfaceId and one surfaceModelRef",
+    "Phase 2 validates whole submitted geometry minY against one horizontal planeY",
+    "Phase 2 permits support contact only on FLOOR or SUPPORT_SURFACE",
+    "Phase 2 rejects WALL contact as SURFACE_TYPE_FORBIDDEN_FOR_CONTACT",
+    "per-contact geometry submissions would omit full-body collision unless a separate full-body collision pass is contracted"
+  ],
+  "forbiddenWorkarounds":["first relation wins","last relation wins","relabel WALL as SUPPORT_SURFACE","submit contact slices without full-body collision proof","borrow one relation proof for another"]
+}

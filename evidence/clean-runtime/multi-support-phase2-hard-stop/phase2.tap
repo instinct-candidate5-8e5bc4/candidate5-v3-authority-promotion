@@ -1,0 +1,238 @@
+TAP version 13
+# Subtest: contract uses one million integer microunits per authored unit
+ok 1 - contract uses one million integer microunits per authored unit
+  ---
+  duration_ms: 0.758956
+  type: 'test'
+  ...
+# Subtest: identical decimal 0.08 has exact identical representation
+ok 2 - identical decimal 0.08 has exact identical representation
+  ---
+  duration_ms: 0.218422
+  type: 'test'
+  ...
+# Subtest: rounds nearest microunit with half away from zero
+ok 3 - rounds nearest microunit with half away from zero
+  ---
+  duration_ms: 0.123727
+  type: 'test'
+  ...
+# Subtest: negative authored values preserve sign
+ok 4 - negative authored values preserve sign
+  ---
+  duration_ms: 0.104855
+  type: 'test'
+  ...
+# Subtest: near contract magnitude limit remains safe integer
+ok 5 - near contract magnitude limit remains safe integer
+  ---
+  duration_ms: 0.167431
+  type: 'test'
+  ...
+# Subtest: overflow and non-finite coordinates fail closed
+ok 6 - overflow and non-finite coordinates fail closed
+  ---
+  duration_ms: 0.424628
+  type: 'test'
+  ...
+# Subtest: partial footprint outside deterministically fails
+ok 7 - partial footprint outside deterministically fails
+  ---
+  duration_ms: 3.236269
+  type: 'test'
+  ...
+# Subtest: full footprint outside deterministically fails
+ok 8 - full footprint outside deterministically fails
+  ---
+  duration_ms: 1.76266
+  type: 'test'
+  ...
+# Subtest: wall penetration deterministically fails
+ok 9 - wall penetration deterministically fails
+  ---
+  duration_ms: 0.559021
+  type: 'test'
+  ...
+# Subtest: door penetration deterministically fails
+ok 10 - door penetration deterministically fails
+  ---
+  duration_ms: 0.48324
+  type: 'test'
+  ...
+# Subtest: obstacle penetration deterministically fails
+ok 11 - obstacle penetration deterministically fails
+  ---
+  duration_ms: 0.561727
+  type: 'test'
+  ...
+# Subtest: floating deterministically fails
+ok 12 - floating deterministically fails
+  ---
+  duration_ms: 0.44263
+  type: 'test'
+  ...
+# Subtest: support penetration deterministically fails
+ok 13 - support penetration deterministically fails
+  ---
+  duration_ms: 1.299205
+  type: 'test'
+  ...
+# Subtest: wrong surface id deterministically fails
+ok 14 - wrong surface id deterministically fails
+  ---
+  duration_ms: 0.438345
+  type: 'test'
+  ...
+# Subtest: forbidden surface type deterministically fails
+ok 15 - forbidden surface type deterministically fails
+  ---
+  duration_ms: 0.736574
+  type: 'test'
+  ...
+# Subtest: bad orientation deterministically fails
+ok 16 - bad orientation deterministically fails
+  ---
+  duration_ms: 0.728405
+  type: 'test'
+  ...
+# Subtest: UNKNOWN surface fails closed
+ok 17 - UNKNOWN surface fails closed
+  ---
+  duration_ms: 0.409192
+  type: 'test'
+  ...
+# Subtest: stale mismatched proof fails
+ok 18 - stale mismatched proof fails
+  ---
+  duration_ms: 0.505804
+  type: 'test'
+  ...
+# Subtest: missing evidence fails
+ok 19 - missing evidence fails
+  ---
+  duration_ms: 6.575298
+  type: 'test'
+  ...
+# Subtest: mismatched geometry digest fails
+ok 20 - mismatched geometry digest fails
+  ---
+  duration_ms: 0.592647
+  type: 'test'
+  ...
+# Subtest: geometry changed after proof fails
+ok 21 - geometry changed after proof fails
+  ---
+  duration_ms: 0.40772
+  type: 'test'
+  ...
+# Subtest: multi-failure precedence is evidence before stale/contact/collision/containment and stable across runs
+ok 22 - multi-failure precedence is evidence before stale/contact/collision/containment and stable across runs
+  ---
+  duration_ms: 0.621083
+  type: 'test'
+  ...
+# Subtest: multi-failure precedence is stale before contact/collision/containment
+ok 23 - multi-failure precedence is stale before contact/collision/containment
+  ---
+  duration_ms: 0.720919
+  type: 'test'
+  ...
+# Subtest: multi-failure precedence is contact before door collision and containment
+ok 24 - multi-failure precedence is contact before door collision and containment
+  ---
+  duration_ms: 1.148982
+  type: 'test'
+  ...
+# Subtest: multi-failure precedence is door collision before containment
+ok 25 - multi-failure precedence is door collision before containment
+  ---
+  duration_ms: 0.820909
+  type: 'test'
+  ...
+# Subtest: pixel evidence cannot rescue illegal geometry
+ok 26 - pixel evidence cannot rescue illegal geometry
+  ---
+  duration_ms: 2.352975
+  type: 'test'
+  ...
+# Subtest: Geometry PASS makes no visual correctness claim
+ok 27 - Geometry PASS makes no visual correctness claim
+  ---
+  duration_ms: 0.767674
+  type: 'test'
+  ...
+# Subtest: all three Surface Models carry required explicit chain and provenance
+ok 28 - all three Surface Models carry required explicit chain and provenance
+  ---
+  duration_ms: 4.432792
+  type: 'test'
+  ...
+# Subtest: canonical proof reruns are byte-identical
+ok 29 - canonical proof reruns are byte-identical
+  ---
+  duration_ms: 4.795705
+  type: 'test'
+  ...
+# Subtest: provenance ledger excludes industrial and keeps synagogue UNKNOWN
+ok 30 - provenance ledger excludes industrial and keeps synagogue UNKNOWN
+  ---
+  duration_ms: 0.627401
+  type: 'test'
+  ...
+# Subtest: school real-source legal positive
+ok 31 - school real-source legal positive
+  ---
+  duration_ms: 2.640923
+  type: 'test'
+  ...
+# Subtest: clinic real-source legal positive
+ok 32 - clinic real-source legal positive
+  ---
+  duration_ms: 0.675068
+  type: 'test'
+  ...
+# Subtest: urban real-source legal positive
+ok 33 - urban real-source legal positive
+  ---
+  duration_ms: 0.576188
+  type: 'test'
+  ...
+# Subtest: original authored School bag y=.18 is rejected as floating, not moved
+ok 34 - original authored School bag y=.18 is rejected as floating, not moved
+  ---
+  duration_ms: 1.853494
+  type: 'test'
+  ...
+# Subtest: bag in door region is rejected by Geometry Gate
+ok 35 - bag in door region is rejected by Geometry Gate
+  ---
+  duration_ms: 0.648653
+  type: 'test'
+  ...
+# Subtest: clinic cart penetration is rejected
+ok 36 - clinic cart penetration is rejected
+  ---
+  duration_ms: 0.461995
+  type: 'test'
+  ...
+# Subtest: Phase 2 has no fallback, clamp, snap, runtime adapter or promotion API
+ok 37 - Phase 2 has no fallback, clamp, snap, runtime adapter or promotion API
+  ---
+  duration_ms: 2.617606
+  type: 'test'
+  ...
+# Subtest: locked runtime and Phase 1 are unchanged from base
+ok 38 - locked runtime and Phase 1 are unchanged from base
+  ---
+  duration_ms: 8.14335
+  type: 'test'
+  ...
+1..38
+# tests 38
+# suites 0
+# pass 38
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 459.731938
