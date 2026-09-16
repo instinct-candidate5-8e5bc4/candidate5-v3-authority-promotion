@@ -1,0 +1,112 @@
+TAP version 13
+# Subtest: PROFILE definition bytes/digest unchanged through all envelope states
+ok 1 - PROFILE definition bytes/digest unchanged through all envelope states
+  ---
+  duration_ms: 2.268538
+  type: 'test'
+  ...
+# Subtest: POSTURE definition bytes/digest unchanged through all envelope states
+ok 2 - POSTURE definition bytes/digest unchanged through all envelope states
+  ---
+  duration_ms: 0.376252
+  type: 'test'
+  ...
+# Subtest: PHYSICAL_BODY definition bytes/digest unchanged through all envelope states
+ok 3 - PHYSICAL_BODY definition bytes/digest unchanged through all envelope states
+  ---
+  duration_ms: 0.835621
+  type: 'test'
+  ...
+# Subtest: exact Gate B refs and review admission succeed
+ok 4 - exact Gate B refs and review admission succeed
+  ---
+  duration_ms: 0.554339
+  type: 'test'
+  ...
+# Subtest: wrong digest rejects closed
+ok 5 - wrong digest rejects closed
+  ---
+  duration_ms: 0.364847
+  type: 'test'
+  ...
+# Subtest: wrong revision rejects closed
+ok 6 - wrong revision rejects closed
+  ---
+  duration_ms: 0.155211
+  type: 'test'
+  ...
+# Subtest: review other digest rejects closed
+ok 7 - review other digest rejects closed
+  ---
+  duration_ms: 0.246899
+  type: 'test'
+  ...
+# Subtest: review other revision rejects closed
+ok 8 - review other revision rejects closed
+  ---
+  duration_ms: 0.140716
+  type: 'test'
+  ...
+# Subtest: scope mismatch rejects closed
+ok 9 - scope mismatch rejects closed
+  ---
+  duration_ms: 1.294341
+  type: 'test'
+  ...
+# Subtest: missing review rejects closed
+ok 10 - missing review rejects closed
+  ---
+  duration_ms: 0.627584
+  type: 'test'
+  ...
+# Subtest: unknown state rejects closed
+ok 11 - unknown state rejects closed
+  ---
+  duration_ms: 0.304486
+  type: 'test'
+  ...
+# Subtest: envelope digest mismatch and malformed reject
+ok 12 - envelope digest mismatch and malformed reject
+  ---
+  duration_ms: 0.475099
+  type: 'test'
+  ...
+# Subtest: invalid transitions and unverified admission reject
+ok 13 - invalid transitions and unverified admission reject
+  ---
+  duration_ms: 0.848511
+  type: 'test'
+  ...
+# Subtest: review is not transitive to same ID new revision or other definition
+ok 14 - review is not transitive to same ID new revision or other definition
+  ---
+  duration_ms: 0.314091
+  type: 'test'
+  ...
+# Subtest: supersession preserves prior immutable history
+ok 15 - supersession preserves prior immutable history
+  ---
+  duration_ms: 0.474626
+  type: 'test'
+  ...
+# Subtest: logical envelope insertion order canonicalizes identically
+ok 16 - logical envelope insertion order canonicalizes identically
+  ---
+  duration_ms: 0.297334
+  type: 'test'
+  ...
+# Subtest: old embedded lifecycle mutator cannot create second truth
+ok 17 - old embedded lifecycle mutator cannot create second truth
+  ---
+  duration_ms: 0.158662
+  type: 'test'
+  ...
+1..17
+# tests 17
+# suites 0
+# pass 17
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 99.770909

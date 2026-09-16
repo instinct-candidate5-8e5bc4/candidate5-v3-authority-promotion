@@ -1,0 +1,22 @@
+{
+  "gate": "GATE C LIFECYCLE ADMISSION",
+  "result": "PASS",
+  "reviewId": "gate-c-user-review-0c27c92",
+  "scope": "SCHOOL_VERTICAL_SLICE|TREATMENT_CHAIR_R1|SEAT_SUPPORT_SURFACE_R1|PHYSICAL_SUPPORT_AND_DEPENDENCY_VALIDATION",
+  "body": {
+    "digest": "1e78439ad5977c6c050475b4ac692cee9fce7da034725ea88a7ed4f0b0803247",
+    "lifecycle": "VERIFIED_FOR_SLICE",
+    "envelopeDigest": "2c63e1e6328acd25bf8c8ef47724bf92a065a4ef3233cd1233fb862098a127a5"
+  },
+  "surface": {
+    "digest": "08028ddd3faa51edaba2c202b44f91c18e3f60ac5c74b353a14d4ab89ba5501d",
+    "lifecycle": "VERIFIED_FOR_SLICE",
+    "envelopeDigest": "6fcb5cea101135958bed3a49cfe4b235dbbcba0073fdd9773e66003bcc7089e2"
+  },
+  "unknowns": [
+    "Load capacity and structural strength not modeled",
+    "No visual binding",
+    "No seated adult casualty definition",
+    "Persistent registry storage remains outside gate"
+  ]
+}

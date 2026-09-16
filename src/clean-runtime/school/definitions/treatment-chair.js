@@ -11,4 +11,8 @@ const rawSurface={schemaVersion:'1.0.0',supportSurfaceId:'school/treatment-chair
 const SURFACE=A.validateSupportSurface(rawSurface,ENTITY).definition;
 const SURFACE_ENVELOPE=A.transitionEnvelope(A.createDraft({envelopeId:'gate-c-treatment-chair-seat-v1',definitionRef:A.refFor('SUPPORT_SURFACE',SURFACE),limitations:['SEAT_ONLY','IDENTITY_ORIENTATION_TRANSLATION_ONLY','NOT_REVIEWED_FOR_SLICE']}),'VALIDATED',{validationEvidenceRefs:['gate-c-chair-definition-tests']});
 const BODY_ENVELOPE=A.transitionEnvelope(A.createDraft({envelopeId:'gate-c-treatment-chair-body-v1',definitionRef:A.refFor('PHYSICAL_BODY',BODY),limitations:['PHYSICAL_ONLY_NO_VISUAL_BINDING','IDENTITY_ORIENTATION_TRANSLATION_ONLY','NOT_REVIEWED_FOR_SLICE']}),'VALIDATED',{validationEvidenceRefs:['gate-c-chair-definition-tests']});
-module.exports={BODY,ENTITY,SURFACE,BODY_ENVELOPE,SURFACE_ENVELOPE,decisionId};
+const REVIEW_SCOPE='SCHOOL_VERTICAL_SLICE|TREATMENT_CHAIR_R1|SEAT_SUPPORT_SURFACE_R1|PHYSICAL_SUPPORT_AND_DEPENDENCY_VALIDATION';
+const REVIEW={reviewId:'gate-c-user-review-0c27c92',reviewDecision:'APPROVED_FOR_SLICE',reviewScope:REVIEW_SCOPE,reviewEvidenceRefs:['authority:USER_GATE_REVIEW','commit:0c27c92bb10e6af6e7f4e4fcb61a4a9cdc3e6d45','package-sha256:6efc8f2d860e3b88f307390eab11b14f629a975682365dd8c2aab1d3df2e9e37','whatsapp:wamid.HBgMOTcyNTMyNDkwMzUxFQIAEhgUM0FDNEJFREQzQzM5NUY2OTRERkIA','evidence:gate-c-28-of-28','evidence:ast-pass-geometry-call-sites-1']};
+function promote(validated){const r={...REVIEW,reviewedDefinitionDigest:validated.definitionRef.definitionDigest,reviewedDefinitionRevision:validated.definitionRef.revision};return A.transitionEnvelope(A.transitionEnvelope(validated,'REVIEWED',r),'VERIFIED_FOR_SLICE',r)}
+const BODY_VERIFIED_ENVELOPE=promote(BODY_ENVELOPE),SURFACE_VERIFIED_ENVELOPE=promote(SURFACE_ENVELOPE);
+module.exports={BODY,ENTITY,SURFACE,BODY_ENVELOPE,SURFACE_ENVELOPE,BODY_VERIFIED_ENVELOPE,SURFACE_VERIFIED_ENVELOPE,REVIEW_SCOPE,decisionId};

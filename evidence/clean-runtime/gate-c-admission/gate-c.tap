@@ -1,0 +1,179 @@
+TAP version 13
+# Subtest: one AUTHORED_NEW chair body validates and aggregate is derived
+ok 1 - one AUTHORED_NEW chair body validates and aggregate is derived
+  ---
+  duration_ms: 2.078855
+  type: 'test'
+  ...
+# Subtest: entity-owned seat validates and is not whole chair AABB
+ok 2 - entity-owned seat validates and is not whole chair AABB
+  ---
+  duration_ms: 0.337096
+  type: 'test'
+  ...
+# Subtest: local seat materialization is deterministic
+ok 3 - local seat materialization is deterministic
+  ---
+  duration_ms: 0.565879
+  type: 'test'
+  ...
+# Subtest: chair lifecycle remains separate VALIDATED pending USER_GATE_REVIEW
+ok 4 - chair lifecycle remains separate VALIDATED pending USER_GATE_REVIEW
+  ---
+  duration_ms: 1.194351
+  type: 'test'
+  ...
+# Subtest: legal chair placement passes Phase 2 and commits
+ok 5 - legal chair placement passes Phase 2 and commits
+  ---
+  duration_ms: 3.577969
+  type: 'test'
+  ...
+# Subtest: chair floating rejects atomically
+ok 6 - chair floating rejects atomically
+  ---
+  duration_ms: 1.37264
+  type: 'test'
+  ...
+# Subtest: chair wall rejects atomically
+ok 7 - chair wall rejects atomically
+  ---
+  duration_ms: 1.177249
+  type: 'test'
+  ...
+# Subtest: chair door rejects atomically
+ok 8 - chair door rejects atomically
+  ---
+  duration_ms: 1.268915
+  type: 'test'
+  ...
+# Subtest: chair partial-door rejects atomically
+ok 9 - chair partial-door rejects atomically
+  ---
+  duration_ms: 1.974165
+  type: 'test'
+  ...
+# Subtest: chair obstacle rejects atomically
+ok 10 - chair obstacle rejects atomically
+  ---
+  duration_ms: 1.296343
+  type: 'test'
+  ...
+# Subtest: chair partial-outside rejects atomically
+ok 11 - chair partial-outside rejects atomically
+  ---
+  duration_ms: 1.049842
+  type: 'test'
+  ...
+# Subtest: chair full-outside rejects atomically
+ok 12 - chair full-outside rejects atomically
+  ---
+  duration_ms: 0.968944
+  type: 'test'
+  ...
+# Subtest: stale chair body proof rejects closed
+ok 13 - stale chair body proof rejects closed
+  ---
+  duration_ms: 1.168507
+  type: 'test'
+  ...
+# Subtest: wrong-owner dependency rejects with no partial commit
+ok 14 - wrong-owner dependency rejects with no partial commit
+  ---
+  duration_ms: 1.233678
+  type: 'test'
+  ...
+# Subtest: wrong-surface-revision dependency rejects with no partial commit
+ok 15 - wrong-surface-revision dependency rejects with no partial commit
+  ---
+  duration_ms: 8.411291
+  type: 'test'
+  ...
+# Subtest: wrong-surface-digest dependency rejects with no partial commit
+ok 16 - wrong-surface-digest dependency rejects with no partial commit
+  ---
+  duration_ms: 0.861735
+  type: 'test'
+  ...
+# Subtest: wrong-owner-body dependency rejects with no partial commit
+ok 17 - wrong-owner-body dependency rejects with no partial commit
+  ---
+  duration_ms: 0.762937
+  type: 'test'
+  ...
+# Subtest: stale dependency world revision rejects
+ok 18 - stale dependency world revision rejects
+  ---
+  duration_ms: 0.749621
+  type: 'test'
+  ...
+# Subtest: missing owner surface and dangling relation reject
+ok 19 - missing owner surface and dangling relation reject
+  ---
+  duration_ms: 0.705962
+  type: 'test'
+  ...
+# Subtest: support-surface mutation with stale dependent fails closed
+ok 20 - support-surface mutation with stale dependent fails closed
+  ---
+  duration_ms: 1.292633
+  type: 'test'
+  ...
+# Subtest: ReplacePhysicalBody with dependent rejects atomically
+ok 21 - ReplacePhysicalBody with dependent rejects atomically
+  ---
+  duration_ms: 0.767717
+  type: 'test'
+  ...
+# Subtest: remove chair with dependent fails closed
+ok 22 - remove chair with dependent fails closed
+  ---
+  duration_ms: 1.165139
+  type: 'test'
+  ...
+# Subtest: move chair without dependent update fails closed, no auto-drop
+ok 23 - move chair without dependent update fails closed, no auto-drop
+  ---
+  duration_ms: 0.874311
+  type: 'test'
+  ...
+# Subtest: atomic legal chair + dependent transaction commits together
+ok 24 - atomic legal chair + dependent transaction commits together
+  ---
+  duration_ms: 9.890093
+  type: 'test'
+  ...
+# Subtest: atomic invalid pair rejects with exact unchanged state
+ok 25 - atomic invalid pair rejects with exact unchanged state
+  ---
+  duration_ms: 1.35568
+  type: 'test'
+  ...
+# Subtest: successful support transaction replays exact and event tamper/reorder fails
+ok 26 - successful support transaction replays exact and event tamper/reorder fails
+  ---
+  duration_ms: 3.555518
+  type: 'test'
+  ...
+# Subtest: transaction command insertion order gives same candidate state digest
+ok 27 - transaction command insertion order gives same candidate state digest
+  ---
+  duration_ms: 8.329984
+  type: 'test'
+  ...
+# {"environment":{"node":"v22.23.2","platform":"linux","arch":"x64","cpu":"Intel(R) Xeon(R) Processor @ 2.60GHz"},"threshold":null,"materialize":{"unit":"microseconds","count":30,"min":32.444,"p50":41.831,"p95":248.497,"max":519.797},"placement":{"unit":"microseconds","count":30,"min":646.047,"p50":976.998,"p95":3771.236,"max":3828.278},"transaction":{"unit":"microseconds","count":30,"min":1292.503,"p50":1632.114,"p95":8662.262,"max":9948.783},"replay":{"unit":"microseconds","count":30,"min":263.031,"p50":305.732,"p95":521.309,"max":538.657},"finalDigest":"885c3a61a4fb6af23117ed93788e78d40087cab896d6a238ea4cf2659b0e804e"}
+# Subtest: Gate C performance measurements have no threshold
+ok 28 - Gate C performance measurements have no threshold
+  ---
+  duration_ms: 116.172279
+  type: 'test'
+  ...
+1..28
+# tests 28
+# suites 0
+# pass 28
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 342.543163

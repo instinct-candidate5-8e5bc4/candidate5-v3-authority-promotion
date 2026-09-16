@@ -1,0 +1,22 @@
+TAP version 13
+# Subtest: Gate C exact chair and surface review envelopes admit only reviewed refs
+ok 1 - Gate C exact chair and surface review envelopes admit only reviewed refs
+  ---
+  duration_ms: 1.808315
+  type: 'test'
+  ...
+# Subtest: Gate C promotion changes envelopes only, not definition bytes/digests
+ok 2 - Gate C promotion changes envelopes only, not definition bytes/digests
+  ---
+  duration_ms: 0.678825
+  type: 'test'
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 2
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 90.879801
