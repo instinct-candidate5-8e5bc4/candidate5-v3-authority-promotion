@@ -1,0 +1,20 @@
+{
+  "reviewedCommit": "ee0448105268221ea34ff4a204231d4dfadaadc5",
+  "reviewPackageSha256": "8c67d608a9bd9299dd852d83bc4802fc6ca4c4f5216c08c873ac15a3f3a6aa99",
+  "reviewEvidenceId": "gate-b-user-review-ee04481",
+  "exactReviewed": {
+    "profileDigest": "f1d973b4cfbebdfa230fe0257ccfe9c11056a7d07e52c3701d1e6772311bcc41",
+    "postureDigest": "197a806537a3c9d9f629cf2a57d6db4031fa93ebea0618c2e18603f48301745e",
+    "bodyDigest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+  },
+  "dryRunRecomputedDigests": {
+    "AUTHORED_NEW_DRAFT": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3",
+    "VALIDATED": "c025160cb0330f5c6b2f9ea04bbef3c1cfc2efd613ca191eab1dd52e2cc82779",
+    "REVIEWED": "065850042ccf513e68b87c09aa5a43e5fd5bf0477e13a040bcbd4f577323a4e0",
+    "VERIFIED_FOR_SLICE": "75b9182759e0008c85a6441e0aaf70816810cb9a0033d8fc35aeec9ae33ff19f"
+  },
+  "storedDigestAfterEachTransition": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3",
+  "canonicalBytesChanged": true,
+  "promotionExecuted": false,
+  "result": "HARD_STOP"
+}

@@ -1,0 +1,1 @@
+{"gate":"GATE B LIFECYCLE PROMOTION","result":"HARD_STOP","promotionExecuted":false,"physicalDefinitionsChanged":false,"reason":"Locked lifecycle transition changes canonical physical bytes but retains stale reviewed digest. Separate lifecycle envelope contract requires approval."}
