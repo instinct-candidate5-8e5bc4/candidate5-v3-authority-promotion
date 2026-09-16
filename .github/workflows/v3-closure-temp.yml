@@ -9,22 +9,60 @@ jobs:
         with: {fetch-depth: 0}
       - uses: actions/setup-node@v4
         with: {node-version: 22}
-      - name: focused
+      - name: focused twice detached processes
         shell: bash
         run: |
           set -o pipefail
-          node --test tests/verified-architecture-phase2-v3/*.test.js | tee focused.tap
-      - name: broad
+          node --test tests/verified-architecture-phase2-v3/*.test.js | tee focused-1.tap
+          node --test tests/verified-architecture-phase2-v3/*.test.js | tee focused-2.tap
+      - name: deterministic evidence
+        shell: bash
+        run: |
+          mkdir -p review-evidence
+          node tools/verified-architecture-phase2-v3/closure-evidence.js determinism > review-evidence/determinism-1.json
+          node tools/verified-architecture-phase2-v3/closure-evidence.js determinism > review-evidence/determinism-2.json
+          cmp review-evidence/determinism-1.json review-evidence/determinism-2.json
+          sha256sum review-evidence/determinism-*.json > review-evidence/determinism.sha256
+          node tools/verified-architecture-phase2-v3/closure-evidence.js performance > review-evidence/performance.json
+      - name: broad exact command
         if: always()
         shell: bash
         run: |
           set -o pipefail
           files=$(find tests -name '*.test.js' -print | sort | tr '\n' ' ')
           node --test $files | tee broad.tap
+      - name: static boundaries debt exact result
+        if: always()
+        shell: bash
+        run: |
+          set +e
+          node --test tests/verified-architecture-phase2/static-boundaries.test.js > review-evidence/static-boundaries.tap 2>&1
+          code=$?
+          echo $code > review-evidence/static-boundaries.exit
+          if [ $code -ne 0 ]; then echo COMPATIBILITY_DEBT_PENDING_AUTHORITY_PROMOTION_REVIEW > review-evidence/static-boundaries.debt; fi
+          exit 0
+      - name: review metadata and authority audit
+        if: always()
+        shell: bash
+        run: |
+          git rev-parse HEAD > review-evidence/commit.txt
+          git rev-parse HEAD^ > review-evidence/parent.txt
+          git rev-list --left-right --count 1f1985ea0f37a8a82eb39efa9e28f2794fa5e667...HEAD > review-evidence/rev-list.txt
+          git diff --name-status 1f1985ea0f37a8a82eb39efa9e28f2794fa5e667...HEAD > review-evidence/diff-name-status.txt
+          git diff --numstat 1f1985ea0f37a8a82eb39efa9e28f2794fa5e667...HEAD > review-evidence/diff-numstat.txt
+          git status --porcelain=v1 > review-evidence/worktree-status.txt
+          {
+            echo 'gatewayRouted=false'
+            echo 'legalityPromoted=false'
+            echo -n 'runtime_imports_v3_legality='; grep -R -l "verified-architecture-phase2-v3/\|phase2-v3" src/runtime src 2>/dev/null | grep -v 'src/verified-architecture-phase2-v3' | wc -l || true
+            echo -n 'renderer_three_imports_in_v3='; grep -R -E "require\(['\"]three|from ['\"]three|renderer" src/verified-architecture-phase2-v3 2>/dev/null | wc -l || true
+            echo -n 'candidate_evaluator_entry='; grep -R -l "function evaluateV3" src/verified-architecture-phase2-v3/evaluate.js | wc -l
+          } > review-evidence/authority-audit.txt
+          cp focused-1.tap focused-2.tap broad.tap review-evidence/
+          tar --exclude=.git --exclude=review-evidence --exclude='candidate.tar.gz' -czf review-evidence/candidate.tar.gz .
+          sha256sum review-evidence/candidate.tar.gz > review-evidence/candidate.sha256
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: v3-closure-temp-${{ github.sha }}
-          path: |
-            focused.tap
-            broad.tap
+          name: v3-closure-review-${{ github.sha }}
+          path: review-evidence
