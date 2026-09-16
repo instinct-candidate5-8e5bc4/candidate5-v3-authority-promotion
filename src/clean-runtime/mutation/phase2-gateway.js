@@ -1,0 +1,1 @@
+'use strict';const V1=require('../../verified-architecture-phase2/geometry-gate'),V2=V1&&require('../../verified-architecture-phase2').evaluateV2;const requestDigest=require('../../verified-architecture-phase2').requestDigest;function evaluate(version,request,model){return version==='2.0.0'?V2(request,model):V1.evaluate(request,model)}module.exports={evaluate,requestDigest};

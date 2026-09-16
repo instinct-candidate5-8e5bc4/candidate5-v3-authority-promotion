@@ -1,0 +1,27 @@
+{
+  "gate": "MULTI-SUPPORT CLEAN RUNTIME",
+  "result": "PASS",
+  "stateSchemaVersion": "2.0.0",
+  "stateDigest": "841e32555c09e4879f9efe9fcaf80324a51000cc95e246025e6f382fe8389e94",
+  "eventDigest": "83f762b8933e939bf5e23767c39cdade1a9fdc1928b6983e2b39b394f8583020",
+  "index": {
+    "static:synthetic-v2-surfaces:floor": [
+      {
+        "relationId": "a",
+        "supportedEntityId": "supported"
+      }
+    ],
+    "static:synthetic-v2-surfaces:wall": [
+      {
+        "relationId": "b",
+        "supportedEntityId": "supported"
+      }
+    ]
+  },
+  "relationIds": [
+    "a",
+    "b"
+  ],
+  "phase2V2": true,
+  "geometryGateCallSites": 1
+}

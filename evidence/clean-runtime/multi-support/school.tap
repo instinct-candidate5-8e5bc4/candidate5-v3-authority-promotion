@@ -1,0 +1,107 @@
+TAP version 13
+# Subtest: same School state, mutation and pinned proofs are byte-identical
+ok 1 - same School state, mutation and pinned proofs are byte-identical
+  ---
+  duration_ms: 6.927498
+  type: 'test'
+  ...
+# Subtest: raw mutation path latency distribution is recorded without a pass threshold
+ok 2 - raw mutation path latency distribution is recorded without a pass threshold
+  ---
+  duration_ms: 72.628283
+  type: 'test'
+  ...
+# {"unit":"microseconds","count":100,"min":218.15499999999588,"p50":268.11100000000465,"p95":688.524000000001,"max":3801.397999999992,"raw":[218.15499999999588,222.3679999999888,222.50199999999154,223.95600000000115,226.31900000001792,226.37899999999433,226.65299999999888,228.38799999999537,229.42299999999705,231.6810000000089,231.804000000011,233.16400000000215,233.17099999999868,233.34199999999328,233.5819999999984,233.62500000000352,233.8799999999992,234.2440000000181,236.6580000000056,237.86899999998923,238.70999999999754,239.7409999999951,240.24,240.63800000000413,241.1650000000094,241.3569999999936,241.50500000000363,241.6859999999872,241.75700000000688,242.45000000000516,243.83000000000266,244.43399999999826,245.3259999999915,246.25799999999742,246.3249999999988,246.65899999999397,247.23000000000184,248.39399999999046,250.98799999999244,252.7730000000048,256.9250000000096,258.37699999999586,260.97100000001205,261.90799999999115,262.1329999999915,262.99099999999953,263.220000000004,265.11100000000454,265.5340000000024,268.11100000000465,269.42900000000236,269.79599999998527,274.14300000000935,275.3010000000131,275.51400000000115,278.0350000000027,278.0470000000008,280.3480000000036,280.69199999998773,283.180999999999,284.9199999999996,288.62499999999613,289.6299999999883,291.91400000000556,296.3630000000137,298.8239999999962,299.9500000000097,300.2610000000061,302.6430000000033,302.8149999999954,316.229000000007,316.2990000000008,317.5159999999977,325.52900000000307,347.93500000000677,364.4610000000057,372.92099999999095,415.25900000000604,435.5889999999931,465.7669999999996,489.7770000000037,500.19100000000094,509.21900000000164,522.8939999999938,534.8529999999982,540.1289999999932,556.7980000000006,568.4840000000122,569.6910000000059,577.6100000000071,612.4769999999984,618.1230000000113,649.9840000000034,659.2259999999897,688.524000000001,719.8309999999992,766.1680000000075,832.4819999999988,2562.303,3801.397999999992]}
+# Subtest: real school legal bag placement commits exact transform through Phase 2
+ok 3 - real school legal bag placement commits exact transform through Phase 2
+  ---
+  duration_ms: 5.206459
+  type: 'test'
+  ...
+# Subtest: floating fails closed with exact Phase 2 evidence
+ok 4 - floating fails closed with exact Phase 2 evidence
+  ---
+  duration_ms: 1.919639
+  type: 'test'
+  ...
+# Subtest: door fails closed with exact Phase 2 evidence
+ok 5 - door fails closed with exact Phase 2 evidence
+  ---
+  duration_ms: 1.192511
+  type: 'test'
+  ...
+# Subtest: partial-door fails closed with exact Phase 2 evidence
+ok 6 - partial-door fails closed with exact Phase 2 evidence
+  ---
+  duration_ms: 1.034744
+  type: 'test'
+  ...
+# Subtest: locker fails closed with exact Phase 2 evidence
+ok 7 - locker fails closed with exact Phase 2 evidence
+  ---
+  duration_ms: 1.799768
+  type: 'test'
+  ...
+# Subtest: partial-outside fails closed with exact Phase 2 evidence
+ok 8 - partial-outside fails closed with exact Phase 2 evidence
+  ---
+  duration_ms: 1.233034
+  type: 'test'
+  ...
+# Subtest: full-outside fails closed with exact Phase 2 evidence
+ok 9 - full-outside fails closed with exact Phase 2 evidence
+  ---
+  duration_ms: 1.061779
+  type: 'test'
+  ...
+# Subtest: wrong surface id and type preserve Phase 2 reasons
+ok 10 - wrong surface id and type preserve Phase 2 reasons
+  ---
+  duration_ms: 2.34157
+  type: 'test'
+  ...
+# Subtest: stale surface revision and digest are rejected by real Phase 2
+ok 11 - stale surface revision and digest are rejected by real Phase 2
+  ---
+  duration_ms: 7.681781
+  type: 'test'
+  ...
+# Subtest: stale body revision and geometry proof reject without gate reinterpretation
+ok 12 - stale body revision and geometry proof reject without gate reinterpretation
+  ---
+  duration_ms: 2.045744
+  type: 'test'
+  ...
+# Subtest: unsupported scene is UNKNOWN and cannot commit
+ok 13 - unsupported scene is UNKNOWN and cannot commit
+  ---
+  duration_ms: 1.184144
+  type: 'test'
+  ...
+# Subtest: stale WorldState revision rejects before Phase 2 and changes no state
+ok 14 - stale WorldState revision rejects before Phase 2 and changes no state
+  ---
+  duration_ms: 0.688197
+  type: 'test'
+  ...
+# Subtest: missing surface proof/evidence is UNKNOWN and cannot commit
+ok 15 - missing surface proof/evidence is UNKNOWN and cannot commit
+  ---
+  duration_ms: 0.604464
+  type: 'test'
+  ...
+# Subtest: adapter records RECOVERED source lineage without visual authority upgrade
+ok 16 - adapter records RECOVERED source lineage without visual authority upgrade
+  ---
+  duration_ms: 2.186749
+  type: 'test'
+  ...
+1..16
+# tests 16
+# suites 0
+# pass 16
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 280.820246

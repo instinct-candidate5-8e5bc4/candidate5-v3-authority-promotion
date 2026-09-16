@@ -3,7 +3,7 @@ const fs=require('node:fs'),path=require('node:path'),acorn=require('internal/de
 const root=path.resolve(__dirname,'../..'),srcRoot=path.join(root,'src/clean-runtime'),files=[];
 function scanFiles(d){for(const x of fs.readdirSync(d,{withFileTypes:true})){const p=path.join(d,x.name);x.isDirectory()?scanFiles(p):x.name.endsWith('.js')&&files.push(p)}}scanFiles(srcRoot);
 const mutationOwners=new Set(['world/world-store.js','mutation/world-mutation-api.js','contracts/world-state.js','events/replay.js']);
-mutationOwners.add('events/event-log.js');
+mutationOwners.add('events/event-log.js');mutationOwners.add('multi-support/runtime.js');
 const internalOnly=new Set(['world/world-store.js','mutation/world-mutation-api.js']);
 const forbiddenDependencies=['three','src/nextgen','index.html','sw.js'];
 const findings=[];let parsedNodes=0,geometryGateCallSites=0;
@@ -11,7 +11,7 @@ function memberName(n){return n.computed&&n.property.type==='Literal'?String(n.p
 for(const f of files){const rel=path.relative(srcRoot,f).replaceAll(path.sep,'/'),source=fs.readFileSync(f,'utf8');let ast;try{ast=acorn.parse(source,{ecmaVersion:'latest',sourceType:'script'})}catch(e){findings.push({rule:'PARSE_FAILURE',file:rel,line:e.loc?.line||null,detail:e.message});continue}
  walk.full(ast,node=>{parsedNodes++;if(node.type==='AssignmentExpression'||node.type==='UpdateExpression'){const target=node.type==='AssignmentExpression'?node.left:node.argument;if(target.type==='MemberExpression'){const name=memberName(target);if(['entities','state','transform','position','positionMicrounits','physicalRelations','supportRelation','parentEntityId','physicalBodyRef','participatesIn'].includes(name)&&!mutationOwners.has(rel))findings.push({rule:'UNAUTHORIZED_PHYSICAL_WRITE',file:rel,start:node.start,member:name})}}
  if(node.type==='CallExpression'&&node.callee.type==='MemberExpression'){const name=memberName(node.callee);if(['set','delete','splice','push'].includes(name)&&!mutationOwners.has(rel))findings.push({rule:'UNAUTHORIZED_MUTATING_CALL',file:rel,start:node.start,member:name})}
- if(node.type==='CallExpression'&&node.callee.name==='require'&&node.arguments[0]?.type==='Literal'){const dep=String(node.arguments[0].value).toLowerCase();if(dep.includes('verified-architecture-phase2/geometry-gate')){geometryGateCallSites++;if(rel!=='school/school-geometry-adapter.js')findings.push({rule:'GEOMETRY_GATE_BYPASS',file:rel,start:node.start})}if(forbiddenDependencies.some(x=>dep.includes(x)))findings.push({rule:'FORBIDDEN_DEPENDENCY',file:rel,start:node.start,dependency:dep})}
+ if(node.type==='CallExpression'&&node.callee.name==='require'&&node.arguments[0]?.type==='Literal'){const dep=String(node.arguments[0].value).toLowerCase();if(dep.includes('verified-architecture-phase2/geometry-gate')){geometryGateCallSites++;if(!['school/school-geometry-adapter.js','mutation/phase2-gateway.js'].includes(rel))findings.push({rule:'GEOMETRY_GATE_BYPASS',file:rel,start:node.start})}if(forbiddenDependencies.some(x=>dep.includes(x)))findings.push({rule:'FORBIDDEN_DEPENDENCY',file:rel,start:node.start,dependency:dep})}
  });
  if(rel==='school/school-geometry-adapter.js'&&/distance|tolerance|containment|collision correction|auto.?move|snap|clamp|pixel|panorama|three/i.test(source))findings.push({rule:'ADAPTER_NOT_THIN_OR_VISUAL_AUTHORITY',file:rel});
  if(rel==='index.js'&&[...internalOnly].some(x=>source.includes(x)))findings.push({rule:'PUBLIC_INTERNAL_EXPORT',file:rel});

@@ -1,5 +1,5 @@
 'use strict';
-const {evaluate}=require('../../verified-architecture-phase2/geometry-gate');
+const {evaluate:gatewayEvaluate}=require('../mutation/phase2-gateway');const evaluate=(request,model)=>gatewayEvaluate('1.0.0',request,model);
 const {canonical,digest}=require('../../verified-architecture-phase2/canonical');
 const {MICROUNITS_PER_UNIT}=require('../../verified-architecture-phase2/fixed-point');
 const {SCHOOL_SCENE,SCHOOL_BAG_BODY,SCHOOL_SURFACE_MODEL_REF}=require('./school-physical-contract');const {PROFILE,POSTURE,BODY}=require('./definitions/adult-v1-male-supine-floor');const CHAIR=require('./definitions/treatment-chair');const A=require('../authoring');
