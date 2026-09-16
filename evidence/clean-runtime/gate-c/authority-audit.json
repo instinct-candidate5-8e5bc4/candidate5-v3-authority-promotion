@@ -1,0 +1,26 @@
+{
+  "geometryGateCallSites": 1,
+  "auditKind": "ACORN_AST_AUTHORITY_AUDIT",
+  "ecmaVersion": "latest",
+  "files": 35,
+  "parsedNodes": 8765,
+  "mutationOwnerModules": [
+    "world/world-store.js",
+    "mutation/world-mutation-api.js",
+    "contracts/world-state.js",
+    "events/replay.js",
+    "events/event-log.js"
+  ],
+  "internalOnlyModules": [
+    "world/world-store.js",
+    "mutation/world-mutation-api.js"
+  ],
+  "forbiddenDependencies": [
+    "three",
+    "src/nextgen",
+    "index.html",
+    "sw.js"
+  ],
+  "unauthorizedFindings": [],
+  "status": "PASS"
+}

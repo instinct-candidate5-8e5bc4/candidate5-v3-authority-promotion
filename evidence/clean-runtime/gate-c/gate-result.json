@@ -1,0 +1,25 @@
+{
+  "gate": "GATE C",
+  "result": "PASS_PENDING_USER_REVIEW_FOR_ADMISSION",
+  "chair": {
+    "id": "school/treatment-chair",
+    "revision": 1,
+    "digest": "1e78439ad5977c6c050475b4ac692cee9fce7da034725ea88a7ed4f0b0803247",
+    "envelopeState": "VALIDATED"
+  },
+  "surface": {
+    "id": "school/treatment-chair-seat",
+    "revision": 1,
+    "digest": "08028ddd3faa51edaba2c202b44f91c18e3f60ac5c74b353a14d4ab89ba5501d",
+    "envelopeState": "VALIDATED"
+  },
+  "legacyOrProductionDiff": false,
+  "phase1Or2Diff": false,
+  "adultV1Changed": false,
+  "unknowns": [
+    "Load capacity and structural strength not modeled",
+    "No visual binding",
+    "No seated adult casualty definition",
+    "Persistent registry storage remains outside gate"
+  ]
+}
