@@ -1,0 +1,221 @@
+{
+  "gate": "PHASE_3_GATE_0_HARNESS_FEASIBILITY",
+  "baseCommit": "7020b41e9067f5c58fb094cb126cd9ddc014ab72",
+  "tree": "92ddff4c8030a299536a7e04f66902c50b3d58cc",
+  "archivedPaths": [
+    "index.html",
+    "sw.js",
+    "src/nextgen"
+  ],
+  "sourceBeforeAfterIdentical": true,
+  "sourceFiles": [
+    {
+      "path": "index.html",
+      "bytes": 233183,
+      "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618"
+    },
+    {
+      "path": "src/nextgen/accessibility-learning.js",
+      "bytes": 2193,
+      "sha256": "ac1ca2e743cce30728db4d724ffb6ae1f6b5a0a41cb2442c01a65c091a8700c5"
+    },
+    {
+      "path": "src/nextgen/achievements.js",
+      "bytes": 1520,
+      "sha256": "03d5156c1661e9fdff073280a163c602776abcefd8a9ba6716d8b027f49e251a"
+    },
+    {
+      "path": "src/nextgen/adaptive-runtime.js",
+      "bytes": 7322,
+      "sha256": "f1b4bda849e468940622649763e705fd118360e68c83baeea7e1538fc2da2499"
+    },
+    {
+      "path": "src/nextgen/branch-evidence.js",
+      "bytes": 1733,
+      "sha256": "42ba88b5e9372738b23b8ab186234517c55f6f7dac2e6a615daa583f8e0ccc3a"
+    },
+    {
+      "path": "src/nextgen/confidence-calibration.js",
+      "bytes": 1694,
+      "sha256": "59c42397cde1966c91af52bceb529713d3a38bffcdb76d679fb41afdd118c097"
+    },
+    {
+      "path": "src/nextgen/context-memory.js",
+      "bytes": 536,
+      "sha256": "32de512e5ec3be79f4fb8e77932977f82743ac76b90fb8b4db8192a59f1fa2b1"
+    },
+    {
+      "path": "src/nextgen/core.js",
+      "bytes": 11123,
+      "sha256": "2e704b8dce4bcd0b18fa377edafe38bdaa89c16229dcddc3efeb6f6daffc1173"
+    },
+    {
+      "path": "src/nextgen/environment-catalog.js",
+      "bytes": 3771,
+      "sha256": "b699ea103aac11734df899364e43446383ac50bc4729e268cd63e81678669c70"
+    },
+    {
+      "path": "src/nextgen/event-bus.js",
+      "bytes": 1980,
+      "sha256": "ee0b6a75dfb3fe0823040086d310817f1d679a02cca037a93a77c971b79b69cd"
+    },
+    {
+      "path": "src/nextgen/explainability.js",
+      "bytes": 6447,
+      "sha256": "8a80174524e83b69dc65d1bf54b6a5777cb3293761907945958833ea39399465"
+    },
+    {
+      "path": "src/nextgen/feature-flags.js",
+      "bytes": 652,
+      "sha256": "e024a0690798ee5e90ab6265e83e8ebece968ae12da70a08a8097351fc8065f3"
+    },
+    {
+      "path": "src/nextgen/ghost-replay.js",
+      "bytes": 632,
+      "sha256": "0f0c5df682f88489d80b4f8336ae4384ba93ea273b602385e67d40bec5ba64d9"
+    },
+    {
+      "path": "src/nextgen/graded-hints.js",
+      "bytes": 659,
+      "sha256": "45a342ebe6d036ab5a657faf3a9b88c6218945e2ca256bd2642b7adaf28c9d52"
+    },
+    {
+      "path": "src/nextgen/interactive-debrief.js",
+      "bytes": 5241,
+      "sha256": "499883aec3bec8874aec6d1e95feb323d8ecb41c97439c1367f1aed9c93fa0e3"
+    },
+    {
+      "path": "src/nextgen/internal-api.js",
+      "bytes": 4204,
+      "sha256": "09e4108091e34bb15de0a7889769c52ff28565f5eaa0e181ec1b69e7b38acf3a"
+    },
+    {
+      "path": "src/nextgen/legacy-adapter.js",
+      "bytes": 3753,
+      "sha256": "58b5a4de638775d15df2cd1edd8eb042012f4c2807fd460d2a21a53749d937cc"
+    },
+    {
+      "path": "src/nextgen/mastery-practice.js",
+      "bytes": 1892,
+      "sha256": "c1cd27d66dd3a798ba3db324e4aef1f598c26c3c68da634be988b4a7d496d4a8"
+    },
+    {
+      "path": "src/nextgen/migrations.js",
+      "bytes": 5030,
+      "sha256": "e67bf21f1e3c08367b3a41f49e7029d0b3b215a69c0505e5b08a3f18fc09ea65"
+    },
+    {
+      "path": "src/nextgen/multi-casualty.js",
+      "bytes": 2704,
+      "sha256": "5e441e8555726cf48108dd6b9042f74e9242e1b075200505da9c9ab277a0ea72"
+    },
+    {
+      "path": "src/nextgen/npc-state.js",
+      "bytes": 4140,
+      "sha256": "9c4376a1de784be7c20b9d9d897f89527d1597b7d79597c8c1b404363eb04c5a"
+    },
+    {
+      "path": "src/nextgen/persistence.js",
+      "bytes": 12999,
+      "sha256": "3190469f106bb9f90069c44c4a2fe9bcc0f1875d9280108ba98a26665a60f501"
+    },
+    {
+      "path": "src/nextgen/plugin-registry.js",
+      "bytes": 768,
+      "sha256": "2a340f878d0bd0423f21ea263fa825d12390aa692a09990e0617e817e503c9aa"
+    },
+    {
+      "path": "src/nextgen/posture-map.js",
+      "bytes": 2279,
+      "sha256": "65431f42463493bbba5860bfc6739d0716d2a8987a811e107a8a91e469fc4627"
+    },
+    {
+      "path": "src/nextgen/recovery.js",
+      "bytes": 1963,
+      "sha256": "05a1ec22dba0cd599f9037887fd04534d6b437de55f757e45ac18a1bdce69642"
+    },
+    {
+      "path": "src/nextgen/reporting.js",
+      "bytes": 3179,
+      "sha256": "ffd590fbd422e8f0194297904bd9f8c2af7d7d0e15724e9fe405993d5f847f05"
+    },
+    {
+      "path": "src/nextgen/semantic-environment.js",
+      "bytes": 5524,
+      "sha256": "9820ea568d7e09d1f423d9983c082ee9810fc095ff86a056f8eb455e3cbc210f"
+    },
+    {
+      "path": "src/nextgen/sync-engine.js",
+      "bytes": 8490,
+      "sha256": "8026375b15cddab9eff07da84339a2620c7d16cdef5242563502e4594c523fcd"
+    },
+    {
+      "path": "src/nextgen/triage.js",
+      "bytes": 1868,
+      "sha256": "8c9859769572ddbcf0b0b3fc7aa60ee0a5d52c7b52514578c229ca35c4f8e66a"
+    },
+    {
+      "path": "src/nextgen/unexpected-events.js",
+      "bytes": 788,
+      "sha256": "b46f94981d84075af406fc6f15c16de81fe3aed240466c8385ff65844ca60b2a"
+    },
+    {
+      "path": "src/nextgen/world-reactor.js",
+      "bytes": 2415,
+      "sha256": "c13261bcf99c756fac4c0f911e0f12e02cea24124e8edd0cce8e4bf25b125351"
+    },
+    {
+      "path": "sw.js",
+      "bytes": 2461,
+      "sha256": "7cf0abdf36077f0dc0f674eaa5e3c912c3e9fc7993244692023828a3b7f9968b"
+    }
+  ],
+  "mechanismAssessment": {
+    "result": "HARD_STOP",
+    "reasonCode": "PRE_EXECUTION_OBSERVER_REQUIRES_PROHIBITED_INJECTION",
+    "facts": [
+      "Three.js is imported inside an inline ES module.",
+      "The scene and THREE namespace are lexical module bindings, not window properties.",
+      "Installing wrappers before the module executes requires editing archived HTML/module imports, rewriting the response, or injecting into the runtime path.",
+      "Post-load external evaluation cannot retroactively observe boot mutations or access the lexical scene binding."
+    ],
+    "prohibitedWorkaroundsNotAttempted": [
+      "archived source edit",
+      "dynamic response rewrite",
+      "production-path injection"
+    ]
+  },
+  "offOnDiagnostic": {
+    "off": {
+      "status": 0,
+      "signal": null,
+      "domSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "wallCpuDiagnosticMs": 30073.831387
+    },
+    "on": {
+      "status": 0,
+      "signal": null,
+      "domSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "wallCpuDiagnosticMs": 30086.332978
+    },
+    "comparableObserverInstalled": false,
+    "result": "NOT_A_VALID_OBSERVER_DIFFERENTIAL"
+  },
+  "serverDiagnostics": {
+    "requests": 0,
+    "serializedBytes": 0
+  },
+  "performanceObservation": {
+    "status": "BLOCKED_BY_GATE_0",
+    "frameTimeFps": null,
+    "cpuReliable": null,
+    "memoryGrowth": null,
+    "eventVolume": 0,
+    "serializedEvidenceBytes": 0,
+    "note": "No observer was installed; no sampling or events were dropped."
+  },
+  "newUnknowns": [
+    "Whether a browser preload/CDP hook could safely access the imported module namespace without source/response injection is unproven.",
+    "Observer performance cost is unknown because installing the observer is blocked."
+  ]
+}
