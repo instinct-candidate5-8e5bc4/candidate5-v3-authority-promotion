@@ -12,6 +12,7 @@
   - A `docs/verified-architecture-phase2-v3/foundation-boundary-reopen/*` (docs)
   - A `.github/workflows/v3-foundation-boundary-reopen.yml` (branch CI)
   - A `evidence/clean-runtime/v3-foundation-boundary-reopen/*` (this package)
+  - A `tests/clean-runtime/vendor/acorn.js` (vendored parser, integrity-pinned)
   - Nothing under `src/`; inherited Foundation evidence untouched
     (CI asserts `foundation-matrix-evidence.json` stays blob `aea5d721...`).
 - Byte comparison of all six Foundation production modules: CI step prints
@@ -32,8 +33,8 @@
   reject wrong target, wrong source, sibling module, path alias, and
   normalization bypass.
 - Gate results (this package): focused Foundation suite twice (120/120 each),
-  broad suite (582/582), static boundaries (4/4), hostile boundary suite
-  (22/22: 18 mandatory + 4 independent-certification regressions), reopened audit 1.4.0 (0 findings, boundaryPolicyValid=true, exactly 3
+  broad suite (590/590), static boundaries (4/4), hostile boundary suite
+  (30/30: 18 mandatory + 12 independent-certification regressions), reopened audit 1.5.0 (acorn 8.18.0 AST-based loader policy, vendored with npm registry integrity) (0 findings, boundaryPolicyValid=true, exactly 3
   allowed pairs), Foundation detached determinism byte-identical across two
   runs, closure determinism byte-identical, closure performance captured,
   matrix coverage 69/69 with clean audit gate.

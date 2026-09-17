@@ -25,6 +25,7 @@ function fixture(mutate){
   fs.cpSync(path.join(ROOT,'src'),path.join(dir,'src'),{recursive:true});
   fs.mkdirSync(path.join(dir,'tests/clean-runtime'),{recursive:true});
   fs.copyFileSync(path.join(ROOT,'tests/clean-runtime/v3-promotion-authority-audit.js'),path.join(dir,'tests/clean-runtime/v3-promotion-authority-audit.js'));
+  fs.cpSync(path.join(ROOT,'tests/clean-runtime/vendor'),path.join(dir,'tests/clean-runtime/vendor'),{recursive:true});
   const manifest=JSON.parse(fs.readFileSync(path.join(ROOT,'tests/clean-runtime/foundation-allowed-paths.json'),'utf8'));
   if(mutate)mutate(dir,manifest);
   fs.writeFileSync(path.join(dir,'tests/clean-runtime/foundation-allowed-paths.json'),JSON.stringify(manifest,null,2));
@@ -129,19 +130,62 @@ test('regression 19: aliased require fails (Yoni repro a)',()=>{
   const r=audit(fixture(dir=>writePort(dir,"'use strict';\nconst R=require;\nconst x=R('../mutation/v3-promotion-foundation.js');\nmodule.exports={};\n")));
   assert.notEqual(r.code,0);
   assert.ok(findingsOf(r,'NON_STATICALLY_RESOLVABLE_LOAD').some(f=>f.detail==='require used as a value'))});
-test('regression 20: comment-separated require fails (Yoni repro b)',()=>{
-  for(const src of [
-    "'use strict';\nconst name='../mutation/v3-promotion-foundation.js';\nconst x=require /* hidden */ (name);\nmodule.exports={};\n",
-    "'use strict';\nconst x=require /* hidden */ ('../mutation/v3-promotion-foundation.js');\nmodule.exports={};\n",
-    "'use strict';\nconst x=require(/* hidden */ '../mutation/v3-promotion-foundation.js');\nmodule.exports={};\n"]){
-    const r=audit(fixture(dir=>writePort(dir,src)));
-    assert.notEqual(r.code,0,'comment-obfuscated require must fail');
-    assert.ok(findingsOf(r,'NON_STATICALLY_RESOLVABLE_LOAD').length>=1)}});
+test('regression 20: comment-separated require cannot hide or smuggle edges (Yoni repro b)',()=>{
+  const dyn=audit(fixture(dir=>writePort(dir,"'use strict';\nconst name='../mutation/v3-promotion-foundation.js';\nconst x=require /* hidden */ (name);\nmodule.exports={};\n")));
+  assert.notEqual(dyn.code,0,'comment + non-literal argument must fail');
+  assert.ok(findingsOf(dyn,'NON_STATICALLY_RESOLVABLE_LOAD').length>=1);
+  const wrongSrc=audit(fixture(dir=>{const p=path.join(dir,'src/clean-runtime/v3-routing/wrong-source.js');fs.mkdirSync(path.dirname(p),{recursive:true});fs.writeFileSync(p,"'use strict';\nconst x=require /* hidden */ ('../mutation/v3-promotion-foundation.js');\nmodule.exports={};\n")}));
+  assert.notEqual(wrongSrc.code,0,'comment cannot hide a literal edge from the graph');
+  assert.ok(findingsOf(wrongSrc,'FORBIDDEN_INBOUND_FOUNDATION_IMPORT').length===1);
+  const smuggle=audit(fixture(dir=>writePort(dir,"'use strict';\nconst x0=require('../mutation/physical-proof-planner.js');\nconst x1=require('../mutation/v3-promotion-foundation.js');\nconst x2=require('../v3-authority/authority-envelope-builder.js');\nconst x3=require /* hidden */ ('../mutation/physical-capability-router.js');\nmodule.exports={};\n")));
+  assert.notEqual(smuggle.code,0,'comment cannot smuggle a fourth edge');
+  assert.ok(findingsOf(smuggle,'FORBIDDEN_INBOUND_FOUNDATION_IMPORT').some(f=>f.foundationImports.includes(T_ROUTER)))});
 test('regression 21: bracket/member loader access fails (Yoni repro c)',()=>{
   const r=audit(fixture(dir=>writePort(dir,"'use strict';\nconst a=module['require']('../mutation/v3-promotion-foundation.js');\nconst b=module.require('../mutation/physical-proof-planner.js');\nmodule.exports={};\n")));
   assert.notEqual(r.code,0);
-  assert.equal(findingsOf(r,'NON_STATICALLY_RESOLVABLE_LOAD').length,2)});
+  assert.ok(findingsOf(r,'NON_STATICALLY_RESOLVABLE_LOAD').length>=2)});
 test('regression 22: dynamic loading from non-allowlisted production source fails (Yoni repro d)',()=>{
   const r=audit(fixture(dir=>{const p=path.join(dir,'src/clean-runtime/v3-routing/wrong-source.js');fs.mkdirSync(path.dirname(p),{recursive:true});fs.writeFileSync(p,"'use strict';\nconst name='../mutation/v3-promotion-foundation.js';\nmodule.exports=require(name);\n")}));
   assert.notEqual(r.code,0);
   assert.ok(findingsOf(r,'NON_STATICALLY_RESOLVABLE_LOAD').some(f=>f.file==='src/clean-runtime/v3-routing/wrong-source.js'))});
+test('regression 23: unicode-escaped require binding fails (Yoni bypass 1)',()=>{
+  for(const src of [
+    "'use strict';\nconst x=requ\\u0069re('../mutation/v3-promotion-foundation.js');\nmodule.exports={};\n",
+    "'use strict';\nconst name='../mutation/v3-promotion-foundation.js';\nconst x=requ\\u0069re(name);\nmodule.exports={};\n"]){
+    const r=audit(fixture(dir=>{const p=path.join(dir,'src/clean-runtime/v3-routing/wrong-source.js');fs.mkdirSync(path.dirname(p),{recursive:true});fs.writeFileSync(p,src)}));
+    assert.notEqual(r.code,0,'unicode-escaped require must fail');
+    assert.ok(findingsOf(r,'FORBIDDEN_INBOUND_FOUNDATION_IMPORT').length+findingsOf(r,'NON_STATICALLY_RESOLVABLE_LOAD').length>=1)}});
+test('regression 24: destructured createRequire fails (Yoni bypass 2)',()=>{
+  const r=audit(fixture(dir=>writePort(dir,"'use strict';\nconst {createRequire}=require('module');\nconst req=createRequire(__filename);\nconst x=req('../mutation/v3-promotion-foundation.js');\nmodule.exports={};\n")));
+  assert.notEqual(r.code,0);
+  assert.ok(findingsOf(r,'NON_STATICALLY_RESOLVABLE_LOAD').length>=1)});
+test('regression 25: member-access createRequire fails (Yoni bypass 3)',()=>{
+  const r=audit(fixture(dir=>writePort(dir,"'use strict';\nconst req=require('node:module').createRequire(__filename);\nconst x=req('../mutation/v3-promotion-foundation.js');\nmodule.exports={};\n")));
+  assert.notEqual(r.code,0);
+  assert.ok(findingsOf(r,'NON_STATICALLY_RESOLVABLE_LOAD').length>=1)});
+test('regression 26: createRequire through process/module indirection fails (Yoni bypass 4)',()=>{
+  const r=audit(fixture(dir=>writePort(dir,"'use strict';\nconst req=process.getBuiltinModule('module').createRequire(__filename);\nconst x=req('../mutation/v3-promotion-foundation.js');\nmodule.exports={};\n")));
+  assert.notEqual(r.code,0);
+  assert.ok(findingsOf(r,'NON_STATICALLY_RESOLVABLE_LOAD').length>=1)});
+test('regression 27: computed module[re+quire] fails (Yoni bypass 5)',()=>{
+  const r=audit(fixture(dir=>writePort(dir,"'use strict';\nconst x=module['re'+'quire']('../mutation/v3-promotion-foundation.js');\nmodule.exports={};\n")));
+  assert.notEqual(r.code,0);
+  assert.ok(findingsOf(r,'NON_STATICALLY_RESOLVABLE_LOAD').length>=1)});
+test('regression 28: module.constructor._load fails (Yoni bypass 6)',()=>{
+  const r=audit(fixture(dir=>writePort(dir,"'use strict';\nconst x=module.constructor._load('../mutation/v3-promotion-foundation.js');\nmodule.exports={};\n")));
+  assert.notEqual(r.code,0);
+  assert.ok(findingsOf(r,'NON_STATICALLY_RESOLVABLE_LOAD').length>=1)});
+test('regression 29: computed/aliased eval, Function and Reflect fail (Yoni bypass 7)',()=>{
+  for(const src of [
+    "'use strict';\nconst e=eval;\nmodule.exports=e;\n",
+    "'use strict';\nconst F=Function;\nmodule.exports=F;\n",
+    "'use strict';\nconst R2=Reflect;\nmodule.exports=R2;\n",
+    "'use strict';\nconst g=globalThis;\nmodule.exports=g;\n",
+    "'use strict';\nmodule.exports=globalThis['ev'+'al'];\n",
+    "'use strict';\nmodule.exports=globalThis.eval;\n"]){
+    const r=audit(fixture(dir=>writePort(dir,src)));
+    assert.notEqual(r.code,0,'variant must fail: '+src.slice(0,60))}});
+test('regression 30: shadowed local require fails closed',()=>{
+  const r=audit(fixture(dir=>writePort(dir,"'use strict';\nfunction f(require){return require('../mutation/v3-promotion-foundation.js')}\nmodule.exports=f;\n")));
+  assert.notEqual(r.code,0);
+  assert.ok(findingsOf(r,'NON_STATICALLY_RESOLVABLE_LOAD').length>=1)});

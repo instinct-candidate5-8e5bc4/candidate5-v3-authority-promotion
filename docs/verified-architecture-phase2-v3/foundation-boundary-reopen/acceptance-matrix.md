@@ -24,6 +24,14 @@
 | R20 | Comment-separated require fails (repro b; also closes graph-invisibility) | regression test 20 (3 variants) |
 | R21 | Bracket/member loader access fails (repro c) | regression test 21 |
 | R22 | Dynamic load from non-allowlisted source fails (repro d) | regression test 22 |
+| R23 | Unicode-escaped require binding fails (bypass 1) | regression test 23 (2 variants) |
+| R24 | Destructured createRequire fails (bypass 2) | regression test 24 |
+| R25 | Member-access createRequire fails (bypass 3) | regression test 25 |
+| R26 | createRequire via process/module indirection fails (bypass 4) | regression test 26 |
+| R27 | Computed module['re'+'quire'] fails (bypass 5) | regression test 27 |
+| R28 | module.constructor._load fails (bypass 6) | regression test 28 |
+| R29 | Computed/aliased eval, Function, Reflect fail (bypass 7 + variants) | regression test 29 (6 variants) |
+| R30 | Shadowed local require fails closed | regression test 30 |
 
 Certification evidence: `evidence/clean-runtime/v3-foundation-boundary-reopen/`
 (baseline SHA, changed-file list, six-module byte comparison, old/new policy,

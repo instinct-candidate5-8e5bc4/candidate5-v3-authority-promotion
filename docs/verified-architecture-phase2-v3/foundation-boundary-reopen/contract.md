@@ -50,21 +50,32 @@ certified three-edge set exactly: a missing edge, an additional edge, a
 duplicate, or a malformed entry each fail certification
 (`ALLOWLIST_POLICY_MISMATCH`).
 
-Module-load verification (audit 1.4.0) is parsing-based, not regex-based: a
-lexical scanner (comments, strings, regex literals, template `${}` expressions
-handled) examines EVERY production source file and fails certification
-(`NON_STATICALLY_RESOLVABLE_LOAD`) unless every `require` is a direct call
-with exactly one plain string-literal argument. It rejects: `require` used as
-a value or alias (`const R=require`), member or bracket loader access
-(`module.require`, `module['require']`), non-literal arguments
-(`require(name)`), comment-obfuscated calls (`require /* hidden */ ('...')` -
-which would also hide the edge from the import graph), dynamic `import()`,
-and the `eval()`/`Function()`/`Reflect.` load channels. A `typeof require`
-capability probe and method definitions named `import` (both present in
-baseline code) are not loads and are explicitly allowed; `...require('./x')`
-spread of a literal call remains allowed. Any computed or indirect module load
-that cannot be statically resolved fails certification, from the allowlisted
-importer and from any other production file alike.
+Module-load verification (audit 1.5.0) is parsing-based on a real JavaScript
+parser: acorn 8.18.0 vendored at tests/clean-runtime/vendor/acorn.js (npm
+registry integrity sha512-lGq+9yr1/GuAWaVYIHRjvvySG5/4VfKIvC8EWxStPdcDh/Ka7FG3twP6v4d5BkravUilhIAsG4Qj83t02LWUPQ==,
+file sha256 fc3ed7b81e58464715d0291402892f22c3d86ea75302645a330390f85d8015c9).
+The import graph itself is built from parsed ASTs, so comments, escapes, and
+formatting cannot hide an edge. Every production source file is parsed
+(unparseable = UNPARSEABLE_PRODUCTION_FILE) and held to a closed loader
+policy: the ONLY permitted module load is a direct require call with exactly
+one static string-literal argument whose specifier is relative or one of
+node:crypto / node:fs / node:path (the exact builtin set used at baseline).
+The capability roots require, module, process, globalThis, global, eval,
+Function, Reflect, constructor, __proto__, createRequire, getBuiltinModule,
+_load, and binding fail closed as: identifier value/alias/shadow uses
+(`const R=require`, `const {createRequire}=...`, shadowed parameters),
+member access (`module.require`, `X.constructor`, `globalThis.eval`),
+computed member access to capability names (`module['require']`), computed
+member keys CONSTRUCTED from strings (`module['re'+'quire']`, template keys;
+literal-selection keys like the baseline `profiles[cond?'a':b]` remain
+allowed), capability names as string literals anywhere, dynamic import(),
+`with` statements, and any unresolved/unknown binding state. Unicode-escaped
+identifier tricks (`requ\u0069re`) are normalized by the parser and fail.
+Baseline-legitimate forms stay allowed: typeof require/module/globalThis
+capability probes, ...require('./x') spreads, module.exports, class
+constructor definitions, globalThis in UMD wrapper positions (argument,
+ternary branch, parameter default, non-capability member such as
+globalThis.fetch), and method definitions named import.
 Every edge outside the exact allowlist fails closed
 (`FORBIDDEN_INBOUND_FOUNDATION_IMPORT`), as do School/runtime/gateway
 connections (`SCHOOL_CONNECTED`, `RUNTIME_CONNECTED`, `GATEWAY_ROUTED`) -
