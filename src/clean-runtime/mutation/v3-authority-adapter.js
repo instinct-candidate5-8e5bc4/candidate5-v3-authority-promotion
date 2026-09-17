@@ -10,11 +10,12 @@ function evaluate({obligation,route,context,envelopeRef}={}){
 }
 return deepFreeze({evaluate})
 }
-// The production export closes over the real closed-V3 evaluator. Callers of
-// evaluate cannot select or replace the evaluator: the input object is
-// destructured for obligation/route/context/envelopeRef only, and any caller-
-// supplied `evaluator` field is ignored. The factory is exported under a
-// test-only name so hostile-evaluator regressions can exercise the same
-// adapter logic without touching the production authority path.
+// The production export closes over the real closed-V3 evaluator and is the
+// ONLY export: no factory, no dependency seam. Callers cannot select or
+// replace the evaluator - the input object is destructured for
+// obligation/route/context/envelopeRef only and any caller-supplied
+// `evaluator` field is ignored. Hostile-evaluator regressions build the seam
+// outside this module via a test-only module-resolution loader
+// (tests/clean-runtime/v3-test-only-loader.js).
 const production=createAdapter((q,c)=>evaluateV3(q,c));
-module.exports={evaluate:production.evaluate,__testOnlyCreateAdapter:createAdapter};
+module.exports={evaluate:production.evaluate};

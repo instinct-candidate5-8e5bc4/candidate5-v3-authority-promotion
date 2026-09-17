@@ -1,7 +1,7 @@
 'use strict';
-// Candidate 5 (resubmission, corrected): normative 68-row acceptance matrix.
+// Candidate 5 (resubmission, corrected): normative 69-row acceptance matrix.
 // No duplicate route-exactness or permutation filler rows; every row is a
-// distinct normative behavior mapped to a real behavioral regression. The 26
+// distinct normative behavior mapped to a real behavioral regression. The 27
 // Foundation-path rows are enforced against structured per-row evidence
 // records: outcome, reason/classification, evaluator count, final decision,
 // unchanged synthetic state bytes on rejection, and required evidence fields.
@@ -78,9 +78,10 @@ const rows=[
 ['VALID_UNRELATED_CONTROL','__X__',X],
 ['MANIFEST_MODIFIED_MODULE','__X__',X],
 ['MANIFEST_UNAPPROVED_MODULE','__X__',X],
+['PRODUCTION_EXPORTS_CLOSED','__X__',X],
 ['DETACHED_DETERMINISM','__DETERMINISM__','tests/clean-runtime/v3-candidate5-determinism.js']];
-if(rows.length!==68){console.error('matrix row count '+rows.length+' != 68');process.exit(1)}
-const ids=new Set(rows.map(r=>r[0]));if(ids.size!==68){console.error('matrix row ids are not distinct');process.exit(1)}
+if(rows.length!==69){console.error('matrix row count '+rows.length+' != 69');process.exit(1)}
+const ids=new Set(rows.map(r=>r[0]));if(ids.size!==69){console.error('matrix row ids are not distinct');process.exit(1)}
 const files=[...new Set(rows.map(r=>r[2]).filter(f=>f.endsWith('.test.js')))];
 const evidencePath=path.resolve(root,'evidence/clean-runtime/v3-authority-promotion-foundation/candidate5/foundation-matrix-evidence.json');
 fs.rmSync(evidencePath,{force:true});
@@ -106,7 +107,7 @@ for(const [id,name] of rows){
 let auditOk=false,auditDigest=null;try{const a=JSON.parse(cp.execFileSync('node',['tests/clean-runtime/v3-promotion-authority-audit.js'],{cwd:root,encoding:'utf8'}));auditOk=a.findings.length===0;auditDigest=a.auditDigest}catch{}
 let determinismOk=false,determinismSha=null;try{const r1=cp.execFileSync('node',['tests/clean-runtime/v3-candidate5-determinism.js'],{cwd:root,encoding:'utf8'});const r2=cp.execFileSync('node',['tests/clean-runtime/v3-candidate5-determinism.js'],{cwd:root,encoding:'utf8'});const h1=crypto.createHash('sha256').update(r1).digest('hex'),h2=crypto.createHash('sha256').update(r2).digest('hex');determinismOk=h1===h2;determinismSha={run1:h1,run2:h2,identical:h1===h2}}catch{}
 if(!determinismOk)uncovered.push(['DETACHED_DETERMINISM','detached determinism runs differ or failed']);
-const result={schemaVersion:'v3-candidate5-matrix-coverage/3.1.0',matrixRows:68,covered:68-uncovered.length,gates:{audit:{executed:true,clean:auditOk,digest:auditDigest},detachedDeterminism:determinismSha},uncovered:uncovered.map(([id,what])=>({row:id,missing:what}))};
+const result={schemaVersion:'v3-candidate5-matrix-coverage/3.2.0',matrixRows:69,covered:69-uncovered.length,gates:{audit:{executed:true,clean:auditOk,digest:auditDigest},detachedDeterminism:determinismSha},uncovered:uncovered.map(([id,what])=>({row:id,missing:what}))};
 console.log(JSON.stringify(result,null,2));
 if(uncovered.length||!auditOk)process.exit(1);
-console.log('MATRIX 68/68 COVERED BY PASSING BEHAVIORAL REGRESSIONS WITH PER-ROW EVIDENCE RECORDS');
+console.log('MATRIX 69/69 COVERED BY PASSING BEHAVIORAL REGRESSIONS WITH PER-ROW EVIDENCE RECORDS');

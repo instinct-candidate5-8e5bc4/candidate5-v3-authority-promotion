@@ -381,6 +381,27 @@
       ]
     },
     {
+      "row": "PRODUCTION_EXPORTS_CLOSED",
+      "outcome": "PASS",
+      "reason": "VALID",
+      "classification": "V3_VALID",
+      "evaluatorCalls": 1,
+      "decision": "COMMIT_ALLOWED",
+      "stateBytesUnchanged": true,
+      "resultDigest": "112f2b2e2ab67dc009a3c2fb54eee462838086533f916cace8dabe3de49ae438",
+      "evidenceFields": [
+        "Object.keys(Adapter)",
+        "Object.keys(Foundation)",
+        "decision",
+        "outcome",
+        "v3.status",
+        "v3.reason",
+        "classification",
+        "summary.evaluatorCalls",
+        "decisionDigest"
+      ]
+    },
+    {
       "row": "GLOBAL_CORRUPTION_OUTSIDE_IMPACT",
       "outcome": "UNKNOWN",
       "reason": "STALE_AUTHORITY",
@@ -417,7 +438,7 @@
       "evaluatorCalls": 0,
       "decision": "AUDIT_REJECTED",
       "stateBytesUnchanged": true,
-      "resultDigest": "590a1a0229a9be2facb56092de3d4704f8e22eb0c4a3de1b7fa1367505fbbbd2",
+      "resultDigest": "4f3191b0cc762bb863f8f4ca3d07b30892e39333211825469d5f0f7d7c69e4b3",
       "evidenceFields": [
         "audit.exit-nonzero-on-mutation",
         "audit.findings.MANIFEST_SHA_MISMATCH",
@@ -432,7 +453,7 @@
       "evaluatorCalls": 0,
       "decision": "AUDIT_REJECTED",
       "stateBytesUnchanged": true,
-      "resultDigest": "590a1a0229a9be2facb56092de3d4704f8e22eb0c4a3de1b7fa1367505fbbbd2",
+      "resultDigest": "4f3191b0cc762bb863f8f4ca3d07b30892e39333211825469d5f0f7d7c69e4b3",
       "evidenceFields": [
         "audit.exit-nonzero-on-unapproved",
         "audit.findings.FOUNDATION_MANIFEST_SET_MISMATCH",

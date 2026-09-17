@@ -7,8 +7,8 @@ return evaluateTransaction
 }
 function physicalProofPayload({decision,authoritySnapshotRef,plan}){const body={foundationSchemaVersion:'1.0.0',authoritySnapshotRef,authorityEnvelopeDigest:decision.authorityEnvelopeDigest,transactionId:decision.transactionId,beforeStateDigest:decision.beforeStateDigest,proposedStateDigest:decision.proposedStateDigest,planId:plan.planId,planDigest:decision.planDigest,routeTableDigest:decision.routeTableDigest,decision:decision.decision,decisionDigest:decision.decisionDigest,obligations:decision.obligationResults.map(r=>({obligationId:r.obligationId,obligationDigest:r.obligationDigest,capability:r.capability,routeDigest:r.routeDigest||r.route?.routeDigest||null,outcome:r.outcome,adapterResultDigest:r.resultDigest||null,v3Status:r.v3?.status||null,v3Reason:r.v3?.reason||null,v3EvidenceDigest:r.v3?.evidenceDigest||null}))};return deepFreeze({...body,payloadDigest:digest(body)})}
 // The production export closes over the real authority adapter (which itself
-// closes over the closed-V3 evaluator); callers cannot substitute either.
-// The factory is exported under a test-only name for hostile-evaluator
-// regressions.
+// closes over the closed-V3 evaluator) and exposes no factory: callers cannot
+// substitute either dependency. Hostile-evaluator regressions build the seam
+// outside this module via tests/clean-runtime/v3-test-only-loader.js.
 const evaluateTransaction=createEvaluateTransaction(Adapter);
-module.exports={evaluateTransaction,physicalProofPayload,__testOnlyCreateEvaluateTransaction:createEvaluateTransaction};
+module.exports={evaluateTransaction,physicalProofPayload};

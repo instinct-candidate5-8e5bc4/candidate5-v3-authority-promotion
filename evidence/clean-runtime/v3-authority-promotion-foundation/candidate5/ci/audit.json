@@ -19,12 +19,12 @@
   "manifestBlobShas": {
     "src/clean-runtime/mutation/physical-capability-router.js": "4acc0ea42557c226b4c4ea0d162f787f46fb753e",
     "src/clean-runtime/mutation/physical-proof-planner.js": "f2bacae79bbb476222f683fa74bda85daeef1629",
-    "src/clean-runtime/mutation/v3-authority-adapter.js": "09cff11d9b0978ac57857b729a897b316b88571d",
-    "src/clean-runtime/mutation/v3-promotion-foundation.js": "2d33eb443ffd1314c6317f874e5c9cd7c5894a46",
+    "src/clean-runtime/mutation/v3-authority-adapter.js": "4ef9f013fa1cc15ea2898fd39ca00dafa4c17879",
+    "src/clean-runtime/mutation/v3-promotion-foundation.js": "c09f5e2c6dac357b1a0b3d660dcc1b73c9dc04bc",
     "src/clean-runtime/v3-authority/authority-envelope-builder.js": "19f5f180b2253dbda45401542153471ab3ce5c45",
     "src/clean-runtime/v3-authority/authority-envelope.js": "5766c26d5deacd2b92a231c9a341e636ff97e392"
   },
   "inboundFoundationImports": [],
   "findings": [],
-  "auditDigest": "590a1a0229a9be2facb56092de3d4704f8e22eb0c4a3de1b7fa1367505fbbbd2"
+  "auditDigest": "4f3191b0cc762bb863f8f4ca3d07b30892e39333211825469d5f0f7d7c69e4b3"
 }
