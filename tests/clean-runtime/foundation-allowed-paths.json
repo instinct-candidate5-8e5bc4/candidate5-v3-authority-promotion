@@ -3,7 +3,7 @@
   "policy": "Only these six production modules may constitute the isolated V3 promotion foundation. Any other production module importing one of them is forbidden until Authority Routing Gate. Blob SHAs are immutable content identities.",
   "files": {
     "src/clean-runtime/mutation/physical-capability-router.js": "4acc0ea42557c226b4c4ea0d162f787f46fb753e",
-    "src/clean-runtime/mutation/physical-proof-planner.js": "3c062077994dc62ff5527f9ec40f94143f62f2d7",
+    "src/clean-runtime/mutation/physical-proof-planner.js": "b89d2b5556168139c34882bb4b8900035ca13929",
     "src/clean-runtime/mutation/v3-authority-adapter.js": "6cde21da65c24c415035382a318b3825b2708c29",
     "src/clean-runtime/mutation/v3-promotion-foundation.js": "d04be963d2802c647737e120fc107b898da67a4d",
     "src/clean-runtime/v3-authority/authority-envelope-builder.js": "19f5f180b2253dbda45401542153471ab3ce5c45",
