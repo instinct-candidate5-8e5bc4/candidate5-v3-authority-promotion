@@ -1,0 +1,74 @@
+name: V3 Structural Enforcement Preflight
+on:
+  push:
+    branches: [candidate5-structural-enforcement-preflight]
+  pull_request:
+    paths:
+      - docs/verified-architecture-phase2-v3/structural-enforcement-preflight.md
+      - .github/workflows/v3-structural-enforcement-preflight.yml
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - name: Certified baseline and immutable Foundation
+        shell: bash
+        run: |
+          set -euo pipefail
+          base=127f284d78b83f358f076b3ee8f8b56044bcc691
+          git merge-base --is-ancestor "$base" HEAD
+          paths=(
+            src/clean-runtime/mutation/physical-capability-router.js
+            src/clean-runtime/mutation/physical-proof-planner.js
+            src/clean-runtime/mutation/v3-authority-adapter.js
+            src/clean-runtime/mutation/v3-promotion-foundation.js
+            src/clean-runtime/v3-authority/authority-envelope-builder.js
+            src/clean-runtime/v3-authority/authority-envelope.js
+          )
+          git diff --exit-code "$base" -- "${paths[@]}"
+          test "$(git rev-parse HEAD:"${paths[0]}")" = 4acc0ea42557c226b4c4ea0d162f787f46fb753e
+          test "$(git rev-parse HEAD:"${paths[1]}")" = f2bacae79bbb476222f683fa74bda85daeef1629
+          test "$(git rev-parse HEAD:"${paths[2]}")" = 4ef9f013fa1cc15ea2898fd39ca00dafa4c17879
+          test "$(git rev-parse HEAD:"${paths[3]}")" = c09f5e2c6dac357b1a0b3d660dcc1b73c9dc04bc
+          test "$(git rev-parse HEAD:"${paths[4]}")" = 19f5f180b2253dbda45401542153471ab3ce5c45
+          test "$(git rev-parse HEAD:"${paths[5]}")" = 5766c26d5deacd2b92a231c9a341e636ff97e392
+      - name: Preflight completeness
+        shell: bash
+        run: |
+          set -euo pipefail
+          doc=docs/verified-architecture-phase2-v3/structural-enforcement-preflight.md
+          test -s "$doc"
+          for heading in \
+            '## Decision' '## Exact trust boundaries' '## Threat model' \
+            '## Implementation choice' '## Mandatory hostile proof strategy' \
+            '## Node and Web compatibility' '## Deterministic build strategy' \
+            '## Evidence plan'; do
+            grep -Fqx "$heading" "$doc"
+          done
+          grep -Fq '127f284d78b83f358f076b3ee8f8b56044bcc691' "$doc"
+          grep -Fq 'promoted-legality-port.js -> physical-proof-planner.js' "$doc"
+          grep -Fq 'promoted-legality-port.js -> v3-promotion-foundation.js' "$doc"
+          grep -Fq 'promoted-legality-port.js -> authority-envelope-builder.js' "$doc"
+          grep -Fq 'CommonJS `arguments[1]`' "$doc"
+          grep -Fq '`Object.values(arguments)`' "$doc"
+          grep -Fq 'constructed strings for `constructor`, `process`, `getBuiltinModule`, and `createRequire`' "$doc"
+      - name: Existing Foundation focused twice
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --test tests/clean-runtime/v3-*.test.js
+          node --test tests/clean-runtime/v3-*.test.js
+      - name: Existing broad regressions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --test $(find tests -name '*.test.js' -print | sort)
+      - name: Existing static boundaries and audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --test tests/verified-architecture-phase2/static-boundaries.test.js
+          node tests/clean-runtime/v3-promotion-authority-audit.js
