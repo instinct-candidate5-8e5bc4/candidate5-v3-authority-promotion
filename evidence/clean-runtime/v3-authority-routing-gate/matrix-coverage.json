@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "v3-candidate5-matrix-coverage/3.2.0",
+  "matrixRows": 69,
+  "covered": 69,
+  "gates": {
+    "audit": {
+      "executed": true,
+      "clean": true,
+      "digest": "42093d4734c22c09b8b06943c27b15e77218966185a8621b72c1e3533f3c6e1c"
+    },
+    "detachedDeterminism": {
+      "run1": "a0eb287985202a942ac1a3b065ebcca6021308c412e29ab0ea10dcbaae3e15df",
+      "run2": "a0eb287985202a942ac1a3b065ebcca6021308c412e29ab0ea10dcbaae3e15df",
+      "identical": true
+    }
+  },
+  "uncovered": []
+}
+MATRIX 69/69 COVERED BY PASSING BEHAVIORAL REGRESSIONS WITH PER-ROW EVIDENCE RECORDS

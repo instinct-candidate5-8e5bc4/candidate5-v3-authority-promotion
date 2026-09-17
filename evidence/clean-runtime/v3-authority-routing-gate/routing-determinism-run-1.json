@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "v3-routing-determinism/1.0.0",
+  "inProcessRuns": 3,
+  "inProcessIdentical": true,
+  "run": {
+    "registrySnapshotDigest": "70fa272e2a075adeaa8a90bf3e9fabf96dc7afffcaec598e70bda8f89a7dd694",
+    "initialStateDigest": "c1c6ac16659fe5dde46005cdbd951dc06e3f976d54393b3b8e1c19f5b76cc489",
+    "finalStateDigest": "de61783100027547e29f05852c580b0a8ed676d18d341a6aecd806a2c72017a1",
+    "proofPayloadDigests": [
+      "c47c0bed8888d9ac5737e9c98295f9e41e0310798d47e36529c38d31bdfc89ee",
+      "16bd467be3d7bf049b1b252cdedf3529da945bf240fbf89bc7bde5ed95745b47"
+    ],
+    "planDigests": [
+      "90d60a7e844dd11bcdecc7eaf061cb7db6f49949f016fcb7695d37468ba42263",
+      "04190c0d865bd1646df36fb0ff34e9a4d4f3c670ecf040a88586888fc365eb02"
+    ],
+    "decisionDigests": [
+      "39ceca9df9351b45ea3a3c113943d691b36e6d182f4d395fef65c1f11f0d6b76",
+      "e890c2a7b5550fe5aa9d632632458117147256c5947ede73611c6e7ac9866a63"
+    ],
+    "eventDigests": [
+      "d5ca3db4e2d3877bcf8dd414c6a4bf2ce32970a50f5cc87f76b7388c1bb17c57",
+      "29847c896e96667e3b4d75d43f140ccdeab55c7c947c464edac232a766f0ee0d"
+    ],
+    "eventChainDigest": "adb790f0087c06823aca57ba228a54302ffd5acba31458a9c5fe350feb824a97",
+    "replayFinalStateDigest": "de61783100027547e29f05852c580b0a8ed676d18d341a6aecd806a2c72017a1"
+  },
+  "evidenceDigest": "42c42cdf24a521e2dbc319273342f030044127f7b6126d869c01c27507691ad7"
+}

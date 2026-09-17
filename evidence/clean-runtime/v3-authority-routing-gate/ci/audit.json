@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "v3-foundation-authority-audit/1.3.0",
+  "gatewayRouted": false,
+  "schoolConnected": false,
+  "runtimeConnected": false,
+  "legalityPromoted": false,
+  "routingConnected": true,
+  "evaluatorImportSeams": [
+    "src/clean-runtime/mutation/v3-authority-adapter.js"
+  ],
+  "adapterEvaluatorCallSites": 1,
+  "foundationFiles": [
+    "src/clean-runtime/mutation/physical-capability-router.js",
+    "src/clean-runtime/mutation/physical-proof-planner.js",
+    "src/clean-runtime/mutation/v3-authority-adapter.js",
+    "src/clean-runtime/mutation/v3-promotion-foundation.js",
+    "src/clean-runtime/v3-authority/authority-envelope-builder.js",
+    "src/clean-runtime/v3-authority/authority-envelope.js"
+  ],
+  "manifestBlobShas": {
+    "src/clean-runtime/mutation/physical-capability-router.js": "4acc0ea42557c226b4c4ea0d162f787f46fb753e",
+    "src/clean-runtime/mutation/physical-proof-planner.js": "f2bacae79bbb476222f683fa74bda85daeef1629",
+    "src/clean-runtime/mutation/v3-authority-adapter.js": "4ef9f013fa1cc15ea2898fd39ca00dafa4c17879",
+    "src/clean-runtime/mutation/v3-promotion-foundation.js": "c09f5e2c6dac357b1a0b3d660dcc1b73c9dc04bc",
+    "src/clean-runtime/v3-authority/authority-envelope-builder.js": "19f5f180b2253dbda45401542153471ab3ce5c45",
+    "src/clean-runtime/v3-authority/authority-envelope.js": "5766c26d5deacd2b92a231c9a341e636ff97e392"
+  },
+  "routingFiles": [
+    "src/clean-runtime/v3-routing/promoted-authority-runtime.js",
+    "src/clean-runtime/v3-routing/promoted-legality-port.js"
+  ],
+  "routingBlobShas": {
+    "src/clean-runtime/v3-routing/promoted-legality-port.js": "fabb26c5e51cc8ad1eea5094064077969b89577a",
+    "src/clean-runtime/v3-routing/promoted-authority-runtime.js": "541fcbf2b0febf1a16da906f2ab21c0b36350d6d"
+  },
+  "allowedRoutingEdges": {
+    "src/clean-runtime/v3-routing/promoted-legality-port.js": [
+      "src/clean-runtime/mutation/v3-promotion-foundation.js",
+      "src/clean-runtime/mutation/physical-proof-planner.js",
+      "src/clean-runtime/v3-authority/authority-envelope-builder.js"
+    ],
+    "src/clean-runtime/v3-routing/promoted-authority-runtime.js": []
+  },
+  "inboundFoundationImports": [
+    {
+      "file": "src/clean-runtime/v3-routing/promoted-legality-port.js",
+      "foundationImports": [
+        "src/clean-runtime/mutation/physical-proof-planner.js",
+        "src/clean-runtime/mutation/v3-promotion-foundation.js",
+        "src/clean-runtime/v3-authority/authority-envelope-builder.js"
+      ]
+    }
+  ],
+  "findings": [],
+  "auditDigest": "42093d4734c22c09b8b06943c27b15e77218966185a8621b72c1e3533f3c6e1c"
+}

@@ -438,7 +438,7 @@
       "evaluatorCalls": 0,
       "decision": "AUDIT_REJECTED",
       "stateBytesUnchanged": true,
-      "resultDigest": "4f3191b0cc762bb863f8f4ca3d07b30892e39333211825469d5f0f7d7c69e4b3",
+      "resultDigest": "42093d4734c22c09b8b06943c27b15e77218966185a8621b72c1e3533f3c6e1c",
       "evidenceFields": [
         "audit.exit-nonzero-on-mutation",
         "audit.findings.MANIFEST_SHA_MISMATCH",
@@ -453,7 +453,7 @@
       "evaluatorCalls": 0,
       "decision": "AUDIT_REJECTED",
       "stateBytesUnchanged": true,
-      "resultDigest": "4f3191b0cc762bb863f8f4ca3d07b30892e39333211825469d5f0f7d7c69e4b3",
+      "resultDigest": "42093d4734c22c09b8b06943c27b15e77218966185a8621b72c1e3533f3c6e1c",
       "evidenceFields": [
         "audit.exit-nonzero-on-unapproved",
         "audit.findings.FOUNDATION_MANIFEST_SET_MISMATCH",
