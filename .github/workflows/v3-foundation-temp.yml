@@ -5,6 +5,9 @@ on:
 jobs:
   foundation:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@v4
         with: {fetch-depth: 0}
@@ -14,14 +17,21 @@ jobs:
         run: find src/clean-runtime/mutation src/clean-runtime/v3-authority -name '*.js' -print0 | xargs -0 -n1 node --check
       - name: Foundation focused twice
         run: |
+          set -o pipefail
           node --test tests/clean-runtime/v3-*.test.js | tee /tmp/focused-1.tap
           node --test tests/clean-runtime/v3-*.test.js | tee /tmp/focused-2.tap
       - name: Broad
-        run: node --test tests/**/*.test.js | tee /tmp/broad.tap
+        run: |
+          set -o pipefail
+          node --test tests/**/*.test.js | tee /tmp/broad.tap
       - name: Static boundaries
-        run: node --test tests/verified-architecture-phase2/static-boundaries.test.js | tee /tmp/static.tap
+        run: |
+          set -o pipefail
+          node --test tests/verified-architecture-phase2/static-boundaries.test.js | tee /tmp/static.tap
       - name: Isolation audit
-        run: node tests/clean-runtime/v3-promotion-authority-audit.js | tee /tmp/audit.json
+        run: |
+          set -o pipefail
+          node tests/clean-runtime/v3-promotion-authority-audit.js | tee /tmp/audit.json
       - name: Evidence
         if: always()
         run: |
