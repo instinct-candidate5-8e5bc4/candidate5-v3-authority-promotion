@@ -32,8 +32,8 @@
   reject wrong target, wrong source, sibling module, path alias, and
   normalization bypass.
 - Gate results (this package): focused Foundation suite twice (120/120 each),
-  broad suite (578/578), static boundaries (4/4), hostile boundary suite
-  (18/18), reopened audit (0 findings, boundaryPolicyValid=true, exactly 3
+  broad suite (582/582), static boundaries (4/4), hostile boundary suite
+  (22/22: 18 mandatory + 4 independent-certification regressions), reopened audit 1.4.0 (0 findings, boundaryPolicyValid=true, exactly 3
   allowed pairs), Foundation detached determinism byte-identical across two
   runs, closure determinism byte-identical, closure performance captured,
   matrix coverage 69/69 with clean audit gate.

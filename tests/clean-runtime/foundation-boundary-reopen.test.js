@@ -70,7 +70,7 @@ test('hostile 8: relative-path normalization bypass fails',()=>{
 test('hostile 9: dynamic require/import attempt fails',()=>{
   const r=audit(fixture(dir=>writePort(dir,"'use strict';\nconst x0=require('../mutation/physical-proof-planner.js');\nconst name='../mutation/v3-promotion-foundation.js';\nconst dyn=require(name);\nconst p=import('../v3-authority/authority-envelope-builder.js');\nmodule.exports={};\n")));
   assert.notEqual(r.code,0);
-  assert.ok(findingsOf(r,'ALLOWLIST_IMPORTER_DYNAMIC_LOAD').length===1)});
+  assert.equal(findingsOf(r,'NON_STATICALLY_RESOLVABLE_LOAD').length,2)});
 test('hostile 10: re-export/factory/injector indirection creates no additional authority',()=>{
   const dir=fixture(d=>{writePort(d,portSource([T_PLANNER,T_FOUNDATION,T_ENVELOPE],"module.exports.plan=x0;"));fs.writeFileSync(path.join(d,'src/clean-runtime/v3-routing/consumer.js'),"'use strict';\nconst port=require('./promoted-legality-port.js');\nmodule.exports={plan:port.plan};\n")});
   const ok=audit(dir);assert.equal(ok.code,0,'consumer via port holds no foundation authority of its own: '+JSON.stringify(ok.body.findings));
@@ -125,3 +125,23 @@ test('hostile 18: routing gate remains non-promoted during this reopen',()=>{
   assert.equal(r.body.runtimeConnected,false);
   assert.equal(r.body.inboundFoundationImports.length,0);
   assert.equal(r.body.boundaryPolicyValid,true)});
+test('regression 19: aliased require fails (Yoni repro a)',()=>{
+  const r=audit(fixture(dir=>writePort(dir,"'use strict';\nconst R=require;\nconst x=R('../mutation/v3-promotion-foundation.js');\nmodule.exports={};\n")));
+  assert.notEqual(r.code,0);
+  assert.ok(findingsOf(r,'NON_STATICALLY_RESOLVABLE_LOAD').some(f=>f.detail==='require used as a value'))});
+test('regression 20: comment-separated require fails (Yoni repro b)',()=>{
+  for(const src of [
+    "'use strict';\nconst name='../mutation/v3-promotion-foundation.js';\nconst x=require /* hidden */ (name);\nmodule.exports={};\n",
+    "'use strict';\nconst x=require /* hidden */ ('../mutation/v3-promotion-foundation.js');\nmodule.exports={};\n",
+    "'use strict';\nconst x=require(/* hidden */ '../mutation/v3-promotion-foundation.js');\nmodule.exports={};\n"]){
+    const r=audit(fixture(dir=>writePort(dir,src)));
+    assert.notEqual(r.code,0,'comment-obfuscated require must fail');
+    assert.ok(findingsOf(r,'NON_STATICALLY_RESOLVABLE_LOAD').length>=1)}});
+test('regression 21: bracket/member loader access fails (Yoni repro c)',()=>{
+  const r=audit(fixture(dir=>writePort(dir,"'use strict';\nconst a=module['require']('../mutation/v3-promotion-foundation.js');\nconst b=module.require('../mutation/physical-proof-planner.js');\nmodule.exports={};\n")));
+  assert.notEqual(r.code,0);
+  assert.equal(findingsOf(r,'NON_STATICALLY_RESOLVABLE_LOAD').length,2)});
+test('regression 22: dynamic loading from non-allowlisted production source fails (Yoni repro d)',()=>{
+  const r=audit(fixture(dir=>{const p=path.join(dir,'src/clean-runtime/v3-routing/wrong-source.js');fs.mkdirSync(path.dirname(p),{recursive:true});fs.writeFileSync(p,"'use strict';\nconst name='../mutation/v3-promotion-foundation.js';\nmodule.exports=require(name);\n")}));
+  assert.notEqual(r.code,0);
+  assert.ok(findingsOf(r,'NON_STATICALLY_RESOLVABLE_LOAD').some(f=>f.file==='src/clean-runtime/v3-routing/wrong-source.js'))});

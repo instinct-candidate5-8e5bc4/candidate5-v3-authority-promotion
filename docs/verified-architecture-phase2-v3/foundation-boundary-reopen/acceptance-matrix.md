@@ -20,6 +20,10 @@
 | 16 | Existing fail-closed behavior unchanged | hostile test 16 (school + runtime inbound still rejected) |
 | 17 | Inherited hostile/replay/determinism suites green | hostile test 17 |
 | 18 | Routing Gate remains non-promoted | hostile test 18 |
+| R19 | Aliased require fails (independent-cert repro a) | regression test 19 |
+| R20 | Comment-separated require fails (repro b; also closes graph-invisibility) | regression test 20 (3 variants) |
+| R21 | Bracket/member loader access fails (repro c) | regression test 21 |
+| R22 | Dynamic load from non-allowlisted source fails (repro d) | regression test 22 |
 
 Certification evidence: `evidence/clean-runtime/v3-foundation-boundary-reopen/`
 (baseline SHA, changed-file list, six-module byte comparison, old/new policy,

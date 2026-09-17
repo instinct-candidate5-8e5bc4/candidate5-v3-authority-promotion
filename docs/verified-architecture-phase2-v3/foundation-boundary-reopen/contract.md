@@ -48,8 +48,23 @@ paths contain no `.`/`..` segments, backslashes, or glob/regex metacharacters,
 so normalization cannot expand permission. The manifest policy must equal the
 certified three-edge set exactly: a missing edge, an additional edge, a
 duplicate, or a malformed entry each fail certification
-(`ALLOWLIST_POLICY_MISMATCH`). An allowlisted importer using dynamic
-`require`/`import()` fails certification (`ALLOWLIST_IMPORTER_DYNAMIC_LOAD`).
+(`ALLOWLIST_POLICY_MISMATCH`).
+
+Module-load verification (audit 1.4.0) is parsing-based, not regex-based: a
+lexical scanner (comments, strings, regex literals, template `${}` expressions
+handled) examines EVERY production source file and fails certification
+(`NON_STATICALLY_RESOLVABLE_LOAD`) unless every `require` is a direct call
+with exactly one plain string-literal argument. It rejects: `require` used as
+a value or alias (`const R=require`), member or bracket loader access
+(`module.require`, `module['require']`), non-literal arguments
+(`require(name)`), comment-obfuscated calls (`require /* hidden */ ('...')` -
+which would also hide the edge from the import graph), dynamic `import()`,
+and the `eval()`/`Function()`/`Reflect.` load channels. A `typeof require`
+capability probe and method definitions named `import` (both present in
+baseline code) are not loads and are explicitly allowed; `...require('./x')`
+spread of a literal call remains allowed. Any computed or indirect module load
+that cannot be statically resolved fails certification, from the allowlisted
+importer and from any other production file alike.
 Every edge outside the exact allowlist fails closed
 (`FORBIDDEN_INBOUND_FOUNDATION_IMPORT`), as do School/runtime/gateway
 connections (`SCHOOL_CONNECTED`, `RUNTIME_CONNECTED`, `GATEWAY_ROUTED`) -
