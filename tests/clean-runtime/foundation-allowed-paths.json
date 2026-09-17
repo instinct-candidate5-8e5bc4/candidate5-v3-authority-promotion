@@ -6,7 +6,7 @@
     "src/clean-runtime/mutation/physical-proof-planner.js": "3c062077994dc62ff5527f9ec40f94143f62f2d7",
     "src/clean-runtime/mutation/v3-authority-adapter.js": "4f1b820f0903eed6e3ac66ca5179747145217c93",
     "src/clean-runtime/mutation/v3-promotion-foundation.js": "d04be963d2802c647737e120fc107b898da67a4d",
-    "src/clean-runtime/v3-authority/authority-envelope-builder.js": "4469f65ebc3e6dd13a5144e98df758e8b462f0cc",
+    "src/clean-runtime/v3-authority/authority-envelope-builder.js": "19f5f180b2253dbda45401542153471ab3ce5c45",
     "src/clean-runtime/v3-authority/authority-envelope.js": "335a019f69257dd4d84bdda8f56f8fa46cfc81a8"
   }
 }
