@@ -56,16 +56,21 @@
       "reason": "STALE_EVIDENCE",
       "classification": "V3_INVALID_AUTHORITY",
       "evaluatorCalls": 1,
-      "decision": "REJECTED_AT_ADAPTER",
+      "decision": "REJECT_REQUIRED",
       "stateBytesUnchanged": true,
-      "resultDigest": "189799afc4f37230f679f8bcdfabf45eea4c21f2a5215952ef0fec4f0cdc7e71",
+      "resultDigest": "3f24270e64349f59de590effba17d4060ea52e8ccd3ff51da3cd73aad3cee551",
       "evidenceFields": [
+        "decision",
         "outcome",
-        "classification",
-        "v3.status",
-        "v3.reason",
-        "adapterEvidence.validationStage",
-        "adapterEvidence.evaluatorCalls"
+        "obligationResults[V3_OPENING].outcome",
+        "obligationResults[V3_OPENING].classification",
+        "obligationResults[V3_OPENING].v3.status",
+        "obligationResults[V3_OPENING].v3.reason",
+        "obligationResults[V3_OPENING].adapterEvidence.validationStage",
+        "obligationResults[V3_OPENING].adapterEvidence.evaluatorCalls",
+        "summary.invalidV3",
+        "summary.evaluatorCalls",
+        "decisionDigest"
       ]
     },
     {
@@ -314,17 +319,21 @@
       "reason": "MALFORMED_V3_RESULT",
       "classification": "MALFORMED_V3_RESULT",
       "evaluatorCalls": 1,
-      "decision": "REJECTED_AT_ADAPTER",
+      "decision": "REJECT_REQUIRED",
       "stateBytesUnchanged": true,
-      "resultDigest": "a276b2ee30660ec58945dff32e598914891b752a777e85f5272a0c638c92f4aa",
+      "resultDigest": "ebd0edf286ac65adf0e554a9aed2e9fc72a8b3e227772c8292b8ee55023806f0",
       "evidenceFields": [
+        "decision",
         "outcome",
         "classification",
         "v3.status",
+        "v3.reason",
         "adapterEvidence.validationStage",
         "adapterEvidence.evaluatorCalls",
         "exception",
-        "resultDigest-determinism"
+        "summary.evaluatorCalls",
+        "resultDigest-determinism",
+        "decisionDigest"
       ]
     },
     {
@@ -333,16 +342,42 @@
       "reason": "MALFORMED_V3_RESULT",
       "classification": "MALFORMED_V3_RESULT",
       "evaluatorCalls": 1,
-      "decision": "REJECTED_AT_ADAPTER",
+      "decision": "REJECT_REQUIRED",
       "stateBytesUnchanged": true,
-      "resultDigest": "6f986b3b1ecc6e91db784327b9494503298a864b9d75aa905da8b921aac39c24",
+      "resultDigest": "29fe75dcf039101627f209871b50b6248f063f83006f415b7de21006ef577f1f",
       "evidenceFields": [
+        "decision",
         "outcome",
         "classification",
         "v3.status",
+        "v3.reason",
         "adapterEvidence.validationStage",
         "adapterEvidence.evaluatorCalls",
-        "resultDigest-determinism"
+        "summary.evaluatorCalls",
+        "resultDigest-determinism",
+        "decisionDigest"
+      ]
+    },
+    {
+      "row": "CALLER_EVALUATOR_BYPASS",
+      "outcome": "FAIL",
+      "reason": "CONTACT_FLOATING",
+      "classification": "V3_DEFINITE_ILLEGALITY",
+      "evaluatorCalls": 1,
+      "decision": "REJECT_REQUIRED",
+      "stateBytesUnchanged": true,
+      "resultDigest": "faba172cb623753e7877629c5e1108ae1cff8db5f4d344ed7f42821a5e6d9df3",
+      "evidenceFields": [
+        "decision",
+        "outcome",
+        "classification",
+        "v3.status",
+        "v3.reason",
+        "adapterEvidence.evaluatorId",
+        "adapterEvidence.evaluatorCalls",
+        "adapterEvidence.validationStage",
+        "resultDigest-equals-real-chain-result",
+        "decisionDigest"
       ]
     },
     {
@@ -382,7 +417,7 @@
       "evaluatorCalls": 0,
       "decision": "AUDIT_REJECTED",
       "stateBytesUnchanged": true,
-      "resultDigest": "f4fd3f7550e12c69695d22a9fc6f49daf6e7234836e3cdba8aedd2f1c65d7caa",
+      "resultDigest": "590a1a0229a9be2facb56092de3d4704f8e22eb0c4a3de1b7fa1367505fbbbd2",
       "evidenceFields": [
         "audit.exit-nonzero-on-mutation",
         "audit.findings.MANIFEST_SHA_MISMATCH",
@@ -397,7 +432,7 @@
       "evaluatorCalls": 0,
       "decision": "AUDIT_REJECTED",
       "stateBytesUnchanged": true,
-      "resultDigest": "f4fd3f7550e12c69695d22a9fc6f49daf6e7234836e3cdba8aedd2f1c65d7caa",
+      "resultDigest": "590a1a0229a9be2facb56092de3d4704f8e22eb0c4a3de1b7fa1367505fbbbd2",
       "evidenceFields": [
         "audit.exit-nonzero-on-unapproved",
         "audit.findings.FOUNDATION_MANIFEST_SET_MISMATCH",

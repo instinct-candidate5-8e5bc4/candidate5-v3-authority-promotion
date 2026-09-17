@@ -1,12 +1,12 @@
 {
-  "schemaVersion": "v3-candidate5-matrix-coverage/3.0.0",
-  "matrixRows": 67,
-  "covered": 67,
+  "schemaVersion": "v3-candidate5-matrix-coverage/3.1.0",
+  "matrixRows": 68,
+  "covered": 68,
   "gates": {
     "audit": {
       "executed": true,
       "clean": true,
-      "digest": "f4fd3f7550e12c69695d22a9fc6f49daf6e7234836e3cdba8aedd2f1c65d7caa"
+      "digest": "590a1a0229a9be2facb56092de3d4704f8e22eb0c4a3de1b7fa1367505fbbbd2"
     },
     "detachedDeterminism": {
       "run1": "a0eb287985202a942ac1a3b065ebcca6021308c412e29ab0ea10dcbaae3e15df",
@@ -16,4 +16,4 @@
   },
   "uncovered": []
 }
-MATRIX 67/67 COVERED BY PASSING BEHAVIORAL REGRESSIONS WITH PER-ROW EVIDENCE RECORDS
+MATRIX 68/68 COVERED BY PASSING BEHAVIORAL REGRESSIONS WITH PER-ROW EVIDENCE RECORDS

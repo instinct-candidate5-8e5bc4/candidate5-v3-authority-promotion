@@ -2,25 +2,25 @@ TAP version 13
 # Subtest: Phase 2 has no fallback, clamp, snap, runtime adapter or promotion API
 ok 1 - Phase 2 has no fallback, clamp, snap, runtime adapter or promotion API
   ---
-  duration_ms: 1.626736
+  duration_ms: 1.592516
   type: 'test'
   ...
 # Subtest: Phase 1 immutable boundary remains byte unchanged from reviewed Phase 1
 ok 2 - Phase 1 immutable boundary remains byte unchanged from reviewed Phase 1
   ---
-  duration_ms: 5.801175
+  duration_ms: 4.722885
   type: 'test'
   ...
 # Subtest: V1/V2 and closed V3 implementation boundaries remain byte unchanged by foundation
 ok 3 - V1/V2 and closed V3 implementation boundaries remain byte unchanged by foundation
   ---
-  duration_ms: 5.053468
+  duration_ms: 4.230995
   type: 'test'
   ...
 # Subtest: foundation production set is exact immutable manifest and has no unapproved inbound production imports
 ok 4 - foundation production set is exact immutable manifest and has no unapproved inbound production imports
   ---
-  duration_ms: 27.995427
+  duration_ms: 22.437131
   type: 'test'
   ...
 1..4
@@ -31,4 +31,4 @@ ok 4 - foundation production set is exact immutable manifest and has no unapprov
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 101.819449
+# duration_ms 89.884871
