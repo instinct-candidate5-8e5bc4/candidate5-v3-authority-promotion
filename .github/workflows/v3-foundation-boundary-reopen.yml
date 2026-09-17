@@ -1,0 +1,92 @@
+name: V3 Foundation Boundary Policy Reopen
+on:
+  push:
+    branches: [candidate5-foundation-boundary-reopen]
+jobs:
+  boundary-reopen:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Syntax
+        run: node --check tests/clean-runtime/v3-promotion-authority-audit.js && node --check tests/clean-runtime/foundation-boundary-reopen.test.js && node --check tests/verified-architecture-phase2/static-boundaries.test.js
+      - name: Scope guard - no production or inherited-evidence change
+        run: |
+          BASE=127f284d78b83f358f076b3ee8f8b56044bcc691
+          test -z "$(git diff --name-only "$BASE"...HEAD -- src/)"
+          test -z "$(git diff --name-only "$BASE"...HEAD -- evidence/clean-runtime/v3-authority-promotion-foundation/)"
+          git diff --name-status "$BASE"...HEAD
+      - name: Six certified Foundation modules byte-identical
+      # byte comparison of all six production blobs against the pinned SHAs
+        run: |
+          python3 - <<'PY'
+          import json,subprocess
+          m=json.load(open('tests/clean-runtime/foundation-allowed-paths.json'))
+          for p,sha in sorted(m['files'].items()):
+              actual=subprocess.check_output(['git','hash-object',p],text=True).strip()
+              assert actual==sha, f'{p}: {actual} != {sha}'
+              print('byte-identical:',p,actual)
+          PY
+      - name: Focused Foundation suite twice
+        run: |
+          set -o pipefail
+          node --test tests/clean-runtime/v3-*.test.js | tee "$RUNNER_TEMP/focused-1.tap"
+          node --test tests/clean-runtime/v3-*.test.js | tee "$RUNNER_TEMP/focused-2.tap"
+      - name: Broad exact command (inherited regression gates + hostile boundary suite)
+        run: |
+          set -o pipefail
+          files=$(find tests -name '*.test.js' -print | sort | tr '\n' ' ')
+          node --test $files | tee "$RUNNER_TEMP/broad.tap"
+      - name: Static boundaries
+        run: |
+          set -o pipefail
+          node --test tests/verified-architecture-phase2/static-boundaries.test.js | tee "$RUNNER_TEMP/static.tap"
+      - name: Hostile boundary suite (18 mandatory)
+        run: |
+          set -o pipefail
+          node --test tests/clean-runtime/foundation-boundary-reopen.test.js | tee "$RUNNER_TEMP/hostile.tap"
+      - name: Reopened authority audit
+        run: |
+          set -o pipefail
+          node tests/clean-runtime/v3-promotion-authority-audit.js | tee "$RUNNER_TEMP/audit.json"
+      - name: Foundation detached determinism, closure determinism/performance, matrix coverage
+        run: |
+          OUT="$RUNNER_TEMP/review-evidence"; mkdir -p "$OUT"; set -o pipefail
+          node tests/clean-runtime/v3-candidate5-determinism.js > "$OUT/determinism-1.json"
+          node tests/clean-runtime/v3-candidate5-determinism.js > "$OUT/determinism-2.json"
+          cmp "$OUT/determinism-1.json" "$OUT/determinism-2.json"
+          node tools/verified-architecture-phase2-v3/closure-evidence.js determinism > "$OUT/closure-determinism-1.json"
+          node tools/verified-architecture-phase2-v3/closure-evidence.js determinism > "$OUT/closure-determinism-2.json"
+          cmp "$OUT/closure-determinism-1.json" "$OUT/closure-determinism-2.json"
+          node tools/verified-architecture-phase2-v3/closure-evidence.js performance > "$OUT/closure-performance.json"
+          node tests/clean-runtime/v3-candidate5-matrix-coverage.js | tee "$OUT/matrix-coverage.json"
+          git checkout -- evidence/clean-runtime/v3-authority-promotion-foundation/candidate5/foundation-matrix-evidence.json
+          test "$(git hash-object evidence/clean-runtime/v3-authority-promotion-foundation/candidate5/foundation-matrix-evidence.json)" = "aea5d721b39875d17aa2b7e5327580e11545efdb"
+          git status --porcelain=v1 | grep -v '^??' | wc -l | grep -q '^0$'
+      - name: Review metadata and controls
+        if: always()
+        run: |
+          OUT="$RUNNER_TEMP/review-evidence"; mkdir -p "$OUT"
+          BASE=127f284d78b83f358f076b3ee8f8b56044bcc691
+          git rev-parse HEAD > "$OUT/commit.txt"; git rev-parse HEAD^ > "$OUT/parent.txt"
+          test "$(git merge-base "$BASE" HEAD)" = "$BASE"
+          git rev-list --left-right --count "$BASE"...HEAD > "$OUT/rev-list.txt"
+          git diff --name-status "$BASE"...HEAD > "$OUT/diff-name-status.txt"
+          git diff --numstat "$BASE"...HEAD > "$OUT/diff-numstat.txt"
+          git status --porcelain=v1 > "$OUT/review-worktree-status.txt"
+          remote=$(git ls-remote origin refs/heads/candidate5-foundation-boundary-reopen | awk '{print $1}'); echo "$remote" > "$OUT/remote-tip.txt"; test "$remote" = "$(git rev-parse HEAD)"
+          foundation=$(git ls-remote origin refs/heads/candidate5 | awk '{print $1}'); echo "$foundation" > "$OUT/foundation-branch-tip.txt"; test "$foundation" = "127f284d78b83f358f076b3ee8f8b56044bcc691"
+          git fetch --depth=1 https://github.com/yuzok101/ko-rishon-first-aid-simulator.git main && test "$(git rev-parse FETCH_HEAD)" = "4e06f74a058f10c0be229dabfedf2015cb350e69"
+          cp "$RUNNER_TEMP/focused-1.tap" "$RUNNER_TEMP/focused-2.tap" "$RUNNER_TEMP/broad.tap" "$RUNNER_TEMP/static.tap" "$RUNNER_TEMP/hostile.tap" "$RUNNER_TEMP/audit.json" "$OUT/" 2>/dev/null || true
+          tar --exclude=.git -czf "$OUT/candidate.tar.gz" .
+          sha256sum "$OUT/candidate.tar.gz" > "$OUT/candidate.sha256"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v3-foundation-boundary-reopen-${{ github.sha }}
+          path: ${{ runner.temp }}/review-evidence
