@@ -1,0 +1,36 @@
+name: V3 Authority Promotion Foundation
+on:
+  push:
+    branches: [chatgpt/v3-authority-promotion-preflight]
+jobs:
+  foundation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Syntax
+        run: find src/clean-runtime/mutation src/clean-runtime/v3-authority -name '*.js' -print0 | xargs -0 -n1 node --check
+      - name: Foundation focused twice
+        run: |
+          node --test tests/clean-runtime/v3-*.test.js | tee /tmp/focused-1.tap
+          node --test tests/clean-runtime/v3-*.test.js | tee /tmp/focused-2.tap
+      - name: Broad
+        run: node --test tests/**/*.test.js | tee /tmp/broad.tap
+      - name: Static boundaries
+        run: node --test tests/verified-architecture-phase2/static-boundaries.test.js | tee /tmp/static.tap
+      - name: Isolation audit
+        run: node tests/clean-runtime/v3-promotion-authority-audit.js | tee /tmp/audit.json
+      - name: Evidence
+        if: always()
+        run: |
+          mkdir -p evidence/clean-runtime/v3-authority-promotion-foundation/ci
+          cp /tmp/*.tap evidence/clean-runtime/v3-authority-promotion-foundation/ci/ 2>/dev/null || true
+          cp /tmp/audit.json evidence/clean-runtime/v3-authority-promotion-foundation/ci/ 2>/dev/null || true
+          sha256sum evidence/clean-runtime/v3-authority-promotion-foundation/ci/* > evidence/clean-runtime/v3-authority-promotion-foundation/ci/SHA256SUMS 2>/dev/null || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v3-foundation-${{ github.sha }}
+          path: evidence/clean-runtime/v3-authority-promotion-foundation/ci
