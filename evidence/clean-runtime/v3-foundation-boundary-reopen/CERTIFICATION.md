@@ -38,6 +38,10 @@
   allowed pairs), Foundation detached determinism byte-identical across two
   runs, closure determinism byte-identical, closure performance captured,
   matrix coverage 69/69 with clean audit gate.
+- Fixture integrity: hostile fixtures build from `git archive HEAD src`
+  (immutable committed content) after a CI race where the parallel matrix
+  suite's in-place tamper probe was copied mid-write; audit itself always
+  runs on the real tree.
 - Manifest verification: reopened audit validates the manifest allowlist
   equals exactly the certified three-edge set (`ALLOWLIST_POLICY_MISMATCH`
   otherwise) - hostile tests 11-13.

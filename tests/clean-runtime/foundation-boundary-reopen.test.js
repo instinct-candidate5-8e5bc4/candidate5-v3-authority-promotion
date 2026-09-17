@@ -22,7 +22,13 @@ const REL={ // require specifier for a foundation target as seen from the port f
 function portSource(targets,extra){return "'use strict';\n"+targets.map(t=>"const x"+targets.indexOf(t)+"=require('"+REL[t]+"');").join('\n')+(extra||'')+"\nmodule.exports={};\n"}
 function fixture(mutate){
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),'boundary-reopen-'));
-  fs.cpSync(path.join(ROOT,'src'),path.join(dir,'src'),{recursive:true});
+  // source the fixture tree from committed HEAD content, never the working
+  // tree: the broad suite runs files in parallel and the matrix suite briefly
+  // tampers a foundation module in place to prove detection.
+  const tar=cp.execFileSync('git',['archive','HEAD','src'],{cwd:ROOT,maxBuffer:64*1024*1024});
+  fs.writeFileSync(path.join(dir,'src.tar'),tar);
+  cp.execFileSync('tar',['-x','-f','src.tar'],{cwd:dir});
+  fs.rmSync(path.join(dir,'src.tar'));
   fs.mkdirSync(path.join(dir,'tests/clean-runtime'),{recursive:true});
   fs.copyFileSync(path.join(ROOT,'tests/clean-runtime/v3-promotion-authority-audit.js'),path.join(dir,'tests/clean-runtime/v3-promotion-authority-audit.js'));
   fs.cpSync(path.join(ROOT,'tests/clean-runtime/vendor'),path.join(dir,'tests/clean-runtime/vendor'),{recursive:true});

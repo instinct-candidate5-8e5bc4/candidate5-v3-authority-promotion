@@ -1,184 +1,184 @@
 TAP version 13
-# (node:16015) Warning: node:test run() is being called recursively within a test file. skipping running files.
+# (node:21728) Warning: node:test run() is being called recursively within a test file. skipping running files.
 # (Use `node --trace-warnings ...` to show where the warning was created)
 # Subtest: hostile 1: each approved edge independently passes
 ok 1 - hostile 1: each approved edge independently passes
   ---
-  duration_ms: 1066.620426
+  duration_ms: 1022.165931
   type: 'test'
   ...
 # Subtest: hostile 2: all three approved edges together pass
 ok 2 - hostile 2: all three approved edges together pass
   ---
-  duration_ms: 383.492886
+  duration_ms: 357.798863
   type: 'test'
   ...
 # Subtest: hostile 3: same source to wrong target fails
 ok 3 - hostile 3: same source to wrong target fails
   ---
-  duration_ms: 339.957553
+  duration_ms: 348.136415
   type: 'test'
   ...
 # Subtest: hostile 4: wrong source to approved target fails
 ok 4 - hostile 4: wrong source to approved target fails
   ---
-  duration_ms: 346.521158
+  duration_ms: 358.950145
   type: 'test'
   ...
 # Subtest: hostile 5: fourth foundation edge fails
 ok 5 - hostile 5: fourth foundation edge fails
   ---
-  duration_ms: 344.606946
+  duration_ms: 368.319925
   type: 'test'
   ...
 # Subtest: hostile 6: sibling module edge fails
 ok 6 - hostile 6: sibling module edge fails
   ---
-  duration_ms: 329.955263
+  duration_ms: 382.169245
   type: 'test'
   ...
 # Subtest: hostile 7: path alias attempt fails
 ok 7 - hostile 7: path alias attempt fails
   ---
-  duration_ms: 350.58941
+  duration_ms: 338.226288
   type: 'test'
   ...
 # Subtest: hostile 8: relative-path normalization bypass fails
 ok 8 - hostile 8: relative-path normalization bypass fails
   ---
-  duration_ms: 354.062873
+  duration_ms: 316.713317
   type: 'test'
   ...
 # Subtest: hostile 9: dynamic require/import attempt fails
 ok 9 - hostile 9: dynamic require/import attempt fails
   ---
-  duration_ms: 426.450067
+  duration_ms: 381.821303
   type: 'test'
   ...
 # Subtest: hostile 10: re-export/factory/injector indirection creates no additional authority
 ok 10 - hostile 10: re-export/factory/injector indirection creates no additional authority
   ---
-  duration_ms: 679.708693
+  duration_ms: 747.59332
   type: 'test'
   ...
 # Subtest: hostile 11: duplicate or malformed allowlist entry fails
 ok 11 - hostile 11: duplicate or malformed allowlist entry fails
   ---
-  duration_ms: 1343.438766
+  duration_ms: 1427.926897
   type: 'test'
   ...
 # Subtest: hostile 12: missing approved edge fails certification
 ok 12 - hostile 12: missing approved edge fails certification
   ---
-  duration_ms: 339.646219
+  duration_ms: 349.071213
   type: 'test'
   ...
 # Subtest: hostile 13: additional allowlist edge fails certification
 ok 13 - hostile 13: additional allowlist edge fails certification
   ---
-  duration_ms: 340.292607
+  duration_ms: 325.399103
   type: 'test'
   ...
 # Subtest: hostile 14: modification of any certified foundation blob fails certification
 ok 14 - hostile 14: modification of any certified foundation blob fails certification
   ---
-  duration_ms: 1986.028799
+  duration_ms: 2176.002084
   type: 'test'
   ...
 # Subtest: hostile 15: any foundation semantic/result change fails certification
 ok 15 - hostile 15: any foundation semantic/result change fails certification
   ---
-  duration_ms: 348.503864
+  duration_ms: 359.41925
   type: 'test'
   ...
 # Subtest: hostile 16: existing fail-closed behavior remains unchanged
 ok 16 - hostile 16: existing fail-closed behavior remains unchanged
   ---
-  duration_ms: 393.764657
+  duration_ms: 396.715074
   type: 'test'
   ...
 # Subtest: hostile 17: existing foundation hostile/replay/determinism suites remain green
 ok 17 - hostile 17: existing foundation hostile/replay/determinism suites remain green
   ---
-  duration_ms: 36.13123
+  duration_ms: 34.418159
   type: 'test'
   ...
 # Subtest: hostile 18: routing gate remains non-promoted during this reopen
 ok 18 - hostile 18: routing gate remains non-promoted during this reopen
   ---
-  duration_ms: 330.099599
+  duration_ms: 363.158118
   type: 'test'
   ...
 # Subtest: regression 19: aliased require fails (Yoni repro a)
 ok 19 - regression 19: aliased require fails (Yoni repro a)
   ---
-  duration_ms: 333.898791
+  duration_ms: 384.918413
   type: 'test'
   ...
 # Subtest: regression 20: comment-separated require cannot hide or smuggle edges (Yoni repro b)
 ok 20 - regression 20: comment-separated require cannot hide or smuggle edges (Yoni repro b)
   ---
-  duration_ms: 1055.043738
+  duration_ms: 1147.875474
   type: 'test'
   ...
 # Subtest: regression 21: bracket/member loader access fails (Yoni repro c)
 ok 21 - regression 21: bracket/member loader access fails (Yoni repro c)
   ---
-  duration_ms: 335.123812
+  duration_ms: 372.765605
   type: 'test'
   ...
 # Subtest: regression 22: dynamic loading from non-allowlisted production source fails (Yoni repro d)
 ok 22 - regression 22: dynamic loading from non-allowlisted production source fails (Yoni repro d)
   ---
-  duration_ms: 319.955588
+  duration_ms: 339.635775
   type: 'test'
   ...
 # Subtest: regression 23: unicode-escaped require binding fails (Yoni bypass 1)
 ok 23 - regression 23: unicode-escaped require binding fails (Yoni bypass 1)
   ---
-  duration_ms: 716.040129
+  duration_ms: 687.198205
   type: 'test'
   ...
 # Subtest: regression 24: destructured createRequire fails (Yoni bypass 2)
 ok 24 - regression 24: destructured createRequire fails (Yoni bypass 2)
   ---
-  duration_ms: 374.749402
+  duration_ms: 354.776908
   type: 'test'
   ...
 # Subtest: regression 25: member-access createRequire fails (Yoni bypass 3)
 ok 25 - regression 25: member-access createRequire fails (Yoni bypass 3)
   ---
-  duration_ms: 394.0361
+  duration_ms: 338.509185
   type: 'test'
   ...
 # Subtest: regression 26: createRequire through process/module indirection fails (Yoni bypass 4)
 ok 26 - regression 26: createRequire through process/module indirection fails (Yoni bypass 4)
   ---
-  duration_ms: 324.214464
+  duration_ms: 361.975855
   type: 'test'
   ...
 # Subtest: regression 27: computed module[re+quire] fails (Yoni bypass 5)
 ok 27 - regression 27: computed module[re+quire] fails (Yoni bypass 5)
   ---
-  duration_ms: 325.06356
+  duration_ms: 354.012734
   type: 'test'
   ...
 # Subtest: regression 28: module.constructor._load fails (Yoni bypass 6)
 ok 28 - regression 28: module.constructor._load fails (Yoni bypass 6)
   ---
-  duration_ms: 321.725508
+  duration_ms: 346.975528
   type: 'test'
   ...
 # Subtest: regression 29: computed/aliased eval, Function and Reflect fail (Yoni bypass 7)
 ok 29 - regression 29: computed/aliased eval, Function and Reflect fail (Yoni bypass 7)
   ---
-  duration_ms: 1972.651002
+  duration_ms: 2184.732389
   type: 'test'
   ...
 # Subtest: regression 30: shadowed local require fails closed
 ok 30 - regression 30: shadowed local require fails closed
   ---
-  duration_ms: 388.27907
+  duration_ms: 349.476798
   type: 'test'
   ...
 1..30
@@ -189,4 +189,4 @@ ok 30 - regression 30: shadowed local require fails closed
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 16659.582222
+# duration_ms 17342.440002
