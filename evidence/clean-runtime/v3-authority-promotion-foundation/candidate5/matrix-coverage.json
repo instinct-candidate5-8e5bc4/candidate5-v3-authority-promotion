@@ -1,9 +1,14 @@
 {
-  "schemaVersion": "v3-candidate5-matrix-coverage/1.0.0",
+  "schemaVersion": "v3-candidate5-matrix-coverage/2.0.0",
   "matrixRows": 67,
   "covered": 67,
   "auditExecuted": true,
   "auditClean": true,
+  "detachedDeterminism": {
+    "run1": "a0eb287985202a942ac1a3b065ebcca6021308c412e29ab0ea10dcbaae3e15df",
+    "run2": "a0eb287985202a942ac1a3b065ebcca6021308c412e29ab0ea10dcbaae3e15df",
+    "identical": true
+  },
   "uncovered": []
 }
 MATRIX 67/67 COVERED BY PASSING BEHAVIORAL REGRESSIONS

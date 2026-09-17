@@ -1,7 +1,7 @@
 name: V3 Authority Promotion Foundation
 on:
   push:
-    branches: [chatgpt/v3-authority-promotion-preflight]
+    branches: [candidate5]
 jobs:
   foundation:
     runs-on: ubuntu-latest
@@ -23,7 +23,7 @@ jobs:
       - name: Broad
         run: |
           set -o pipefail
-          node --test tests/**/*.test.js | tee /tmp/broad.tap
+          node --test $(find tests -name '*.test.js' | sort) | tee /tmp/broad.tap
       - name: Static boundaries
         run: |
           set -o pipefail

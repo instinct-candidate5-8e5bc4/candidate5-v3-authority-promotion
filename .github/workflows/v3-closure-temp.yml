@@ -2,7 +2,7 @@ name: V3 closure temp
 on: [push]
 jobs:
   test:
-    if: github.ref == 'refs/heads/chatgpt/v3-surface-containment-opening'
+    if: github.ref == 'refs/heads/candidate5'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
