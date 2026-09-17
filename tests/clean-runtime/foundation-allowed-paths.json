@@ -1,6 +1,6 @@
 {
   "schemaVersion": "v3-foundation-file-manifest/1.0.0",
-  "policy": "Only these six production modules may constitute the isolated V3 promotion foundation. Any other production module importing one of them is forbidden until Authority Routing Gate. Blob SHAs are immutable content identities.",
+  "policy": "Only these six production modules may constitute the isolated V3 promotion foundation. Blob SHAs are immutable content identities. Until the Authority Routing Gate, any other production module importing one of them is forbidden; at the Authority Routing Gate only the exact routingGate edges below are approved.",
   "files": {
     "src/clean-runtime/mutation/physical-capability-router.js": "4acc0ea42557c226b4c4ea0d162f787f46fb753e",
     "src/clean-runtime/mutation/physical-proof-planner.js": "f2bacae79bbb476222f683fa74bda85daeef1629",
@@ -8,5 +8,24 @@
     "src/clean-runtime/mutation/v3-promotion-foundation.js": "c09f5e2c6dac357b1a0b3d660dcc1b73c9dc04bc",
     "src/clean-runtime/v3-authority/authority-envelope-builder.js": "19f5f180b2253dbda45401542153471ab3ce5c45",
     "src/clean-runtime/v3-authority/authority-envelope.js": "5766c26d5deacd2b92a231c9a341e636ff97e392"
+  },
+  "routingGate": {
+    "schemaVersion": "v3-routing-gate-allowlist/1.0.0",
+    "policy": "Authority Routing Gate: exactly the routing modules below may exist as the runtime composition seam, and only the listed importer -> foundation-module edges are approved. Any other inbound production import of a foundation module remains forbidden. The V3 evaluator seam stays unique: nothing outside the six foundation modules may import v3-authority-adapter.js, and neither routing module may import it. Blob SHAs pin the routing modules as immutable content identities. The composition root alone may name authority-runtime.js to inject the promoted port; the port module never imports runtime composition.",
+    "files": {
+      "src/clean-runtime/v3-routing/promoted-legality-port.js": "fabb26c5e51cc8ad1eea5094064077969b89577a",
+      "src/clean-runtime/v3-routing/promoted-authority-runtime.js": "541fcbf2b0febf1a16da906f2ab21c0b36350d6d"
+    },
+    "allowedInboundEdges": {
+      "src/clean-runtime/v3-routing/promoted-legality-port.js": [
+        "src/clean-runtime/mutation/v3-promotion-foundation.js",
+        "src/clean-runtime/mutation/physical-proof-planner.js",
+        "src/clean-runtime/v3-authority/authority-envelope-builder.js"
+      ],
+      "src/clean-runtime/v3-routing/promoted-authority-runtime.js": []
+    },
+    "compositionRoots": [
+      "src/clean-runtime/v3-routing/promoted-authority-runtime.js"
+    ]
   }
 }
