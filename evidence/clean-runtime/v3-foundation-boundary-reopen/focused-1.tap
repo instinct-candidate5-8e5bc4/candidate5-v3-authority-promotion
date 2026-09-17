@@ -2,721 +2,721 @@ TAP version 13
 # Subtest: foundation route table is exactly 3 promoted + 3 non-promoted
 ok 1 - foundation route table is exactly 3 promoted + 3 non-promoted
   ---
-  duration_ms: 0.634757
+  duration_ms: 0.559631
   type: 'test'
   ...
 # Subtest: promoted routes require exact capability version query tuple
 ok 2 - promoted routes require exact capability version query tuple
   ---
-  duration_ms: 0.518515
+  duration_ms: 0.435988
   type: 'test'
   ...
 # Subtest: locked collision routes are explicit NON_PROMOTED
 ok 3 - locked collision routes are explicit NON_PROMOTED
   ---
-  duration_ms: 0.299258
+  duration_ms: 0.220941
   type: 'test'
   ...
 # Subtest: OFFSET_PLANE_Y10 coplanar support at offset plane y=10 commits with VALID evaluator evidence
 ok 4 - OFFSET_PLANE_Y10 coplanar support at offset plane y=10 commits with VALID evaluator evidence
   ---
-  duration_ms: 38.499072
+  duration_ms: 39.028092
   type: 'test'
   ...
 # Subtest: OFFSET_PLANE_Y11 floating above offset plane y=10 fails closed through the full path
 ok 5 - OFFSET_PLANE_Y11 floating above offset plane y=10 fails closed through the full path
   ---
-  duration_ms: 16.126
+  duration_ms: 11.605168
   type: 'test'
   ...
 # Subtest: OFFSET_PLANE_Y9 penetrating the offset plane fails closed through the full path
 ok 6 - OFFSET_PLANE_Y9 penetrating the offset plane fails closed through the full path
   ---
-  duration_ms: 11.927797
+  duration_ms: 12.136156
   type: 'test'
   ...
 # Subtest: MISSING_BOUNDARY_PROTRUSION_1000 forged affirmative owner pin with protrusion 1000 is INVALID/STALE_EVIDENCE before geometry through the real chain
 ok 7 - MISSING_BOUNDARY_PROTRUSION_1000 forged affirmative owner pin with protrusion 1000 is INVALID/STALE_EVIDENCE before geometry through the real chain
   ---
-  duration_ms: 16.437002
+  duration_ms: 18.228246
   type: 'test'
   ...
 # Subtest: FORGED_CONTAINMENT_BODY tampered body authority pin rejects at envelope build
 ok 8 - FORGED_CONTAINMENT_BODY tampered body authority pin rejects at envelope build
   ---
-  duration_ms: 1.360242
+  duration_ms: 2.037252
   type: 'test'
   ...
 # Subtest: FORGED_CONTAINMENT_TARGET tampered target authority pin rejects at envelope build
 ok 9 - FORGED_CONTAINMENT_TARGET tampered target authority pin rejects at envelope build
   ---
-  duration_ms: 1.03607
+  duration_ms: 1.403083
   type: 'test'
   ...
 # Subtest: MISSING_OPENING_BODY opening body absent from the registry fails closed before the evaluator
 ok 10 - MISSING_OPENING_BODY opening body absent from the registry fails closed before the evaluator
   ---
-  duration_ms: 14.30898
+  duration_ms: 12.564739
   type: 'test'
   ...
 # Subtest: FORGED_OPENING_BODY forged opening body reference is stale evidence at the evaluator
 ok 11 - FORGED_OPENING_BODY forged opening body reference is stale evidence at the evaluator
   ---
-  duration_ms: 14.42995
+  duration_ms: 12.412075
   type: 'test'
   ...
 # Subtest: MISSING_OPENING_SOLID owner solid reference absent from the registry rejects at envelope build
 ok 12 - MISSING_OPENING_SOLID owner solid reference absent from the registry rejects at envelope build
   ---
-  duration_ms: 2.399717
+  duration_ms: 2.326236
   type: 'test'
   ...
 # Subtest: FORGED_OPENING_SOLID tampered owner solid reference is stale at envelope build
 ok 13 - FORGED_OPENING_SOLID tampered owner solid reference is stale at envelope build
   ---
-  duration_ms: 3.620573
+  duration_ms: 3.262539
   type: 'test'
   ...
 # Subtest: COMPOUND_ILLEGAL_SIBLING compound containment with an illegal sibling fails closed
 ok 14 - COMPOUND_ILLEGAL_SIBLING compound containment with an illegal sibling fails closed
   ---
-  duration_ms: 27.264462
+  duration_ms: 24.17623
   type: 'test'
   ...
 # Subtest: QUANTIZATION_AMBIGUITY exact opening edge cannot PASS and stays UNKNOWN
 ok 15 - QUANTIZATION_AMBIGUITY exact opening edge cannot PASS and stays UNKNOWN
   ---
-  duration_ms: 26.585027
+  duration_ms: 17.122317
   type: 'test'
   ...
 # Subtest: AGGREGATE_PASS_PASS two passing obligations aggregate to COMMIT_ALLOWED
 ok 16 - AGGREGATE_PASS_PASS two passing obligations aggregate to COMMIT_ALLOWED
   ---
-  duration_ms: 20.916863
+  duration_ms: 16.861624
   type: 'test'
   ...
 # Subtest: AGGREGATE_PASS_FAIL one passing and one failing obligation aggregates to FAIL and no commit
 ok 17 - AGGREGATE_PASS_FAIL one passing and one failing obligation aggregates to FAIL and no commit
   ---
-  duration_ms: 16.732219
+  duration_ms: 17.546601
   type: 'test'
   ...
 # Subtest: AGGREGATE_PASS_UNKNOWN one passing and one ambiguous obligation aggregates to UNKNOWN and no commit
 ok 18 - AGGREGATE_PASS_UNKNOWN one passing and one ambiguous obligation aggregates to UNKNOWN and no commit
   ---
-  duration_ms: 21.973209
+  duration_ms: 13.369747
   type: 'test'
   ...
 # Subtest: AGGREGATE_PASS_INVALID one passing and one invalid obligation aggregates to UNKNOWN and no commit
 ok 19 - AGGREGATE_PASS_INVALID one passing and one invalid obligation aggregates to UNKNOWN and no commit
   ---
-  duration_ms: 10.525235
+  duration_ms: 11.588872
   type: 'test'
   ...
 # Subtest: AGGREGATE_PASS_NON_PROMOTED locked collision capability stays NON_PROMOTED inside a mixed decision
 ok 20 - AGGREGATE_PASS_NON_PROMOTED locked collision capability stays NON_PROMOTED inside a mixed decision
   ---
-  duration_ms: 9.071017
+  duration_ms: 9.402251
   type: 'test'
   ...
 # Subtest: FAIL_CLOSED_PRECEDENCE_UNKNOWN_OVER_FAIL ambiguity outranks definite failure and blocks commit
 ok 21 - FAIL_CLOSED_PRECEDENCE_UNKNOWN_OVER_FAIL ambiguity outranks definite failure and blocks commit
   ---
-  duration_ms: 18.376212
+  duration_ms: 17.218166
   type: 'test'
   ...
 # Subtest: FAIL_CLOSED_PRECEDENCE_INVALID_OVER_FAIL invalid authority outranks definite failure and blocks commit
 ok 22 - FAIL_CLOSED_PRECEDENCE_INVALID_OVER_FAIL invalid authority outranks definite failure and blocks commit
   ---
-  duration_ms: 10.72917
+  duration_ms: 10.116185
   type: 'test'
   ...
 # Subtest: EVALUATOR_THROW throwing evaluator converts to bounded UNKNOWN/MALFORMED_V3_RESULT through a real aggregate decision
 ok 23 - EVALUATOR_THROW throwing evaluator converts to bounded UNKNOWN/MALFORMED_V3_RESULT through a real aggregate decision
   ---
-  duration_ms: 4.485331
+  duration_ms: 5.136828
   type: 'test'
   ...
 # Subtest: EVALUATOR_MALFORMED_RETURN malformed evaluator result converts to bounded UNKNOWN/MALFORMED_V3_RESULT through a real aggregate decision
 ok 24 - EVALUATOR_MALFORMED_RETURN malformed evaluator result converts to bounded UNKNOWN/MALFORMED_V3_RESULT through a real aggregate decision
   ---
-  duration_ms: 5.755771
+  duration_ms: 6.507094
   type: 'test'
   ...
 # Subtest: CALLER_EVALUATOR_BYPASS caller-supplied evaluator input cannot override the closed evaluator on a y=11 floating contact
 ok 25 - CALLER_EVALUATOR_BYPASS caller-supplied evaluator input cannot override the closed evaluator on a y=11 floating contact
   ---
-  duration_ms: 13.624883
+  duration_ms: 16.109421
   type: 'test'
   ...
 # Subtest: PRODUCTION_EXPORTS_CLOSED production Foundation modules export no evaluator or coordinator factory, and the real chain still commits a valid y=10 transaction
 ok 26 - PRODUCTION_EXPORTS_CLOSED production Foundation modules export no evaluator or coordinator factory, and the real chain still commits a valid y=10 transaction
   ---
-  duration_ms: 7.43676
+  duration_ms: 9.388357
   type: 'test'
   ...
 # Subtest: GLOBAL_CORRUPTION_OUTSIDE_IMPACT tampering an unrelated registry record rejects the whole decision
 ok 27 - GLOBAL_CORRUPTION_OUTSIDE_IMPACT tampering an unrelated registry record rejects the whole decision
   ---
-  duration_ms: 0.851492
+  duration_ms: 0.998747
   type: 'test'
   ...
 # Subtest: VALID_UNRELATED_CONTROL a valid unrelated registry record does not block a clean commit
 ok 28 - VALID_UNRELATED_CONTROL a valid unrelated registry record does not block a clean commit
   ---
-  duration_ms: 7.041749
+  duration_ms: 8.346802
   type: 'test'
   ...
 # Subtest: MANIFEST_MODIFIED_MODULE modifying a foundation module trips MANIFEST_SHA_MISMATCH
 ok 29 - MANIFEST_MODIFIED_MODULE modifying a foundation module trips MANIFEST_SHA_MISMATCH
   ---
-  duration_ms: 721.041006
+  duration_ms: 721.368391
   type: 'test'
   ...
 # Subtest: MANIFEST_UNAPPROVED_MODULE creating an unapproved module trips the audit set mismatch
 ok 30 - MANIFEST_UNAPPROVED_MODULE creating an unapproved module trips the audit set mismatch
   ---
-  duration_ms: 701.507662
+  duration_ms: 702.102221
   type: 'test'
   ...
 # Subtest: all command permutations produce identical canonical plan bytes
 ok 31 - all command permutations produce identical canonical plan bytes
   ---
-  duration_ms: 3.660896
+  duration_ms: 2.919709
   type: 'test'
   ...
 # Subtest: shared containment target closes impact over siblings
 ok 32 - shared containment target closes impact over siblings
   ---
-  duration_ms: 0.568739
+  duration_ms: 0.41341
   type: 'test'
   ...
 # Subtest: shared boundary closes impact over siblings
 ok 33 - shared boundary closes impact over siblings
   ---
-  duration_ms: 0.352774
+  duration_ms: 1.173585
   type: 'test'
   ...
 # Subtest: mixed-envelope context projection rejects before evaluator
 ok 34 - mixed-envelope context projection rejects before evaluator
   ---
-  duration_ms: 1.316152
+  duration_ms: 1.128265
   type: 'test'
   ...
 # Subtest: context projection rejects envelope missing authoritySnapshotRef
 ok 35 - context projection rejects envelope missing authoritySnapshotRef
   ---
-  duration_ms: 0.480682
+  duration_ms: 0.405563
   type: 'test'
   ...
 # Subtest: context projection rejects envelope missing canonical worldBinding
 ok 36 - context projection rejects envelope missing canonical worldBinding
   ---
-  duration_ms: 0.252364
+  duration_ms: 0.181543
   type: 'test'
   ...
 # Subtest: A3 context binds sourceEnvelopeDigest, full authoritySnapshotRef and canonical worldBinding
 ok 37 - A3 context binds sourceEnvelopeDigest, full authoritySnapshotRef and canonical worldBinding
   ---
-  duration_ms: 0.963964
+  duration_ms: 0.810122
   type: 'test'
   ...
 # Subtest: adapter rejects context rebound to another envelope with zero evaluator calls
 ok 38 - adapter rejects context rebound to another envelope with zero evaluator calls
   ---
-  duration_ms: 0.810716
+  duration_ms: 0.664039
   type: 'test'
   ...
 # Subtest: adapter rejects honestly re-signed context with tampered authoritySnapshotRef
 ok 39 - adapter rejects honestly re-signed context with tampered authoritySnapshotRef
   ---
-  duration_ms: 1.230501
+  duration_ms: 0.949408
   type: 'test'
   ...
 # Subtest: adapter rejects honestly re-signed context with tampered worldBinding
 ok 40 - adapter rejects honestly re-signed context with tampered worldBinding
   ---
-  duration_ms: 0.57539
+  duration_ms: 0.491406
   type: 'test'
   ...
 # Subtest: real Foundation output append+commit is atomic and replay exact under external proof root
 ok 41 - real Foundation output append+commit is atomic and replay exact under external proof root
   ---
-  duration_ms: 40.475787
+  duration_ms: 38.451516
   type: 'test'
   ...
 # Subtest: replay requires the EXTERNAL proof root and never trusts the event-carried root
 ok 42 - replay requires the EXTERNAL proof root and never trusts the event-carried root
   ---
-  duration_ms: 13.189137
+  duration_ms: 12.192585
   type: 'test'
   ...
 # Subtest: real event append failure leaves state and log byte-identical
 ok 43 - real event append failure leaves state and log byte-identical
   ---
-  duration_ms: 13.753075
+  duration_ms: 10.361299
   type: 'test'
   ...
 # Subtest: real commit failure rolls back staged event and state
 ok 44 - real commit failure rolls back staged event and state
   ---
-  duration_ms: 10.749614
+  duration_ms: 9.431204
   type: 'test'
   ...
 # Subtest: replay rejects tampered sequence
 ok 45 - replay rejects tampered sequence
   ---
-  duration_ms: 11.504812
+  duration_ms: 9.996475
   type: 'test'
   ...
 # Subtest: replay rejects tampered transactionId
 ok 46 - replay rejects tampered transactionId
   ---
-  duration_ms: 13.915092
+  duration_ms: 10.006755
   type: 'test'
   ...
 # Subtest: replay rejects tampered beforeStateDigest
 ok 47 - replay rejects tampered beforeStateDigest
   ---
-  duration_ms: 14.811949
+  duration_ms: 10.033775
   type: 'test'
   ...
 # Subtest: replay rejects tampered afterStateDigest
 ok 48 - replay rejects tampered afterStateDigest
   ---
-  duration_ms: 13.342994
+  duration_ms: 10.783141
   type: 'test'
   ...
 # Subtest: replay rejects tampered physicalProof
 ok 49 - replay rejects tampered physicalProof
   ---
-  duration_ms: 12.123031
+  duration_ms: 11.081315
   type: 'test'
   ...
 # Subtest: replay rejects a re-signed forged proof (honest payload and event re-digest)
 ok 50 - replay rejects a re-signed forged proof (honest payload and event re-digest)
   ---
-  duration_ms: 12.139791
+  duration_ms: 12.012899
   type: 'test'
   ...
 # Subtest: replay rejects arbitrary honestly sealed state at revision 99
 ok 51 - replay rejects arbitrary honestly sealed state at revision 99
   ---
-  duration_ms: 11.429952
+  duration_ms: 10.202981
   type: 'test'
   ...
 # Subtest: replay rejects arbitrary honestly sealed state at revision+1 under a re-signed event
 ok 52 - replay rejects arbitrary honestly sealed state at revision+1 under a re-signed event
   ---
-  duration_ms: 12.76433
+  duration_ms: 11.256708
   type: 'test'
   ...
 # Subtest: execute rejects an honestly re-signed decision proposing revision 99
 ok 53 - execute rejects an honestly re-signed decision proposing revision 99
   ---
-  duration_ms: 11.962767
+  duration_ms: 14.906036
   type: 'test'
   ...
 # Subtest: replay rejects missing duplicate and reordered events
 ok 54 - replay rejects missing duplicate and reordered events
   ---
-  duration_ms: 12.170178
+  duration_ms: 11.62298
   type: 'test'
   ...
 # Subtest: real Foundation evidence is deterministic byte-for-byte
 ok 55 - real Foundation evidence is deterministic byte-for-byte
   ---
-  duration_ms: 23.216607
+  duration_ms: 20.595134
   type: 'test'
   ...
 # Subtest: route exact V3_SUPPORT
 ok 56 - route exact V3_SUPPORT
   ---
-  duration_ms: 1.905982
+  duration_ms: 0.844379
   type: 'test'
   ...
 # Subtest: route exact V3_CONTAINMENT
 ok 57 - route exact V3_CONTAINMENT
   ---
-  duration_ms: 0.210864
+  duration_ms: 0.1581
   type: 'test'
   ...
 # Subtest: route exact V3_OPENING
 ok 58 - route exact V3_OPENING
   ---
-  duration_ms: 0.148995
+  duration_ms: 0.123323
   type: 'test'
   ...
 # Subtest: route exact V3_BODY_VS_BODY
 ok 59 - route exact V3_BODY_VS_BODY
   ---
-  duration_ms: 0.090725
+  duration_ms: 0.147423
   type: 'test'
   ...
 # Subtest: route exact V3_WORLD_SOLID
 ok 60 - route exact V3_WORLD_SOLID
   ---
-  duration_ms: 0.081862
+  duration_ms: 0.072899
   type: 'test'
   ...
 # Subtest: route exact V3_OBSTACLE
 ok 61 - route exact V3_OBSTACLE
   ---
-  duration_ms: 0.071708
+  duration_ms: 0.064211
   type: 'test'
   ...
 # Subtest: route rejects wrong query V3_SUPPORT
 ok 62 - route rejects wrong query V3_SUPPORT
   ---
-  duration_ms: 0.155788
+  duration_ms: 0.112867
   type: 'test'
   ...
 # Subtest: route rejects wrong query V3_CONTAINMENT
 ok 63 - route rejects wrong query V3_CONTAINMENT
   ---
-  duration_ms: 0.070909
+  duration_ms: 0.057908
   type: 'test'
   ...
 # Subtest: route rejects wrong query V3_OPENING
 ok 64 - route rejects wrong query V3_OPENING
   ---
-  duration_ms: 0.237812
+  duration_ms: 0.188458
   type: 'test'
   ...
 # Subtest: route rejects wrong query V3_BODY_VS_BODY
 ok 65 - route rejects wrong query V3_BODY_VS_BODY
   ---
-  duration_ms: 0.320556
+  duration_ms: 0.309855
   type: 'test'
   ...
 # Subtest: route rejects wrong query V3_WORLD_SOLID
 ok 66 - route rejects wrong query V3_WORLD_SOLID
   ---
-  duration_ms: 0.129692
+  duration_ms: 0.104558
   type: 'test'
   ...
 # Subtest: route rejects wrong query V3_OBSTACLE
 ok 67 - route rejects wrong query V3_OBSTACLE
   ---
-  duration_ms: 0.06929
+  duration_ms: 0.060406
   type: 'test'
   ...
 # Subtest: route table exact six
 ok 68 - route table exact six
   ---
-  duration_ms: 0.095563
+  duration_ms: 0.076624
   type: 'test'
   ...
 # Subtest: route table exact promoted three
 ok 69 - route table exact promoted three
   ---
-  duration_ms: 0.519828
+  duration_ms: 0.440251
   type: 'test'
   ...
 # Subtest: route digest sealed
 ok 70 - route digest sealed
   ---
-  duration_ms: 0.159283
+  duration_ms: 0.135223
   type: 'test'
   ...
 # Subtest: unknown version is never routed 3.0.0 
 ok 71 - unknown version is never routed 3.0.0 
   ---
-  duration_ms: 0.091223
+  duration_ms: 0.078444
   type: 'test'
   ...
 # Subtest: unknown version is never routed 03.0.0
 ok 72 - unknown version is never routed 03.0.0
   ---
-  duration_ms: 0.050664
+  duration_ms: 0.047012
   type: 'test'
   ...
 # Subtest: unknown version is never routed 4.0.0
 ok 73 - unknown version is never routed 4.0.0
   ---
-  duration_ms: 0.046903
+  duration_ms: 0.038994
   type: 'test'
   ...
 # Subtest: unknown version is never routed 
 ok 74 - unknown version is never routed 
   ---
-  duration_ms: 0.05589
+  duration_ms: 0.039038
   type: 'test'
   ...
 # Subtest: unknown version is never routed null
 ok 75 - unknown version is never routed null
   ---
-  duration_ms: 0.047247
+  duration_ms: 0.039105
   type: 'test'
   ...
 # Subtest: unknown version is never routed undefined
 ok 76 - unknown version is never routed undefined
   ---
-  duration_ms: 0.05763
+  duration_ms: 0.062081
   type: 'test'
   ...
 # Subtest: permutation canonical 1
 ok 77 - permutation canonical 1
   ---
-  duration_ms: 0.063118
+  duration_ms: 0.054522
   type: 'test'
   ...
 # Subtest: permutation canonical 2
 ok 78 - permutation canonical 2
   ---
-  duration_ms: 0.124584
+  duration_ms: 0.105086
   type: 'test'
   ...
 # Subtest: permutation canonical 3
 ok 79 - permutation canonical 3
   ---
-  duration_ms: 0.057841
+  duration_ms: 0.048416
   type: 'test'
   ...
 # Subtest: permutation canonical 4
 ok 80 - permutation canonical 4
   ---
-  duration_ms: 0.045929
+  duration_ms: 0.041
   type: 'test'
   ...
 # Subtest: permutation canonical 5
 ok 81 - permutation canonical 5
   ---
-  duration_ms: 0.04377
+  duration_ms: 0.037042
   type: 'test'
   ...
 # Subtest: permutation canonical 6
 ok 82 - permutation canonical 6
   ---
-  duration_ms: 0.159875
+  duration_ms: 0.105008
   type: 'test'
   ...
 # Subtest: impact shared target includes initiator
 ok 83 - impact shared target includes initiator
   ---
-  duration_ms: 0.104864
+  duration_ms: 0.120977
   type: 'test'
   ...
 # Subtest: impact shared target includes sibling
 ok 84 - impact shared target includes sibling
   ---
-  duration_ms: 0.042307
+  duration_ms: 0.045717
   type: 'test'
   ...
 # Subtest: impact shared target records target
 ok 85 - impact shared target records target
   ---
-  duration_ms: 0.07142
+  duration_ms: 0.049325
   type: 'test'
   ...
 # Subtest: impact direct set canonical
 ok 86 - impact direct set canonical
   ---
-  duration_ms: 0.048571
+  duration_ms: 0.0392
   type: 'test'
   ...
 # Subtest: impact digest sealed
 ok 87 - impact digest sealed
   ---
-  duration_ms: 0.081044
+  duration_ms: 0.06891
   type: 'test'
   ...
 # Subtest: boundary closure includes sibling
 ok 88 - boundary closure includes sibling
   ---
-  duration_ms: 0.049548
+  duration_ms: 0.04121
   type: 'test'
   ...
 # Subtest: boundary closure records boundary
 ok 89 - boundary closure records boundary
   ---
-  duration_ms: 0.042617
+  duration_ms: 0.036637
   type: 'test'
   ...
 # Subtest: context exact envelope is READY
 ok 90 - context exact envelope is READY
   ---
-  duration_ms: 0.827131
+  duration_ms: 0.666349
   type: 'test'
   ...
 # Subtest: context mixed envelope rejects
 ok 91 - context mixed envelope rejects
   ---
-  duration_ms: 0.202305
+  duration_ms: 0.199776
   type: 'test'
   ...
 # Subtest: locked collision remains NON_PROMOTED V3_BODY_VS_BODY
 ok 92 - locked collision remains NON_PROMOTED V3_BODY_VS_BODY
   ---
-  duration_ms: 0.108639
+  duration_ms: 0.116269
   type: 'test'
   ...
 # Subtest: locked collision remains NON_PROMOTED V3_WORLD_SOLID
 ok 93 - locked collision remains NON_PROMOTED V3_WORLD_SOLID
   ---
-  duration_ms: 0.058436
+  duration_ms: 0.072968
   type: 'test'
   ...
 # Subtest: locked collision remains NON_PROMOTED V3_OBSTACLE
 ok 94 - locked collision remains NON_PROMOTED V3_OBSTACLE
   ---
-  duration_ms: 0.0517
+  duration_ms: 0.051465
   type: 'test'
   ...
 # Subtest: unknown capability fails closed
 ok 95 - unknown capability fails closed
   ---
-  duration_ms: 0.127685
+  duration_ms: 0.062304
   type: 'test'
   ...
 # Subtest: missing route request fails closed
 ok 96 - missing route request fails closed
   ---
-  duration_ms: 0.067766
+  duration_ms: 0.055362
   type: 'test'
   ...
 # Subtest: FULL-PATH-CONTAINMENT envelope -> plan -> route -> context -> adapter -> aggregate PASS
 ok 97 - FULL-PATH-CONTAINMENT envelope -> plan -> route -> context -> adapter -> aggregate PASS
   ---
-  duration_ms: 29.412726
+  duration_ms: 28.681074
   type: 'test'
   ...
 # Subtest: FULL-PATH-OPENING envelope -> plan -> route -> context -> adapter -> aggregate PASS
 ok 98 - FULL-PATH-OPENING envelope -> plan -> route -> context -> adapter -> aggregate PASS
   ---
-  duration_ms: 23.849019
+  duration_ms: 20.420759
   type: 'test'
   ...
 # Subtest: FULL-PATH-SUPPORT envelope -> plan -> route -> context -> adapter -> aggregate PASS
 ok 99 - FULL-PATH-SUPPORT envelope -> plan -> route -> context -> adapter -> aggregate PASS
   ---
-  duration_ms: 54.433702
+  duration_ms: 52.052144
   type: 'test'
   ...
 # Subtest: ADV-01 missing opening membership target is rejected before READY
 ok 100 - ADV-01 missing opening membership target is rejected before READY
   ---
-  duration_ms: 3.842904
+  duration_ms: 2.525941
   type: 'test'
   ...
 # Subtest: ADV-02 exact promoted identities cannot be swapped
 ok 101 - ADV-02 exact promoted identities cannot be swapped
   ---
-  duration_ms: 0.881636
+  duration_ms: 0.56382
   type: 'test'
   ...
 # Subtest: ADV-03 caller requirements cannot create an obligation
 ok 102 - ADV-03 caller requirements cannot create an obligation
   ---
-  duration_ms: 2.13915
+  duration_ms: 1.725385
   type: 'test'
   ...
 # Subtest: ADV-04 physical zero obligations fail closed
 ok 103 - ADV-04 physical zero obligations fail closed
   ---
-  duration_ms: 2.327137
+  duration_ms: 1.919232
   type: 'test'
   ...
 # Subtest: ADV-05 forged registry digest rejects
 ok 104 - ADV-05 forged registry digest rejects
   ---
-  duration_ms: 0.393144
+  duration_ms: 0.392418
   type: 'test'
   ...
 # Subtest: ADV-06 missing geometry pin rejects
 ok 105 - ADV-06 missing geometry pin rejects
   ---
-  duration_ms: 0.491143
+  duration_ms: 0.550541
   type: 'test'
   ...
 # Subtest: ADV-07 missing frame pin rejects
 ok 106 - ADV-07 missing frame pin rejects
   ---
-  duration_ms: 0.499291
+  duration_ms: 0.514778
   type: 'test'
   ...
 # Subtest: ADV-08 wrong query does not route
 ok 107 - ADV-08 wrong query does not route
   ---
-  duration_ms: 0.277993
+  duration_ms: 0.26157
   type: 'test'
   ...
 # Subtest: ADV locked V3_BODY_VS_BODY
 ok 108 - ADV locked V3_BODY_VS_BODY
   ---
-  duration_ms: 0.376988
+  duration_ms: 0.285368
   type: 'test'
   ...
 # Subtest: ADV locked V3_WORLD_SOLID
 ok 109 - ADV locked V3_WORLD_SOLID
   ---
-  duration_ms: 0.369326
+  duration_ms: 0.275632
   type: 'test'
   ...
 # Subtest: ADV locked V3_OBSTACLE
 ok 110 - ADV locked V3_OBSTACLE
   ---
-  duration_ms: 0.161047
+  duration_ms: 0.119222
   type: 'test'
   ...
 # Subtest: ADV version 3.0.0 
 ok 111 - ADV version 3.0.0 
   ---
-  duration_ms: 0.169775
+  duration_ms: 0.190146
   type: 'test'
   ...
 # Subtest: ADV version 03.0.0
 ok 112 - ADV version 03.0.0
   ---
-  duration_ms: 0.06905
+  duration_ms: 0.069845
   type: 'test'
   ...
 # Subtest: ADV version 4.0.0
 ok 113 - ADV version 4.0.0
   ---
-  duration_ms: 0.06096
+  duration_ms: 0.076908
   type: 'test'
   ...
 # Subtest: ADV version null
 ok 114 - ADV version null
   ---
-  duration_ms: 0.062271
+  duration_ms: 0.061356
   type: 'test'
   ...
 # Subtest: ADV version undefined
 ok 115 - ADV version undefined
   ---
-  duration_ms: 0.060405
+  duration_ms: 0.064133
   type: 'test'
   ...
 # Subtest: ADV-09 envelope bound to a foreign transaction digest rejects at planning
 ok 116 - ADV-09 envelope bound to a foreign transaction digest rejects at planning
   ---
-  duration_ms: 0.488733
+  duration_ms: 0.4963
   type: 'test'
   ...
 # Subtest: ADV-10 opening backref mismatch rejects before READY
 ok 117 - ADV-10 opening backref mismatch rejects before READY
   ---
-  duration_ms: 0.85831
+  duration_ms: 0.753846
   type: 'test'
   ...
 # Subtest: ADV-11 stale compound child digest rejects before READY
 ok 118 - ADV-11 stale compound child digest rejects before READY
   ---
-  duration_ms: 1.660667
+  duration_ms: 1.334696
   type: 'test'
   ...
 # Subtest: ADV-12 context projection and adapter enforce the full authority requirement set
 ok 119 - ADV-12 context projection and adapter enforce the full authority requirement set
   ---
-  duration_ms: 3.31629
+  duration_ms: 3.508106
   type: 'test'
   ...
 # Subtest: ADV-13 obligation identity is content-bound and requestId equals obligationId
 ok 120 - ADV-13 obligation identity is content-bound and requestId equals obligationId
   ---
-  duration_ms: 1.110425
+  duration_ms: 0.99974
   type: 'test'
   ...
 1..120
@@ -727,4 +727,4 @@ ok 120 - ADV-13 obligation identity is content-bound and requestId equals obliga
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 2620.610431
+# duration_ms 2517.029315

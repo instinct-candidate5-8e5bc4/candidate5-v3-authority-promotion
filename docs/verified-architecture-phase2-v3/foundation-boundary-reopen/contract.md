@@ -50,10 +50,23 @@ certified three-edge set exactly: a missing edge, an additional edge, a
 duplicate, or a malformed entry each fail certification
 (`ALLOWLIST_POLICY_MISMATCH`).
 
-Module-load verification (audit 1.5.0) is parsing-based on a real JavaScript
+Module-load verification (audit 1.6.0) is parsing-based on a real JavaScript
 parser: acorn 8.18.0 vendored at tests/clean-runtime/vendor/acorn.js (npm
 registry integrity sha512-lGq+9yr1/GuAWaVYIHRjvvySG5/4VfKIvC8EWxStPdcDh/Ka7FG3twP6v4d5BkravUilhIAsG4Qj83t02LWUPQ==,
-file sha256 fc3ed7b81e58464715d0291402892f22c3d86ea75302645a330390f85d8015c9).
+file sha256 fc3ed7b81e58464715d0291402892f22c3d86ea75302645a330390f85d8015c9)
+with the full Acorn LICENSE at tests/clean-runtime/vendor/acorn.LICENSE
+(file sha256 76a876cf886ff9be2a8b5e2e86514fed06223c8c9f0c1e9ee9606e93841e00b7).
+Both vendor files are hash-locked in the audit and verified before the parser
+is loaded; a missing or modified vendor artifact fails the audit closed
+(VENDOR_INTEGRITY_MISMATCH).
+Ambient CommonJS wrapper capabilities are closed: every CJS module receives
+(exports, require, module, __filename, __dirname) as wrapper arguments, so
+any `arguments` reference that resolves to the module wrapper scope (top
+level, including through arrow functions, which do not rebind it) fails
+closed; `arguments` inside an ordinary nested function refers to that
+function's own arguments and remains legal. The V8 stack-trace capability
+API (Error.prepareStackTrace / Error.captureStackTrace) is treated as a
+capability root.
 The import graph itself is built from parsed ASTs, so comments, escapes, and
 formatting cannot hide an edge. Every production source file is parsed
 (unparseable = UNPARSEABLE_PRODUCTION_FILE) and held to a closed loader

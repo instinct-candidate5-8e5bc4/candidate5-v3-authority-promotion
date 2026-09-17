@@ -33,8 +33,17 @@
   reject wrong target, wrong source, sibling module, path alias, and
   normalization bypass.
 - Gate results (this package): focused Foundation suite twice (120/120 each),
-  broad suite (590/590), static boundaries (4/4), hostile boundary suite
-  (30/30: 18 mandatory + 12 independent-certification regressions), reopened audit 1.5.0 (acorn 8.18.0 AST-based loader policy, vendored with npm registry integrity) (0 findings, boundaryPolicyValid=true, exactly 3
+  broad suite (600/600), static boundaries (4/4), hostile boundary suite
+  (40/40: 18 mandatory + 22 independent-certification regressions, incl. the
+  six CommonJS wrapper `arguments[1]` reproductions from round-3 review, arrow
+  and alias variants, V8 stack-trace API closure, and a nested-function
+  positive control), reopened audit 1.6.0 (acorn 8.18.0 AST-based loader
+  policy, vendored with npm registry integrity; vendor file and full Acorn
+  LICENSE hash-locked and verified at audit startup, fail closed on mismatch;
+  CommonJS wrapper `arguments` capability closed: any use resolving to the
+  module wrapper scope fails closed, nested-function arguments still legal;
+  Error.prepareStackTrace/captureStackTrace treated as capability roots)
+  (0 findings, boundaryPolicyValid=true, exactly 3
   allowed pairs), Foundation detached determinism byte-identical across two
   runs, closure determinism byte-identical, closure performance captured,
   matrix coverage 69/69 with clean audit gate.

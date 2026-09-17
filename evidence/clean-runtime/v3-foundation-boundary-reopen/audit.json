@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "v3-foundation-authority-audit/1.5.0",
+  "schemaVersion": "v3-foundation-authority-audit/1.6.0",
   "boundaryPolicyValid": true,
   "allowedInboundPairs": [
     "src/clean-runtime/v3-routing/promoted-legality-port.js->src/clean-runtime/mutation/physical-proof-planner.js",
@@ -32,5 +32,5 @@
   },
   "inboundFoundationImports": [],
   "findings": [],
-  "auditDigest": "4dc04681bc7420b24f6a5cbbf16064bc8b0ae452bdb5575c9a03ca3f3ab362c7"
+  "auditDigest": "f8926490440dada0b831cda03b7b6949917452aeffc574fea9c8551160fd25c6"
 }

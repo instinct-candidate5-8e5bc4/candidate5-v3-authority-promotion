@@ -1,6 +1,6 @@
 'use strict';
 // Foundation Boundary Policy Reopen - mandatory hostile boundary suite.
-// Proves the reopened boundary policy (manifest allowlist + audit 1.3.0 +
+// Proves the reopened boundary policy (manifest allowlist + audit 1.6.0 +
 // static boundary test 4) authorizes EXACTLY the three certified Authority
 // Routing Gate edges and fails closed on everything else.
 const test=require('node:test'),assert=require('node:assert'),fs=require('node:fs'),os=require('node:os'),path=require('node:path'),cp=require('node:child_process');
@@ -195,3 +195,38 @@ test('regression 30: shadowed local require fails closed',()=>{
   const r=audit(fixture(dir=>writePort(dir,"'use strict';\nfunction f(require){return require('../mutation/v3-promotion-foundation.js')}\nmodule.exports=f;\n")));
   assert.notEqual(r.code,0);
   assert.ok(findingsOf(r,'NON_STATICALLY_RESOLVABLE_LOAD').length>=1)});
+// CommonJS wrapper-capability closure (independent certification, round 3):
+// every CJS module receives require as arguments[1]. The six reproductions
+// below each loaded a Foundation module in Node before this fix; the audit
+// must now fail closed on every wrapper-scope use, alias or escape of
+// `arguments`. Nested ordinary functions rebind arguments legally and must
+// still pass (positive control).
+const T_WORLD='src/clean-runtime/world/world-store.js';
+function injectProd(dir,code){fs.appendFileSync(path.join(dir,T_WORLD),'\n'+code+'\n')}
+const WRAPPER_BYPASSES=[
+  ['arguments[1] indexed call',"arguments[1]('../clean-runtime/mutation/v3-promotion-foundation.js');"],
+  ['arguments[1] sequence-expression call',"(0,arguments[1])('../clean-runtime/mutation/v3-promotion-foundation.js');"],
+  ['Object.values(arguments)[1]',"Object.values(arguments)[1]('../clean-runtime/mutation/v3-promotion-foundation.js');"],
+  ['spread [...arguments][1]',"[...arguments][1]('../clean-runtime/mutation/v3-promotion-foundation.js');"],
+  ['arguments[1].call',"arguments[1].call(null,'../clean-runtime/mutation/v3-promotion-foundation.js');"],
+  ['arguments[1].apply',"arguments[1].apply(null,['../clean-runtime/mutation/v3-promotion-foundation.js']);"]];
+WRAPPER_BYPASSES.forEach(([label,code],i)=>{
+  test('regression '+(31+i)+': CommonJS wrapper capability via '+label+' fails closed',()=>{
+    const r=audit(fixture(dir=>injectProd(dir,code)));
+    assert.notEqual(r.code,0,label+' must be rejected: '+JSON.stringify(r.body.findings));
+    assert.ok(findingsOf(r,'NON_STATICALLY_RESOLVABLE_LOAD').some(f=>/arguments/.test(f.detail)),label+' finding must name wrapper arguments: '+JSON.stringify(r.body.findings))})});
+test('regression 37: arrow functions inherit wrapper arguments - fails closed',()=>{
+  const r=audit(fixture(dir=>injectProd(dir,"const g=()=>arguments;g()[1]('../clean-runtime/mutation/v3-promotion-foundation.js');")));
+  assert.notEqual(r.code,0);
+  assert.ok(findingsOf(r,'NON_STATICALLY_RESOLVABLE_LOAD').some(f=>/arguments/.test(f.detail)))});
+test('regression 38: aliased wrapper arguments fails closed',()=>{
+  const r=audit(fixture(dir=>injectProd(dir,"const a=arguments;a[1]('../clean-runtime/mutation/v3-promotion-foundation.js');")));
+  assert.notEqual(r.code,0);
+  assert.ok(findingsOf(r,'NON_STATICALLY_RESOLVABLE_LOAD').some(f=>/arguments/.test(f.detail)))});
+test('regression 39: V8 stack-trace capability API (prepareStackTrace/captureStackTrace) fails closed',()=>{
+  const r=audit(fixture(dir=>injectProd(dir,"Error.prepareStackTrace=(e,s)=>s;const st=new Error().stack;Error.captureStackTrace(st);")));
+  assert.notEqual(r.code,0);
+  assert.ok(findingsOf(r,'NON_STATICALLY_RESOLVABLE_LOAD').length>=1)});
+test('regression 40: arguments inside an ordinary nested function is legal and passes',()=>{
+  const r=audit(fixture(dir=>injectProd(dir,"function legit(){return arguments.length}\nconst arrowOk=(f)=>f(function(){return arguments});\nmodule.exports.legit=legit;")));
+  assert.equal(r.code,0,'nested-function arguments must not false-positive: '+JSON.stringify(r.body.findings))});
