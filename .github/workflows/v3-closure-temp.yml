@@ -51,7 +51,7 @@ jobs:
           git diff --numstat 1f1985ea0f37a8a82eb39efa9e28f2794fa5e667...HEAD > "$OUT/diff-numstat.txt"
           git status --porcelain=v1 > "$OUT/review-worktree-status.txt"
           remote=$(git ls-remote origin refs/heads/candidate5 | awk '{print $1}'); echo "$remote" > "$OUT/remote-tip.txt"; test "$remote" = "$(git rev-parse HEAD)"
-          base=$(git rev-parse --verify -q origin/main || git rev-parse HEAD); git worktree add --detach "$RUNNER_TEMP/main-worktree" "$base" >/dev/null
+          git fetch --depth=1 https://github.com/yuzok101/ko-rishon-first-aid-simulator.git main && test "$(git rev-parse FETCH_HEAD)" = "4e06f74a058f10c0be229dabfedf2015cb350e69" && git worktree add --detach "$RUNNER_TEMP/main-worktree" FETCH_HEAD >/dev/null
           git -C "$RUNNER_TEMP/main-worktree" status --porcelain=v1 > "$OUT/main-worktree-status.txt"
           {
             echo 'gatewayRouted=false'; echo 'legalityPromoted=false'

@@ -1,0 +1,408 @@
+{
+  "schemaVersion": "v3-candidate5-foundation-matrix-evidence/1.0.0",
+  "records": [
+    {
+      "row": "OFFSET_PLANE_Y10",
+      "outcome": "PASS",
+      "reason": "VALID",
+      "classification": "V3_VALID",
+      "evaluatorCalls": 1,
+      "decision": "COMMIT_ALLOWED",
+      "stateBytesUnchanged": true,
+      "resultDigest": "112f2b2e2ab67dc009a3c2fb54eee462838086533f916cace8dabe3de49ae438",
+      "evidenceFields": [
+        "decision",
+        "outcome",
+        "v3.reason",
+        "summary.evaluatorCalls",
+        "decisionDigest"
+      ]
+    },
+    {
+      "row": "OFFSET_PLANE_Y11",
+      "outcome": "FAIL",
+      "reason": "CONTACT_FLOATING",
+      "classification": "V3_DEFINITE_ILLEGALITY",
+      "evaluatorCalls": 1,
+      "decision": "REJECT_REQUIRED",
+      "stateBytesUnchanged": true,
+      "resultDigest": "faba172cb623753e7877629c5e1108ae1cff8db5f4d344ed7f42821a5e6d9df3",
+      "evidenceFields": [
+        "decision",
+        "outcome",
+        "v3.reason",
+        "summary.failed"
+      ]
+    },
+    {
+      "row": "OFFSET_PLANE_Y9",
+      "outcome": "FAIL",
+      "reason": "CONTACT_PENETRATION",
+      "classification": "V3_DEFINITE_ILLEGALITY",
+      "evaluatorCalls": 1,
+      "decision": "REJECT_REQUIRED",
+      "stateBytesUnchanged": true,
+      "resultDigest": "dc13b922ee0a21a0ace63103841fddda0bb5a50a18589032272f71dd8d40fda1",
+      "evidenceFields": [
+        "decision",
+        "outcome",
+        "v3.reason",
+        "summary.failed"
+      ]
+    },
+    {
+      "row": "MISSING_BOUNDARY_PROTRUSION_1000",
+      "outcome": "UNKNOWN",
+      "reason": "STALE_EVIDENCE",
+      "classification": "V3_INVALID_AUTHORITY",
+      "evaluatorCalls": 1,
+      "decision": "REJECTED_AT_ADAPTER",
+      "stateBytesUnchanged": true,
+      "resultDigest": "189799afc4f37230f679f8bcdfabf45eea4c21f2a5215952ef0fec4f0cdc7e71",
+      "evidenceFields": [
+        "outcome",
+        "classification",
+        "v3.status",
+        "v3.reason",
+        "adapterEvidence.validationStage",
+        "adapterEvidence.evaluatorCalls"
+      ]
+    },
+    {
+      "row": "FORGED_CONTAINMENT_BODY",
+      "outcome": "UNKNOWN",
+      "reason": "STALE_AUTHORITY",
+      "classification": "ENVELOPE_REJECTED",
+      "evaluatorCalls": 0,
+      "decision": "REJECT_REQUIRED",
+      "stateBytesUnchanged": true,
+      "resultDigest": "79c4fe2b2f781ad9d696a94d082c8313e6357728cea1587f0fd6164d643e9b4c",
+      "evidenceFields": [
+        "decision",
+        "envelopeFailure.reason",
+        "envelopeFailure.evidence.stage",
+        "envelopeFailure.evidence.recordId"
+      ]
+    },
+    {
+      "row": "FORGED_CONTAINMENT_TARGET",
+      "outcome": "UNKNOWN",
+      "reason": "STALE_AUTHORITY",
+      "classification": "ENVELOPE_REJECTED",
+      "evaluatorCalls": 0,
+      "decision": "REJECT_REQUIRED",
+      "stateBytesUnchanged": true,
+      "resultDigest": "5fd44fa7cca3f87df607f00e49f7e48cc70d5516ac3b8a901f733506bf874111",
+      "evidenceFields": [
+        "decision",
+        "envelopeFailure.reason",
+        "envelopeFailure.evidence.recordId"
+      ]
+    },
+    {
+      "row": "MISSING_OPENING_BODY",
+      "outcome": "UNKNOWN",
+      "reason": "INCOMPLETE_AUTHORITY",
+      "classification": "INCOMPLETE_AUTHORITY",
+      "evaluatorCalls": 1,
+      "decision": "REJECT_REQUIRED",
+      "stateBytesUnchanged": true,
+      "resultDigest": "d0afd9380aefda78b663e8877b8ce030303086811ee3a3abe741f5580b831994",
+      "evidenceFields": [
+        "decision",
+        "outcome",
+        "classification",
+        "summary.evaluatorCalls"
+      ]
+    },
+    {
+      "row": "FORGED_OPENING_BODY",
+      "outcome": "UNKNOWN",
+      "reason": "STALE_EVIDENCE",
+      "classification": "V3_INVALID_AUTHORITY",
+      "evaluatorCalls": 2,
+      "decision": "REJECT_REQUIRED",
+      "stateBytesUnchanged": true,
+      "resultDigest": "01bee1e30fc94a36aacdec2bc007391f0d3a4ba4eced3296b8e30d1bb2f363c2",
+      "evidenceFields": [
+        "decision",
+        "v3.status",
+        "v3.reason",
+        "summary.invalidV3",
+        "outcome"
+      ]
+    },
+    {
+      "row": "MISSING_OPENING_SOLID",
+      "outcome": "UNKNOWN",
+      "reason": "INCOMPLETE_AUTHORITY",
+      "classification": "ENVELOPE_REJECTED",
+      "evaluatorCalls": 0,
+      "decision": "REJECT_REQUIRED",
+      "stateBytesUnchanged": true,
+      "resultDigest": "da9631fc66d9a8979cdd6d405a00bd71d1afda6dc0d2b1c7acf6539a26a29a7d",
+      "evidenceFields": [
+        "decision",
+        "envelopeFailure.reason",
+        "envelopeFailure.evidence.stage"
+      ]
+    },
+    {
+      "row": "FORGED_OPENING_SOLID",
+      "outcome": "UNKNOWN",
+      "reason": "STALE_AUTHORITY",
+      "classification": "ENVELOPE_REJECTED",
+      "evaluatorCalls": 0,
+      "decision": "REJECT_REQUIRED",
+      "stateBytesUnchanged": true,
+      "resultDigest": "0ca641273084196c672c47abaf53a73b59ea92b6f84c1681c1e248757e716d77",
+      "evidenceFields": [
+        "decision",
+        "envelopeFailure.reason",
+        "envelopeFailure.evidence.stage"
+      ]
+    },
+    {
+      "row": "COMPOUND_ILLEGAL_SIBLING",
+      "outcome": "FAIL",
+      "reason": "OUTSIDE_ALLOWED_REGION",
+      "classification": "V3_DEFINITE_ILLEGALITY",
+      "evaluatorCalls": 2,
+      "decision": "REJECT_REQUIRED",
+      "stateBytesUnchanged": true,
+      "resultDigest": "c88b490a44dc93ec83a33054b4780590878aa7b1bce70f6bed69d77e32f85422",
+      "evidenceFields": [
+        "decision",
+        "outcome",
+        "v3.status",
+        "v3.reason"
+      ]
+    },
+    {
+      "row": "QUANTIZATION_AMBIGUITY",
+      "outcome": "UNKNOWN",
+      "reason": "QUANTIZATION_AMBIGUITY",
+      "classification": "V3_UNCERTAIN_OR_UNSUPPORTED",
+      "evaluatorCalls": 2,
+      "decision": "REJECT_REQUIRED",
+      "stateBytesUnchanged": true,
+      "resultDigest": "d27edef732bd0c8e47055a1a22318a3e3be94d75c3d9a86a34d85a219a092ff1",
+      "evidenceFields": [
+        "decision",
+        "outcome",
+        "v3.status",
+        "v3.reason"
+      ]
+    },
+    {
+      "row": "AGGREGATE_PASS_PASS",
+      "outcome": "PASS",
+      "reason": "VALID",
+      "classification": "V3_VALID",
+      "evaluatorCalls": 2,
+      "decision": "COMMIT_ALLOWED",
+      "stateBytesUnchanged": true,
+      "resultDigest": "6aecbf740f350cad73a08dac85a668dbaedca5d47f7f17e8d8bb17842026c2ab",
+      "evidenceFields": [
+        "decision",
+        "outcome",
+        "summary.passed",
+        "summary.evaluatorCalls"
+      ]
+    },
+    {
+      "row": "AGGREGATE_PASS_FAIL",
+      "outcome": "FAIL",
+      "reason": "FAIL",
+      "classification": "V3_DEFINITE_ILLEGALITY",
+      "evaluatorCalls": 2,
+      "decision": "REJECT_REQUIRED",
+      "stateBytesUnchanged": true,
+      "resultDigest": "20b0eb70b086c153f6b732047f53d8eabcbbe7cc1379f8b1c95c2a9cbd8cb92a",
+      "evidenceFields": [
+        "decision",
+        "outcome",
+        "summary.passed",
+        "summary.failed",
+        "summary.evaluatorCalls"
+      ]
+    },
+    {
+      "row": "AGGREGATE_PASS_UNKNOWN",
+      "outcome": "UNKNOWN",
+      "reason": "QUANTIZATION_AMBIGUITY",
+      "classification": "V3_UNCERTAIN_OR_UNSUPPORTED",
+      "evaluatorCalls": 2,
+      "decision": "REJECT_REQUIRED",
+      "stateBytesUnchanged": true,
+      "resultDigest": "d27edef732bd0c8e47055a1a22318a3e3be94d75c3d9a86a34d85a219a092ff1",
+      "evidenceFields": [
+        "decision",
+        "outcome",
+        "summary.passed",
+        "summary.unknown"
+      ]
+    },
+    {
+      "row": "AGGREGATE_PASS_INVALID",
+      "outcome": "UNKNOWN",
+      "reason": "STALE_EVIDENCE",
+      "classification": "V3_INVALID_AUTHORITY",
+      "evaluatorCalls": 2,
+      "decision": "REJECT_REQUIRED",
+      "stateBytesUnchanged": true,
+      "resultDigest": "01bee1e30fc94a36aacdec2bc007391f0d3a4ba4eced3296b8e30d1bb2f363c2",
+      "evidenceFields": [
+        "decision",
+        "outcome",
+        "summary.passed",
+        "summary.invalidV3"
+      ]
+    },
+    {
+      "row": "AGGREGATE_PASS_NON_PROMOTED",
+      "outcome": "UNKNOWN",
+      "reason": "NON_PROMOTED_CAPABILITY",
+      "classification": "NON_PROMOTED_CAPABILITY",
+      "evaluatorCalls": 1,
+      "decision": "REJECT_REQUIRED",
+      "stateBytesUnchanged": true,
+      "resultDigest": "ef508c5c4f3501ef4e36a69f478ad170988addce0b7e2b43da58e920b8a9b312",
+      "evidenceFields": [
+        "decision",
+        "locked.outcome",
+        "locked.classification",
+        "summary.passed",
+        "summary.evaluatorCalls"
+      ]
+    },
+    {
+      "row": "FAIL_CLOSED_PRECEDENCE_UNKNOWN_OVER_FAIL",
+      "outcome": "UNKNOWN",
+      "reason": "QUANTIZATION_AMBIGUITY",
+      "classification": "V3_UNCERTAIN_OR_UNSUPPORTED",
+      "evaluatorCalls": 2,
+      "decision": "REJECT_REQUIRED",
+      "stateBytesUnchanged": true,
+      "resultDigest": "ad6472b201f421dafab7f9e631a326f841eeee50ef472cad085b721762c74e0d",
+      "evidenceFields": [
+        "decision",
+        "outcome",
+        "summary.failed",
+        "summary.unknown"
+      ]
+    },
+    {
+      "row": "FAIL_CLOSED_PRECEDENCE_INVALID_OVER_FAIL",
+      "outcome": "UNKNOWN",
+      "reason": "STALE_EVIDENCE",
+      "classification": "V3_INVALID_AUTHORITY",
+      "evaluatorCalls": 2,
+      "decision": "REJECT_REQUIRED",
+      "stateBytesUnchanged": true,
+      "resultDigest": "83eb7ba5c581320766475145531004a619409c7139808a79a8898f0bd7bbfbd8",
+      "evidenceFields": [
+        "decision",
+        "outcome",
+        "summary.failed",
+        "summary.invalidV3"
+      ]
+    },
+    {
+      "row": "EVALUATOR_THROW",
+      "outcome": "UNKNOWN",
+      "reason": "MALFORMED_V3_RESULT",
+      "classification": "MALFORMED_V3_RESULT",
+      "evaluatorCalls": 1,
+      "decision": "REJECTED_AT_ADAPTER",
+      "stateBytesUnchanged": true,
+      "resultDigest": "a276b2ee30660ec58945dff32e598914891b752a777e85f5272a0c638c92f4aa",
+      "evidenceFields": [
+        "outcome",
+        "classification",
+        "v3.status",
+        "adapterEvidence.validationStage",
+        "adapterEvidence.evaluatorCalls",
+        "exception",
+        "resultDigest-determinism"
+      ]
+    },
+    {
+      "row": "EVALUATOR_MALFORMED_RETURN",
+      "outcome": "UNKNOWN",
+      "reason": "MALFORMED_V3_RESULT",
+      "classification": "MALFORMED_V3_RESULT",
+      "evaluatorCalls": 1,
+      "decision": "REJECTED_AT_ADAPTER",
+      "stateBytesUnchanged": true,
+      "resultDigest": "6f986b3b1ecc6e91db784327b9494503298a864b9d75aa905da8b921aac39c24",
+      "evidenceFields": [
+        "outcome",
+        "classification",
+        "v3.status",
+        "adapterEvidence.validationStage",
+        "adapterEvidence.evaluatorCalls",
+        "resultDigest-determinism"
+      ]
+    },
+    {
+      "row": "GLOBAL_CORRUPTION_OUTSIDE_IMPACT",
+      "outcome": "UNKNOWN",
+      "reason": "STALE_AUTHORITY",
+      "classification": "ENVELOPE_REJECTED",
+      "evaluatorCalls": 0,
+      "decision": "REJECT_REQUIRED",
+      "stateBytesUnchanged": true,
+      "resultDigest": "baaa3b3a8d030dcefc7d974cff5fd604ca6dcf2bc061df5013621d17dc8ef66d",
+      "evidenceFields": [
+        "decision",
+        "envelopeFailure.reason",
+        "envelopeFailure.evidence.recordId"
+      ]
+    },
+    {
+      "row": "VALID_UNRELATED_CONTROL",
+      "outcome": "PASS",
+      "reason": "VALID",
+      "classification": "V3_VALID",
+      "evaluatorCalls": 1,
+      "decision": "COMMIT_ALLOWED",
+      "stateBytesUnchanged": true,
+      "resultDigest": "59d7b902f4b9b04f227ecd29ec93ee8ddf8d40283de36901f8eb5aff0175c932",
+      "evidenceFields": [
+        "decision",
+        "outcome"
+      ]
+    },
+    {
+      "row": "MANIFEST_MODIFIED_MODULE",
+      "outcome": "UNKNOWN",
+      "reason": "MANIFEST_SHA_MISMATCH",
+      "classification": "AUDIT_FINDING",
+      "evaluatorCalls": 0,
+      "decision": "AUDIT_REJECTED",
+      "stateBytesUnchanged": true,
+      "resultDigest": "f4fd3f7550e12c69695d22a9fc6f49daf6e7234836e3cdba8aedd2f1c65d7caa",
+      "evidenceFields": [
+        "audit.exit-nonzero-on-mutation",
+        "audit.findings.MANIFEST_SHA_MISMATCH",
+        "audit.clean-after-restore"
+      ]
+    },
+    {
+      "row": "MANIFEST_UNAPPROVED_MODULE",
+      "outcome": "UNKNOWN",
+      "reason": "FOUNDATION_MANIFEST_SET_MISMATCH",
+      "classification": "AUDIT_FINDING",
+      "evaluatorCalls": 0,
+      "decision": "AUDIT_REJECTED",
+      "stateBytesUnchanged": true,
+      "resultDigest": "f4fd3f7550e12c69695d22a9fc6f49daf6e7234836e3cdba8aedd2f1c65d7caa",
+      "evidenceFields": [
+        "audit.exit-nonzero-on-unapproved",
+        "audit.findings.FOUNDATION_MANIFEST_SET_MISMATCH",
+        "audit.clean-after-restore"
+      ]
+    }
+  ]
+}

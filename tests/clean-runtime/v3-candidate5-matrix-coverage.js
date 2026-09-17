@@ -1,11 +1,13 @@
 'use strict';
-// Candidate 5 (resubmission): corrected normative 67-row acceptance matrix.
-// Every row is distinct (no route/permutation duplication) and maps to a real
-// behavioral regression that exercises behavior and asserts fail-closed,
-// result, evaluator and commit evidence. Rows 66 and 67 are covered by
-// executing the detached determinism harness (two processes, byte-identical
-// output) and the isolation audit. Exits 0 only when every row is covered.
-const cp=require('node:child_process'),path=require('node:path');
+// Candidate 5 (resubmission, corrected): normative 67-row acceptance matrix.
+// No duplicate route-exactness or permutation filler rows; every row is a
+// distinct normative behavior mapped to a real behavioral regression. The 25
+// Foundation-path rows are enforced against structured per-row evidence
+// records: outcome, reason/classification, evaluator count, final decision,
+// unchanged synthetic state bytes on rejection, and required evidence fields.
+// The isolation audit and detached determinism harness run as additional
+// gates (not matrix rows). Exits 0 only when every row and gate passes.
+const cp=require('node:child_process'),path=require('node:path'),fs=require('node:fs'),crypto=require('node:crypto');
 const root=path.resolve(__dirname,'../..');
 const F='tests/clean-runtime/v3-authority-promotion-foundation.test.js',A='tests/clean-runtime/v3-foundation-adversarial-closure.test.js',M='tests/clean-runtime/v3-promotion-acceptance-matrix.test.js',H='tests/clean-runtime/v3-promotion-hostile.test.js',FP='tests/clean-runtime/v3-promotion-full-path.test.js',FPCO='tests/clean-runtime/v3-promotion-full-path-containment-opening.test.js',R='tests/clean-runtime/v3-foundation-fourth-review.test.js',X='tests/clean-runtime/v3-candidate5-foundation-matrix.test.js';
 const rows=[
@@ -15,13 +17,9 @@ const rows=[
 ['PLAN_PERMUTATION_CANONICAL','all command permutations produce identical canonical plan bytes',A],
 ['IMPACT_CONTAINMENT_CLOSURE','shared containment target closes impact over siblings',A],
 ['IMPACT_BOUNDARY_CLOSURE','shared boundary closes impact over siblings',A],
-['ROUTE_EXACT_PROMOTED_TUPLES','route exact V3_SUPPORT',M],
-['ROUTE_WRONG_QUERY_REJECTED','route rejects wrong query V3_SUPPORT',M],
 ['ROUTE_DIGEST_SEALED','route digest sealed',M],
 ['ROUTE_UNKNOWN_VERSION_FAIL_CLOSED','unknown version is never routed 3.0.0 ',M],
 ['ROUTE_UNKNOWN_CAPABILITY_FAIL_CLOSED','unknown capability fails closed',M],
-['PLAN_CANONICAL_PERMUTATION','permutation canonical 1',M],
-['IMPACT_DIGEST_SEALED','impact digest sealed',M],
 ['CONTEXT_EXACT_ENVELOPE_READY','context exact envelope is READY',M],
 ['ADV_01','ADV-01 missing opening membership target is rejected before READY',H],
 ['ADV_02','ADV-02 exact promoted identities cannot be swapped',H],
@@ -51,40 +49,63 @@ const rows=[
 ['APPEND_FAILURE_ATOMIC','real event append failure leaves state and log byte-identical',R],
 ['COMMIT_FAILURE_ROLLBACK','real commit failure rolls back staged event and state',R],
 ['REPLAY_TAMPERED_SEQUENCE','replay rejects tampered sequence',R],
+['REPLAY_TAMPERED_TRANSACTION','replay rejects tampered transactionId',R],
 ['REPLAY_TAMPERED_PROOF','replay rejects tampered physicalProof',R],
 ['REPLAY_FORGED_PROOF','replay rejects a re-signed forged proof (honest payload and event re-digest)',R],
-['OFFSET_PLANE_Y10','FOUNDATION-OFFSET-PLANE-Y10 coplanar support at offset plane y=10 commits with VALID evaluator evidence',X],
-['OFFSET_PLANE_Y11','FOUNDATION-OFFSET-PLANE-Y11 floating above offset plane y=10 fails closed through the full path',X],
-['OFFSET_PLANE_Y9','FOUNDATION-OFFSET-PLANE-Y9 penetrating the offset plane fails closed through the full path',X],
-['MISSING_BOUNDARY_PROTRUSION_1000','FOUNDATION-MISSING-BOUNDARY-1000 unresolved affirmative owner with protrusion 1000 stops before the evaluator',X],
-['FORGED_CONTAINMENT_BODY','FOUNDATION-FORGED-CONTAINMENT-BODY tampered body authority pin rejects at envelope build',X],
-['FORGED_CONTAINMENT_TARGET','FOUNDATION-FORGED-CONTAINMENT-TARGET tampered target authority pin rejects at envelope build',X],
-['MISSING_OPENING_BODY','FOUNDATION-MISSING-OPENING-BODY opening body absent from the registry fails closed before the evaluator',X],
-['FORGED_OPENING_BODY','FOUNDATION-FORGED-OPENING-BODY forged opening body reference is stale evidence at the evaluator',X],
-['MISSING_OPENING_SOLID','FOUNDATION-MISSING-OPENING-SOLID owner solid reference absent from the registry rejects at envelope build',X],
-['FORGED_OPENING_SOLID','FOUNDATION-FORGED-OPENING-SOLID tampered owner solid reference is stale at envelope build',X],
-['COMPOUND_ILLEGAL_SIBLING','FOUNDATION-COMPOUND-ILLEGAL-SIBLING compound containment with an illegal sibling fails closed',X],
-['QUANTIZATION_AMBIGUITY','FOUNDATION-QUANTIZATION-AMBIGUITY exact opening edge cannot PASS and stays UNKNOWN',X],
-['AGGREGATE_PASS_FAIL','FOUNDATION-AGGREGATE-PASS-FAIL one passing and one failing obligation aggregates to FAIL and no commit',X],
-['AGGREGATE_PASS_UNKNOWN','FOUNDATION-AGGREGATE-PASS-UNKNOWN one passing and one ambiguous obligation aggregates to UNKNOWN and no commit',X],
-['AGGREGATE_PASS_INVALID','FOUNDATION-AGGREGATE-PASS-INVALID one passing and one invalid obligation aggregates to UNKNOWN and no commit',X],
-['AGGREGATE_PASS_NON_PROMOTED','FOUNDATION-AGGREGATE-PASS-NON_PROMOTED locked collision capability stays NON_PROMOTED inside a mixed decision',X],
-['MALFORMED_EVALUATOR','FOUNDATION-MALFORMED-EVALUATOR malformed module data reaching the evaluator fails closed with no commit',X],
-['GLOBAL_CORRUPTION_OUTSIDE_IMPACT','FOUNDATION-GLOBAL-CORRUPTION-OUTSIDE-IMPACT tampering an unrelated registry record rejects the whole decision',X],
-['VALID_UNRELATED_CONTROL','FOUNDATION-VALID-UNRELATED-CONTROL a valid unrelated registry record does not block a clean commit',X],
-['MANIFEST_MODIFIED_MODULE','FOUNDATION-MANIFEST-MODIFIED-MODULE-DETECTED modifying a foundation module trips MANIFEST_SHA_MISMATCH',X],
-['MANIFEST_UNAPPROVED_MODULE','FOUNDATION-MANIFEST-UNAPPROVED-MODULE-DETECTED creating an unapproved module trips the audit set mismatch',X],
-['DETACHED_DETERMINISM','__DETERMINISM__','tests/clean-runtime/v3-candidate5-determinism.js'],
-['AUDIT_INBOUND_ISOLATION','__AUDIT__','tests/clean-runtime/v3-promotion-authority-audit.js']];
+['OFFSET_PLANE_Y10','__X__',X],
+['OFFSET_PLANE_Y11','__X__',X],
+['OFFSET_PLANE_Y9','__X__',X],
+['MISSING_BOUNDARY_PROTRUSION_1000','__X__',X],
+['FORGED_CONTAINMENT_BODY','__X__',X],
+['FORGED_CONTAINMENT_TARGET','__X__',X],
+['MISSING_OPENING_BODY','__X__',X],
+['FORGED_OPENING_BODY','__X__',X],
+['MISSING_OPENING_SOLID','__X__',X],
+['FORGED_OPENING_SOLID','__X__',X],
+['COMPOUND_ILLEGAL_SIBLING','__X__',X],
+['QUANTIZATION_AMBIGUITY','__X__',X],
+['AGGREGATE_PASS_PASS','__X__',X],
+['AGGREGATE_PASS_FAIL','__X__',X],
+['AGGREGATE_PASS_UNKNOWN','__X__',X],
+['AGGREGATE_PASS_INVALID','__X__',X],
+['AGGREGATE_PASS_NON_PROMOTED','__X__',X],
+['FAIL_CLOSED_PRECEDENCE_UNKNOWN_OVER_FAIL','__X__',X],
+['FAIL_CLOSED_PRECEDENCE_INVALID_OVER_FAIL','__X__',X],
+['EVALUATOR_THROW','__X__',X],
+['EVALUATOR_MALFORMED_RETURN','__X__',X],
+['GLOBAL_CORRUPTION_OUTSIDE_IMPACT','__X__',X],
+['VALID_UNRELATED_CONTROL','__X__',X],
+['MANIFEST_MODIFIED_MODULE','__X__',X],
+['MANIFEST_UNAPPROVED_MODULE','__X__',X],
+['DETACHED_DETERMINISM','__DETERMINISM__','tests/clean-runtime/v3-candidate5-determinism.js']];
 if(rows.length!==67){console.error('matrix row count '+rows.length+' != 67');process.exit(1)}
 const ids=new Set(rows.map(r=>r[0]));if(ids.size!==67){console.error('matrix row ids are not distinct');process.exit(1)}
 const files=[...new Set(rows.map(r=>r[2]).filter(f=>f.endsWith('.test.js')))];
+const evidencePath=path.resolve(root,'evidence/clean-runtime/v3-authority-promotion-foundation/candidate5/foundation-matrix-evidence.json');
+fs.rmSync(evidencePath,{force:true});
 const out=cp.execFileSync('node',['--test',...files],{cwd:root,encoding:'utf8'});
 const passing=new Set();for(const line of out.split('\n')){const m=line.match(/^ok \d+ - (.*)$/);if(m)passing.add(m[1]);if(/^not ok /.test(line)){console.error('focused suite has a failing test: '+line);process.exit(1)}}
-let auditOk=false;try{cp.execFileSync('node',['tests/clean-runtime/v3-promotion-authority-audit.js'],{cwd:root,encoding:'utf8',stdio:['ignore','pipe','pipe']});auditOk=true}catch{}
-let determinismOk=false,determinismSha=null;try{const r1=cp.execFileSync('node',['tests/clean-runtime/v3-candidate5-determinism.js'],{cwd:root,encoding:'utf8'});const r2=cp.execFileSync('node',['tests/clean-runtime/v3-candidate5-determinism.js'],{cwd:root,encoding:'utf8'});const crypto=require('node:crypto');const h1=crypto.createHash('sha256').update(r1).digest('hex'),h2=crypto.createHash('sha256').update(r2).digest('hex');determinismOk=h1===h2;determinismSha={run1:h1,run2:h2,identical:h1===h2}}catch{}
-const uncovered=[];for(const [id,name,file] of rows){if(name==='__AUDIT__'){if(!auditOk)uncovered.push([id,'audit findings or nonzero exit']);continue}if(name==='__DETERMINISM__'){if(!determinismOk)uncovered.push([id,'detached determinism runs differ or failed']);continue}if(!passing.has(name))uncovered.push([id,name+' ('+file+')'])}
-const result={schemaVersion:'v3-candidate5-matrix-coverage/2.0.0',matrixRows:67,covered:67-uncovered.length,auditExecuted:true,auditClean:auditOk,detachedDeterminism:determinismSha,uncovered:uncovered.map(([id,what])=>({row:id,missing:what}))};
+const evidence=JSON.parse(fs.readFileSync(evidencePath,'utf8'));
+const byRow=new Map(evidence.records.map(r=>[r.row,r]));
+const REQUIRED=['outcome','reason','classification','evaluatorCalls','decision','stateBytesUnchanged','resultDigest','evidenceFields'];
+const uncovered=[];
+for(const [id,name] of rows){
+ if(name==='__DETERMINISM__')continue;
+ if(name==='__X__'){
+  const r=byRow.get(id);
+  if(!r){uncovered.push([id,'missing per-row evidence record']);continue}
+  for(const k of REQUIRED)if(r[k]===undefined)uncovered.push([id,'evidence record missing field '+k]);
+  if(!/^[0-9a-f]{64}$/.test(r.resultDigest||''))uncovered.push([id,'resultDigest is not a sha256 hex']);
+  if(!Array.isArray(r.evidenceFields)||!r.evidenceFields.length)uncovered.push([id,'evidenceFields empty']);
+  if(!Number.isInteger(r.evaluatorCalls)||r.evaluatorCalls<0)uncovered.push([id,'evaluatorCalls not a non-negative integer']);
+  if((r.decision==='COMMIT_ALLOWED')!==(r.outcome==='PASS'))uncovered.push([id,'decision/outcome inconsistent: commit without PASS or PASS without commit']);
+  if(r.decision!=='COMMIT_ALLOWED'&&r.stateBytesUnchanged!==true)uncovered.push([id,'rejection did not prove unchanged synthetic state bytes']);
+  continue}
+ if(!passing.has(name))uncovered.push([id,name])}
+let auditOk=false,auditDigest=null;try{const a=JSON.parse(cp.execFileSync('node',['tests/clean-runtime/v3-promotion-authority-audit.js'],{cwd:root,encoding:'utf8'}));auditOk=a.findings.length===0;auditDigest=a.auditDigest}catch{}
+let determinismOk=false,determinismSha=null;try{const r1=cp.execFileSync('node',['tests/clean-runtime/v3-candidate5-determinism.js'],{cwd:root,encoding:'utf8'});const r2=cp.execFileSync('node',['tests/clean-runtime/v3-candidate5-determinism.js'],{cwd:root,encoding:'utf8'});const h1=crypto.createHash('sha256').update(r1).digest('hex'),h2=crypto.createHash('sha256').update(r2).digest('hex');determinismOk=h1===h2;determinismSha={run1:h1,run2:h2,identical:h1===h2}}catch{}
+if(!determinismOk)uncovered.push(['DETACHED_DETERMINISM','detached determinism runs differ or failed']);
+const result={schemaVersion:'v3-candidate5-matrix-coverage/3.0.0',matrixRows:67,covered:67-uncovered.length,gates:{audit:{executed:true,clean:auditOk,digest:auditDigest},detachedDeterminism:determinismSha},uncovered:uncovered.map(([id,what])=>({row:id,missing:what}))};
 console.log(JSON.stringify(result,null,2));
-if(uncovered.length)process.exit(1);
-console.log('MATRIX 67/67 COVERED BY PASSING BEHAVIORAL REGRESSIONS');
+if(uncovered.length||!auditOk)process.exit(1);
+console.log('MATRIX 67/67 COVERED BY PASSING BEHAVIORAL REGRESSIONS WITH PER-ROW EVIDENCE RECORDS');
