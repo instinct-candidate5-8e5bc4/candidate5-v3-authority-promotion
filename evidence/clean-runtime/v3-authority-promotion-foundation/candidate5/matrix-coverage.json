@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "v3-candidate5-matrix-coverage/1.0.0",
+  "matrixRows": 67,
+  "covered": 67,
+  "auditExecuted": true,
+  "auditClean": true,
+  "uncovered": []
+}
+MATRIX 67/67 COVERED BY PASSING BEHAVIORAL REGRESSIONS
