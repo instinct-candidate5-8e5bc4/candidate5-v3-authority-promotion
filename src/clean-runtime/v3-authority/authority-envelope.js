@@ -3,8 +3,8 @@ const {digest}=require('../contracts/canonical');const {deepFreeze}=require('../
 const HEX=/^[0-9a-f]{64}$/;const cmp=(a,b)=>a<b?-1:a>b?1:0;function clone(x){return structuredClone(x)}function seal(body,field='envelopeDigest'){const b=clone(body);b[field]=digest(b);return deepFreeze(b)}function validRef(r){return !!r&&typeof r==='object'&&typeof Object.values(r)[0]==='string'&&Number.isInteger(r.revision)&&r.revision>0&&HEX.test(r.digest||'')}function refEqual(a,b){return !!a&&!!b&&a.revision===b.revision&&a.digest===b.digest&&Object.keys(a).filter(k=>k.endsWith('Id')).every(k=>a[k]===b[k])}
 function contextForObligation(envelope,o){
  if(!envelope||!o||digest({...envelope,envelopeDigest:undefined})!==envelope.envelopeDigest)return deepFreeze({status:'INCOMPLETE_AUTHORITY',reason:'INVALID_ENVELOPE'});
- const snap=envelope.authoritySnapshotRef,wb=envelope.worldBinding;
- if(!snap||typeof snap.authoritySnapshotId!=='string'||!Number.isInteger(snap.revision)||snap.revision<1||!HEX.test(snap.digest||''))return deepFreeze({status:'INCOMPLETE_AUTHORITY',reason:'INVALID_ENVELOPE'});
+ const sref=envelope.authoritySnapshotRef,wb=envelope.worldBinding;
+ if(!sref||typeof sref.authoritySnapshotId!=='string'||!Number.isInteger(sref.revision)||sref.revision<1||!HEX.test(sref.digest||''))return deepFreeze({status:'INCOMPLETE_AUTHORITY',reason:'INVALID_ENVELOPE'});
  if(!wb||typeof wb.worldId!=='string'||!Number.isInteger(wb.beforeRevision)||!Number.isInteger(wb.proposedRevision)||wb.proposedRevision!==wb.beforeRevision+1||!HEX.test(wb.beforeStateDigest||'')||!HEX.test(wb.proposedStateDigest||'')||!HEX.test(wb.transactionDigest||''))return deepFreeze({status:'INCOMPLETE_AUTHORITY',reason:'INVALID_ENVELOPE'});
  if(o.authorityEnvelopeDigest!==envelope.envelopeDigest)return deepFreeze({status:'INCOMPLETE_AUTHORITY',reason:'MIXED_ENVELOPE'});
  const a=o.authorityRequirements||{},ids=k=>[...new Set(a[k]||[])].sort(cmp),missing=[];
