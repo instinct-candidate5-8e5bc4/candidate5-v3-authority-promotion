@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "v3-candidate5-determinism/1.0.0",
+  "inProcessRuns": 3,
+  "inProcessIdentical": true,
+  "run": {
+    "registrySnapshotDigest": "0f678322d94c293cd9612153cb92d237199d3c7bd1ea8cab265f8566cf27ca67",
+    "beforeStateDigest": "a33cb3c37b5446b5e49e32b167b5333d43d833038eac9eb51c5190747e7313b8",
+    "afterStateDigest": "5d5273012271b0ab90cecd0250c7a7bb0bbde4d0f82f7ef7b23cf07a347a48ed",
+    "authorityEnvelopeDigest": "04c65d22d2f7b5e8e8526c36439143ffc6cac519c746adaa42309315c03663ab",
+    "planDigest": "85d035b0959f8273a33ef9d9d266d08dfce1a9dbba50617cc203a7df83ce4cc5",
+    "decisionDigest": "ff014fe558a2860d010f7118c2c7bcd409e07a2a655048660a7c7daa1fdf88b7",
+    "proofPayloadDigest": "21e2f1f7ca17126930790fc2f8cd2e500ff6d15ed607cb44ec6c7f69375bc1a0",
+    "externalProofRoot": "684afb58002c7b22da854288fce352bc82504e93bb5a1911fc9c7671b87e536f",
+    "eventDigest": "30d2931128819dd1da50e8aeb22626e10730f65643bd16687546dc3a8ae39288",
+    "eventChainDigest": "0bc1bde1462a7c981410a76623d6b3e7c4cf4da6060290f5642d971fe4dc575b",
+    "replayFinalStateDigest": "5d5273012271b0ab90cecd0250c7a7bb0bbde4d0f82f7ef7b23cf07a347a48ed"
+  },
+  "evidenceDigest": "af052155344def0223ff22568d13bacd7114569b420a85c4056627ae86986eff"
+}
