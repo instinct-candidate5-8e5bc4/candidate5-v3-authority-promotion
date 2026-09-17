@@ -1,0 +1,79 @@
+name: V3 Authority Routing Gate
+on:
+  push:
+    branches: [candidate5-authority-routing-gate]
+jobs:
+  routing-gate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Syntax
+        run: find src/clean-runtime/v3-routing src/clean-runtime/mutation -name '*.js' -print0 | xargs -0 -n1 node --check
+      - name: Foundation + routing focused twice
+        run: |
+          set -o pipefail
+          node --test tests/clean-runtime/v3-*.test.js | tee "$RUNNER_TEMP/focused-1.tap"
+          node --test tests/clean-runtime/v3-*.test.js | tee "$RUNNER_TEMP/focused-2.tap"
+      - name: Broad exact command (inherited regression gates)
+        run: |
+          set -o pipefail
+          files=$(find tests -name '*.test.js' -print | sort | tr '\n' ' ')
+          node --test $files | tee "$RUNNER_TEMP/broad.tap"
+      - name: Static boundaries
+        run: |
+          set -o pipefail
+          node --test tests/verified-architecture-phase2/static-boundaries.test.js | tee "$RUNNER_TEMP/static.tap"
+      - name: Isolation and routing audit
+        run: |
+          set -o pipefail
+          node tests/clean-runtime/v3-promotion-authority-audit.js | tee "$RUNNER_TEMP/audit.json"
+      - name: Routing detached determinism
+        run: |
+          OUT="$RUNNER_TEMP/review-evidence"; mkdir -p "$OUT"
+          node tests/clean-runtime/v3-routing-determinism.js > "$OUT/routing-determinism-1.json"
+          node tests/clean-runtime/v3-routing-determinism.js > "$OUT/routing-determinism-2.json"
+          cmp "$OUT/routing-determinism-1.json" "$OUT/routing-determinism-2.json"
+          sha256sum "$OUT"/routing-determinism-*.json > "$OUT/routing-determinism.sha256"
+      - name: Foundation detached determinism and matrix coverage (inherited)
+        run: |
+          OUT="$RUNNER_TEMP/review-evidence"; mkdir -p "$OUT"; set -o pipefail
+          node tools/verified-architecture-phase2-v3/closure-evidence.js determinism > "$OUT/foundation-determinism-1.json"
+          node tools/verified-architecture-phase2-v3/closure-evidence.js determinism > "$OUT/foundation-determinism-2.json"
+          cmp "$OUT/foundation-determinism-1.json" "$OUT/foundation-determinism-2.json"
+          node tools/verified-architecture-phase2-v3/closure-evidence.js performance > "$OUT/foundation-performance.json"
+          node tests/clean-runtime/v3-candidate5-matrix-coverage.js | tee "$OUT/matrix-coverage.json"
+      - name: Review metadata and authority audit
+        if: always()
+        run: |
+          OUT="$RUNNER_TEMP/review-evidence"; mkdir -p "$OUT"
+          BASE=127f284d78b83f358f076b3ee8f8b56044bcc691
+          git rev-parse HEAD > "$OUT/commit.txt"; git rev-parse HEAD^ > "$OUT/parent.txt"
+          test "$(git merge-base "$BASE" HEAD)" = "$BASE"
+          git rev-list --left-right --count "$BASE"...HEAD > "$OUT/rev-list.txt"
+          git diff --name-status "$BASE"...HEAD > "$OUT/diff-name-status.txt"
+          git diff --numstat "$BASE"...HEAD > "$OUT/diff-numstat.txt"
+          git status --porcelain=v1 > "$OUT/review-worktree-status.txt"
+          remote=$(git ls-remote origin refs/heads/candidate5-authority-routing-gate | awk '{print $1}'); echo "$remote" > "$OUT/remote-tip.txt"; test "$remote" = "$(git rev-parse HEAD)"
+          foundation=$(git ls-remote origin refs/heads/candidate5 | awk '{print $1}'); echo "$foundation" > "$OUT/foundation-branch-tip.txt"; test "$foundation" = "127f284d78b83f358f076b3ee8f8b56044bcc691"
+          git fetch --depth=1 https://github.com/yuzok101/ko-rishon-first-aid-simulator.git main && test "$(git rev-parse FETCH_HEAD)" = "4e06f74a058f10c0be229dabfedf2015cb350e69" && git worktree add --detach "$RUNNER_TEMP/main-worktree" FETCH_HEAD >/dev/null
+          git -C "$RUNNER_TEMP/main-worktree" status --porcelain=v1 > "$OUT/main-worktree-status.txt"
+          {
+            echo 'gatewayRouted=false'; echo 'legalityPromoted=false'; echo 'routingConnected=true'
+            echo -n 'runtime_imports_v3_legality='; grep -R -l "verified-architecture-phase2-v3/\|phase2-v3" src/runtime src 2>/dev/null | grep -v 'src/verified-architecture-phase2-v3' | grep -v 'src/clean-runtime/mutation/v3-authority-adapter.js' | wc -l || true
+            echo -n 'renderer_three_imports_in_v3='; grep -R -E "require\(['\"]three|from ['\"]three|renderer" src/verified-architecture-phase2-v3 src/clean-runtime/v3-routing 2>/dev/null | wc -l || true
+            echo -n 'candidate_evaluator_entry='; grep -R -l "function evaluateV3" src/verified-architecture-phase2-v3/evaluate.js | wc -l
+          } > "$OUT/authority-audit.txt"
+          cp "$RUNNER_TEMP/focused-1.tap" "$RUNNER_TEMP/focused-2.tap" "$RUNNER_TEMP/broad.tap" "$RUNNER_TEMP/static.tap" "$RUNNER_TEMP/audit.json" "$OUT/" 2>/dev/null || true
+          tar --exclude=.git -czf "$OUT/candidate.tar.gz" .
+          sha256sum "$OUT/candidate.tar.gz" > "$OUT/candidate.sha256"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v3-authority-routing-gate-${{ github.sha }}
+          path: ${{ runner.temp }}/review-evidence
