@@ -1,0 +1,120 @@
+TAP version 13
+# (node:7965) Warning: node:test run() is being called recursively within a test file. skipping running files.
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: hostile 1: each approved edge independently passes
+ok 1 - hostile 1: each approved edge independently passes
+  ---
+  duration_ms: 172.05329
+  type: 'test'
+  ...
+# Subtest: hostile 2: all three approved edges together pass
+ok 2 - hostile 2: all three approved edges together pass
+  ---
+  duration_ms: 61.408802
+  type: 'test'
+  ...
+# Subtest: hostile 3: same source to wrong target fails
+ok 3 - hostile 3: same source to wrong target fails
+  ---
+  duration_ms: 60.192537
+  type: 'test'
+  ...
+# Subtest: hostile 4: wrong source to approved target fails
+ok 4 - hostile 4: wrong source to approved target fails
+  ---
+  duration_ms: 55.181197
+  type: 'test'
+  ...
+# Subtest: hostile 5: fourth foundation edge fails
+ok 5 - hostile 5: fourth foundation edge fails
+  ---
+  duration_ms: 53.72399
+  type: 'test'
+  ...
+# Subtest: hostile 6: sibling module edge fails
+ok 6 - hostile 6: sibling module edge fails
+  ---
+  duration_ms: 56.096554
+  type: 'test'
+  ...
+# Subtest: hostile 7: path alias attempt fails
+ok 7 - hostile 7: path alias attempt fails
+  ---
+  duration_ms: 59.694014
+  type: 'test'
+  ...
+# Subtest: hostile 8: relative-path normalization bypass fails
+ok 8 - hostile 8: relative-path normalization bypass fails
+  ---
+  duration_ms: 57.102762
+  type: 'test'
+  ...
+# Subtest: hostile 9: dynamic require/import attempt fails
+ok 9 - hostile 9: dynamic require/import attempt fails
+  ---
+  duration_ms: 56.308034
+  type: 'test'
+  ...
+# Subtest: hostile 10: re-export/factory/injector indirection creates no additional authority
+ok 10 - hostile 10: re-export/factory/injector indirection creates no additional authority
+  ---
+  duration_ms: 112.749959
+  type: 'test'
+  ...
+# Subtest: hostile 11: duplicate or malformed allowlist entry fails
+ok 11 - hostile 11: duplicate or malformed allowlist entry fails
+  ---
+  duration_ms: 237.224157
+  type: 'test'
+  ...
+# Subtest: hostile 12: missing approved edge fails certification
+ok 12 - hostile 12: missing approved edge fails certification
+  ---
+  duration_ms: 59.409431
+  type: 'test'
+  ...
+# Subtest: hostile 13: additional allowlist edge fails certification
+ok 13 - hostile 13: additional allowlist edge fails certification
+  ---
+  duration_ms: 59.690658
+  type: 'test'
+  ...
+# Subtest: hostile 14: modification of any certified foundation blob fails certification
+ok 14 - hostile 14: modification of any certified foundation blob fails certification
+  ---
+  duration_ms: 354.119375
+  type: 'test'
+  ...
+# Subtest: hostile 15: any foundation semantic/result change fails certification
+ok 15 - hostile 15: any foundation semantic/result change fails certification
+  ---
+  duration_ms: 68.714028
+  type: 'test'
+  ...
+# Subtest: hostile 16: existing fail-closed behavior remains unchanged
+ok 16 - hostile 16: existing fail-closed behavior remains unchanged
+  ---
+  duration_ms: 65.220603
+  type: 'test'
+  ...
+# Subtest: hostile 17: existing foundation hostile/replay/determinism suites remain green
+ok 17 - hostile 17: existing foundation hostile/replay/determinism suites remain green
+  ---
+  duration_ms: 36.875211
+  type: 'test'
+  ...
+# Subtest: hostile 18: routing gate remains non-promoted during this reopen
+ok 18 - hostile 18: routing gate remains non-promoted during this reopen
+  ---
+  duration_ms: 57.0777
+  type: 'test'
+  ...
+1..18
+# tests 18
+# suites 0
+# pass 18
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1730.234656

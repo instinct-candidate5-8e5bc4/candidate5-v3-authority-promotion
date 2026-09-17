@@ -1,0 +1,78 @@
+{
+  "containment": {
+    "apiVersion": "3.0.0",
+    "evidence": {
+      "error": "UNSUPPORTED_GEOMETRY",
+      "limitations": [
+        "GEOMETRIC_ONLY",
+        "NO_STABILITY_LOAD_FRICTION",
+        "NO_WATER_BUOYANCY",
+        "NO_ENTRAPMENT_INFERENCE",
+        "DISCRETE_STATE_ONLY"
+      ]
+    },
+    "evidenceDigest": "dc064ca0761feb1984207985d35e2ba4d744d9f1c9ec25913f1c4281ec2d731d",
+    "queryType": "BODY_CONTAINMENT_IN_ALLOWED_REGION",
+    "reason": "UNSUPPORTED_GEOMETRY",
+    "requestId": "contain",
+    "status": "UNKNOWN"
+  },
+  "gatewayRouted": false,
+  "legalityPromoted": false,
+  "multiSupport": {
+    "apiVersion": "3.0.0",
+    "evidence": {
+      "error": "UNSUPPORTED_GEOMETRY",
+      "limitations": [
+        "GEOMETRIC_ONLY",
+        "NO_STABILITY_LOAD_FRICTION",
+        "NO_WATER_BUOYANCY",
+        "NO_ENTRAPMENT_INFERENCE",
+        "DISCRETE_STATE_ONLY"
+      ]
+    },
+    "evidenceDigest": "00b47ec948fbd272dc003bdadeef9b95fe9fd116aeb95ab338576094c325cce7",
+    "queryType": "CONTACT_REGION_VS_SUPPORT_SURFACE",
+    "reason": "UNSUPPORTED_GEOMETRY",
+    "requestId": "multi",
+    "status": "UNKNOWN"
+  },
+  "opening": {
+    "apiVersion": "3.0.0",
+    "evidence": {
+      "error": "UNSUPPORTED_GEOMETRY",
+      "limitations": [
+        "GEOMETRIC_ONLY",
+        "NO_STABILITY_LOAD_FRICTION",
+        "NO_WATER_BUOYANCY",
+        "NO_ENTRAPMENT_INFERENCE",
+        "DISCRETE_STATE_ONLY"
+      ]
+    },
+    "evidenceDigest": "a6a4bebb2b49a2f0acd2f0e32f6c62c8db742eb03ba43009772470a2bb3df2db",
+    "queryType": "BODY_VS_OPENING_BOUNDARY",
+    "reason": "UNSUPPORTED_GEOMETRY",
+    "requestId": "open",
+    "status": "UNKNOWN"
+  },
+  "schema": "v3-closure-determinism-r2",
+  "sha256": "240146bb17f78627445dfce7a99444ad66358d6bebc25a802d1b771457102e9e",
+  "support": {
+    "apiVersion": "3.0.0",
+    "evidence": {
+      "error": "UNSUPPORTED_GEOMETRY",
+      "limitations": [
+        "GEOMETRIC_ONLY",
+        "NO_STABILITY_LOAD_FRICTION",
+        "NO_WATER_BUOYANCY",
+        "NO_ENTRAPMENT_INFERENCE",
+        "DISCRETE_STATE_ONLY"
+      ]
+    },
+    "evidenceDigest": "f92080414d5121e495d1f1eb45878b1024909072368ea5d4179940eb72f81f56",
+    "queryType": "CONTACT_REGION_VS_SUPPORT_SURFACE",
+    "reason": "UNSUPPORTED_GEOMETRY",
+    "requestId": "support",
+    "status": "UNKNOWN"
+  }
+}
