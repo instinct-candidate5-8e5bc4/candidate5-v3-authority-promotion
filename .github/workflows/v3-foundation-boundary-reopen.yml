@@ -66,8 +66,11 @@ jobs:
           node tools/verified-architecture-phase2-v3/closure-evidence.js performance > "$OUT/closure-performance.json"
           node tests/clean-runtime/v3-candidate5-matrix-coverage.js | tee "$OUT/matrix-coverage.json"
           git checkout -- evidence/clean-runtime/v3-authority-promotion-foundation/candidate5/foundation-matrix-evidence.json
-          test "$(git hash-object evidence/clean-runtime/v3-authority-promotion-foundation/candidate5/foundation-matrix-evidence.json)" = "aea5d721b39875d17aa2b7e5327580e11545efdb"
-          git status --porcelain=v1 | grep -v '^??' | wc -l | grep -q '^0$'
+          restored=$(git hash-object evidence/clean-runtime/v3-authority-promotion-foundation/candidate5/foundation-matrix-evidence.json)
+          echo "inherited matrix evidence restored: $restored"
+          test "$restored" = "aea5d721b39875d17aa2b7e5327580e11545efdb"
+          leftovers=$(git status --porcelain=v1 | grep -v '^??' || true)
+          test -z "$leftovers" && echo "worktree clean of tracked modifications" 
       - name: Review metadata and controls
         if: always()
         run: |
