@@ -43,12 +43,19 @@ jobs:
           test -s "$doc"
           for heading in \
             '## Decision' '## Exact trust boundaries' '## Threat model' \
+            '## Prerequisite certified boundary-policy baseline' \
             '## Implementation choice' '## Mandatory hostile proof strategy' \
             '## Node and Web compatibility' '## Deterministic build strategy' \
             '## Evidence plan'; do
             grep -Fqx "$heading" "$doc"
           done
           grep -Fq '127f284d78b83f358f076b3ee8f8b56044bcc691' "$doc"
+          grep -Fq 'BOUNDARY_POLICY_BASELINE_COMMIT' "$doc"
+          grep -Fq 'Current value: `UNASSIGNED`' "$doc"
+          grep -Fq 'implementation is blocked' "$doc"
+          grep -Fq '@endo/module-source@1.5.0' "$doc"
+          grep -Fq '@endo/compartment-mapper@2.4.0' "$doc"
+          grep -Fq 'ses@2.3.0' "$doc"
           grep -Fq 'promoted-legality-port.js -> physical-proof-planner.js' "$doc"
           grep -Fq 'promoted-legality-port.js -> v3-promotion-foundation.js' "$doc"
           grep -Fq 'promoted-legality-port.js -> authority-envelope-builder.js' "$doc"
@@ -66,7 +73,7 @@ jobs:
         run: |
           set -euo pipefail
           node --test $(find tests -name '*.test.js' -print | sort)
-      - name: Existing static boundaries and audit
+      - name: Existing baseline static and audit witness (not future implementation acceptance)
         shell: bash
         run: |
           set -euo pipefail

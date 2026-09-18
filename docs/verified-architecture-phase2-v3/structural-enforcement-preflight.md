@@ -6,7 +6,7 @@ Certified Foundation baseline: `127f284d78b83f358f076b3ee8f8b56044bcc691`.
 
 ## Decision
 
-Proceed to an implementation gate only with a trusted, hermetic graph compiler and a locked-down SES compartment in a dedicated worker. Do not continue the JavaScript spelling/identifier blacklist approach.
+Do not proceed to implementation. A prerequisite boundary-policy reopen has not been approved or certified, so its immutable baseline commit is currently `UNASSIGNED`. This is an explicit blocker, not a value an implementer may fill. After owner approval and independent certification name a 40-hex `BOUNDARY_POLICY_BASELINE_COMMIT`; only then may reviewers consider a separate implementation gate using a trusted, hermetic graph compiler and a locked-down SES compartment in a dedicated worker. Do not continue the JavaScript spelling/identifier blacklist approach.
 
 The enforcement chain is:
 
@@ -22,6 +22,8 @@ trusted build/compiler
 ```
 
 The graph compiler and signing step are outside unrestricted application JavaScript. The runtime application receives neither the compiler, graph mutation authority, host import hooks, Node's loader, nor host globals.
+
+All security claims in this document are conditional on the integrity of the certified boundary-policy baseline, compiler and reproducible toolchain, signer and key controls, trusted bootstrap and verifier, pinned SES/Endo packages, JavaScript engine, OS, Node install root, browser origin and external Web trust root. Compromise of any one of these invalidates the claim.
 
 Implementation MUST HARD STOP if it requires a source change to any certified Foundation production module. The build may parse and bundle those source bytes without changing the repository blobs or their semantics.
 
@@ -41,6 +43,21 @@ The following baseline production blobs are immutable:
 | `src/clean-runtime/v3-authority/authority-envelope.js` | `5766c26d5deacd2b92a231c9a341e636ff97e392` |
 
 All existing fail-closed Foundation meanings remain normative. Packaging failure, graph failure, compartment failure, and loader denial add rejection paths. They cannot produce `COMMIT_ALLOWED` or turn Foundation `FAIL`, `UNKNOWN`, or invalid evidence into `PASS`.
+
+## Prerequisite certified boundary-policy baseline
+
+The certified Foundation baseline's current immutable policy forbids every production import into the six Foundation modules. On that baseline, adding the proposed three edges correctly makes `tests/clean-runtime/v3-promotion-authority-audit.js` report `FORBIDDEN_INBOUND_FOUNDATION_IMPORT` three times and makes static-boundaries test 4 fail. SES, a bundle, or a compiler cannot override this repository-level rule. Therefore the three edges MUST NOT be implemented on `127f284` and this preflight is not implementation-ready.
+
+Before implementation, a separate owner-approved boundary-policy reopen must be independently delivered and certified. Certification must assign all of the following immutable identifiers:
+
+- `BOUNDARY_POLICY_BASELINE_COMMIT`: a full 40-hex commit. Current value: `UNASSIGNED`.
+- `boundary-policy/exact-three-edges.json`: canonical resolved source/target IDs, all three required edges, no wildcard, and expected source blob/digest for each endpoint.
+- `boundary-policy/foundation-files.json`: the six certified Foundation paths and their unchanged `127f284` blob IDs.
+- `boundary-policy/inbound-import-policy.json`: default-deny policy whose sole production exception is the exact three-edge artifact.
+- `boundary-policy/audit-contract.json`: exact commands, expected rule IDs, schema versions, and tool blob/digests for the replacement audit and static suite.
+- `boundary-policy/certification.json`: owner approval evidence reference, independent reviewer verdict, baseline commit, artifact digests, and suite results.
+
+Those names describe required artifacts, not artifacts present in this branch. `UNASSIGNED`, a missing artifact, a non-ancestor baseline, a changed Foundation blob, or a policy/audit mismatch is a hard stop. The implementation branch must start from the named certified boundary-policy commit, not from this preflight head and not directly from `127f284`. Its CI must run the boundary baseline's audit/static commands. The old `127f284` audit/static suite remains a regression witness for this design-only branch but is not an implementation acceptance suite after the approved policy reopen.
 
 ## Exact trust boundaries
 
@@ -63,7 +80,11 @@ Untrusted inside this boundary: source text, package metadata supplied by the ap
 
 The canonical graph is the sole module authority for the compartment. Each node records normalized module ID, source SHA-256, format, ordered dependency specifiers, resolved target IDs, transform identity, and output record SHA-256. The graph header records schema version, policy digest, compiler digest/version, target (`node` or `web`), Foundation baseline, and bundle root.
 
-Canonical encoding uses UTF-8, normalized `/` paths, sorted nodes and edges, explicit lengths, and no timestamps or host paths. The graph root is a domain-separated SHA-256 Merkle root. Release CI signs the canonical graph root and bundle root. Runtime verifies the signature and every referenced digest before evaluation.
+Canonical bytes use the following fixed grammar. Integers are unsigned 32-bit big-endian. `bytes(x)` is `u32be(length) || x`; text is shortest-form valid UTF-8 with no BOM and no Unicode normalization; IDs and specifiers must already be canonical ASCII. A graph is `bytes("V3GRAPH\0v1") || bytes(header) || u32be(nodeCount) || nodes || u32be(edgeCount) || edges`. Header fields occur in schema order and each is `bytes(field)`. Nodes sort by raw module-ID bytes and encode `bytes(id) || bytes(sourceSha256Raw32) || bytes(format) || bytes(transformSha256Raw32) || bytes(recordSha256Raw32)`. Edges sort by `(referrer raw bytes, specifier raw bytes, target raw bytes)` and encode three `bytes` fields. Duplicates are invalid.
+
+Merkle leaves are `SHA-256(bytes("V3GRAPH:LEAF:v1") || u32be(index) || bytes(encodedRecord))`; internal nodes are `SHA-256(bytes("V3GRAPH:NODE:v1") || left32 || right32)`. An odd final node is paired with itself. Empty trees are invalid. The release statement is `bytes("V3RELEASE:v1") || graphRoot32 || bundleRoot32 || policyRoot32 || verifierSha256Raw32 || bytes(target) || bytes(boundaryPolicyBaselineCommit) || bytes(sourceCommit)`. A separate canonical-vector artifact must cover zero/non-ASCII rejection, ordering, duplicate, odd-leaf, single-leaf, and multi-level trees, with expected bytes and roots produced by two independent implementations.
+
+The graph root, policy root, and bundle root are domain-separated SHA-256 Merkle roots. Release CI signs only the release statement. Runtime verifies the signature and every referenced digest before evaluation.
 
 The graph object visible to application code is a deep-frozen data projection without loader hooks. The authoritative runtime graph and resolver tables stay in the trusted bootstrap closure. No application reference points to them.
 
@@ -81,7 +102,11 @@ Foundation's own closed transitive graph is recorded in full. Every production m
 
 ### Restricted execution boundary
 
-Each evaluation occurs in a dedicated Node Worker or Web Worker. Trusted bootstrap code runs first, verifies the signed graph/bundle, applies SES `lockdown`, creates one new `Compartment`, installs only graph-backed static module records, and then evaluates the fixed entry module.
+Each evaluation occurs in a dedicated Node Worker or Web Worker. The record ABI is pinned to Endo `ModuleSource` as exported by `@endo/module-source@1.5.0` and the archive/module descriptor ABI consumed by `@endo/compartment-mapper@2.4.0`; no ad-hoc `ModuleSource` shim is permitted. The compiler emits canonical graph records plus an Endo archive whose parser/record type and import/export tables are compared byte-for-byte with the canonical graph before use. A package API or record-shape change is a build failure requiring a new preflight.
+
+Verified load order is strict: (1) start a minimal trusted worker from pinned bootstrap bytes; (2) clear/reject forbidden launch state; (3) load pinned SES and Endo bytes only from the bootstrap's content-addressed local store; (4) call `lockdown` before parsing or evaluating any application record; (5) verify external trust root, release signature, boundary baseline, target, graph, policy, verifier, archive and every module digest; (6) instantiate the graph-only compartment; (7) install minimal frozen endowments; (8) evaluate the fixed entry; (9) validate and bind the data-only result; (10) return one terminal decision. Any inversion terminates the worker.
+
+Trusted bootstrap code never imports an application-selected path. After verification it never rereads source files, package metadata, environment options, URLs, or mutable archives. It evaluates only the verified in-memory bytes.
 
 Endowments are an explicit frozen record of value capabilities needed by the Foundation, such as deterministic data primitives. They exclude `process`, `global`, host `globalThis`, `require`, `module`, `exports`, `Buffer`, filesystem/network APIs, worker constructors, `fetch`, `WebSocket`, timers unless proven necessary, DOM objects, and all host loader or reflection handles. No host object with a prototype or callback path into the bootstrap is endowed.
 
@@ -131,9 +156,13 @@ The host validates returned data against the existing Foundation decision schema
 Use:
 
 1. A small Rust graph compiler using a pinned ECMAScript parser and a locked resolver implementation. The compiler performs static resolution, exact-edge checking, source hashing, graph closure, deterministic CommonJS-to-static-record lowering, bundle assembly, and evidence emission.
-2. SES `lockdown` plus `Compartment` in an isolated worker for both Node and Web. Pin the exact SES source and digest. Run SES's own supported-engine tests for each target engine before accepting a release.
+2. SES `ses@2.3.0` (npm integrity `sha512-qd3iWzDqGKllI2FmExKsWLrJwt+6COWb8jUdzaCn8Cq5OTeoXdQ62Gn/xLy0GWLORC3du6yBAVe/V0B0dLVKew==`, tar SHA-256 `3bf2f4ef5c8e7c725c9acc817dbd70b1fc519e1ef5782402157f3436fb0db5c9`), `@endo/compartment-mapper@2.4.0` (`sha512-tlJH9nbQqHMF6hJ5rYZ8CS9FXEJwufEpVHbhI05vAA/h7Csq3l4QEJZNGiOUSegcQF7HJosljjZXatJ8Ch3dmQ==`, tar SHA-256 `2c2b94f723f8e034c09bfd23f3c5f4dbbeb9eb830a6dc48653fee5b39a7c4070`), and `@endo/module-source@1.5.0` (`sha512-AwoxpkqYlF4jkr8ET8kCp6+Yro0of+rxYwcyeO3Vz+slMB0cnCjk6a/cch48kSvT7xvgIZZCCtVXlaaf6trOrA==`, tar SHA-256 `7788bbf9d92f093a2b267354e320ac906d6c3c48e52a7794ef9136b628e486f3`). Resolve and vendor their complete locked transitive graph. Run SES/Endo self-tests and project hostile probes on every exact engine build; no package declares an npm engine range, so compatibility is established only by these probes.
 3. Static module records only. No Node `vm` context as a security boundary, no unrestricted `require`, no `import()` discovery, and no `createRequire`.
-4. Ed25519 signatures over the domain-separated canonical graph root and bundle root. Node trusts a public key pinned by the installed bootstrap. Web trusts a public key pinned by an integrity-protected bootstrap delivered under the release origin's CSP/SRI policy.
+4. Ed25519 signatures over the canonical release statement. Production keys are generated inside a non-exportable HSM by a release-security custodian, with signer identity and approved boundary baseline bound into an auditable release authorization. Build operators cannot use the key; security custodians cannot alter artifacts. The HSM policy refuses signing unless two independently built unsigned release statements, every gate result, and source/reviewer authorization match exactly. Dev/test keys live in separate accounts/HSM partitions, have distinct key IDs and trust roots, and cannot verify in production.
+
+The signature envelope records key ID, algorithm, release sequence, source/boundary commits, all roots, signer authorization reference, and transparency-log inclusion proof. Rotation requires an old-key-signed plus offline-recovery-root-approved key transition; emergency revocation comes from an independently hosted signed revocation log. Runtime rejects revoked keys, sequence rollback, unknown successors, expired policy epochs, or a release not bound to the requested target. Rollback is an explicit, separately signed authorization to a named prior release sequence, never acceptance of any older valid signature.
+
+Node pins the production trust root in the separately installed bootstrap package. Web MUST obtain the trust root, minimum release sequence, and revocation state from an independently controlled channel, such as an enterprise-managed browser policy/extension or native shell; origin-hosted bootstrap, artifact, and key alone are insufficient. Until that external Web pin/update mechanism is selected and certified, Web production is blocked.
 
 Rejected choices:
 
@@ -143,7 +172,7 @@ Rejected choices:
 - ordinary bundling alone: a bundle proves packaging, not confinement or exact runtime authority.
 - runtime graph generation by application JavaScript: hostile code could influence discovery or mutate authority.
 
-The implementation gate must pin actual compiler, SES, Node, and browser versions only after the hostile proof suite passes. This preflight does not claim an untested version combination.
+SES/Endo package versions are pinned above. Exact Node, Chromium, Firefox, WebKit, OS and architecture build IDs remain `UNASSIGNED`; implementation is blocked until the boundary-policy certification names them and engine probes pass. Version changes require re-certification, not a fallback.
 
 ## Mandatory hostile proof strategy
 
@@ -182,7 +211,7 @@ The suite must include positive controls showing ordinary computation and every 
 | Direct escape | every hostile direct fixture obtains no capability and loads nothing external |
 | Indirect escape | helper/alias/prototype chain obtains no capability and loads nothing external |
 | Determinism | two clean builds on separate workers produce byte-identical graph, bundle, roots, and evidence |
-| Foundation regression | focused suites twice, broad suite, static boundaries, and existing authority audit remain green |
+| Foundation regression | focused suites twice and broad suite remain green; implementation runs the named certified boundary-policy baseline's audit/static suite, while the old baseline suite is retained only as a design-branch witness |
 | Foundation immutability | all six git blob IDs equal baseline; diff from `127f284` is empty for those paths |
 
 Negative tests must fail for the intended structural reason and record stage (`BUILD_GRAPH`, `VERIFY_ARTIFACT`, `CREATE_COMPARTMENT`, `RESOLVE_EDGE`, or `VALIDATE_RESULT`). Mutation and escape fixtures also assert zero host effects and zero transaction mutation.
@@ -194,30 +223,36 @@ The same canonical source graph and policy feed two target bundles because host 
 Node target:
 
 - dedicated `worker_threads` worker;
-- ESM bootstrap launched without inheriting application preload hooks;
+- ESM bootstrap launched by a fixed native/service entry with an explicit empty `execArgv`; reject inherited `--require`, `--import`, `--loader`, policy, permission, inspector/debug and experimental-loader flags, `NODE_OPTIONS`, SES/environment option variables, preload hooks, inspector ports, IPC handles, and application-controlled environment;
+- parent supplies no transferable function, port other than the one authenticated protocol port, shared memory, file descriptor, host object, loader object, or callback;
 - no `process`, CommonJS wrapper, builtin-module access, filesystem, network, inspector, or native add-on in the compartment;
 - parent sends immutable input bytes and accepts data-only output;
 - worker resource and time limits convert exhaustion into rejection.
 
 Web target:
 
-- dedicated module Worker from a release URL pinned by the trusted bootstrap;
-- CSP denies unexpected script, worker, connection, and object sources;
+- dedicated module Worker whose bootstrap and complete transitive SES/Endo/application bytes are preloaded, content-addressed, signature-verified, and then started with network disabled; no runtime module fetch is permitted;
+- CSP denies unexpected script, worker, connection, and object sources; `blob:` and `data:` are denied unless a separately reviewed bootstrap uses a verified, single-use blob URL and revokes it immediately; classic workers and `importScripts` are forbidden;
 - no DOM in the worker and no `fetch`, nested worker, storage, or messaging endpoint except the single data-only parent channel endowed to the trusted bootstrap;
-- graph and bundle signatures are verified with Web Crypto before SES/application evaluation.
+- graph and bundle signatures are verified with Web Crypto before SES/application evaluation; the external Web trust root is checked before trusting any origin-delivered verifier or artifact.
 
-Compatibility acceptance requires current supported Node LTS and the project's declared Chromium, Firefox, and WebKit versions. Cross-target fixture outputs and canonical decision digests must match. Browser feature absence is a release failure, never permission to use unrestricted script execution.
+Compatibility acceptance requires exact, recorded builds of Node LTS and the project's declared Chromium, Firefox, and WebKit versions. Probes cover lockdown, ModuleSource/archive ABI, strict-mode/evaluator behavior, Unicode parsing, structured clone, worker launch constraints, Web Crypto Ed25519, termination, and all hostile fixtures. Cross-target fixture outputs and canonical decision digests must match. Browser feature absence is a release failure, never permission to use unrestricted script execution.
+
+The parent/worker protocol uses a fresh 256-bit session nonce created by the trusted parent and included in the signed input envelope, monotonically increasing sequence numbers, exactly one request and one terminal response, graph/release/input digests in every frame, and replay rejection. Frames are plain null-prototype data, schema-validated after structured clone, with fixed byte, nesting-depth, collection-count, string-length, and numeric limits; accessors, proxies, shared memory and transferable capabilities are forbidden. The host owns transaction mutation and remains in a non-committing staged state until it validates the single terminal response. Timeout or termination atomically discards the stage; late/duplicate responses cannot race or revive commit.
 
 ## Deterministic build strategy
 
-- locked Rust toolchain, dependency lockfile, SES version/digest, container image digest, and build flags;
+- a dedicated compiler repository and full source commit, Rust channel manifest, `Cargo.lock`, vendored-crate tree digest, compiler flags, target triple, linker binary/digest, sysroot, container/Dockerfile source and image digest. All are currently `UNASSIGNED`; implementation is blocked until an owner-approved compiler preflight assigns them;
+- pin parser, resolver and CommonJS lowering crates by source commit and crate digest. Differential fixtures must prove Node CommonJS semantics needed by every frozen Foundation module: resolution, cycles, export aliasing/reassignment, evaluation order, strictness, top-level `this`, error timing and cache identity. Unsupported behavior fails build; no compatibility shim may add loader authority;
+- locked SES/Endo package tarballs and complete transitive dependency lock/vendor digests, exact engine build IDs, and build flags;
 - clean checkout with no network during graph compilation or bundling;
 - repository-relative normalized paths; reject symlinks and case-fold collisions;
 - parser and resolver versions included in evidence;
 - sorted canonical nodes/edges and deterministic module IDs derived from normalized path plus source digest;
 - fixed compression settings or no compression in the authority artifact;
 - no timestamps, random IDs, locale, environment paths, filesystem iteration order, or source-map host paths;
-- separate clean builders run the complete build; `cmp` graph, bundle, policy result, roots, and evidence before signing;
+- two administratively independent builders start from separately reproduced compiler binaries built from the pinned compiler source, lockfile, vendored crates and toolchain. They run in separate accounts/runners and independently fetch content-addressed frozen inputs. Using the same prebuilt compiler binary is not independent. `cmp` must match compiler binary, graph, bundle, policy result, roots, vectors and evidence before the signing request can exist;
+- every source input, compiler source/binary, policy artifact, graph, bundle, bootstrap, verifier, SES/Endo archive and unsigned/signed release statement is stored under its digest with retention lock. Runtime consumes verified in-memory bytes and never rereads mutable sources;
 - signature envelope is separate from deterministic unsigned artifacts because signature implementations may add non-authority metadata.
 
 Rebuilding from the same commit, toolchain, policy, and target must produce identical unsigned bytes. A target change intentionally changes target-bound roots.
@@ -227,10 +262,10 @@ Rebuilding from the same commit, toolchain, policy, and target must produce iden
 The implementation gate must publish, for each target:
 
 - source commit, certified baseline, clean-worktree proof, and immutable Foundation blob report;
-- compiler source digest, binary digest, toolchain/lock/container identities;
+- compiler repository/commit, two independently reproduced binary digests, parser/resolver/lowering pins, Rust manifest, `Cargo.lock`, vendor tree, linker/sysroot/target, container source/image, and CommonJS semantic differential results;
 - canonical graph, node/edge inventory, closure report, exact-three-edge policy report, and graph root;
-- deterministic bundle, per-record digests, bundle root, signature, and verification transcript;
-- endowment inventory and worker/bootstrap/SES digests;
+- exact canonical grammar vectors, deterministic bundle, per-record digests, graph/policy/bundle roots, release statement, HSM signature, signer authorization and transparency proof, key lifecycle state, and verification transcript;
+- endowment inventory; worker/bootstrap/verifier/SES/Endo and transitive package digests; exact ABI and Node/browser/OS build probes; Node launch-state and Web external-root/no-network evidence; parent-channel protocol tests;
 - positive and negative proof-matrix results with stage/reason and zero-effects assertions;
 - hostile fixture source digests and behavioral result records;
 - two-build byte comparison from independent clean builders;
@@ -242,10 +277,11 @@ The existing JavaScript authority audit remains defense-in-depth. Its success is
 
 ## Gate sequence and stop conditions
 
-1. Review and approve this architecture and its trust assumptions.
-2. Pin candidate compiler, SES, Node, and browser versions.
-3. Implement only the graph compiler, artifact verifier, isolated worker compartment, fixtures, and evidence generator on a new implementation branch.
-4. Run independent security review and the complete proof matrix.
-5. Only after independent certification may a separate Authority Routing Gate review consider runtime promotion.
+1. Obtain owner approval for a separate boundary-policy reopen; independently certify it and replace `UNASSIGNED` with its immutable 40-hex commit plus the six named policy/certification artifacts.
+2. Run that baseline's named audit/static suite and prove exactly the three policy edges are allowed while all others remain denied.
+3. Approve compiler provenance/reproducibility, signing/key controls, external Web root, SES/Endo ABI, exact engine builds, and protocol limits.
+4. Implement only the graph compiler, artifact verifier, isolated worker compartment, fixtures, and evidence generator on a new implementation branch.
+5. Run independent security review and the complete proof matrix.
+6. Only after independent certification may a separate Authority Routing Gate review consider runtime promotion.
 
-HARD STOP and request owner review if any step requires changing a certified Foundation production module, weakening Foundation fail-closed behavior, adding a fourth Gate-to-Foundation edge, exposing a loader/host object, accepting an undeclared dependency, relaxing a failed target, or replacing behavioral proof with a source blacklist.
+HARD STOP and request owner review if the boundary baseline remains `UNASSIGNED` or uncertified, its artifacts/suite are absent, any step requires changing a certified Foundation production module, weakening Foundation fail-closed behavior, adding a fourth Gate-to-Foundation edge, exposing a loader/host object, accepting an undeclared dependency, relaxing a failed target, or replacing behavioral proof with a source blacklist.
