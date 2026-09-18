@@ -86,8 +86,9 @@ fail E_CANDIDATE_AUTHORITY
  vfs=$(/usr/bin/findmnt -n -o VFS-OPTIONS --target "$stage")||fail E_STAGE_QUERY;case ",$vfs," in *,ro,*) :;;*) fail E_STAGE_READONLY;;esac
  # Latch before child creation and keep latching through spawn, wait/reap, exact status classification, success publication and cleanup. Signals are not forwarded: the trusted child reaches one unambiguous terminal status.
  cleanup_signal_code=0;latch_traps
- /usr/bin/bash --noprofile --norc "$launcher" "$root" "$stage" "$output" "$evidence" & child=$!
- child_status=;while :;do wait_generation=$signal_generation;wait_rc=0;wait "$child"||wait_rc=$?;after_generation=$signal_generation;if [ "$after_generation" -ne "$wait_generation" ];then continue;fi;child_status=$wait_rc;break;done
+ # The admitted native supervisor blocks termination signals around waitpid and maps child zero to 0, every child failure to 1, and helper failure to 2. Thus 128+ can only be shell wait interruption and is always retried.
+ /measured-supervisor.elf --wait-success /usr/bin/bash --noprofile --norc "$launcher" "$root" "$stage" "$output" "$evidence" & child=$!
+ child_status=;while :;do wait_rc=0;wait "$child"||wait_rc=$?;if [ "$wait_rc" -ge 128 ];then continue;fi;child_status=$wait_rc;break;done
  [ -n "$child_status" ]||fail E_SUCCESSOR_WAIT;[ "$child_status" -eq 0 ]||fail E_SUCCESSOR
  # Monotonic commit publication while still latched. Committed success is never downgraded by an ordinary signal.
  success=1;cleanup;exit 0

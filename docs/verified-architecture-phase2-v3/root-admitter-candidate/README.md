@@ -1,3 +1,3 @@
-# Provenanced-wait-status candidate
+# Native wait-classifier candidate
 
-A signal generation counter records every trapped signal. A wait status is accepted only when its invocation saw no generation change; an interrupted wait is always retried for the retained exact child status without jobs enumeration. Image `b3dd2bfbca910c89efe2bb1ee60a027814aa1cd108fe68cc8f005a5e78ef26fd`, root `ad2f705fdb1ac3a42c250102d3b9f89878c0bed6b5a9a77d157c7394858352cf`, UKI `ab16dd27c7b8086dd9e23be5b57167b07dfdd078fad9b4b4bbef88ea7e8ec1d5`. Candidate only.
+The existing measured static-PIE supervisor provides a wait mode: it blocks HUP/INT/TERM before fork, uses waitpid, and classifies zero/nonzero/helper-fault while signals remain blocked. Shell accepts only the helper's finite terminal domain and retries 128+ interrupted waits. Image `f6e4d693c730a0b6c53d54bbbdc9618a80e8471bfd7783011d9b49c0341e6883`, root `57f52e9c8d52c1cf7fb48581f64d02852d01a4c4fd37f6fee245da7f90d47f33`, UKI `970e007bea6988a71427a60e9d0dc443b483b3f87c92f59e274e16c1ce749ff7`. Candidate only.

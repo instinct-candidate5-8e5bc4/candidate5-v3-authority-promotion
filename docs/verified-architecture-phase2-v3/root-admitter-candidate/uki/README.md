@@ -1,3 +1,3 @@
-# Exact UKI provenanced-wait candidate
+# Exact UKI native-wait candidate
 
-Signed UKI `ab16dd27c7b8086dd9e23be5b57167b07dfdd078fad9b4b4bbef88ea7e8ec1d5`, root `ad2f705fdb1ac3a42c250102d3b9f89878c0bed6b5a9a77d157c7394858352cf`, db cert DER `75abbd20daae6c5ea7a8ce0ae83da93756029a3cacf37074814c9b6e69636903`. Candidate only.
+Signed UKI `970e007bea6988a71427a60e9d0dc443b483b3f87c92f59e274e16c1ce749ff7`, root `57f52e9c8d52c1cf7fb48581f64d02852d01a4c4fd37f6fee245da7f90d47f33`, db cert DER `aa98b9bb71e36aeb0f8f8fb39f9cbf2f74011683501ab8827844acc9e6a7d735`. Candidate only.
