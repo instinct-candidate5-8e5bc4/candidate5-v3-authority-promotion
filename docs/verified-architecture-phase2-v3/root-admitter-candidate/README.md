@@ -1,3 +1,3 @@
-# PID-namespace lifetime candidate
+# Native PID-lifetime candidate
 
-The native wait helper is PID 1 in a nested pid namespace. Init death makes the kernel terminate all namespace descendants; unshare --fork reaps init before command substitution returns, so no grandchild/stage holder/output mutator survives before cleanup. Image `46bcc28cf4bda04daf43f341ea4472d1d60a77fe8a16128c0006b158efc3bd3d`, root `bfda76d0ebcb6a8d2b258faa6a0c0e6bf963c46b22b5f8d9103c33a5758e116e`, UKI `ddf00d68669a47f386c7673819929447633c1b2f02adde0eb4210684c5bb1360`. Candidate only.
+The admitted helper itself calls unshare(CLONE_NEWPID), forks PID1, and supervises it directly. PID1 sets PDEATHSIG SIGKILL against the helper with parent recheck. No external wrapper remains; helper death kills PID1 and kernel teardown kills all namespace members. Image `55a2686939ae0adb8060bf4bceea2eb96cb7d0188576787f140a6ddc676bff74`, root `d860cb10c45261bf76a4c8c886dfe6373516ee693eba224dbbeef5bcbc73b935`, UKI `5e1264dcbdea6f31f8683fa41cca09da9763cd37fd204cfcad50b1b416a88675`. Candidate only.

@@ -1,3 +1,3 @@
-# Exact UKI PID-lifetime candidate
+# Exact UKI native-PID-lifetime candidate
 
-Signed UKI `ddf00d68669a47f386c7673819929447633c1b2f02adde0eb4210684c5bb1360`, root `bfda76d0ebcb6a8d2b258faa6a0c0e6bf963c46b22b5f8d9103c33a5758e116e`, db cert DER `8eebf122ef273e5cc97269872c314d3d4231623afc9f3cfa847aa505efa0a03a`. Candidate only.
+Signed UKI `5e1264dcbdea6f31f8683fa41cca09da9763cd37fd204cfcad50b1b416a88675`, root `d860cb10c45261bf76a4c8c886dfe6373516ee693eba224dbbeef5bcbc73b935`, db cert DER `ac8fdb5d2baf615341a98632ed98b6dce7c32927b5872169667ffb186701df60`. Candidate only.
