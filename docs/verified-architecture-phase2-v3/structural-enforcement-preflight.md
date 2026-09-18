@@ -662,6 +662,25 @@ The later owner GO supersedes only the historical "Do not proceed" status langua
 
 `7d6ae7d -> Owner Authorization Amendment -> Implementation -> Independent Review -> Implementation PASS -> finalize artifact commit -> finalize certification commit -> assign immutable pins -> verify acyclic chain -> certify new Boundary Baseline -> resume Gate from exact baseline`.
 
-The pins remain `UNASSIGNED` during implementation. UNASSIGNED pins MUST NOT be guessed, precomputed, synthesized, self-referentially constructed, treated as wildcard, placeholder match, zero digest/value, optional authority/value, bypass, authority, or successful certification. UNASSIGNED pins MUST NEVER satisfy any equality, authority, certification, promotion, release, routing, or baseline-validity decision. Any attempt to interpret UNASSIGNED as matching another placeholder or producing successful certification MUST FAIL CLOSED. The prior requirement to complete the two-commit boundary baseline before implementation is superseded; the two-commit model remains normative and completes only after Implementation PASS, when the real immutable IDs exist.
+The pins remain `UNASSIGNED` during implementation.
+
+UNASSIGNED pins MUST NOT be:
+- guessed;
+- precomputed;
+- synthesized;
+- self-referentially constructed;
+- treated as a wildcard;
+- treated as a placeholder match;
+- treated as a zero digest/value;
+- treated as an optional authority/value;
+- treated as a bypass;
+- treated as authority;
+- treated as successful certification.
+
+UNASSIGNED pins MUST NEVER satisfy any equality, authority, certification, promotion, release, routing, or baseline-validity decision.
+
+Any attempt to interpret UNASSIGNED as matching another placeholder or as producing a successful certification result MUST FAIL CLOSED.
+
+The prior requirement to complete the two-commit boundary baseline before implementation is superseded; the two-commit model remains normative and completes only after Implementation PASS, when the real immutable IDs exist.
 
 Any design-semantic change requires `DESIGN REOPEN REQUIRED`. Any certified Foundation-semantic change requires `FOUNDATION REOPEN REQUIRED`. This amendment authorizes no Gate continuation, main merge, production routing, School work or visuals.
