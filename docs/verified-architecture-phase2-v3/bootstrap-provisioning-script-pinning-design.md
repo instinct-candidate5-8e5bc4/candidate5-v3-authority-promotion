@@ -4,7 +4,7 @@ Status: `DESIGN - INDEPENDENT REVIEW REQUIRED`
 
 Parent: `2b569a1294fbcc7a9d19aeeb980772bc06edc4ff`
 
-Maximum verdict: `BOOTSTRAP_PINNING_DESIGN_PASS`.
+Current maximum state: `BOOTSTRAP_TRUST_ROOT_CANDIDATES_READY_FOR_OWNER_REVIEW`. `BOOTSTRAP_PINNING_DESIGN_PASS` is prohibited until every required candidate is independently reviewed and explicitly approved by the owner.
 
 This document designs the bootstrap and future provisioning script. It commits no executable script and performs no provisioning. It preserves every approved Rust 1.98.1 pin, signer rule, component decision and license manifest at `2b569a1` unchanged.
 
@@ -16,7 +16,7 @@ The states are distinct and monotonic:
 2. `RUST_TOOLCHAIN_PROVISIONED`: that admitted script completed the `2b569a1` protocol and emitted verified evidence. This does not imply an authoritative compiler invocation.
 3. `AUTHORITATIVE_BUILD_ENVIRONMENT_CERTIFIED`: a later review has additionally pinned and verified compiler source/dependencies/flags, kernel, OS/base image, glibc, linker, sysroot, container and all build-time inputs.
 
-This delivery can reach only `BOOTSTRAP_PINNING_DESIGN_PASS`. It authorizes no bootstrap provisioning, Rust provisioning, compilation, Structural Enforcement implementation, Certified Boundary Baseline, Authority Routing, runtime routing, Gate continuation, release, promotion, main merge, School integration or visuals.
+This delivery cannot reach `BOOTSTRAP_PINNING_DESIGN_PASS` while candidates remain unapproved. It authorizes no bootstrap provisioning, Rust provisioning, compilation, Structural Enforcement implementation, Certified Boundary Baseline, Authority Routing, runtime routing, Gate continuation, release, promotion, main merge, School integration or visuals.
 
 ## Host/platform and bootstrap trust root
 
@@ -24,36 +24,17 @@ The sole designed bootstrap platform is an externally measured, read-only `linux
 
 Bootstrap verification terminates at an external trusted launcher/verifier, protected measurement store and execution environment. They are initial trust assumptions, not verified by the script. Before starting any bootstrap executable, the launcher compares platform identity, the committed closure manifest, filesystem bytes and eventual script bytes against immutable values from the reviewed repository commit using a verifier outside the measured filesystem. It mounts the admitted closure read-only, denies writes to it and starts the script by exact absolute path. No script, bootstrap executable or library verifies itself.
 
-The current design inventory is `bootstrap-ubuntu-22.04-amd64-closure.md`. Its canonical records are exact-path UTF-8, NUL, role, NUL, decimal length, NUL, lowercase SHA-256, LF, sorted by unsigned raw path bytes. The intended 12 executables and their complete ELF `DT_NEEDED` recursive closure total 56 files; canonical manifest length is 6,966 bytes and SHA-256 is `c658d6c78749e27421dddf26acdfcbdaf2390bc4b7c1dbf8f66e4d7285b29926`. The later script commit MUST include the exact canonical binary manifest as a reviewed artifact; until independent reproduction confirms its bytes and root, execution is a hard stop.
+The original independently reproduced 56-file static-ELF vector remains evidence only. The complete candidate graph is `bootstrap-trust-root-candidates.md`; its executable/library inventory is mechanically derived from the exact review artifacts plus the retrieval phase. It does not become authority until candidate approval.
 
 Security-relevant runtime data is also in the external trust-root measurement: `/etc/os-release`, CA bundle, DNS/NSS configuration and modules, locale/timezone settings, mount table, loader cache and the kernel/execution policy. These data identities are intentionally not assigned by this design. They must be pinned in the later script review before execution. Network retrieval additionally requires a separately reviewed CA trust policy. Missing identity means `HARD STOP - BOOTSTRAP_TRUST_ROOT_INCOMPLETE`.
 
 ## Exact bootstrap capabilities
 
-The future script may execute only these absolute paths:
-
-| Capability | Exact path | Version / purpose | SHA-256 |
-|---|---|---|---|
-| POSIX orchestration | `/usr/bin/bash` | GNU bash 5.1.16; script interpreter | `59474588a312b6b6e73e5a42a59bf71e62b55416b6c9d5e4a6e1c630c2a9ecd4` |
-| HTTPS retrieval | `/usr/bin/curl` | curl 7.81.0; exact approved HTTPS URLs only | `0ca2b923679ab186f6512c7512e131a1c5c1b43d4cb5d55933998405b39e85bf` |
-| digest | `/usr/bin/sha256sum` | GNU coreutils 8.32 | `b88ea413571562a591268213d736121fada5ba14330bfcc74b8d9f14e4018ddf` |
-| signature | `/usr/bin/gpg` | GnuPG 2.2.27; isolated keyring and exact VALIDSIG | `9dcc2c88ecfe281b416b47453444cb382dac67f62e9a551fbbec0417441cf480` |
-| archive | `/usr/bin/tar` | GNU tar 1.34; list/extract verified archives | `fd0d62eed19efd3e115aa1be44160f89d777cd1e6d6d8eb0ce7c8bdc879f59e2` |
-| xz decoder | `/usr/bin/xz` | XZ Utils 5.2.5; invoked only by absolute path | `d0ef210d5cf6ce495db2994254b183907989686c8647440fa2eb03cf99903e21` |
-| directories | `/usr/bin/mkdir` | coreutils 8.32 | `1bf979d8d0ec5a3b64f24806668b738940c8735790098c96e0bb2a16d81fe516` |
-| cleanup | `/usr/bin/rm` | coreutils 8.32 | `2e49f7c07c7b58dfef7c556dd43ddd2c491c70a9cf1e0283b411f6c2438097b5` |
-| mode seal | `/usr/bin/chmod` | coreutils 8.32 | `8a9091d6d2a0e5da7778ff6057b69097ec9bc4fcf1bfed9d8d94d5232dd72b50` |
-| temporary root | `/usr/bin/mktemp` | coreutils 8.32 | `5ba7d37836aecbb741f868e29baa57d5f99524e6c8d0acafba2db80e674f0f6e` |
-| byte compare | `/usr/bin/cmp` | diffutils 3.8 | `b355472d3c90ea94d11ebb8b750e6946ccd348edc6fca4aefc1235c3994ef791` |
-| empty environment | `/usr/bin/env` | coreutils 8.32 | `854a8d7f147ff1bf3562edd1aa0b2f2ac28ef432811533f03c43dc9162fe3af3` |
-
-The companion closure inventory pins every dynamic loader/library byte used by these executables. A same-version binary with another digest fails. A same digest at another location fails where location is listed as authoritative. Symlink resolution, ELF interpreter, every recursively loaded object and runtime data policy must equal the externally measured closure before execution. `LD_PRELOAD`, `LD_LIBRARY_PATH`, `GCONV_PATH`, `LOCPATH`, audit variables and all unknown environment variables are rejected.
-
-No `command -v`, `/usr/bin/env <name>`, PATH lookup, shell alias, function, package manager, downloader fallback, mirror, alternate OpenPGP implementation or alternate archive decoder is allowed. `PATH` is set to an empty directory. Bash builtins are allowed only for control flow, parameter expansion, fixed-string comparison, redirection and `printf`; use of any other external command or builtin must be added to this design and closure first.
+The exact review artifacts and mechanically derived operation/closure inventory in `bootstrap-trust-root-candidates.md` supersede the earlier hand-selected capability table. The executable set MUST be extracted from the script and launcher bytes plus the declared retrieval phase, never selected manually. Every absolute executable, recursive ELF interpreter/library and runtime-selected data node appears in that package. PATH remains empty and every undeclared dependency fails closed.
 
 ## Exact future provisioning script contract
 
-The later delivery MUST add exactly one LF-terminated UTF-8 Bash script with no BOM, CR, NUL, generated code or sourced file. It will be reviewed as bytes before execution. Its deterministic phases are:
+The exact non-executable bytes are now committed at `future-rust-provisioning-script.review-bytes`, mode `100644`, with no shebang. The exact bytes govern; the phase summary below is explanatory and any conflict fails review. Its deterministic phases are:
 
 1. Require arguments naming only an empty output root and evidence root. Reject all other arguments, existing roots, relative paths and environment values outside the fixed allowlist.
 2. Emit the reviewed repository commit, script blob ID, script SHA-256, platform-measurement ID and bootstrap-closure root received from the trusted launcher. Compare each to literal reviewed values before any network access.
@@ -69,7 +50,7 @@ Every mismatch, missing input, extra input, malformed record, stale approved ide
 
 ## Final script identity and lineage
 
-The later executable-script commit must descend exactly from this design PASS commit and change only the reviewed script plus its canonical fixtures/evidence schema and complete closure manifest. Review records its full commit, parent, Git blob ID, mode `100755`, byte length and SHA-256. The trusted launcher receives those immutable values through protected configuration, verifies the checked-out commit ancestry/tree and exact script bytes before running `/reviewed-root/<fixed-path>` by file descriptor. It rejects symlinks, writable file/parent, replacement after measurement and a script copied from another commit even if its content happens to match unless the approved lineage also matches. Execution evidence binds all identities and a pre/post byte measurement. Branch, tag, CI status, filename and shebang alone grant no authority.
+Any later execution-authorizing commit must descend exactly from the owner-approved candidate/design commit and must not change the reviewed script bytes, fixtures/evidence schema or closure manifest. Review records its full commit, parent, Git blob ID, mode `100755`, byte length and SHA-256. The trusted launcher receives those immutable values through protected configuration, verifies the checked-out commit ancestry/tree and exact script bytes before running `/reviewed-root/<fixed-path>` by file descriptor. It rejects symlinks, writable file/parent, replacement after measurement and a script copied from another commit even if its content happens to match unless the approved lineage also matches. Execution evidence binds all identities and a pre/post byte measurement. Branch, tag, CI status, filename and shebang alone grant no authority.
 
 ## Complete verification graph and termination
 
@@ -103,6 +84,6 @@ The harness must also demonstrate that an exact approved fixture reaches only `B
 
 The design review receives this document, full closure inventory, generator source/command transcript, raw `readelf` dependency evidence, package provenance records, platform/runtime-data assumptions, hostile fixtures and expected reason codes. Independent reviewers reproduce the closure from a separately obtained immutable Ubuntu base image, compare every path/digest and audit that the script plan invokes no undeclared capability.
 
-This draft intentionally leaves the immutable Ubuntu base-image digest, external-launcher identity, protected pin-store identity, kernel/execution-policy identity, CA/runtime-data hashes and final script commit/blob/digest `UNASSIGNED`; inventing them from this mutable workspace would be false provenance. Therefore this design may PASS as a pinning design, but no bootstrap execution may start. The later executable-script review must assign and independently reproduce all of them or stop with `HARD STOP - BOOTSTRAP_TRUST_ROOT_INCOMPLETE`.
+This package supplies concrete base-image, launcher, pin-store, script and runtime-data candidates. Each is `CANDIDATE_FOR_OWNER_APPROVAL`, never placeholder authority. Until independent review and owner approval bind all terminal artifacts, the only result is `BOOTSTRAP_TRUST_ROOT_CANDIDATES_READY_FOR_OWNER_REVIEW`; `BOOTSTRAP_PINNING_DESIGN_PASS` and execution both MUST FAIL CLOSED with `HARD STOP - BOOTSTRAP_TRUST_ROOT_INCOMPLETE`.
 
 No paid GitHub plan feature is a trust root or dependency. GitHub Free CI may publish head-bound reproduction evidence only.

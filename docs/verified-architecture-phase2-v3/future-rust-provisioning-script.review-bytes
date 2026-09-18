@@ -1,0 +1,60 @@
+# REVIEW INPUT ONLY. NO SHEBANG. DO NOT EXECUTE WITHOUT LATER OWNER GO.
+set -euf
+umask 077
+fail() { code=$1; /usr/bin/printf '%s\n' "$code" >&2; exit 97; }
+[ "$#" -eq 2 ] || fail E_ARGUMENT_COUNT
+case $1 in /*) ;; *) fail E_INPUT_PATH;; esac
+case $2 in /*) ;; *) fail E_OUTPUT_PATH;; esac
+INPUT=$1
+OUTPUT=$2
+[ ! -e "$OUTPUT" ] || fail E_OUTPUT_EXISTS
+[ -d "$INPUT" ] || fail E_INPUT_MISSING
+[ -z "${BASH_ENV-}${ENV-}${CDPATH-}${GLOBIGNORE-}${LD_AUDIT-}${LD_LIBRARY_PATH-}${LD_PRELOAD-}${LOCPATH-}${GCONV_PATH-}${PYTHONPATH-}${PERL5LIB-}${RUBYLIB-}${RUSTUP_HOME-}${CARGO_HOME-}${RUSTC-}${CARGO-}${RUSTC_WRAPPER-}${RUSTC_WORKSPACE_WRAPPER-}${http_proxy-}${https_proxy-}${HTTP_PROXY-}${HTTPS_PROXY-}${ALL_PROXY-}${NO_PROXY-}" ] || fail E_ENVIRONMENT
+export PATH=/v3-empty-path LC_ALL=C LANG=C TZ=UTC HOME=/nonexistent
+KEY=$INPUT/rust-key.gpg.ascii
+MANIFEST=$INPUT/channel-rust-1.98.1.toml
+CHECKSUM=$INPUT/channel-rust-1.98.1.toml.sha256
+SIGNATURE=$INPUT/channel-rust-1.98.1.toml.asc
+RUSTC=$INPUT/rustc-1.98.1-x86_64-unknown-linux-gnu.tar.xz
+CARGO=$INPUT/cargo-1.98.1-x86_64-unknown-linux-gnu.tar.xz
+STD=$INPUT/rust-std-1.98.1-x86_64-unknown-linux-gnu.tar.xz
+for f in "$KEY" "$MANIFEST" "$CHECKSUM" "$SIGNATURE" "$RUSTC" "$CARGO" "$STD"; do [ -f "$f" ] && [ ! -L "$f" ] || fail E_INPUT_TYPE; done
+check() { expected=$1; file=$2; actual=$(/usr/bin/sha256sum "$file") || fail E_HASH_TOOL; actual=${actual%% *}; [ "$actual" = "$expected" ] || fail E_DIGEST; }
+check e54b09a439647e006b4831eec9785cbaaf3e07ab371c3a6ee6a68e1bdb9fbc6b "$KEY"
+check a7c8774a5fd8441c997d94c029776cbc5eb111e9d72ab5d256fa69866644347e "$MANIFEST"
+check 48632299e2889ef236ef5411123148c86baef9816a662af28e98784771484260 "$CHECKSUM"
+check a9fed69b47daaaf29a6207af9df13aedb66d502ab0acc4ea557602edf87fd1aa "$SIGNATURE"
+check e974f036b28565f37c0f3bd92ddefa809bee16c04f9dcf07b9ed96e05aaaf7c4 "$RUSTC"
+check ea1de9f9e23107d97ee2b41a72c552f34064a593da503789218387aee59f3ba4 "$CARGO"
+check fa3ff450172a16c026944030230c5069947af93c728d9179971d44e5e0cfb561 "$STD"
+/usr/bin/cmp -s "$CHECKSUM" "$INPUT/expected-channel-rust-1.98.1.toml.sha256" || fail E_CHECKSUM_BYTES
+GNUPGHOME=$OUTPUT.gnupg
+/usr/bin/mkdir -m 700 "$GNUPGHOME" || fail E_GPG_HOME
+export GNUPGHOME
+/usr/bin/gpg --batch --no-options --homedir "$GNUPGHOME" --import "$KEY" >$OUTPUT.gpg-import.out 2>$OUTPUT.gpg-import.err || fail E_KEY_IMPORT
+/usr/bin/gpg --batch --no-options --homedir "$GNUPGHOME" --status-fd 1 --verify "$SIGNATURE" "$MANIFEST" >$OUTPUT.gpg-status 2>$OUTPUT.gpg-verify.err || fail E_SIGNATURE
+/usr/bin/grep -Fx '[GNUPG:] VALIDSIG 108F66205EAEB0AAA8DD5E1C85AB96E6FA1BE5FE 2026-09-03 1788440054 0 4 0 1 10 00 108F66205EAEB0AAA8DD5E1C85AB96E6FA1BE5FE' "$OUTPUT.gpg-status" >/dev/null || fail E_SIGNER
+/usr/bin/grep -Fx 'manifest-version = "2"' "$MANIFEST" >/dev/null || fail E_MANIFEST_FIELD
+/usr/bin/grep -Fx 'date = "2026-09-03"' "$MANIFEST" >/dev/null || fail E_MANIFEST_FIELD
+[ "$(/usr/bin/grep -Fc 'manifest-version = "2"' "$MANIFEST")" = 1 ] || fail E_MANIFEST_DUPLICATE
+[ "$(/usr/bin/grep -Fc 'date = "2026-09-03"' "$MANIFEST")" = 1 ] || fail E_MANIFEST_DUPLICATE
+STAGE=$OUTPUT.stage
+/usr/bin/mkdir -m 700 "$STAGE" "$OUTPUT" || fail E_DIRECTORY
+for archive in "$RUSTC" "$CARGO" "$STD"; do
+  /usr/bin/tar --use-compress-program=/usr/bin/xz -tf "$archive" >$OUTPUT.archive-list || fail E_ARCHIVE_LIST
+  /usr/bin/grep -E '(^/|(^|/)\.\.(/|$)|\\)' "$OUTPUT.archive-list" >/dev/null && fail E_ARCHIVE_PATH
+  /usr/bin/tar --use-compress-program=/usr/bin/xz --no-same-owner --no-same-permissions -xf "$archive" -C "$STAGE" || fail E_ARCHIVE_EXTRACT
+done
+/usr/bin/find "$STAGE" -xdev -printf '%y\0%p\0%m\0%s\0%l\0' | /usr/bin/sort -z >$OUTPUT.extracted.inventory || fail E_INVENTORY
+for component in rustc-1.98.1-x86_64-unknown-linux-gnu cargo-1.98.1-x86_64-unknown-linux-gnu rust-std-1.98.1-x86_64-unknown-linux-gnu; do [ -d "$STAGE/$component" ] || fail E_COMPONENT; done
+/usr/bin/cp -a --no-preserve=ownership "$STAGE/rustc-1.98.1-x86_64-unknown-linux-gnu/rustc/." "$OUTPUT/" || fail E_INSTALL_COPY
+/usr/bin/cp -a --no-preserve=ownership "$STAGE/cargo-1.98.1-x86_64-unknown-linux-gnu/cargo/." "$OUTPUT/" || fail E_INSTALL_COPY
+/usr/bin/cp -a --no-preserve=ownership "$STAGE/rust-std-1.98.1-x86_64-unknown-linux-gnu/rust-std-x86_64-unknown-linux-gnu/." "$OUTPUT/" || fail E_INSTALL_COPY
+/usr/bin/find "$OUTPUT" -xdev -type l -printf '%p\0%l\0' | /usr/bin/sort -z >$OUTPUT.symlinks || fail E_SYMLINK_INVENTORY
+/usr/bin/find "$OUTPUT" -xdev -type f -print0 | /usr/bin/sort -z | /usr/bin/xargs -0 /usr/bin/sha256sum >$OUTPUT.files.sha256 || fail E_FILE_HASH
+/usr/bin/find "$OUTPUT" -xdev -printf '%y\0%p\0%m\0%s\0%l\0' | /usr/bin/sort -z >$OUTPUT.installed.inventory || fail E_INSTALL_INVENTORY
+/usr/bin/printf '%s\n' 'RUST_TOOLCHAIN_PROVISIONED' >$OUTPUT.success.tmp || fail E_EVIDENCE
+/usr/bin/sync -f "$OUTPUT.success.tmp" || fail E_FSYNC
+/usr/bin/mv "$OUTPUT.success.tmp" "$OUTPUT.success" || fail E_MARKER
+/usr/bin/sync -f "$OUTPUT" || fail E_FSYNC
+/usr/bin/chmod -R a-w "$OUTPUT" || fail E_SEAL

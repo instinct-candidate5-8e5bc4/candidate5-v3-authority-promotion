@@ -1,0 +1,16 @@
+# CANDIDATE REVIEW INPUT ONLY. NO SHEBANG. DO NOT EXECUTE WITHOUT OWNER APPROVAL AND GO.
+set -euf
+fail() { /usr/bin/printf '%s\n' "$1" >&2; exit 96; }
+[ "$#" -eq 4 ] || fail E_LAUNCH_ARGUMENTS
+ROOT=$1
+SCRIPT=$2
+INPUT=$3
+OUTPUT=$4
+[ "$ROOT" = /reviewed-root ] || fail E_ROOT
+[ "$SCRIPT" = /reviewed-root/docs/verified-architecture-phase2-v3/future-rust-provisioning-script.review-bytes ] || fail E_SCRIPT_PATH
+[ -f "$SCRIPT" ] && [ ! -L "$SCRIPT" ] || fail E_SCRIPT_TYPE
+actual=$(/usr/bin/sha256sum "$SCRIPT") || fail E_SCRIPT_HASH_TOOL
+[ "${actual%% *}" = e9aac6e92dd2c8f6c53c90c8eb81a2520ba0edb774acefe76e493a0912608e58 ] || fail E_SCRIPT_DIGEST
+[ "$(/usr/bin/stat -c %s "$SCRIPT")" = 5032 ] || fail E_SCRIPT_LENGTH
+[ "$(/usr/bin/stat -c %a "$SCRIPT")" = 644 ] || fail E_SCRIPT_MODE
+exec /usr/bin/bash --noprofile --norc "$SCRIPT" "$INPUT" "$OUTPUT"
