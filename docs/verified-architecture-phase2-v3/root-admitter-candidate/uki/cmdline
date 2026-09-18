@@ -1,1 +1,1 @@
-ro root=/dev/mapper/v3-root-admitter rootfstype=ext4 v3.root_admitter_verity=f531756bcb4482773b443929ab3c32cdf46b9f13fb4ec2b78f289c52f3ef3f0e rd.systemd.unit=v3-root-admitter.target
+ro root=/dev/mapper/v3-root-admitter rootfstype=ext4 v3.root_admitter_verity=bfda76d0ebcb6a8d2b258faa6a0c0e6bf963c46b22b5f8d9103c33a5758e116e rd.systemd.unit=v3-root-admitter.target

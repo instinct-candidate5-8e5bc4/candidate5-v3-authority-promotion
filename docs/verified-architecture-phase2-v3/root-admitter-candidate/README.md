@@ -1,3 +1,3 @@
-# Dedicated native result-channel candidate
+# PID-namespace lifetime candidate
 
-The command-substitution FIFO is verified and CLOEXEC. Only the helper parent retains its writer; child stdout is separate. Child uses a new process group plus PDEATHSIG kill/race check, so helper death closes the result pipe and terminates the child. Image `8c602481c9334ccba6587dff0b84e1b4be32f79c29bb4dae0b09693544ee6668`, root `f531756bcb4482773b443929ab3c32cdf46b9f13fb4ec2b78f289c52f3ef3f0e`, UKI `a9d9b33421555cd4ef106f658033a09aa3aa1a7e6aab96e828e48c22e4faa4d7`. Candidate only.
+The native wait helper is PID 1 in a nested pid namespace. Init death makes the kernel terminate all namespace descendants; unshare --fork reaps init before command substitution returns, so no grandchild/stage holder/output mutator survives before cleanup. Image `46bcc28cf4bda04daf43f341ea4472d1d60a77fe8a16128c0006b158efc3bd3d`, root `bfda76d0ebcb6a8d2b258faa6a0c0e6bf963c46b22b5f8d9103c33a5758e116e`, UKI `ddf00d68669a47f386c7673819929447633c1b2f02adde0eb4210684c5bb1360`. Candidate only.
