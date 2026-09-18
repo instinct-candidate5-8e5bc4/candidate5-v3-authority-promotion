@@ -1,0 +1,104 @@
+# CANDIDATE REVIEW INPUT ONLY. NO SHEBANG. DO NOT EXECUTE WITHOUT LATER OWNER APPROVAL AND GO.
+set -euf
+fail() { /usr/bin/printf '%s\n' "$1" >&2; exit 97; }
+[ "$#" -eq 4 ] || fail E_ADMISSION_ARGUMENTS
+REPO=$1; INPUT=$2; OUTPUT=$3; EVIDENCE=$4
+STAGE=$EVIDENCE.admission-stage
+cleanup() { code=$?; if [ -e "$STAGE" ]; then /usr/bin/rm -rf -- "$STAGE"; fi; exit $code; }
+trap cleanup EXIT
+ROOT=/reviewed-root
+SELF=/external-admission/external-measured-admission-launcher.review-bytes
+ADMISSION=/external-admission/external-admission-binding.v1.json
+ADMISSION_SIG=/external-admission/external-admission-binding.v1.sig
+ADMISSION_PUB=/external-admission/admission-root-ed25519-public.pem
+CLOSURE=/external-admission/external-admission-closure.v1.bin
+CROSS=$ROOT/docs/verified-architecture-phase2-v3/bootstrap-concrete-candidates/cross-binding.v1.json
+CROSS_SIG=$ROOT/docs/verified-architecture-phase2-v3/bootstrap-concrete-candidates/cross-binding.v1.sig
+SCRIPT=$ROOT/docs/verified-architecture-phase2-v3/future-rust-provisioning-script.review-bytes
+[ "$REPO" = "$ROOT" ] || fail E_REPOSITORY_PATH
+[ "$0" = "$SELF" ] || fail E_ADMISSION_PATH
+for f in "$SELF" "$ADMISSION" "$ADMISSION_SIG" "$ADMISSION_PUB" "$CLOSURE" "$CROSS" "$CROSS_SIG"; do [ -f "$f" ] && [ ! -L "$f" ] || fail E_ADMISSION_ARTIFACT; done
+sum=$(/usr/bin/sha256sum "$ADMISSION_PUB") || fail E_ADMISSION_KEY
+[ "${sum%% *}" = 5ad275e57c4f9918da7a34610dc91c7541cd3579d79db492092e0ef9b98ff653 ] || fail E_ADMISSION_KEY
+sum=$(/usr/bin/sha256sum "$CLOSURE") || fail E_ADMISSION_CLOSURE
+[ "${sum%% *}" = 9e2b064a551e88fb4faa83bf8e169249d10a4ba8464ac19e2bf0d26bc7e6574c ] || fail E_ADMISSION_CLOSURE
+count=0; previous=; while IFS= read -r -d '' path && IFS= read -r -d '' role && IFS= read -r -d '' length && IFS= read -r digest; do
+ case "$path" in /usr/bin/*|/usr/lib/*|/lib/*) ;; *) fail E_CLOSURE_PATH;; esac
+ [ -z "$previous" ] || [[ "$previous" < "$path" ]] || fail E_CLOSURE_ORDER; previous=$path
+ [ "$role" = executable ] || [ "$role" = dynamic-library ] || fail E_CLOSURE_ROLE
+ actual=$ROOT$path; [ -f "$actual" ] && [ ! -L "$actual" ] || fail E_CLOSURE_TYPE
+ [ "$(/usr/bin/stat -c %s "$actual")" = "$length" ] || fail E_CLOSURE_LENGTH
+ actual_sum=$(/usr/bin/sha256sum "$actual") || fail E_CLOSURE_DIGEST
+ [ "${actual_sum%% *}" = "$digest" ] || fail E_CLOSURE_DIGEST
+ count=$((count+1))
+done <"$CLOSURE"
+[ "$count" -eq 29 ] || fail E_CLOSURE_COUNT
+sum=$(/usr/bin/sha256sum "$CROSS") || fail E_APPROVED_CROSS
+[ "${sum%% *}" = 5de911f8823cbcec9d8e9be54c85b4388a829c085ab540a5b892e3f4b4ca8f4a ] || fail E_APPROVED_CROSS
+sum=$(/usr/bin/sha256sum "$CROSS_SIG") || fail E_APPROVED_CROSS_SIGNATURE
+[ "${sum%% *}" = 6d8349592d6522e39e646167be88b6a7a39c95d932ae55f1b354a121ffcec080 ] || fail E_APPROVED_CROSS_SIGNATURE
+/usr/bin/printf 'V3BOOTSTRAP-SEAL:v1\0external-admission\0' >"$STAGE/admission-message.tmp" || fail E_ADMISSION_EVIDENCE
+/usr/bin/cat "$ADMISSION" >>"$STAGE/admission-message.tmp" || fail E_ADMISSION_EVIDENCE
+/usr/bin/openssl pkeyutl -verify -pubin -inkey "$ADMISSION_PUB" -rawin -in "$STAGE/admission-message.tmp" -sigfile "$ADMISSION_SIG" >/dev/null 2>&1 || fail E_ADMISSION_SIGNATURE
+[ -d "$INPUT" ] && [ ! -e "$OUTPUT" ] && [ ! -e "$EVIDENCE" ] && [ ! -e "$STAGE" ] || fail E_IO_PATH
+/usr/bin/mkdir -m 700 "$STAGE" || fail E_EVIDENCE_STAGE
+# The repository, metadata and script must share one exact read-only mount.
+target=$(/usr/bin/findmnt -n -o TARGET --target "$ROOT") || fail E_MOUNT_QUERY
+[ "$target" = "$ROOT" ] || fail E_MOUNT_TARGET
+vfs=$(/usr/bin/findmnt -n -o VFS-OPTIONS --target "$ROOT") || fail E_MOUNT_QUERY
+case ",$vfs," in *,ro,*) ;; *) fail E_MOUNT_READONLY;; esac
+# Exact repository identity and immutable lineage anchor. Mutable refs are not consulted.
+[ "$(/usr/bin/git -C "$REPO" config --get remote.origin.url)" = https://github.com/instinct-candidate5-8e5bc4/candidate5-v3-authority-promotion ] || fail E_REPOSITORY_IDENTITY
+[ "$(/usr/bin/git -C "$REPO" rev-parse --verify HEAD^{commit})" = b768d48e58b6ddcf66ed482ee06e7d62b3162edb ] || fail E_COMMIT_IDENTITY
+[ "$(/usr/bin/git -C "$REPO" rev-parse --verify HEAD^{tree})" = dd2228b69a45b9b963189ade090032946a60fdcb ] || fail E_TREE_IDENTITY
+entry=$(/usr/bin/git -C "$REPO" ls-tree HEAD -- docs/verified-architecture-phase2-v3/future-rust-provisioning-script.review-bytes) || fail E_TREE_ENTRY
+[ "$entry" = '100644 blob 2622618addebf7385bda722295965540cf51c849'"$'\t'"'docs/verified-architecture-phase2-v3/future-rust-provisioning-script.review-bytes'" ] || fail E_BLOB_BINDING
+# Root-owned and non-writable-by-group/other path policy. Root mount read-only enforces replacement resistance.
+for p in "$ROOT" "$ROOT/.git" "$ROOT/docs" "$ROOT/docs/verified-architecture-phase2-v3" "$SCRIPT"; do
+ [ ! -L "$p" ] || fail E_PATH_SYMLINK
+ [ "$(/usr/bin/stat -c %u:%g "$p")" = 0:0 ] || fail E_PATH_OWNER
+ mode=$(/usr/bin/stat -c %a "$p") || fail E_PATH_MODE
+ case "$mode" in *[2367]|*[2367][0-7]) fail E_PATH_WRITABLE;; esac
+done
+[ -f "$SCRIPT" ] || fail E_SCRIPT_TYPE
+[ "$(/usr/bin/readlink -f -- "$SCRIPT")" = "$SCRIPT" ] || fail E_SCRIPT_CANONICAL_PATH
+# Open once. Every subsequent object check and the final Bash handoff uses this inherited descriptor.
+exec 9<"$SCRIPT" || fail E_SCRIPT_OPEN
+fd=/proc/self/fd/9
+[ -f "$fd" ] || fail E_DESCRIPTOR_TYPE
+[ "$(/usr/bin/stat -Lc %s "$fd")" = 8738 ] || fail E_SCRIPT_LENGTH
+[ "$(/usr/bin/stat -Lc %a "$fd")" = 644 ] || fail E_SCRIPT_MODE
+[ "$(/usr/bin/stat -Lc %u:%g "$fd")" = 0:0 ] || fail E_SCRIPT_OWNER
+sum=$(/usr/bin/sha256sum "$fd") || fail E_SCRIPT_DIGEST_TOOL
+[ "${sum%% *}" = 7d6b7c6399919ebfc4c9f3eea4455b5033ec6ed0a57ffed570ecfe525fde9b33 ] || fail E_SCRIPT_DIGEST
+/usr/bin/printf 'blob 8738\0' >"$STAGE/blob-message.tmp" || fail E_EVIDENCE
+/usr/bin/cat "$fd" >>"$STAGE/blob-message.tmp" || fail E_EVIDENCE
+blob=$(/usr/bin/sha1sum "$STAGE/blob-message.tmp") || fail E_BLOB_TOOL
+[ "${blob%% *}" = 2622618addebf7385bda722295965540cf51c849 ] || fail E_SCRIPT_BLOB
+self_sum=$(/usr/bin/sha256sum "$SELF") || fail E_ADMISSION_SELF
+self_bytes=$(/usr/bin/stat -c %s "$SELF") || fail E_ADMISSION_SELF
+/usr/bin/printf 'blob %s\0' "$self_bytes" >"$STAGE/self-blob-message.tmp" || fail E_ADMISSION_EVIDENCE
+/usr/bin/cat "$SELF" >>"$STAGE/self-blob-message.tmp" || fail E_ADMISSION_EVIDENCE
+self_blob=$(/usr/bin/sha1sum "$STAGE/self-blob-message.tmp") || fail E_ADMISSION_SELF
+/usr/bin/printf '{"admissionArtifact":{"blob":"%s","byteLength":%s,"mode":"100644","sha256":"%s"},"approvedCrossBindingSha256":"5de911f8823cbcec9d8e9be54c85b4388a829c085ab540a5b892e3f4b4ca8f4a","approvedCrossBindingSignatureSha256":"6d8349592d6522e39e646167be88b6a7a39c95d932ae55f1b354a121ffcec080","authority":"CANDIDATE_FOR_OWNER_APPROVAL","closure":{"blob":"ddeca46549862214d5d0987f89960edb21853b47","byteLength":3332,"pathCount":29,"sha256":"9e2b064a551e88fb4faa83bf8e169249d10a4ba8464ac19e2bf0d26bc7e6574c"},"commit":"b768d48e58b6ddcf66ed482ee06e7d62b3162edb","domain":"V3BOOTSTRAP-EXTERNAL-ADMISSION:v1","executionRole":"REPLACES_EXISTING_LAUNCHER_ADMISSION_AND_EXECUTION_ROLE","repository":"https://github.com/instinct-candidate5-8e5bc4/candidate5-v3-authority-promotion","schema":"v3.external-admission-binding.v1","script":{"blob":"2622618addebf7385bda722295965540cf51c849","byteLength":8738,"canonicalPath":"docs/verified-architecture-phase2-v3/future-rust-provisioning-script.review-bytes","mode":"100644","sha256":"7d6b7c6399919ebfc4c9f3eea4455b5033ec6ed0a57ffed570ecfe525fde9b33"},"tree":"dd2228b69a45b9b963189ade090032946a60fdcb"}\n' "${self_blob%% *}" "$self_bytes" "${self_sum%% *}" >"$STAGE/admission-expected.tmp" || fail E_ADMISSION_EVIDENCE
+/usr/bin/cmp -s "$ADMISSION" "$STAGE/admission-expected.tmp" || fail E_ADMISSION_BINDING
+path_object=$(/usr/bin/stat -Lc %d:%i "$SCRIPT") || fail E_PATH_OBJECT
+fd_object=$(/usr/bin/stat -Lc %d:%i "$fd") || fail E_DESCRIPTOR_OBJECT
+[ "$path_object" = "$fd_object" ] || fail E_PATH_DESCRIPTOR_MISMATCH
+# Deterministic pre-handoff evidence binds repository, object, mount and same-descriptor state.
+/usr/bin/printf '%s\n' \
+ 'schema=v3.external-admission-evidence.v1' \
+ 'repository=https://github.com/instinct-candidate5-8e5bc4/candidate5-v3-authority-promotion' \
+ 'commit=b768d48e58b6ddcf66ed482ee06e7d62b3162edb' \
+ 'tree=dd2228b69a45b9b963189ade090032946a60fdcb' \
+ 'scriptBlob=2622618addebf7385bda722295965540cf51c849' \
+ 'scriptSha256=7d6b7c6399919ebfc4c9f3eea4455b5033ec6ed0a57ffed570ecfe525fde9b33' \
+ 'scriptLength=8738' 'scriptMode=100644' 'scriptOwner=0:0' \
+ "mountTarget=$target" "mountVfsOptions=$vfs" "descriptorObject=$fd_object" \
+ 'admission=PASS' 'handoff=SAME_DESCRIPTOR' >"$STAGE/admission.v1.txt" || fail E_EVIDENCE
+# Verification scratch remains confined to STAGE. Operational candidate successor atomically renames STAGE to EVIDENCE immediately before same-descriptor handoff.
+# Candidate authority never executes. Operational bytes must replace this stop only after new review/approval.
+fail E_CANDIDATE_AUTHORITY
+/usr/bin/mv -- "$STAGE" "$EVIDENCE" || fail E_EVIDENCE_COMMIT
+trap - EXIT
+exec /usr/bin/bash --noprofile --norc "$fd" "$INPUT" "$OUTPUT"
