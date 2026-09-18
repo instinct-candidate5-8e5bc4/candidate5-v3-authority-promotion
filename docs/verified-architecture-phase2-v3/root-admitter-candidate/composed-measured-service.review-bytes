@@ -70,7 +70,7 @@ fail E_CANDIDATE_AUTHORITY
    if [ "$gone" -ne 1 ];then /usr/bin/printf '%s\n' E_STAGE_CLEANUP_PATH_RESIDUE >&2;trap - EXIT;exit 125;fi
   else created=0;fi
   if [ "$success" -eq 1 ];then [ -e "$output" ]&&[ -e "$evidence" ]||{ /usr/bin/printf '%s\n' E_SUCCESS_COMMIT_MISSING >&2;code=126; };fi
-  trap - EXIT HUP INT TERM;[ "$cleanup_signal_code" -eq 0 ]||code=$cleanup_signal_code;exit "$code"
+  trap - EXIT HUP INT TERM;if [ "$success" -eq 0 ]&&[ "$cleanup_signal_code" -ne 0 ];then code=$cleanup_signal_code;fi;exit "$code"
  }
  cleaning=0;cleanup_signal_code=0;created_object=;trap cleanup EXIT;exit_traps
  [ ! -e "$stage" ]||fail E_STAGE_FRESH
@@ -85,7 +85,8 @@ fail E_CANDIDATE_AUTHORITY
  /usr/bin/mount -o remount,ro,bind "$stage" || fail E_STAGE_FREEZE
  vfs=$(/usr/bin/findmnt -n -o VFS-OPTIONS --target "$stage")||fail E_STAGE_QUERY;case ",$vfs," in *,ro,*) :;;*) fail E_STAGE_READONLY;;esac
  /usr/bin/bash --noprofile --norc "$launcher" "$root" "$stage" "$output" "$evidence" || fail E_SUCCESSOR
- success=1
+ # Monotonic commit publication: signals latch across publication and final cleanup; committed success is never downgraded by an ordinary signal.
+ cleanup_signal_code=0;latch_traps;success=1;cleanup;exit 0
  # Success cleanup owns only the private input stage. Durable OUTPUT/EVIDENCE are preserved; replay is intentionally rejected as already complete.
  exit 0
 ' composed-private-stage "$SERVICE_STAGE" "$LAUNCHER_FD" "$ROOT" "$OUTPUT" "$EVIDENCE" "$fdmap"

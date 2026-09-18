@@ -1,3 +1,3 @@
-# Exact UKI full-flow-freshness candidate
+# Exact UKI monotonic-success candidate
 
-Signed UKI `30901ef67e2d767c740fecf46649342bb9b5cf9c9434b38059cebeeb778f81e5`, root `f1eb350116264a28fd8fd444afa6b7ac5669bf0c9b32ef707ed085eac0806893`, db cert DER `2aa4d8ceed5487d385044b01c465ff5979221439178050f09b298be52a51b4b7`. Candidate only.
+Signed UKI `5b833c46e7a978029722cf85fdb983cce3d7a93c4aa9b61b3407e5cbaebe79aa`, root `8336e9edf12ac8d86d98080e01447c617136374cc5ca4a1c5ab8aedfe8dda857`, db cert DER `79127e5632e81a2b2ad2a45cf1912b00ce3cddbc3c518d461f956c81730df233`. Candidate only.
