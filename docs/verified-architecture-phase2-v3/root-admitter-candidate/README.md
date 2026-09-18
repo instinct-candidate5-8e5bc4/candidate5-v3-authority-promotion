@@ -1,3 +1,3 @@
-# Pre-fork parent-authentication candidate
+# Cross-namespace pidfd-parent candidate
 
-Native helper captures expected_parent=getpid() before fork. PID1 inherits it, installs PDEATHSIG SIGKILL, then requires getppid()==expected_parent before work. Helper death at every clone/fork/prctl/recheck boundary leaves no surviving namespace init or descendants. Image `a59b177d84367ca2f3133040bb7a43194dd3594cdc8cadf798cf2a10e8a8b11b`, root `d6c28baa046ab220dd6fb27feb645596246511a694745d9a9aa200ecd0a63aaa`, UKI `7e5e70c00e74ec00272248be0a6559fb72335009d903414882c228e134b8a634`. Candidate only.
+Helper opens a pidfd for itself before fork. PID1 inherits it across the namespace, installs PDEATHSIG, and requires the parent pidfd not readable before exec. This avoids namespace-relative getppid while closing every parent-death setup boundary. Image `71e3290fa06f2017f685ebe87bc863a9b083f49dcb888305b96f37e26dc90a21`, root `c8f1ca4197a6982aa09ea53dd92ef76fded30dce84c75ff63d2e978b4d227015`, UKI `7f5c339270f486a107285e9abfe0150f6e95bef0456668f34f79401f81dcc836`. Candidate only.
