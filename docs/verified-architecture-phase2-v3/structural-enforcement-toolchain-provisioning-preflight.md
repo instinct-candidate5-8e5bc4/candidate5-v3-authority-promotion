@@ -38,20 +38,16 @@ Pinned distribution:
 
 | Identity | Required value |
 |---|---|
-| Rust release | `1.90.0`, dated `2025-09-18` |
-| Rust source/release commit | `1159e78c4747b02ef996e55082b704c09b970588` |
+| Rust release | `1.98.1`, dated `2026-09-03` |
+| Rust source/release commit | `48a229ceaefd4985c50990b14116b6d856af0985` |
 | host and only installed target | `x86_64-unknown-linux-gnu` |
-| rustc | `rustc 1.90.0 (1159e78c4 2025-09-14)` |
-| cargo | `cargo 1.90.0 (840b83a10 2025-07-30)`; manifest package version `0.91.0` |
-| rust-std | `1.90.0 (1159e78c4 2025-09-14)` for the sole target |
-| rust-src | `1.90.0 (1159e78c4 2025-09-14)` |
-| rustfmt-preview | package `1.8.0`, release artifact `rustfmt-1.90.0` |
-| clippy-preview | package `0.1.90`, release artifact `clippy-1.90.0` |
-| llvm-tools-preview | `1.90.0 (1159e78c4 2025-09-14)` for the sole target |
+| rustc | `rustc 1.98.1 (48a229cea 2026-09-01)` |
+| cargo | `cargo 1.98.1 (797e8a9bc 2026-08-05)`; manifest package version `0.99.0` |
+| rust-std | `1.98.1 (48a229cea 2026-09-01)` for the sole target |
 | rustup bootstrap, if used | `rustup-init 1.28.2` for `x86_64-unknown-linux-gnu` |
-| profile | explicit `minimal`; then add exactly `rust-src`, `rustfmt`, `clippy`, `llvm-tools` |
+| profile | explicit `minimal`; install exactly `rustc`, `cargo` and `rust-std` |
 
-`rustc`, `cargo`, `rust-std`, `rust-src`, `rustfmt`, `clippy` and `llvm-tools` are the complete permitted component set. Documentation and other targets/components MUST NOT be installed. A later need is a design change and requires review, not an opportunistic add.
+`rustc`, `cargo` and `rust-std` are the complete permitted component set because only they are mandatory inputs to compile the structural graph compiler for the sole target. `rust-src`, `rustfmt`, `clippy`, `llvm-tools`, documentation and every other target/component MUST NOT be installed. `rust-src` is library source for the standard library; it is not the graph compiler source identity and cannot satisfy that separate pin. A later need is a reviewed design change, not an opportunistic add.
 
 ## Authoritative sources and immutable integrity pins
 
@@ -61,23 +57,19 @@ Trust anchors and manifest:
 
 | Object | Authoritative URL | Required SHA-256 / identity |
 |---|---|---|
-| Rust release signing key | `https://static.rust-lang.org/rust-key.gpg.ascii` | file SHA-256 `e54b09a439647e006b4831eec9785cbaaf3e07ab371c3a6ee6a68e1bdb9fbc6b`; primary fingerprint `108F66205EAEB0AAA8DD5E1C85AB96E6FA1BE5FE`; signing subkey fingerprint `C13466B7E169A085188632165CB4A9347B3B09DC` |
-| versioned release manifest | `https://static.rust-lang.org/dist/channel-rust-1.90.0.toml` | SHA-256 `489c19f20d331765ab2835661eb546de90f6446a107a8db83045e7371e45cae2` |
-| manifest checksum | `https://static.rust-lang.org/dist/channel-rust-1.90.0.toml.sha256` | exact payload naming the preceding digest |
-| detached manifest signature | `https://static.rust-lang.org/dist/channel-rust-1.90.0.toml.asc` | signature must validate the exact manifest with the pinned signing fingerprint; observed file SHA-256 `d6462be232558bca99d549c3a0a32ec8ec8c37e6fce799d7c38963afcd9b734` |
+| Rust release signing key | `https://static.rust-lang.org/rust-key.gpg.ascii` | file SHA-256 `e54b09a439647e006b4831eec9785cbaaf3e07ab371c3a6ee6a68e1bdb9fbc6b`; actual manifest signer fingerprint `108F66205EAEB0AAA8DD5E1C85AB96E6FA1BE5FE`; the allowed signer set contains exactly this one fingerprint and no subkey or alternate key |
+| versioned release manifest | `https://static.rust-lang.org/dist/channel-rust-1.98.1.toml` | SHA-256 `a7c8774a5fd8441c997d94c029776cbc5eb111e9d72ab5d256fa69866644347e` |
+| manifest checksum | `https://static.rust-lang.org/dist/channel-rust-1.98.1.toml.sha256` | exact payload naming the preceding digest |
+| detached manifest signature | `https://static.rust-lang.org/dist/channel-rust-1.98.1.toml.asc` | signature must validate the exact manifest with the pinned signing fingerprint; observed file SHA-256 `a9fed69b47daaaf29a6207af9df13aedb66d502ab0acc4ea557602edf87fd1aa` |
 | optional rustup bootstrap | `https://static.rust-lang.org/rustup/archive/1.28.2/x86_64-unknown-linux-gnu/rustup-init` | SHA-256 `20a06e644b0d9bd2fbdbfd52d42540bdde820ea7df86e92e533c073da0cdd43c` |
 
-Pinned `.tar.xz` payloads from `https://static.rust-lang.org/dist/2025-09-18/`:
+Pinned `.tar.xz` payloads from `https://static.rust-lang.org/dist/2026-09-03/`:
 
 | Payload | Required SHA-256 |
 |---|---|
-| `rustc-1.90.0-x86_64-unknown-linux-gnu.tar.xz` | `48c2a42de9e92fcae8c24568f5fe40d5734696a6f80e83cc6d46eef1a78f13c9` |
-| `cargo-1.90.0-x86_64-unknown-linux-gnu.tar.xz` | `9853db03d68578a30972e2755c89c66aec035fec641cf8f3a7117c81eec2578d` |
-| `rust-std-1.90.0-x86_64-unknown-linux-gnu.tar.xz` | `663f4ab7945b392d5e5294dec1b050a66820a20e86f084ec37eeb0f2f7ff5569` |
-| `rust-src-1.90.0.tar.xz` | `cde088d57064d151b2236f4619aea4a8207e0709eb3035ddc6617d609ab7d453` |
-| `rustfmt-1.90.0-x86_64-unknown-linux-gnu.tar.xz` | `7f4d38b9d782e55832bf17969ef35477703c60781545bb098eb127cc8172d1c6` |
-| `clippy-1.90.0-x86_64-unknown-linux-gnu.tar.xz` | `5b6466419693a05365827378145014a37ae74fb2948fab390d5210a524792ed8` |
-| `llvm-tools-1.90.0-x86_64-unknown-linux-gnu.tar.xz` | `1376ef6021578fcfe94fad66396f7ca6d2f19bda5a417f8746a2b32ccf3f4470` |
+| `rustc-1.98.1-x86_64-unknown-linux-gnu.tar.xz` | `e974f036b28565f37c0f3bd92ddefa809bee16c04f9dcf07b9ed96e05aaaf7c4` |
+| `cargo-1.98.1-x86_64-unknown-linux-gnu.tar.xz` | `ea1de9f9e23107d97ee2b41a72c552f34064a593da503789218387aee59f3ba4` |
+| `rust-std-1.98.1-x86_64-unknown-linux-gnu.tar.xz` | `fa3ff450172a16c026944030230c5069947af93c728d9179971d44e5e0cfb561` |
 
 The versioned signed manifest is the distribution metadata authority. This reviewed document separately pins its key, fingerprint, manifest digest and permitted payload digests. HTTPS alone, the `.sha256` sidecar alone and rustup alone are insufficient: rustup documents that it does not validate distribution signatures. The accepted provenance chain is:
 
@@ -93,7 +85,7 @@ Provisioning runs in a newly created, empty, access-controlled root. It MUST NOT
 2. Verify the bootstrap operating tools by immutable paths and pre-approved digests. The implementation preflight must assign these before execution: TLS client, SHA-256 tool, OpenPGP verifier, archive extractor, shell/core utilities and C runtime. An unassigned bootstrap-tool digest is a hard stop.
 3. Fetch only the pinned key, manifest, signature and permitted payload URLs. Reject redirects to another origin. Verify key-file hash and exact primary and signing fingerprints in an isolated empty keyring. Verify manifest hash, checksum payload and detached signature. Parse only manifest version 2; reject duplicate keys, malformed TOML, unknown selected fields, missing availability, mismatched date/version/commit/URL/hash, and any requested component not listed available.
 4. Download payloads into a new staging directory. Verify every SHA-256 against both this contract and the authenticated manifest before extraction. Reject links escaping the root, absolute paths, devices, ownership/mode surprises, duplicate paths and post-extraction writes outside staging.
-5. Install with a deterministic provisioning script pinned by the later implementation commit. If rustup is used, first verify exact `rustup-init` bytes, invoke it by absolute path with `--default-toolchain none --profile minimal --no-modify-path -y`, then install the exact versioned toolchain and exact component list into empty explicit `RUSTUP_HOME` and `CARGO_HOME`. Never invoke `stable`, `latest`, an unqualified `1.90`, system rustup or network auto-update. Independently compare its downloaded objects and installed inventory to the preverified set; rustup success is not evidence of integrity.
+5. Install with a deterministic provisioning script pinned by the later implementation commit. If rustup is used, first verify exact `rustup-init` bytes, invoke it by absolute path with `--default-toolchain none --profile minimal --no-modify-path -y`, then install exact `1.98.1-x86_64-unknown-linux-gnu` with only rustc, cargo and rust-std into empty explicit `RUSTUP_HOME` and `CARGO_HOME`. Never invoke `stable`, `latest`, an unqualified `1.98`, system rustup or network auto-update. Independently compare its downloaded objects and installed inventory to the preverified set; rustup success is not evidence of integrity.
 6. Remove network access. Re-run all payload, installed-tree and executable identity checks offline. Produce a canonical installed-file manifest sorted by raw UTF-8 path, with file type, mode, size and SHA-256. Reject unexpected files, targets, components, writable executables and symlinks outside the root.
 7. Seal the verified payload cache and installed root read-only under distinct content-addressed names. A mutable name such as `stable`, `latest` or `default` is forbidden. Cache admission occurs only after the same signature, manifest, payload, extraction and inventory verification. Cache provenance is the complete evidence bundle, not a success marker.
 8. Repeat from empty state on an administratively separate worker using independently fetched bytes. Canonical payload and installed-file manifests, identity outputs and hostile-proof results MUST match byte-for-byte. Environment-specific absolute root paths are recorded separately and excluded from equality only by an explicit evidence schema rule.
@@ -106,14 +98,20 @@ Provisioning PASS does not itself make a build authoritative. Immediately before
 
 - start from an allowlisted environment and absolute tool paths beneath the sealed root; resolve each executable with no PATH search and prove its canonical path, file type, owner, mode and SHA-256 match the sealed installed manifest;
 - reverify the preflight commit, signing-key fingerprint, manifest signature and hash, selected payload hashes, cache evidence and installed-file manifest;
-- require exact `rustc --version --verbose` release `1.90.0`, commit hash `1159e78c4747b02ef996e55082b704c09b970588`, commit date `2025-09-14` and host `x86_64-unknown-linux-gnu`; record the entire output, including LLVM version, and bind it to the later compiler evidence;
-- require exact `cargo --version --verbose` release `1.90.0`, commit hash `840b83a10fb0e039a83f4d70ad032892c287570a` and release date `2025-07-30`;
-- require the exact installed component list and exactly one target, `x86_64-unknown-linux-gnu`; verify rust-src, rustfmt, clippy and LLVM tools by sealed file inventory, and run their explicit version probes where available;
+- require exact `rustc --version --verbose` release `1.98.1`, commit hash `48a229ceaefd4985c50990b14116b6d856af0985`, commit date `2026-09-01` and host `x86_64-unknown-linux-gnu`; record the entire output, including LLVM version, and bind it to the later compiler evidence;
+- require exact `cargo --version --verbose` release `1.98.1`, commit hash `797e8a9bca276c1c9f9f738d2a20f484fa4eea9d` and release date `2026-08-05`;
+- require the exact installed component list and exactly one target, `x86_64-unknown-linux-gnu`; reject rust-src, rustfmt, clippy, LLVM tools, documentation and every other component by sealed file inventory;
 - reject `RUSTC_WRAPPER`, `RUSTC_WORKSPACE_WRAPPER`, aliases, shims, compiler launchers, dynamic preload/injection variables, unknown config, user/system Cargo config, auto-update and network access;
 - record linker, sysroot, dynamic loader, shared-library and OS/container identities. An unassigned or mismatched identity blocks authoritative status even when Rust itself matches;
 - take an exclusive read lease on the sealed root, verify it immediately before execution and again after the build. Any mutation or time-of-check/time-of-use substitution invalidates the build.
 
 Any missing, mismatch, substitution, stale, malformed or unverifiable input or result MUST FAIL CLOSED. Correct version with wrong digest MUST FAIL CLOSED. There is no warning-only mode and no fallback to system, latest, unpinned, PATH-unknown, alternate or unverified cached Rust.
+
+## License, notice and redistribution inventory
+
+The sealed cache and installed tree MUST preserve every license, copyright, notice, exception and third-party attribution shipped in each selected archive. Before cache admission, enumerate archive basenames matching `LICENSE*`, `COPYRIGHT*` and `NOTICE*` case-insensitively without extracting executable content; reject absolute, duplicate or escaping paths. Record raw path, entry type, byte length and SHA-256 for each regular-file notice byte sequence in a canonical notice manifest. Then verify the extracted and installed copies byte-for-byte against it. Do not deduplicate away required paths even when bytes match.
+
+For Rust 1.98.1, independent preflight research found 15 matching archive entries: 14 regular files and one directory across the three selected archives. The canonical research notice-manifest root is `8c1900f5224b4b8974f922fd4196f29844517c2cf188c3238f6ce029563e1081`, computed over the 14 regular-file raw records `relative-path NUL decimal-byte-length NUL sha256 LF`, sorted by raw UTF-8 relative path; the directory is separately recorded by path and type. Provisioning MUST regenerate and reproduce this root from authenticated payloads; this research root is a second equality check, not authority to omit raw notice files. The evidence bundle includes all raw notices, the manifest, detected license expressions/exceptions and a deterministic mapping from every cached/installed artifact to applicable notices. Missing, altered, unrecognized or undistributable terms MUST FAIL CLOSED and require legal/owner review; provisioning PASS makes no legal conclusion.
 
 ## Mandatory hostile proofs
 
@@ -126,7 +124,7 @@ Tests run against disposable copies and MUST prove nonzero failure before any co
 5. set `RUSTC`, `CARGO`, `RUSTC_WRAPPER` and `RUSTC_WORKSPACE_WRAPPER` substitutions;
 6. tamper one byte in rustc after initial verification and test the pre-build and post-build checks;
 7. introduce an unverified cache object and a forged cache-success marker;
-8. remove each required component in turn;
+8. remove rustc, cargo and rust-std in turn;
 9. add an unexpected target or component;
 10. request an unexpected target through Cargo config or command flags;
 11. provide a correctly hashed payload under a URL or manifest with the wrong provenance;
@@ -150,7 +148,7 @@ One canonical, versioned evidence bundle MUST contain:
 - every payload name, byte length and SHA-256 plus the authenticated manifest selection;
 - canonical extraction and installed-file manifests;
 - exact environment allowlist, absolute executable paths and full identity outputs;
-- exact target/component inventory, linker/sysroot/loader/library/OS identities and network-disabled proof;
+- exact target/component inventory, raw license/notice files and canonical notice mapping/root, linker/sysroot/loader/library/OS identities and network-disabled proof;
 - provisioning commands and exit status, UTC timestamps, worker identity and empty-root proof;
 - all hostile fixture inputs, stable reason codes, stdout/stderr digests and no-output/no-mutation proofs;
 - independently reproduced bundle root and byte comparison.
@@ -161,7 +159,9 @@ GitHub Free CI may reproduce the public checks and publish the exact tested head
 
 ## Review stop
 
-This preflight is not PASS merely because its listed public hashes match today. Independent review must confirm every pinned byte, full Cargo commit identity, supported bootstrap host/tool digests, provisioning script semantics, evidence schema, hostile fixtures and the exact supersession boundary. Until then: `TOOLCHAIN_PROVISIONING_PREFLIGHT=REVIEW_REQUIRED`, and no Rust installation or provisioning is authorized by this document.
+This preflight is not PASS merely because its listed public hashes match today. Independent review must confirm every pinned byte, supported bootstrap host/tool digests, provisioning script semantics, license inventory, evidence schema, hostile fixtures and the exact supersession boundary. A PASS verdict is exactly `TOOLCHAIN_PROVISIONING_PASS`; it authorizes provisioning only. Compilation remains non-authorizing until a later plan pins compiler source and dependencies, flags, OS/kernel, glibc, linker, sysroot, container/base environment and bootstrap identities. Until review passes: `TOOLCHAIN_PROVISIONING_PREFLIGHT=REVIEW_REQUIRED`, and no Rust installation or provisioning is authorized by this document.
+
+`1.98.1` is an immutable version pin, never floating `stable`. A future supported stable is adopted only through a new reviewed document commit that regenerates and independently verifies every release URL, version/commit, manifest/signature/signer, payload digest, component availability, notice inventory, identity vector and hostile proof. Security advisories and Rust support status are checked before each provisioning and build; an advisory affecting the pinned toolchain causes a hard stop and design review, never silent update or fallback.
 
 ## Authoritative public references
 
@@ -171,4 +171,4 @@ This preflight is not PASS merely because its listed public hashes match today. 
 - Rustup component semantics: https://rust-lang.github.io/rustup/concepts/components.html
 - Rustup override precedence and directory/toolchain selection risk: https://rust-lang.github.io/rustup/overrides.html
 - rustc command-line identity interface: https://doc.rust-lang.org/stable/rustc/command-line-arguments.html
-- Exact signed release manifest: https://static.rust-lang.org/dist/channel-rust-1.90.0.toml
+- Exact signed release manifest: https://static.rust-lang.org/dist/channel-rust-1.98.1.toml
