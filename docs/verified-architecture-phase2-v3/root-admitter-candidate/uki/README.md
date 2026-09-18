@@ -1,3 +1,3 @@
-# Exact UKI 96 MiB root candidate
+# Exact UKI descriptor-closed candidate
 
-Signed UKI `bc2675ffd30286d46377fcc0d8dd4223a86e80f3c670907065385234604d13e8`, root `f3ff4be7688694d4e1d574fd48237c555b6254c61dc160ef2f3c852891787351`, db cert DER `7fe7d234f96fd5c1b26e76149715d6f93de397f96ed8a0195a73c07142cf0fa2`. Candidate only.
+Signed UKI `60ceaafb533ef2170559e7a4117eff768d2d616438c389b6a0f4c4c01cadfdc8`, root `d91fa3218b71bc28a30f012f0be291fbeeb292218470023111aa7f80fced4000`, db cert DER `1bc21cdf3b66838350c363db183d14a6e8cf74d89520cc86cdc3b77d3cfd8b99`. Candidate only.

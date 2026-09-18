@@ -15,7 +15,7 @@ case ",$input_vfs," in *,ro,*) ;; *) fail E_INPUT_READONLY;; esac
 input_object=$(/usr/bin/stat -Lc %d:%i "$INPUT") || fail E_INPUT_OBJECT
 D=/approved-service; PUB=$D/offline-root-ed25519-public.pem; POLICY=$D/protected-pin-store-policy.v1.json; CROSS=$D/cross-binding.v1.json; CROSS_SIG=$D/cross-binding.v1.sig; MANIFEST=$D/offline-input-manifest.v1.bin; MANIFEST_SIG=$D/offline-input-manifest.v1.sig; PIN=$D/protected-pin-record.v1.json; PIN_SIG=$D/protected-pin-record.v1.sig; CLOSURE=$D/measured-execution-service-closure.v1.bin; APPROVED_SERVICE=$D/measured-execution-service.review-bytes
 for f in "$PUB" "$POLICY" "$CROSS" "$CROSS_SIG" "$MANIFEST" "$MANIFEST_SIG" "$PIN" "$PIN_SIG" "$CLOSURE" "$APPROVED_SERVICE";do [ -f "$f" ] && [ ! -L "$f" ] || fail E_RECORD;done
-sha(){ /usr/bin/sha256sum "$1"|{ read -r x rest; /usr/bin/printf %s "$x"; }; }
+sha(){ actual=$(/usr/bin/sha256sum -- "$1") || fail E_HASH_TOOL; digest=${actual%% *}; [ "${#digest}" -eq 64 ] || fail E_HASH_OUTPUT; case "$digest" in *[!0-9a-f]*) fail E_HASH_OUTPUT;;esac; [ "$actual" = "$digest  $1" ] || fail E_HASH_OUTPUT; /usr/bin/printf %s "$digest"; }
 [ "$(sha "$PUB")" = 6be9ac5779bbc11d2102da23ba03d4ffd13ff56aaf9adbd3e81cb170678fbf29 ] || fail E_ROOT_KEY
 [ "$(sha "$POLICY")" = 2f2b4ef7afebbde05901dc6732c6002725cb38864461e34d44a6cdeedacf698c ] || fail E_POLICY
 [ "$(sha "$MANIFEST")" = 30044b7453c89eb195df394a0236faf5ef7c7ec4ccf8dbe20766f5690d5f13e3 ] || fail E_MANIFEST
@@ -26,15 +26,32 @@ sha(){ /usr/bin/sha256sum "$1"|{ read -r x rest; /usr/bin/printf %s "$x"; }; }
 [ "$(sha "$CROSS_SIG")" = 6d8349592d6522e39e646167be88b6a7a39c95d932ae55f1b354a121ffcec080 ] || fail E_CROSS_SIGNATURE_IDENTITY
 [ "$(sha "$CLOSURE")" = 5e0b440d868e0c9ad21743cd8a4903f43047cbf13993380d39bfd45349dd028d ] || fail E_CLOSURE
 [ "$(sha "$APPROVED_SERVICE")" = e470199b00cc047e7b020909c8d6f200113bf3e770debe2b69f1de8226079aa1 ] || fail E_APPROVED_SERVICE
+[ "$(sha /usr/bin/mount)" = bad230d68e012eb1a2fcaa3b42688d912940f5c61f041ae9451eee7dfb858ff1 ] || fail E_STAGE_MOUNT_TOOL
 seal(){ domain=$1 record=$2 sig=$3; /usr/bin/openssl pkeyutl -verify -pubin -inkey "$PUB" -rawin -in <({ /usr/bin/printf 'V3BOOTSTRAP-SEAL:v1\0%s\0' "$domain"; /usr/bin/cat "$record"; }) -sigfile "$sig" >/dev/null 2>&1 || fail E_SIGNATURE; }
 seal pin-record "$PIN" "$PIN_SIG"; seal cross-binding "$CROSS" "$CROSS_SIG"; seal offline-input-manifest "$MANIFEST" "$MANIFEST_SIG"
-# Exact approved service runtime closure in the dm-verity namespace.
 count=0;previous=;while IFS= read -r -d '' path&&IFS= read -r -d '' role&&IFS= read -r -d '' length&&IFS= read -r digest;do [ -z "$previous" ]||[[ "$previous" < "$path" ]]||fail E_CLOSURE_ORDER;previous=$path;[ -f "$path" ]&&[ ! -L "$path" ]||fail E_CLOSURE_TYPE;[ "$(/usr/bin/stat -c %s "$path")" = "$length" ]||fail E_CLOSURE_LENGTH;[ "$(sha "$path")" = "$digest" ]||fail E_CLOSURE_DIGEST;count=$((count+1));done <"$CLOSURE"
 [ "$count" -eq 44 ] || fail E_CLOSURE_COUNT
-# Exact signed nine-record offline input manifest, enforced against immutable input mount.
-count=0;previous=;while IFS= read -r -d '' name&&IFS= read -r -d '' length&&IFS= read -r digest;do case "$name" in */*|*..*) fail E_INPUT_NAME;;esac;[ -z "$previous" ]||[[ "$previous" < "$name" ]]||fail E_INPUT_ORDER;previous=$name;p=$INPUT/$name;[ -f "$p" ]&&[ ! -L "$p" ]||fail E_INPUT_FILE;[ "$(/usr/bin/stat -c %s "$p")" = "$length" ]||fail E_INPUT_LENGTH;[ "$(sha "$p")" = "$digest" ]||fail E_INPUT_DIGEST;count=$((count+1));done <"$MANIFEST"
+# Enumerate the mount itself before admitting any record. Extras of every type are fatal.
+declare -A expected=(); expected_text=; count=0
+while IFS= read -r -d '' name&&IFS= read -r -d '' length&&IFS= read -r digest;do case "$name" in */*|*..*|*$'\n'*) fail E_INPUT_NAME;;esac;[[ -z "${expected[$name]+x}" ]]||fail E_INPUT_DUPLICATE;expected[$name]=1;expected_text=$expected_text$name$'\n';count=$((count+1));done <"$MANIFEST"
+[ "$count" -eq 9 ] || fail E_INPUT_COUNT
+actual_text=$(/usr/bin/find "$INPUT" -xdev -mindepth 1 -maxdepth 1 -printf '%f\n') || fail E_INPUT_ENUM_TOOL
+actual_count=0;while IFS= read -r name;do [ -n "$name" ]||fail E_INPUT_NAME;[[ -n "${expected[$name]+x}" ]]||fail E_INPUT_EXTRA;actual_count=$((actual_count+1));done <<<"$actual_text"
+[ "$actual_count" -eq 9 ] || fail E_INPUT_EXACT_SET
+# Open each approved object once. Hash, length and type admission and successor copying use these descriptors, never reopened paths.
+fdmap=;count=0;previous=
+while IFS= read -r -d '' name&&IFS= read -r -d '' length&&IFS= read -r digest;do [ -z "$previous" ]||[[ "$previous" < "$name" ]]||fail E_INPUT_ORDER;previous=$name;p=$INPUT/$name;[ -f "$p" ]&&[ ! -L "$p" ]||fail E_INPUT_FILE;exec {input_fd}<"$p"||fail E_INPUT_OPEN;f=/proc/self/fd/$input_fd;[ -f "$f" ]||fail E_INPUT_DESCRIPTOR;[ "$(/usr/bin/stat -Lc %s "$f")" = "$length" ]||fail E_INPUT_LENGTH;[ "$(sha "$f")" = "$digest" ]||fail E_INPUT_DIGEST;fdmap=$fdmap${fdmap:+,}$name:$input_fd:$length:$digest;count=$((count+1));done <"$MANIFEST"
 [ "$count" -eq 9 ] || fail E_INPUT_COUNT
 [ "$input_object" = "$(/usr/bin/stat -Lc %d:%i "$INPUT")" ] && [ "$input_source" = "$(/usr/bin/findmnt -n -o SOURCE --target "$INPUT")" ] || fail E_INPUT_IDENTITY
-# Candidate authority stop precedes namespace creation, evidence mutation, launcher or provisioning.
+# Candidate authority stop precedes namespace creation, staging, evidence mutation, launcher or provisioning.
 fail E_CANDIDATE_AUTHORITY
-/usr/bin/unshare --user --map-root-user --mount --pid --fork --kill-child --net /usr/bin/bash --noprofile --norc "$LAUNCHER_FD" "$ROOT" "$INPUT" "$OUTPUT" "$EVIDENCE"
+# Operational successor: enter denied network/user/mount/pid namespaces, copy only admitted descriptors to private tmpfs, verify copies, freeze it ro, then hand that immutable path to the admitted launcher descriptor.
+/usr/bin/unshare --user --map-root-user --mount --pid --fork --kill-child --net /usr/bin/bash --noprofile --norc -c '
+ set -euf; fail(){ /usr/bin/printf "%s\n" "$1" >&2; exit 94; }; stage=$1; launcher=$2; root=$3; output=$4; evidence=$5; map=$6
+ /usr/bin/mkdir -m 700 "$stage" || fail E_STAGE_CREATE
+ /usr/bin/mount -t tmpfs -o rw,nosuid,nodev,noexec,mode=0700 tmpfs "$stage" || fail E_STAGE_MOUNT
+ oldifs=$IFS;IFS=,;for record in $map;do IFS=:;set -- $record;IFS=$oldifs;name=$1;fd=$2;length=$3;digest=$4;src=/proc/self/fd/$fd;dst=$stage/$name;[ -f "$src" ]||fail E_STAGE_DESCRIPTOR;/usr/bin/cat "$src" >"$dst"||fail E_STAGE_COPY;/usr/bin/chmod 400 "$dst"||fail E_STAGE_MODE;[ "$(/usr/bin/stat -c %s "$dst")" = "$length" ]||fail E_STAGE_LENGTH;actual=$(/usr/bin/sha256sum -- "$dst")||fail E_STAGE_HASH_TOOL;actual=${actual%% *};[ "$actual" = "$digest" ]||fail E_STAGE_DIGEST;done;IFS=$oldifs
+ /usr/bin/mount -o remount,ro,bind "$stage" || fail E_STAGE_FREEZE
+ vfs=$(/usr/bin/findmnt -n -o VFS-OPTIONS --target "$stage")||fail E_STAGE_QUERY;case ",$vfs," in *,ro,*) :;;*) fail E_STAGE_READONLY;;esac
+ exec /usr/bin/bash --noprofile --norc "$launcher" "$root" "$stage" "$output" "$evidence"
+' composed-private-stage "$SERVICE_STAGE" "$LAUNCHER_FD" "$ROOT" "$OUTPUT" "$EVIDENCE" "$fdmap"
