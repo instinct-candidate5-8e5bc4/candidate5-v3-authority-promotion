@@ -55,7 +55,7 @@ jobs:
           grep -Fq 'GitHub User account, not an organization' "$doc"
           grep -Fq 'Feature branches may be pushed, but cannot merge or release' "$doc"
           grep -Fq 'certification.sig` signs `text("V3CERT:v2")' "$doc"
-          grep -Fq 'Unknown/new paths default to implementation scope' "$doc"
+          grep -Fq 'Unknown defaults closed' "$doc"
           grep -Fq 'It excludes `root.json` and `certification.sig`' "$doc"
           grep -Fq 'Max checkpoint age is 5 minutes' "$doc"
           grep -Fq 'is currently `UNASSIGNED`' "$doc"
