@@ -1,0 +1,27 @@
+# REVIEW INPUT ONLY. NO SHEBANG. DO NOT EXECUTE WITHOUT LATER OWNER GO.
+set -euf
+fail() { /usr/bin/printf '%s\n' "$1" >&2; exit 95; }
+[ "$#" -eq 8 ] || fail E_SERVICE_ARGUMENTS
+ROOT=$1
+CROSS=$2
+CROSS_SIG=$3
+PUB=$4
+MANIFEST=$5
+MANIFEST_SIG=$6
+INPUT=$7
+OUTPUT=$8
+[ "$ROOT" = /reviewed-root ] || fail E_SERVICE_ROOT
+[ -d "$INPUT" ] && [ ! -e "$OUTPUT" ] || fail E_SERVICE_PATH
+[ -f "$CROSS" ] && [ -f "$CROSS_SIG" ] && [ -f "$PUB" ] && [ -f "$MANIFEST" ] && [ -f "$MANIFEST_SIG" ] || fail E_SERVICE_RECORD
+[ ! -L "$CROSS" ] && [ ! -L "$CROSS_SIG" ] && [ ! -L "$PUB" ] && [ ! -L "$MANIFEST" ] && [ ! -L "$MANIFEST_SIG" ] || fail E_SERVICE_SYMLINK
+pubhash=$(/usr/bin/sha256sum "$PUB") || fail E_SERVICE_HASH
+[ "${pubhash%% *}" = f6a55be9526560a571067e58faa88c013e55308a7b5028222a2e7aa602b53e65 ] || fail E_SERVICE_PUBLIC_KEY
+/usr/bin/printf 'V3BOOTSTRAP-SEAL:v1\0cross-binding\0' >"$OUTPUT.message.tmp" || fail E_SERVICE_EVIDENCE
+/usr/bin/cat "$CROSS" >>"$OUTPUT.message.tmp" || fail E_SERVICE_EVIDENCE
+/usr/bin/openssl pkeyutl -verify -pubin -inkey "$PUB" -rawin -in "$OUTPUT.message.tmp" -sigfile "$CROSS_SIG" || fail E_SERVICE_SIGNATURE
+manifesthash=$(/usr/bin/sha256sum "$MANIFEST") || fail E_SERVICE_HASH
+[ "${manifesthash%% *}" = 30044b7453c89eb195df394a0236faf5ef7c7ec4ccf8dbe20766f5690d5f13e3 ] || fail E_SERVICE_MANIFEST
+/usr/bin/printf 'V3BOOTSTRAP-SEAL:v1\0offline-input-manifest\0' >"$OUTPUT.manifest-message.tmp" || fail E_SERVICE_EVIDENCE
+/usr/bin/cat "$MANIFEST" >>"$OUTPUT.manifest-message.tmp" || fail E_SERVICE_EVIDENCE
+/usr/bin/openssl pkeyutl -verify -pubin -inkey "$PUB" -rawin -in "$OUTPUT.manifest-message.tmp" -sigfile "$MANIFEST_SIG" || fail E_SERVICE_MANIFEST_SIGNATURE
+/usr/bin/unshare --user --map-root-user --mount --pid --fork --kill-child --net /usr/bin/bash --noprofile --norc /reviewed-root/docs/verified-architecture-phase2-v3/future-bootstrap-launcher.review-bytes "$ROOT" /reviewed-root/docs/verified-architecture-phase2-v3/future-rust-provisioning-script.review-bytes "$INPUT" "$OUTPUT"
