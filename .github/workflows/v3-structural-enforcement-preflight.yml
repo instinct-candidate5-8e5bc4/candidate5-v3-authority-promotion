@@ -66,7 +66,7 @@ jobs:
           grep -Fq 'V3KEYRECOVERY:v1' "$doc"
           grep -Fq '1ff82930ec3120b7d1e8af51d0873b8fd5bd1d2a585f1611cf549516639fda36' "$doc"
           grep -Fq '33c413bd5b3bf2908a27659e76e1aec48a31af80dc41cd8e92e37e3ef0675015' "$doc"
-          grep -Fq '59546eebaa3f0a0ec7e56c1f2cd614e24252fbdfa7fa4e1ba74aee3908ac48be' "$doc"
+          grep -Fq 'ad5d42280aab2bd983fd5c644b53194c5b4eaf2d31e1272fcbf8f90057ee3928' "$doc"
           grep -Fq 'successor self-attestation' "$doc"
           grep -Fq 'Crash-consistent transition table' "$doc"
           grep -Fq 'successor floors/keys inert' "$doc"
