@@ -1,3 +1,3 @@
-# Cleanup-closed composed-service candidate
+# Verified cleanup-state candidate
 
-Input names are compared as NUL-delimited raw names. The private descriptor-derived tmpfs stage installs cleanup before creation, tracks mount/creation ownership, and unmounts then removes only this run's stage on failure, HUP/INT/TERM, launcher/provisioning failure, and success. It leaves no trusted input-stage residue and restores retry freshness. Image `4ddd6f8532e63413aeffd63f3b4e8bb0c504717c48b601303b9e1b5810f6a62b`, root `1ab5a8625089a4206d59afe35249835edd4d2cc65cb0e55af173ee9d29187819`, UKI `80557a7c0083174228840d01f7a0806c94ce3b5b26dcead5dce6773096ebbb3c`. Candidate only.
+Cleanup latches signals, retries unmount/removal three times, independently verifies mount and path absence, and changes state only after verified absence. Persistent cleanup failure emits a distinct terminal residue fault and makes no retry-freshness claim. Image `ec92653481b98547cf878470aa71cfb77a0dde93da44e51507f830364d3189da`, root `fec48d1c7f6c46878b0b059212885fb8b9d8885c3f80050686b7cdc02dee2faa`, UKI `478b78a841e52b38fc0e214d70ee141806d3f77aa5e730de9d3877a2c872eb5e`. Candidate only.
