@@ -97,21 +97,70 @@ The two commit IDs are one authenticated atomic configuration, never two environ
 
 The installed guard carries an append-only minimum `configSequence`; release metadata and revocation state also carry it, and verification uses the greatest observed floor. Updates require sequence +1, correct first-parent/tree equations, fresh approval/review and a new signed tuple. Rollback requires a separate offline recovery signature naming current sequence/digest and target sequence/digest; it publishes a new higher sequence, never lowers the floor. Tests cover atomic replacement, torn/mixed reads, replay of both old pins together, sequence skip/rollback, equivocation, wrong repository/source/tree/root and recovery rollback.
 
-### Realizable integration and release guard
+### Zero-cost external certification authority
 
-Live repository ownership is a blocking infrastructure fact: `instinct-candidate5-8e5bc4` is a GitHub User account, not an organization, and no suitable organization ruleset/required-workflow infrastructure is currently inspectable. GitHub organization/enterprise required workflows cannot be claimed here. Before implementation integration, the repository MUST move to a named suitable GitHub organization/plan and the following live control evidence must be independently inspected. Until then, design can continue but implementation cannot merge or release.
+GitHub Free, repository refs, merge state, branch settings and GitHub Actions are untrusted publication/convenience surfaces. They MAY run defense-in-depth checks and display results, but they never grant authority. No paid plan, organization migration, protected environment, required workflow or ruleset is a prerequisite. Administrator action, branch protection failure, a green/forged check, merge, tag or moved ref cannot change the certified verdict.
 
-Realizable GitHub controls are PR/integration and release controls, not a false claim that a ruleset executes on every push/new branch:
+The zero-cost external verifier/guard, named `structural-boundary-policy-guard` in evidence, is installed with the certified runtime baseline rather than enforced by GitHub. The sole authority predicate is `CERTIFICATION_VALID`. A candidate is authorized only when a separately installed verifier, whose binary and trust roots are part of the certified runtime baseline, validates this complete external chain from content-addressed bytes:
 
-- Organization ruleset ID/version targets the default/integration branches, blocks direct pushes and force pushes, requires pull requests, requires the centrally owned `structural-boundary-policy-guard` status check, requires signed commits/review, and has no bypass actors. Feature branches may be pushed, but cannot merge or release without the guard.
-- The central reusable workflow and guard binary live in a separately protected organization repository, pinned by full commit and SHA-256. Every PR to integration is evaluated by an organization-installed required workflow or GitHub App check that repository writers cannot alter.
-- The check fetches the complete base/head trees and computes rename-aware diff itself. Exact classifier: only these two design paths are non-implementation; every other changed/added/deleted/renamed path, submodule, unknown path, and workflow/package/build/policy/source/test/tool/evidence path is implementation. Unknown defaults closed.
-- While either commit role is `UNASSIGNED`, every implementation-scope PR check fails. After assignment, the guard verifies certification commit first-parent ancestry from the artifact commit, the exact artifact tree and seven artifact-commit files plus signature/attestation in the later commit by git object, acyclic hashes/signature, Foundation blobs, vectors, fresh owner/revocation state, reviewer binding, policy and audit/static results.
-- Protected release environment has no repository-writer bypass and accepts only artifacts bound to repository ID, merged integration commit, both boundary commit IDs, atomic pin tuple sequence/digest, base/head diff digest, artifactCommit/certificationCommit/root, ruleset ID/version, central workflow/guard digest, check-run ID and fresh signed guard result. A feature branch cannot deploy directly.
+`deterministic external certification -> signed artifact/root -> atomic pin tuple -> certified runtime baseline`.
 
-Prerequisite evidence names organization/plan, migrated repository ID, ruleset URL/ID/version, branch targets, empty bypass list, central workflow repository/full commit, guard digest, GitHub App identity if used, required check run, protected environment ID and a negative conformance run. Tests prove direct push is blocked and PR merge/release fail for omitted/narrowed workflows, arbitrary/new paths, renames/deletions/submodules, `UNASSIGNED`, bad artifacts/evidence and stale revocation state. These controls must exist and be independently inspectable; prose is not readiness.
+The verifier receives no authority from GitHub APIs. It fetches repository objects only as untrusted bytes by exact object ID, reconstructs every digest locally, retrieves the signed pin/revocation/checkpoint state from independently hosted append-only stores, and compares it with its locally pinned rollback floors. Runtime evaluation accepts only an in-memory `CERTIFICATION_VALID` capability minted by this verifier for one exact candidate digest and session. A boolean/string supplied by application code, CI, GitHub, an admin, a file in the candidate, or a moved ref is not this capability.
 
-This design branch remains non-authorizing. Missing migration/live controls, either `UNASSIGNED` role, absent artifacts, stale/unavailable evidence, or chain mismatch is a hard stop.
+The atomic pin tuple and signed certification MUST bind all of:
+
+- repository identity: immutable provider namespace plus repository numeric/global ID, not owner/name alone;
+- candidate identity: source commit, complete source tree, target, candidate artifact root and release sequence;
+- Foundation baseline exactly `127f284d78b83f358f076b3ee8f8b56044bcc691` plus all six unchanged Foundation blob IDs;
+- artifact commit, artifact tree, certification commit and certification root;
+- exact graph, bundle, policy and audit roots;
+- compiler source/binary, parser/resolver/lowering, toolchain/lock/vendor/container/linker/target and verifier/runtime-bootstrap identities;
+- exact ordered test-suite contract, test inputs, expected results and independently reproduced result roots;
+- pin configuration sequence/digest, minimum accepted sequence and rollback authorization floor;
+- revocation namespace, key, sequence, checkpoint digest, issue/expiry and minimum accepted sequence;
+- certified runtime baseline identity: verifier binary, trusted keys, clock sources, transparency/revocation stores, SES/Endo/engine/OS target and protocol version.
+
+The external certifier accepts two administratively independent deterministic builds and test runs, requires byte-identical compiler, graph, policy, bundle, evidence and release roots, then signs only the exact certification/artifact binding already defined. Signing and runtime verification are performed outside GitHub-hosted application JavaScript and outside repository-controlled CI. Free CI may reproduce the work, but its result is informational.
+
+Verdict is closed:
+
+```
+CERTIFICATION_VALID = signatureValid
+  && completeBindingsMatch
+  && deterministicReproductionMatches
+  && testContractAndResultsMatch
+  && pinSequenceAtOrAboveFloor
+  && revocationStateFreshAndNotRevoked
+  && ownerCheckpointFreshAndUnrevoked
+  && runtimeBaselineMatches
+
+otherwise NOT_AUTHORIZED
+```
+
+Missing, stale, malformed, unsigned, untrusted-key, revoked, mismatched, unreproducible, ambiguous, unavailable or rolled-back input yields `NOT_AUTHORIZED`. There is no warning mode, CI fallback, cached-green fallback, previous-ref fallback or admin override. `NOT_AUTHORIZED` terminates before compartment creation and before any transaction can commit.
+
+### Governance-independence hostile proofs
+
+A future certification gate MUST execute each proof against the real verifier/runtime boundary and show the exact candidate receives `NOT_AUTHORIZED`, zero compartment evaluation, zero transaction mutation and no releasable runtime artifact:
+
+| Hostile state | Required proof |
+| --- | --- |
+| merge or green CI without valid certification | merge commit and genuinely green Free CI exist; certification absent/invalid; verifier returns `NOT_AUTHORIZED` |
+| forged CI | fabricated check/status/artifact says green; bound external roots do not match; `NOT_AUTHORIZED` |
+| moved ref | branch/tag is force-moved to attacker commit while pin tuple stays fixed; exact-object verification rejects; `NOT_AUTHORIZED` |
+| stale certification | owner, clock, pin or revocation checkpoint exceeds its max age/expiry; `NOT_AUTHORIZED` |
+| rollback/replay | old but correctly signed artifact, tuple or certification is replayed below either monotonic floor; `NOT_AUTHORIZED` |
+| SHA mismatch | one source/artifact/evidence byte changes; local recomputation differs; `NOT_AUTHORIZED` |
+| substitutions | artifact commit, certification commit, graph root or compiler/toolchain identity is independently substituted; each binding mismatch is `NOT_AUTHORIZED` |
+| revoked certification | fresh signed revocation entry names both commits and tuple; verifier returns `NOT_AUTHORIZED` |
+| admin bypass | repository admin disables checks, pushes directly, rewrites branches/tags or publishes a release; external verifier ignores governance state and returns `NOT_AUTHORIZED` without valid chain |
+| governance outage | GitHub controls are absent, branches unprotected, CI unavailable or repository is still user-owned; exact signed external chain alone determines verdict; absence cannot create `CERTIFICATION_VALID` |
+
+Positive control: the exact independently reproduced candidate with fresh, valid, non-revoked chain and matching certified runtime baseline receives one session-bound `CERTIFICATION_VALID` capability. Mutating any bound field after minting invalidates the session digest and yields `NOT_AUTHORIZED`.
+
+GitHub Free CI remains useful for fast regressions, publication visibility and independent reproduction hints. Its workflow must label itself `design only - non-authorizing`, publish the exact head it tested, and never emit or store the production certification key/capability. CI success is not included in the authority predicate.
+
+This design amendment is non-authorizing. Both commit roles remain `UNASSIGNED`; compiler/runtime identities and external key/store/clock infrastructure remain unassigned. No implementation, routing, merge or runtime promotion may begin until a separate gate supplies and independently certifies them.
 
 ## Exact trust boundaries
 
@@ -123,8 +172,10 @@ Trusted:
 - the clean source checkout at the certified baseline plus explicitly reviewed Authority Routing Gate additions;
 - the exact-edge policy file;
 - deterministic bundling and canonicalization;
-- the release signing key, held only by CI/release infrastructure;
-- CI that records compiler, policy, graph, bundle, and source identities.
+- the external certification signing key, held outside GitHub and repository-controlled CI;
+- deterministic external certifiers that record compiler, policy, graph, bundle, source and test identities.
+
+GitHub/CI are explicitly untrusted for authority. Their outputs are candidate evidence that external certification must reproduce and bind independently.
 
 The compiler parses every production module with a real ECMAScript parser. It resolves imports using a fixed, repository-relative resolver. It never executes application code to discover dependencies. Parse ambiguity, unsupported syntax, resolver ambiguity, symlink escape, case collision, package export ambiguity, dynamic dependency expression, native add-on, or generated-at-runtime module is a build failure.
 
@@ -346,7 +397,7 @@ Executable rejection vectors are canonical inputs with exact expected codes:
 
 `canonical-vectors.json` must reproduce these exact values and codes; the guard executes all of them. Independent Rust and non-Rust implementations must match full bytes, roots and failures.
 
-Release CI signs only the normative release bytes. Runtime reconstructs all canonical bytes from parsed bounded values, verifies roots/signature and then verifies every referenced digest before evaluation.
+The external certifier signs only the normative release bytes. GitHub CI cannot sign them. Runtime reconstructs all canonical bytes from parsed bounded values, verifies roots/signature and then verifies every referenced digest before evaluation.
 
 The graph object visible to application code is a deep-frozen data projection without loader hooks. The authoritative runtime graph and resolver tables stay in the trusted bootstrap closure. No application reference points to them.
 
@@ -420,7 +471,7 @@ Use:
 1. A small Rust graph compiler using a pinned ECMAScript parser and a locked resolver implementation. The compiler performs static resolution, exact-edge checking, source hashing, graph closure, deterministic CommonJS-to-static-record lowering, bundle assembly, and evidence emission.
 2. SES `ses@2.3.0` (npm integrity `sha512-qd3iWzDqGKllI2FmExKsWLrJwt+6COWb8jUdzaCn8Cq5OTeoXdQ62Gn/xLy0GWLORC3du6yBAVe/V0B0dLVKew==`, tar SHA-256 `3bf2f4ef5c8e7c725c9acc817dbd70b1fc519e1ef5782402157f3436fb0db5c9`), `@endo/compartment-mapper@2.4.0` (`sha512-tlJH9nbQqHMF6hJ5rYZ8CS9FXEJwufEpVHbhI05vAA/h7Csq3l4QEJZNGiOUSegcQF7HJosljjZXatJ8Ch3dmQ==`, tar SHA-256 `2c2b94f723f8e034c09bfd23f3c5f4dbbeb9eb830a6dc48653fee5b39a7c4070`), and `@endo/module-source@1.5.0` (`sha512-AwoxpkqYlF4jkr8ET8kCp6+Yro0of+rxYwcyeO3Vz+slMB0cnCjk6a/cch48kSvT7xvgIZZCCtVXlaaf6trOrA==`, tar SHA-256 `7788bbf9d92f093a2b267354e320ac906d6c3c48e52a7794ef9136b628e486f3`). Resolve and vendor their complete locked transitive graph. Run SES/Endo self-tests and project hostile probes on every exact engine build; no package declares an npm engine range, so compatibility is established only by these probes.
 3. Static module records only. No Node `vm` context as a security boundary, no unrestricted `require`, no `import()` discovery, and no `createRequire`.
-4. Ed25519 signatures over the canonical release statement. Production keys are generated inside a non-exportable HSM by a release-security custodian, with signer identity and approved boundary baseline bound into an auditable release authorization. Build operators cannot use the key; security custodians cannot alter artifacts. The HSM policy refuses signing unless two independently built unsigned release statements, every gate result, and source/reviewer authorization match exactly. Dev/test keys live in separate accounts/HSM partitions, have distinct key IDs and trust roots, and cannot verify in production.
+4. Ed25519 signatures over the canonical release statement. Production keys are generated inside a non-exportable HSM by a release-security custodian, with signer identity and approved boundary baseline bound into an auditable release authorization. Build operators cannot use the key; security custodians cannot alter artifacts. The external HSM policy refuses signing unless two independently built unsigned release statements, every gate result, and source/reviewer authorization match exactly; GitHub CI cannot invoke this production key. Dev/test keys live in separate accounts/HSM partitions, have distinct key IDs and trust roots, and cannot verify in production.
 
 The signature envelope records key ID, algorithm, release sequence, source/boundary commits, all roots, signer authorization reference, and transparency-log inclusion proof. Rotation requires an old-key-signed plus offline-recovery-root-approved key transition; emergency revocation comes from an independently hosted signed revocation log. Runtime rejects revoked keys, sequence rollback, unknown successors, expired policy epochs, or a release not bound to the requested target. Rollback is an explicit, separately signed authorization to a named prior release sequence, never acceptance of any older valid signature.
 
@@ -541,9 +592,9 @@ The existing JavaScript authority audit remains defense-in-depth. Its success is
 
 1. Obtain owner approval for a separate boundary-policy reopen; independently certify it and replace both `UNASSIGNED` roles with immutable 40-hex artifact and certification commit IDs plus the named boundary artifacts.
 2. Run that baseline's named audit/static suite and prove exactly the three policy edges are allowed while all others remain denied.
-3. Approve compiler provenance/reproducibility, signing/key controls, external Web root, SES/Endo ABI, exact engine builds, and protocol limits.
+3. Approve compiler provenance/reproducibility, external certification/verifier and key/store/clock controls, governance-independence hostile proofs, external Web root, SES/Endo ABI, exact engine builds, and protocol limits.
 4. Implement only the graph compiler, artifact verifier, isolated worker compartment, fixtures, and evidence generator on a new implementation branch.
 5. Run independent security review and the complete proof matrix.
 6. Only after independent certification may a separate Authority Routing Gate review consider runtime promotion.
 
-HARD STOP and request owner review if either boundary commit role remains `UNASSIGNED` or uncertified, its organization migration/live controls, nine two-commit files, or suite are absent, any step requires changing a certified Foundation production module, weakening Foundation fail-closed behavior, adding a fourth Gate-to-Foundation edge, exposing a loader/host object, accepting an undeclared dependency, relaxing a failed target, or replacing behavioral proof with a source blacklist.
+HARD STOP and request owner review if either boundary commit role remains `UNASSIGNED` or uncertified, its zero-cost external certification/verifier controls, nine two-commit files, or suite are absent, any step requires changing a certified Foundation production module, weakening Foundation fail-closed behavior, adding a fourth Gate-to-Foundation edge, exposing a loader/host object, accepting an undeclared dependency, relaxing a failed target, or replacing behavioral proof with a source blacklist.
