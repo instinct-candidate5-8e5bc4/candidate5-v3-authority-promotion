@@ -646,3 +646,22 @@ The existing JavaScript authority audit remains defense-in-depth. Its success is
 6. Only after independent certification may a separate Authority Routing Gate review consider runtime promotion.
 
 HARD STOP and request owner review if either boundary commit role remains `UNASSIGNED` or uncertified, its external certification/verifier controls under NO PAID GITHUB PLAN DEPENDENCY, nine two-commit files, or suite are absent, any step requires changing a certified Foundation production module, weakening Foundation fail-closed behavior, adding a fourth Gate-to-Foundation edge, exposing a loader/host object, accepting an undeclared dependency, relaxing a failed target, or replacing behavioral proof with a source blacklist.
+
+## Owner Authorization Amendment
+
+This amendment is an exact descendant of certified design baseline `7d6ae7da73f98ffc7c1b4b12520000e44ffa89bf`. It does not rewrite or change that baseline's design semantics.
+
+```
+DESIGN_READINESS=PASS
+STRUCTURAL_ENFORCEMENT_IMPLEMENTATION=AUTHORIZED
+BOUNDARY_POLICY_ARTIFACT_COMMIT=UNASSIGNED
+BOUNDARY_POLICY_CERTIFICATION_COMMIT=UNASSIGNED
+```
+
+The later owner GO supersedes only the historical "Do not proceed" status language at `7d6ae7d`. The authorized lifecycle is:
+
+`7d6ae7d -> Owner Authorization Amendment -> Implementation -> Independent Review -> Implementation PASS -> finalize artifact commit -> finalize certification commit -> assign immutable pins -> verify acyclic chain -> certify new Boundary Baseline -> resume Gate from exact baseline`.
+
+The pins remain `UNASSIGNED` during implementation. They MUST NOT be guessed or assigned to pass a check. `UNASSIGNED` is not a wildcard, zero, optional value, bypass or authority. It never permits runtime routing, baseline promotion, Gate continuation, release or main merge. The prior requirement to complete the two-commit boundary baseline before implementation is superseded; the two-commit model remains normative and completes only after Implementation PASS, when the real immutable IDs exist.
+
+Any design-semantic change requires `DESIGN REOPEN REQUIRED`. Any certified Foundation-semantic change requires `FOUNDATION REOPEN REQUIRED`. This amendment authorizes no Gate continuation, main merge, production routing, School work or visuals.
