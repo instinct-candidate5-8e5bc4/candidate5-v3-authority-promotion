@@ -1,3 +1,3 @@
-# Exact UKI synchronous environment candidate
+# Exact UKI dm-table validation candidate
 
-Initramfs `0e2c0d9c375277c3d1b13caab5b3ff15dd5a2c3c680e26404ddb80f112df2836`, signed UKI `7e9b1c5a1475f659c44867b2da198dfdc35c3f1b76fd2f4dab269c3a8431b091`, root `b041c0e4a712890a37b0e0f0cb77eac6265bd5f98fcbecfbd93030460e81cc63`, db cert DER `60a3db4c0664caf8052f5fec06942a15ed041b2fb47a0c41b7fec13541bc1764`. Candidate only.
+Initramfs `4a71b79f2e778b137af22d04a53b2139eae04e73f43e94126246dd964d23779c`, signed UKI `1c71597a97ba339634f756b236244108e1b016123d0bd6bb8b4eb5777935ba4d`, root `6ef70b71bda61f7a988f82072f0ee6e4611f02f557196df4499d27568406cffa`, db cert DER `82513a65c7cfb3155c0c79db16279ff054c1cdd3f1f36f03160b2ed86eb42d88`. Candidate only.
