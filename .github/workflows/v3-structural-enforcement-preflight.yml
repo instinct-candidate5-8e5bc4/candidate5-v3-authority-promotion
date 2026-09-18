@@ -62,6 +62,8 @@ jobs:
           grep -Fq 'V3BOUNDARYPINS:v1' "$doc"
           grep -Fq 'V3REVOCATION:v2' "$doc"
           grep -Fq 'marker bytes (286 bytes)' "$doc"
+          grep -Fq 'are 687 UTF-8 bytes' "$doc"
+          grep -Fq 'RFC 8785/JCS is the sole byte-order rule' "$doc"
           grep -Fq 'substituted bytes with raw20 zero tree (276 bytes)' "$doc"
           grep -Fq 'Max checkpoint age is 5 minutes' "$doc"
           grep -Fq 'are currently `UNASSIGNED`' "$doc"
