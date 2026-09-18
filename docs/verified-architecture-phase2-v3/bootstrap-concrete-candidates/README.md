@@ -16,7 +16,7 @@ The cross-binding cannot contain its own detached-signature hash without a cycle
 
 ## Measured-service candidate
 
-`measured-execution-service.review-bytes` is mode `100644`, has no shebang and is review data. It arms one `EXIT` cleanup trap before the first temporary write and confines all verification state to one dedicated stage. Before any launcher invocation it:
+`measured-execution-service.review-bytes` is mode `100644`, has no shebang and is review data. It arms one `EXIT` cleanup trap before the first temporary write; cleanup tests stage existence directly, closing the asynchronous post-mkdir marker race and confines all verification state to one dedicated stage. Before any launcher invocation it:
 
 1. requires regular, non-symlink records and artifacts;
 2. verifies domain-separated Ed25519 signatures on pin, cross-binding and offline-manifest records;
@@ -45,7 +45,7 @@ Cross-binding and manifest signatures use the same construction with domains `cr
 
 ## Permanent hostile regressions
 
-`hostile-fixtures/VALID_SIGNATURE_WRONG_BINDING/` contains eight canonical records signed by the same candidate key: stale script blob, stale launcher blob, substituted service, modified service closure, substituted detached signature, substituted pin-store, modified layer vector and substituted offline manifest. Every signature independently verifies, while exact semantic comparison fails before launcher invocation. `hostile-fixtures/expected-results.v1.json` records those outcomes.
+`hostile-fixtures/VALID_SIGNATURE_WRONG_BINDING/` contains eight four-artifact signed roots under the same candidate key: stale script blob, stale launcher blob, substituted service, modified service closure, substituted detached signature, substituted pin-store, modified layer vector and substituted offline manifest. Both signatures for each case independently verify and its matching pin exact comparison passes, while cross exact semantic comparison fails before launcher invocation. `hostile-fixtures/expected-results.v1.json` records those outcomes.
 
 ## Scope
 

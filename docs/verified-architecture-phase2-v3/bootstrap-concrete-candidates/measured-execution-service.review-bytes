@@ -5,17 +5,17 @@ fail() { /usr/bin/printf '%s\n' "$1" >&2; exit 95; }
 ROOT=$1; INPUT=$2; OUTPUT=$3
 [ "$ROOT" = /reviewed-root ] || fail E_SERVICE_ROOT
 [ -d "$INPUT" ] && [ ! -e "$OUTPUT" ] && [ ! -e "$OUTPUT.service-verify" ] || fail E_SERVICE_PATH
-STAGE=$OUTPUT.service-verify; CREATED=
-cleanup() { code=$?; if [ -n "$CREATED" ]; then /usr/bin/rm -rf -- "$STAGE"; fi; exit $code; }
+STAGE=$OUTPUT.service-verify
+cleanup() { code=$?; if [ -e "$STAGE" ]; then /usr/bin/rm -rf -- "$STAGE"; fi; exit $code; }
 trap cleanup EXIT
-/usr/bin/mkdir -m 700 "$STAGE" || fail E_SERVICE_STAGE; CREATED=1
+/usr/bin/mkdir -m 700 "$STAGE" || fail E_SERVICE_STAGE
 D=$ROOT/docs/verified-architecture-phase2-v3/bootstrap-concrete-candidates
 PUB=$D/offline-root-ed25519-public.pem; POLICY=$D/protected-pin-store-policy.v1.json; CROSS=$D/cross-binding.v1.json; CROSS_SIG=$D/cross-binding.v1.sig; MANIFEST=$D/offline-input-manifest.v1.bin; MANIFEST_SIG=$D/offline-input-manifest.v1.sig; PIN=$D/protected-pin-record.v1.json; PIN_SIG=$D/protected-pin-record.v1.sig; CLOSURE=$D/measured-execution-service-closure.v1.bin; SERVICE=$D/measured-execution-service.review-bytes; LAUNCHER=$ROOT/docs/verified-architecture-phase2-v3/future-bootstrap-launcher.review-bytes; SCRIPT=$ROOT/docs/verified-architecture-phase2-v3/future-rust-provisioning-script.review-bytes
 for f in "$PUB" "$POLICY" "$CROSS" "$CROSS_SIG" "$MANIFEST" "$MANIFEST_SIG" "$PIN" "$PIN_SIG" "$CLOSURE" "$SERVICE" "$LAUNCHER" "$SCRIPT"; do [ -f "$f" ] && [ ! -L "$f" ] || fail E_SERVICE_RECORD; done
 # Immutable trust-root expectations prevent a valid signature from blessing substituted artifacts.
 expect_sha() { expected=$1; file=$2; set -- $(/usr/bin/sha256sum "$file") || fail E_SERVICE_HASH; [ "$1" = "$expected" ] || fail E_TRUST_ROOT_IDENTITY; }
-expect_sha "5b2b2de8013c8eb3893254b94f32e8a966c119f46b8df494ba545ffe21b634c6" "$PUB"
-expect_sha "d64ced06b13d9f42b765a5a5cbe5b206e2c0b27e8f3bf26271207805d8e1496e" "$POLICY"
+expect_sha "6be9ac5779bbc11d2102da23ba03d4ffd13ff56aaf9adbd3e81cb170678fbf29" "$PUB"
+expect_sha "2f2b4ef7afebbde05901dc6732c6002725cb38864461e34d44a6cdeedacf698c" "$POLICY"
 expect_sha "30044b7453c89eb195df394a0236faf5ef7c7ec4ccf8dbe20766f5690d5f13e3" "$MANIFEST"
 expect_sha "5e0b440d868e0c9ad21743cd8a4903f43047cbf13993380d39bfd45349dd028d" "$CLOSURE"
 expect_sha "7d6b7c6399919ebfc4c9f3eea4455b5033ec6ed0a57ffed570ecfe525fde9b33" "$SCRIPT"
@@ -44,5 +44,5 @@ layers='[["sha256:af6eca94c8104c8e90d3f9efe59c2b3a02b20aad3d985e31c7cd009ea104c4
 /usr/bin/cmp -s "$CROSS" "$STAGE/cross.expected" || fail E_CROSS_BINDING
 # Candidate authority is never runtime authority. Owner-approved operational records require later regeneration/review.
 fail E_CANDIDATE_AUTHORITY
-/usr/bin/rm -rf -- "$STAGE" || fail E_SERVICE_CLEANUP; CREATED=
+/usr/bin/rm -rf -- "$STAGE" || fail E_SERVICE_CLEANUP
 /usr/bin/unshare --user --map-root-user --mount --pid --fork --kill-child --net /usr/bin/bash --noprofile --norc "$LAUNCHER" "$ROOT" "$SCRIPT" "$INPUT" "$OUTPUT"
