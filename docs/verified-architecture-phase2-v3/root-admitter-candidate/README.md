@@ -1,3 +1,3 @@
-# Native result-channel candidate
+# Dedicated native result-channel candidate
 
-The native wait helper writes exactly one V3WAIT result only after waitpid classification. Shell validates helper status and exact result separately. Helper kill/crash/OOM or missing/malformed/duplicate output is bounded terminal failure with stage cleanup, never a wait loop. Image `cc12c83666e7005606bb676312717539df70f21ba5edbb1b1f7a0d1018f83d2e`, root `18dda0b1b4bac0048cf3040c969b80b2f06a55ceeec5a153749d0ec1736d58e9`, UKI `088b1794012b032b168393a6fe75a23905f008583333880c86c96d3774d9820e`. Candidate only.
+The command-substitution FIFO is verified and CLOEXEC. Only the helper parent retains its writer; child stdout is separate. Child uses a new process group plus PDEATHSIG kill/race check, so helper death closes the result pipe and terminates the child. Image `8c602481c9334ccba6587dff0b84e1b4be32f79c29bb4dae0b09693544ee6668`, root `f531756bcb4482773b443929ab3c32cdf46b9f13fb4ec2b78f289c52f3ef3f0e`, UKI `a9d9b33421555cd4ef106f658033a09aa3aa1a7e6aab96e828e48c22e4faa4d7`. Candidate only.
