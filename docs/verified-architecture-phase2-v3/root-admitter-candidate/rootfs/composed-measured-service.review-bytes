@@ -64,7 +64,7 @@ fail E_CANDIDATE_AUTHORITY
   else mounted=0;fi
   if [ -e "$stage" ];then
    [ "$created" -eq 1 ]||{ /usr/bin/printf '%s\n' E_STAGE_CLEANUP_UNOWNED_PATH >&2;trap - EXIT;exit 122; }
-   [ "$(/usr/bin/stat -Lc %d:%i "$stage")" = "$created_object" ]||{ /usr/bin/printf '%s\n' E_STAGE_CLEANUP_OBJECT_CHANGED >&2;trap - EXIT;exit 121; }
+   current_object=$(/usr/bin/stat -Lc %d:%i "$stage")||current_object=;case "$current_object" in *[!0-9:]*|:*|*:) current_object=;;esac;[ -n "$created_object" ]||{ /usr/bin/printf '%s\n' E_STAGE_CLEANUP_OWNERSHIP_UNPROVEN >&2;trap - EXIT;exit 120; };[ "$current_object" = "$created_object" ]||{ /usr/bin/printf '%s\n' E_STAGE_CLEANUP_OBJECT_CHANGED >&2;trap - EXIT;exit 121; }
    gone=0;attempt=0;while [ "$attempt" -lt 3 ];do attempt=$((attempt+1));/usr/bin/rm -rf -- "$stage"||:;if [ ! -e "$stage" ];then gone=1;created=0;break;fi;done
    if [ "$gone" -ne 1 ];then /usr/bin/printf '%s\n' E_STAGE_CLEANUP_PATH_RESIDUE >&2;trap - EXIT;exit 125;fi
   else created=0;fi
@@ -73,7 +73,11 @@ fail E_CANDIDATE_AUTHORITY
  cleaning=0;cleanup_signal_code=0;created_object=;trap cleanup EXIT;exit_traps
  [ ! -e "$stage" ]||fail E_STAGE_FRESH
  # Latch rather than exit across each acquisition and state publication; then honor any latched signal.
- cleanup_signal_code=0;latch_traps;/usr/bin/mkdir -m 700 "$stage" || fail E_STAGE_CREATE;created=1;created_object=$(/usr/bin/stat -Lc %d:%i "$stage")||fail E_STAGE_OBJECT;exit_traps;[ "$cleanup_signal_code" -eq 0 ]||exit "$cleanup_signal_code"
+ cleanup_signal_code=0;latch_traps;/usr/bin/mkdir -m 700 "$stage" || fail E_STAGE_CREATE;created=1
+ # Acquire and structurally validate the owned object token while signals remain latched. Failure is an explicit residue terminal, never a freshness claim.
+ created_object=$(/usr/bin/stat -Lc %d:%i "$stage")||created_object=;case "$created_object" in *[!0-9:]*|:*|*:) created_object=;;esac
+ if [ -z "$created_object" ];then /usr/bin/printf '%s\n' E_STAGE_OWNERSHIP_ACQUISITION_RESIDUE >&2;trap - EXIT;exit 119;fi
+ exit_traps;[ "$cleanup_signal_code" -eq 0 ]||exit "$cleanup_signal_code"
  cleanup_signal_code=0;latch_traps;/usr/bin/mount -t tmpfs -o rw,nosuid,nodev,noexec,mode=0700 tmpfs "$stage" || fail E_STAGE_MOUNT;mounted=1;exit_traps;[ "$cleanup_signal_code" -eq 0 ]||exit "$cleanup_signal_code"
  oldifs=$IFS;IFS=,;for record in $map;do IFS=:;set -- $record;IFS=$oldifs;name=$1;fd=$2;length=$3;digest=$4;src=/proc/self/fd/$fd;dst=$stage/$name;[ -f "$src" ]||fail E_STAGE_DESCRIPTOR;/usr/bin/cat "$src" >"$dst"||fail E_STAGE_COPY;/usr/bin/chmod 400 "$dst"||fail E_STAGE_MODE;[ "$(/usr/bin/stat -c %s "$dst")" = "$length" ]||fail E_STAGE_LENGTH;actual=$(/usr/bin/sha256sum -- "$dst")||fail E_STAGE_HASH_TOOL;actual=${actual%% *};[ "$actual" = "$digest" ]||fail E_STAGE_DIGEST;done;IFS=$oldifs
  /usr/bin/mount -o remount,ro,bind "$stage" || fail E_STAGE_FREEZE

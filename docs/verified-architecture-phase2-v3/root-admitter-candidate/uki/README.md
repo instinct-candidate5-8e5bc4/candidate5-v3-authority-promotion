@@ -1,3 +1,3 @@
-# Exact UKI tri-state-cleanup candidate
+# Exact UKI ownership-fail-closed candidate
 
-Signed UKI `7444eaaa4a187ad5dbd1be19a18278b44bfd4a86db3c2939c59357fa540ce0b1`, root `f462d45fdbcaa13eb6e48d039797c211939aad08430ca4e378323a8132742bee`, db cert DER `ce7c41559edf66d10b075ab73a99d94bc1572780a3a6617cd7264c859b0623e7`. Candidate only.
+Signed UKI `e9b5d04566bb7c4a2806974c8318c98938c972334707b654e5acecbcf9316a98`, root `0eb0f9e1ae4f3f9c8b9263c93ebbd13d6e631a191ead2dcb32473495bb67f537`, db cert DER `c6e0755c50a7940fc4c1cbdcbb943e70390b9fbf422ce543621c3237d42669d6`. Candidate only.
