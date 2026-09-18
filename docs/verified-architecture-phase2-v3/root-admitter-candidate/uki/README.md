@@ -1,3 +1,3 @@
-# Exact UKI latched-successor-wait candidate
+# Exact UKI provenanced-wait candidate
 
-Signed UKI `9f2e0e2ae8f519bce80659218d3be4342747fa24b027dd7b87e6958e3f571578`, root `d9389413ac650d94d50d1068b702f2ee737a92b870f21d2ba6b5b26ca39a8592`, db cert DER `5a16b8aedb862361e41ea1a500c3ffc1ae979acfc30325defa5cf928225c3357`. Candidate only.
+Signed UKI `ab16dd27c7b8086dd9e23be5b57167b07dfdd078fad9b4b4bbef88ea7e8ec1d5`, root `ad2f705fdb1ac3a42c250102d3b9f89878c0bed6b5a9a77d157c7394858352cf`, db cert DER `75abbd20daae6c5ea7a8ce0ae83da93756029a3cacf37074814c9b6e69636903`. Candidate only.
