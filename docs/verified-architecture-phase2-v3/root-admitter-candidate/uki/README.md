@@ -1,3 +1,3 @@
-# Exact UKI ownership-fail-closed candidate
+# Exact UKI object-parser candidate
 
-Signed UKI `e9b5d04566bb7c4a2806974c8318c98938c972334707b654e5acecbcf9316a98`, root `0eb0f9e1ae4f3f9c8b9263c93ebbd13d6e631a191ead2dcb32473495bb67f537`, db cert DER `c6e0755c50a7940fc4c1cbdcbb943e70390b9fbf422ce543621c3237d42669d6`. Candidate only.
+Signed UKI `f9198e9370b42426996529a5a653d60ec32789c82da633feea805b05714cb8be`, root `3000d66e4ebb92a84c84ebaaf8ee380dd067d1a4844770118397396870de9af3`, db cert DER `03cfd1fb9190cdca207197c1f01f459bb7b8daf12cbce7b591308cab417b1392`. Candidate only.

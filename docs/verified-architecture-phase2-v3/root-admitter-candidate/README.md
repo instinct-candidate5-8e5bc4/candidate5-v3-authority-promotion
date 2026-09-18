@@ -1,3 +1,3 @@
-# Ownership-acquisition-fail-closed candidate
+# Exact object-parser candidate
 
-The post-mkdir identity is structurally validated as decimal device:inode while signals are latched. Identity acquisition failure terminates with an explicit possible-residue state and no retry claim, rather than misclassifying the owned directory. Image `ebd2caf8d93588bc6b0c2cb86e80f085fd56291906a77af6e9bd40e864aecff7`, root `0eb0f9e1ae4f3f9c8b9263c93ebbd13d6e631a191ead2dcb32473495bb67f537`, UKI `e9b5d04566bb7c4a2806974c8318c98938c972334707b654e5acecbcf9316a98`. Candidate only.
+One parser is used for acquisition and cleanup. It accepts exactly one colon and two nonempty canonical decimal fields; multi-colon, empty, whitespace, newline, nondecimal and leading-zero forms fail. Image `57f06d34f6d8b26eb967bae9d6b22c30c79c2355b91f182d45db7b3c4c0a8e33`, root `3000d66e4ebb92a84c84ebaaf8ee380dd067d1a4844770118397396870de9af3`, UKI `f9198e9370b42426996529a5a653d60ec32789c82da633feea805b05714cb8be`. Candidate only.
