@@ -1,3 +1,3 @@
-# Exact UKI corrected descriptor-aware candidate
+# Exact UKI closed-environment candidate
 
-Pinned kernel/package identities are in `inputs/pinned-packages.v1.json`. Initramfs `10c7faa1603266d1cb8e888d7b1110c5ccec0c6d45273af7cb361a93b5a20d7e`, signed UKI `a99a7d5ba6fd1d7b82b130ed3a692e233e785d5de8d5c6530b5f0202c129eac6`, dm-verity root `587fb07ead8f50ceee45663291a7846142ad1d998a5a968f39cdfde77a1a3c67`, sole db certificate DER `e0c3e48c41d1b51bbc4cc58de8bc0837adcd952ac95ccc3904a98d9f3de3f9ea`. Candidate only; never executed, mounted, activated or booted.
+Initramfs `cbb4a5b5329ce9390eb2def6e3cc0d2368f2055b8d8475f72194853d4e416e5c`, signed UKI `9ec13012930db1f34a70959d062cf655132f475a05ca9244f432c14ad5095c9c`, verity root `71f373bfd2144b68e7f26d7f278f01d18e24df320e56460c110b942adbeb9b90`, db certificate DER `9e210583657ab6c1cb85ec82652bf0aea93e98cecc5c32a3706872eccb28f7ec`. Candidate only; never executed, mounted, activated or booted.

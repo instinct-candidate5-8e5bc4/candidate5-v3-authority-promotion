@@ -5,7 +5,7 @@ m=json.load(open(R/'dm-verity-metadata.v1.json'));rep=json.load(open(R/'reproduc
 assert m['dataImageSha256']==h(R/'root-admitter-rootfs.ext4') and m['hashTreeSha256']==h(R/'root-admitter-rootfs.verity') and m['rootHash']==rep['rootHash']==boot['dmVerity']['rootHash']==db['verityRoot']
 assert all((rep[x] for x in ('binaryByteEqual','imageByteEqual','verityByteEqual','deterministicSignatureByteEqual','noGeneratedArtifactExecutedBootedOrMounted')))
 assert not boot['selfAdmission'] and not boot['executionAuthorized'];assert boot['uki']['signedSha256']==h(U/'root-admitter-signed.efi')==db['boot']['signedUkiSha256']
-src=(R/'measured-supervisor.c').read_text();assert m['rootHash'] not in src and 'v3.root_admitter_verity=%s' in src and 'DM_READONLY_FLAG' in src and 'O_NOFOLLOW' in src and 'field==8' in src and 'chroot("/verity-root")' in src
+src=(R/'measured-supervisor.c').read_text();assert 'execve(args[0],args,env)' in src and '"PATH=/usr/bin","LANG=C","LC_ALL=C","TZ=UTC",NULL' in src;assert m['rootHash'] not in src and 'v3.root_admitter_verity=%s' in src and 'DM_READONLY_FLAG' in src and 'O_NOFOLLOW' in src and 'field==8' in src and 'chroot("/verity-root")' in src
 hdr=subprocess.check_output(['/usr/bin/readelf','-hW',str(R/'measured-supervisor.elf')],text=True);ph=subprocess.check_output(['/usr/bin/readelf','-lW',str(R/'measured-supervisor.elf')],text=True);assert 'DYN (Position-Independent Executable file)' in hdr and 'INTERP' not in ph
 cmd=(U/'cmdline').read_text().split();assert cmd.count('v3.root_admitter_verity='+m['rootHash'])==1
 assert db['setup']['dbEntryCount']==1 and db['boot']['bootEntryCount']==1 and db['boot']['rejectUnsigned'] and db['boot']['rejectOtherSigners']
@@ -21,7 +21,7 @@ while pos<len(cb):
  fs=[]
  for _ in range(3): e=cb.index(b'\0',pos);fs.append(cb[pos:e].decode());pos=e+1
  e=cb.index(b'\n',pos);want=cb[pos:e].decode();pos=e+1;p=R/'rootfs'/fs[0].lstrip('/');assert p.stat().st_size==int(fs[2]) and h(p)==want;count+=1
-assert count==30
+assert count==31
 for d in ('reviewed-root','reviewed-input','reviewed-output','reviewed-evidence','proc'): assert (R/'rootfs'/d).is_dir()
 init=(U/'initramfs/init').read_text();assert 'set -eu' in init and init.count('|| fail ')>=20 and 'dmsetup table' in init and 'mountpoint -q' in init and ' -ef ' in init
 
