@@ -1,3 +1,3 @@
-# Exact object-parser candidate
+# Full-flow freshness-semantics candidate
 
-One parser is used for acquisition and cleanup. It accepts exactly one colon and two nonempty canonical decimal fields; multi-colon, empty, whitespace, newline, nondecimal and leading-zero forms fail. Image `57f06d34f6d8b26eb967bae9d6b22c30c79c2355b91f182d45db7b3c4c0a8e33`, root `3000d66e4ebb92a84c84ebaaf8ee380dd067d1a4844770118397396870de9af3`, UKI `f9198e9370b42426996529a5a653d60ec32789c82da633feea805b05714cb8be`. Candidate only.
+Success removes only the private input stage, verifies durable OUTPUT/EVIDENCE remain committed, and intentionally rejects replay as already complete. Retry freshness is claimed only for failures where downstream cleanup removed output and evidence; failure after evidence commit makes no whole-operation retry claim. Image `9f5f890dce43d759553cda8d6ce3b8856b2f78cd2bcb77d990c63a5fd1f2728a`, root `f1eb350116264a28fd8fd444afa6b7ac5669bf0c9b32ef707ed085eac0806893`, UKI `30901ef67e2d767c740fecf46649342bb9b5cf9c9434b38059cebeeb778f81e5`. Candidate only.
