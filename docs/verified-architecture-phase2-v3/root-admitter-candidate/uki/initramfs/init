@@ -31,5 +31,9 @@ done
 /bin/busybox grep -q ' /verity-root/reviewed-root .* ro,' /proc/mounts || fail E_REPO_BIND_OPTIONS
 for n in reviewed-input reviewed-output reviewed-evidence; do
  /bin/busybox grep -q " /verity-root/$n .* rw," /proc/mounts || fail E_RW_BIND_OPTIONS
+ [ "$(/bin/busybox stat -c %u:%g /verity-root/$n)" = 0:0 ] || fail E_RW_PARENT_OWNER
+ mode=$(/bin/busybox stat -c %a /verity-root/$n) || fail E_RW_PARENT_MODE
+ case "$mode" in *[2367]|*[2367][0-7]) fail E_RW_PARENT_WRITABLE;; esac
 done
-exec /bin/measured-supervisor "$ROOT_HASH" /reviewed-root /reviewed-input /reviewed-output /reviewed-evidence/final || fail E_SUPERVISOR_EXEC
+[ ! -e /verity-root/reviewed-output/final ] && [ ! -e /verity-root/reviewed-evidence/final ] && [ ! -e /verity-root/reviewed-evidence/final.admission-stage ] || fail E_FRESH_CHILD
+exec /bin/measured-supervisor "$ROOT_HASH" /reviewed-root /reviewed-input /reviewed-output/final /reviewed-evidence/final || fail E_SUPERVISOR_EXEC

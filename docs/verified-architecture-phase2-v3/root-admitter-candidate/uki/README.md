@@ -1,3 +1,3 @@
-# Exact UKI used-size/next-offset candidate
+# Exact UKI fresh-child argument candidate
 
-Signed UKI `5409fae940ee565e4a3359ecd94fbc6c322a822521a1048957342307420eeb02`, root `501df761f691580f6ae3c59e360ac6eba6d9898848e487d5f6d112fea52b83ec`, db cert DER `52cc236961268b8fa0bdb3dd441a7be33c86ba1270e0303cd26bf0e115e2c3e5`. Candidate only.
+Initramfs `2dd534fd87bbfc451d5db6324c778d9f326c8a040fbb7f21d96a7187f6bbcac9`, signed UKI `5d0138524d4b61022ec19d1384e3f00d57d388bdf66cbeb0b1d97e8af6c2f38d`, root `501df761f691580f6ae3c59e360ac6eba6d9898848e487d5f6d112fea52b83ec`, db cert DER `eef67a8369dedf77460581972436e6ec9331349d182653bd50784a3260962117`. Candidate only.
