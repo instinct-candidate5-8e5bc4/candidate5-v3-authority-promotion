@@ -1,6 +1,6 @@
 # Measured-Execution Service Closure
 
-Exact executable and recursive ELF interpreter/DT_NEEDED closure mechanically derived from the concrete service, exact launcher and exact script against the approved MCR OCI root. Canonical records are `path NUL role NUL decimal-length NUL lowercase-sha256 LF`, raw-path sorted: 21 executables, 41 files, 4,656 bytes, SHA-256 `979a54f634eb25c8ada06e627a76142a3e60a4686f59dda6572f195f6dfe934b`.
+Exact executable and recursive ELF interpreter/DT_NEEDED closure mechanically derived from the frozen service, launcher and script review bytes against the approved MCR OCI root. Canonical records are `path NUL role NUL decimal-length NUL lowercase-sha256 LF`, raw-path sorted: 24 executables, 44 files, 4,943 bytes, SHA-256 `5e0b440d868e0c9ad21743cd8a4903f43047cbf13993380d39bfd45349dd028d`. The canonical `.bin` bytes are service-enforced; this table is the human review rendering.
 
 | Exact path | Class | Role | Bytes | SHA-256 |
 |---|---|---|---:|---|
@@ -18,12 +18,15 @@ Exact executable and recursive ELF interpreter/DT_NEEDED closure mechanically de
 | `/usr/bin/openssl` | PINNED_AND_VERIFIED | executable | 1001272 | `8b3df2d202d29791ec056d229506e5e547dabf7d8f130cd5be59a815bf6f72e6` |
 | `/usr/bin/printf` | PINNED_AND_VERIFIED | executable | 51648 | `71f5e524ddba07b97b8b79913103f57dc7ac6a0dd71eed1f3945083b630b4af2` |
 | `/usr/bin/rm` | PINNED_AND_VERIFIED | executable | 59912 | `7477c0f734a465a39a4fe40f6a9bb9d7431827e0a1d799ad1f25855b5dc63682` |
+| `/usr/bin/sha1sum` | PINNED_AND_VERIFIED | executable | 43432 | `397034db86baf4f49d30a4bfd8e4d81751a808be454b131c7ed0821e597d2fde` |
 | `/usr/bin/sha256sum` | PINNED_AND_VERIFIED | executable | 51624 | `7645c8e76d75515ccb75c9086bdcf0d4071f2985f380f249253ead7d7c6810b3` |
 | `/usr/bin/sort` | PINNED_AND_VERIFIED | executable | 101176 | `0fc26ce295e8e549635da2129e389f63685745b3be7c1737db6251a296f1cd78` |
 | `/usr/bin/stat` | PINNED_AND_VERIFIED | executable | 80400 | `9b571b54bd2f17f5fbb841e1886c2d364f5138a02533f4ac3dbfbdaf4dddbea3` |
 | `/usr/bin/sync` | PINNED_AND_VERIFIED | executable | 35240 | `c348f0056e87c717b1864955ab5979604bfe374958bbce24ce451461e8354cb3` |
 | `/usr/bin/tar` | PINNED_AND_VERIFIED | executable | 517952 | `148313667aa9111de45fe3c70a1c7c963ae5f015071a106c4cdabea749d2db9f` |
+| `/usr/bin/tr` | PINNED_AND_VERIFIED | executable | 47624 | `24f53bbf7e48b1be3b71f20cf29963a44dbf084aafe5301f0ed1425b91d1c60c` |
 | `/usr/bin/unshare` | PINNED_AND_VERIFIED | executable | 31336 | `ea175949d95fb64dcf6131758c6fc78ca318a241f7d4cb264ed63fbb5de77bcf` |
+| `/usr/bin/wc` | PINNED_AND_VERIFIED | executable | 43440 | `504463c7a12780b7439321be6e67f43ab61a3ff429cbf916c0722d19f98692a8` |
 | `/usr/bin/xargs` | PINNED_AND_VERIFIED | executable | 63912 | `ff3eca2d9d88883c0e997a5dbe62883819fffb40d12194ebd753848b7c7b3f0b` |
 | `/usr/bin/xz` | PINNED_AND_VERIFIED | executable | 84504 | `bf66862cb9945876668da02c1522a57ad1824a4bde7c510df497db7c15cbe2ed` |
 | `/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2` | PINNED_AND_VERIFIED | dynamic-library | 240936 | `9739c1dc9bff2b11533a38d4218a1a926638a4d8262ef1c9d75c17290ac257e9` |
