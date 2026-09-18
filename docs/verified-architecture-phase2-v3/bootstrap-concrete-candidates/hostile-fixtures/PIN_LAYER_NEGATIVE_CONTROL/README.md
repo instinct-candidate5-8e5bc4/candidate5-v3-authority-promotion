@@ -1,0 +1,3 @@
+# Pin-layer negative control
+
+This test-the-test control distinguishes signature, pin and semantic-cross layers. `cross.json` and `cross.sig` are an internally valid signed hostile cross pair. `mismatched-pin.json` and `mismatched-pin.sig` are the internally valid signed main pin pair. Both signatures pass independently, but the pin binds the main cross record/signature rather than this control's cross record/signature. Exact pin reconstruction therefore fails exactly as `E_PIN_BINDING`; semantic cross-binding comparison is NOT REACHED. A harness reporting generic failure or `E_CROSS_BINDING` for this control is wrong.

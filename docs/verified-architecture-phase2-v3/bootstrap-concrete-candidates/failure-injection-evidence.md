@@ -12,3 +12,9 @@ Review method: static control-flow/data-flow and exact-record reconstruction onl
 | closure path/order/type/length/digest/count mismatch | `E_CLOSURE_*` | none | no |
 | each complete four-artifact `VALID_SIGNATURE_WRONG_BINDING` root | pin and cross signatures pass; pin exact comparison passes; `E_CROSS_BINDING` | none | no |
 | fully matched candidate package | `E_CANDIDATE_AUTHORITY` | none | no |
+
+## Earliest reachable cleanup injection
+
+`cleanup-earliest-point-injection.v1.json` places the injected asynchronous exit immediately after the first mutable operation (`mkdir`) returns and before the next statement. At that point the EXIT trap is already installed and cleanup tests stage existence directly. The only possible service-created path is therefore removed; no evidence or authorization path has been created. This is an exact static control-flow injection, not runtime evidence, because executing the service is outside this design-only authorization.
+
+The signed wrong-binding result data uses the exact required assertions per case: `PIN VALIDATION=PASS`; `SIGNATURE VALIDATION=PASS`; `SEMANTIC CROSS-BINDING VALIDATION=REACHED`; `FINAL RESULT=E_CROSS_BINDING`. `PIN_LAYER_NEGATIVE_CONTROL` proves the review harness keeps the layers distinct: both signatures pass, but pin validation fails exactly at `E_PIN_BINDING` and semantic cross-binding validation is not reached.
