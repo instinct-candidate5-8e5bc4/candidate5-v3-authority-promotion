@@ -1,4 +1,4 @@
-name: V3 Structural Enforcement Preflight
+name: V3 Structural Enforcement Preflight (design only - non-authorizing)
 on:
   push:
     branches: [candidate5-structural-enforcement-preflight]
@@ -51,11 +51,17 @@ jobs:
           done
           grep -Fq '127f284d78b83f358f076b3ee8f8b56044bcc691' "$doc"
           grep -Fq 'BOUNDARY_POLICY_BASELINE_COMMIT' "$doc"
+          grep -Fq 'structural-boundary-policy-guard' "$doc"
+          grep -Fq 'organization-level required workflow' "$doc"
           grep -Fq 'Current value: `UNASSIGNED`' "$doc"
           grep -Fq 'implementation is blocked' "$doc"
           grep -Fq '@endo/module-source@1.5.0' "$doc"
           grep -Fq '@endo/compartment-mapper@2.4.0' "$doc"
           grep -Fq 'ses@2.3.0' "$doc"
+          grep -Fq 'V3GRAPH:HEADER:v1' "$doc"
+          grep -Fq 'V3POLICY:HEADER:v1' "$doc"
+          grep -Fq 'V3BUNDLE:HEADER:v1' "$doc"
+          grep -Fq 'release SHA-256 `1a58d516fd384b853a61301e4b54a641de54c1227428ddb0dfaf5141ae6f815f`' "$doc"
           grep -Fq 'promoted-legality-port.js -> physical-proof-planner.js' "$doc"
           grep -Fq 'promoted-legality-port.js -> v3-promotion-foundation.js' "$doc"
           grep -Fq 'promoted-legality-port.js -> authority-envelope-builder.js' "$doc"

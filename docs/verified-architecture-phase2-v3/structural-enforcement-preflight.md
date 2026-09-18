@@ -48,16 +48,38 @@ All existing fail-closed Foundation meanings remain normative. Packaging failure
 
 The certified Foundation baseline's current immutable policy forbids every production import into the six Foundation modules. On that baseline, adding the proposed three edges correctly makes `tests/clean-runtime/v3-promotion-authority-audit.js` report `FORBIDDEN_INBOUND_FOUNDATION_IMPORT` three times and makes static-boundaries test 4 fail. SES, a bundle, or a compiler cannot override this repository-level rule. Therefore the three edges MUST NOT be implemented on `127f284` and this preflight is not implementation-ready.
 
-Before implementation, a separate owner-approved boundary-policy reopen must be independently delivered and certified. Certification must assign all of the following immutable identifiers:
+Before implementation, a separate owner-approved boundary-policy reopen must be independently delivered and certified. Certification must assign the baseline and all six immutable artifacts below:
 
 - `BOUNDARY_POLICY_BASELINE_COMMIT`: a full 40-hex commit. Current value: `UNASSIGNED`.
+- `boundary-policy/baseline.env`: exactly one canonical assignment of the full baseline commit and no other keys.
 - `boundary-policy/exact-three-edges.json`: canonical resolved source/target IDs, all three required edges, no wildcard, and expected source blob/digest for each endpoint.
 - `boundary-policy/foundation-files.json`: the six certified Foundation paths and their unchanged `127f284` blob IDs.
 - `boundary-policy/inbound-import-policy.json`: default-deny policy whose sole production exception is the exact three-edge artifact.
 - `boundary-policy/audit-contract.json`: exact commands, expected rule IDs, schema versions, and tool blob/digests for the replacement audit and static suite.
-- `boundary-policy/certification.json`: owner approval evidence reference, independent reviewer verdict, baseline commit, artifact digests, and suite results.
+- `boundary-policy/certification.json`: canonical certification envelope, defined below.
+
+`certification.json` MUST contain, in canonical field order: schema version; baseline commit; Foundation baseline; exact SHA-256 of the other five artifacts (`baseline.env` plus four non-certification JSON artifacts); audit-contract root; certification result exactly `PASS`; trusted owner-observation service, conversation ID, message ID, observed timestamp, owner handle, and SHA-256 of the exact UTF-8 owner words; reviewer verified identity/connection ID, reviewer key ID, verdict exactly `PASS`, review timestamp, reviewed baseline/artifact root; and an Ed25519 signature over the domain-separated canonical certification bytes. CI independently retrieves the owner observation from the trusted owner channel, verifies identifier/handle/body digest and that its scoped words approve this boundary reopen, then verifies reviewer identity binding, signature, verdict, and reviewed roots. A reference string, peer claim, copied owner text, unknown signer, or unbound reviewer fails.
+
+`audit-contract.json` MUST contain, in canonical field order: schema version, baseline commit, policy-root digest, ordered audit/static command records, and contract root. Each command record contains command ID, exact argv array (no shell string), working directory, tool path, tool git blob, tool SHA-256, expected exit code, expected result schema, and expected rule IDs/counts. Its root uses the policy canonical/Merkle rules below with domain `V3AUDIT`; `certification.json` signs that root. The baseline commit MUST contain the byte-identical audit contract and all named tools at their declared blobs. CI executes only these argv records from that baseline and hashes results into the certification result.
 
 Those names describe required artifacts, not artifacts present in this branch. `UNASSIGNED`, a missing artifact, a non-ancestor baseline, a changed Foundation blob, or a policy/audit mismatch is a hard stop. The implementation branch must start from the named certified boundary-policy commit, not from this preflight head and not directly from `127f284`. Its CI must run the boundary baseline's audit/static commands. The old `127f284` audit/static suite remains a regression witness for this design-only branch but is not an implementation acceptance suite after the approved policy reopen.
+
+### Executable implementation guard contract
+
+Every future workflow whose changed paths intersect `src/`, implementation `tools/`, runtime tests, structural evidence, bundle/compiler/bootstrap/verifier/policy code, or any Authority Routing branch MUST invoke one versioned guard from the certified baseline before build or test. Required check name: `structural-boundary-policy-guard`; repository branch protection must require it for every structural/routing implementation branch and merge target. A workflow that omits the reusable guard is itself rejected by an organization-level required workflow. This design-only workflow may stay green and MUST be labeled non-authorizing.
+
+The guard reads `boundary-policy/baseline.env`, whose only accepted assignment is `BOUNDARY_POLICY_BASELINE_COMMIT=<40 lowercase hex>`; `UNASSIGNED`, missing, extra keys, or malformed values exit 1. While it is `UNASSIGNED`, any implementation-scope diff or implementation branch exits 1 before other jobs. After assignment the guard MUST:
+
+1. fetch the named commit by object ID from the pinned delivery repository and require it to be an ancestor of `HEAD`;
+2. read all six artifacts from that commit, reject worktree overrides, and verify their exact SHA-256 values from a guard-owned digest manifest committed at the same baseline;
+3. verify unchanged Foundation blobs against `foundation-files.json` and `127f284`;
+4. canonicalize and verify the exact-edge, inbound-policy, audit-contract, certification and digest-manifest chains;
+5. independently retrieve and validate owner approval evidence and reviewer identity/signature as specified above;
+6. require certification `PASS`, exact baseline/root binding, and no revocation;
+7. execute the audit/static argv records from the named baseline and compare exit codes, schema, rule IDs/counts and result digests;
+8. emit a signed machine-readable guard result bound to `HEAD`, then allow downstream jobs only through `needs: structural-boundary-policy-guard`.
+
+Future implementation workflows must include the reusable workflow by immutable commit SHA, expose no `continue-on-error`, and make build/sign/release jobs depend on its success. Organization rules must reject edits that narrow its path classifier. The implementation delivery must include a negative CI fixture proving `UNASSIGNED`, absent artifacts, wrong ancestry, artifact substitution, stale owner evidence, bad reviewer signature, command drift, or an uncovered implementation path blocks all downstream jobs. This preflight does not install that future cross-workflow/organization control; therefore it cannot be cited as mechanical implementation authorization.
 
 ## Exact trust boundaries
 
@@ -80,11 +102,56 @@ Untrusted inside this boundary: source text, package metadata supplied by the ap
 
 The canonical graph is the sole module authority for the compartment. Each node records normalized module ID, source SHA-256, format, ordered dependency specifiers, resolved target IDs, transform identity, and output record SHA-256. The graph header records schema version, policy digest, compiler digest/version, target (`node` or `web`), Foundation baseline, and bundle root.
 
-Canonical bytes use the following fixed grammar. Integers are unsigned 32-bit big-endian. `bytes(x)` is `u32be(length) || x`; text is shortest-form valid UTF-8 with no BOM and no Unicode normalization; IDs and specifiers must already be canonical ASCII. A graph is `bytes("V3GRAPH\0v1") || bytes(header) || u32be(nodeCount) || nodes || u32be(edgeCount) || edges`. Header fields occur in schema order and each is `bytes(field)`. Nodes sort by raw module-ID bytes and encode `bytes(id) || bytes(sourceSha256Raw32) || bytes(format) || bytes(transformSha256Raw32) || bytes(recordSha256Raw32)`. Edges sort by `(referrer raw bytes, specifier raw bytes, target raw bytes)` and encode three `bytes` fields. Duplicates are invalid.
+Canonical encoding has one normative primitive set. `u8` is one byte. `u32` is unsigned big-endian. `sha256` is exactly 32 raw bytes. `git20` is exactly 20 raw bytes decoded from a 40-lowercase-hex commit. `text` is `u32(byteLength) || UTF8`; UTF-8 must be shortest-form, valid scalar values, no BOM, and input is not normalized. Canonical identifiers/specifiers are ASCII and reject `NUL`, `\`, empty/dot segments, duplicate separators, absolute paths, percent encoding and traversal. `blob` is `u32(byteLength) || raw bytes`. Target is `text` constrained to exactly `node` or `web`. Other enums are `u8`: format `1=esm, 2=cjs-lowered, 3=synthetic`; policy action `1=allow, 2=deny`. Arrays encode `u32(count)` followed by records. Every count/length is bounded before allocation. Fixed-width values are never wrapped in `text`/`blob`.
 
-Merkle leaves are `SHA-256(bytes("V3GRAPH:LEAF:v1") || u32be(index) || bytes(encodedRecord))`; internal nodes are `SHA-256(bytes("V3GRAPH:NODE:v1") || left32 || right32)`. An odd final node is paired with itself. Empty trees are invalid. The release statement is `bytes("V3RELEASE:v1") || graphRoot32 || bundleRoot32 || policyRoot32 || verifierSha256Raw32 || bytes(target) || bytes(boundaryPolicyBaselineCommit) || bytes(sourceCommit)`. A separate canonical-vector artifact must cover zero/non-ASCII rejection, ordering, duplicate, odd-leaf, single-leaf, and multi-level trees, with expected bytes and roots produced by two independent implementations.
+### Normative graph schema
 
-The graph root, policy root, and bundle root are domain-separated SHA-256 Merkle roots. Release CI signs only the release statement. Runtime verifies the signature and every referenced digest before evaluation.
+| Record | Exact fields, in byte order |
+| --- | --- |
+| graph header | `text("V3GRAPH:HEADER:v1")`, `text(schemaVersion)`, `text(target)`, `git20(boundaryBaseline)`, `git20(sourceCommit)`, `sha256(policyRoot)`, `sha256(compilerBinary)`, `sha256(transformSet)`, `u32(nodeCount)`, `u32(edgeCount)` |
+| dependency | `text(specifier)`, `text(targetModuleId)`, `sha256(targetSource)`, `u8(importKind)` where `1=static-esm, 2=lowered-cjs` |
+| node | `text("V3GRAPH:NODE:v1")`, `text(moduleId)`, `sha256(source)`, `u8(format)`, `sha256(transform)`, `sha256(outputRecord)`, `u32(dependencyCount)`, dependencies, `u32(exportNameCount)`, sorted `text(exportName)` values |
+| edge | `text("V3GRAPH:EDGE:v1")`, `text(referrerId)`, `text(specifier)`, `text(targetId)`, `sha256(referrerSource)`, `sha256(targetSource)`, `u8(importKind)` |
+| graph artifact | `text("V3GRAPH:ARTIFACT:v1")`, `blob(header)`, nodes sorted by raw module-ID bytes as `blob(node)`, edges sorted by `(referrer,specifier,target)` raw bytes as `blob(edge)` |
+
+A dependency appears exactly once in its node table and exactly once as an equal top-level edge. Duplicate node IDs, dependency specifiers per node, export names, or edge triples are invalid. Counts in the header must equal encoded records. Graph Merkle input records are `[header, ...sorted nodes, ...sorted edges]`.
+
+### Normative policy schema
+
+| Record | Exact fields, in byte order |
+| --- | --- |
+| policy header | `text("V3POLICY:HEADER:v1")`, `text(schemaVersion)`, `git20(boundaryBaseline)`, `sha256(foundationFilesArtifact)`, `sha256(auditContractRoot)`, `u32(ruleCount)` |
+| policy rule | `text("V3POLICY:RULE:v1")`, `u8(action)`, `text(referrerId)`, `text(targetId)`, `sha256(referrerSource)`, `sha256(targetSource)` |
+| policy artifact | `text("V3POLICY:ARTIFACT:v1")`, `blob(header)`, rules sorted by `(action,referrer,target,referrerSource,targetSource)` raw bytes as `blob(rule)` |
+
+No wildcard or omitted digest exists. Duplicate rules and allow/deny conflicts are invalid. Policy Merkle input records are `[header, ...sorted rules]`. The exact-three artifact has three `allow` records; the inbound policy has a default-deny semantic fixed by schema and those same three exceptions.
+
+### Normative bundle schema
+
+| Record | Exact fields, in byte order |
+| --- | --- |
+| bundle header | `text("V3BUNDLE:HEADER:v1")`, `text(schemaVersion)`, `text(target)`, `sha256(graphRoot)`, `u32(recordCount)` |
+| bundle record | `text("V3BUNDLE:RECORD:v1")`, `text(moduleId)`, `u8(format)`, `blob(recordBytes)`, `sha256(recordBytes)` |
+| bundle artifact | `text("V3BUNDLE:ARTIFACT:v1")`, `blob(header)`, records sorted by raw module-ID bytes as `blob(record)` |
+
+Duplicate module IDs, a count mismatch, digest mismatch, or graph/bundle node-set mismatch is invalid. Bundle Merkle input records are `[header, ...sorted records]`.
+
+For each domain `D` in `V3GRAPH`, `V3POLICY`, `V3BUNDLE`, or `V3AUDIT`: leaf `i` is `SHA-256(text(D+":LEAF:v1") || u32(i) || blob(record))`; parent is `SHA-256(text(D+":NODE:v1") || left32 || right32)`. Odd levels duplicate the final hash. Empty roots are `SHA-256(text(D+":EMPTY:v1"))` only where the schema permits an empty record array; graph, policy and bundle reject empty trees. Domains are never interchangeable.
+
+### Normative release schema and vector
+
+Release bytes are exactly: `text("V3RELEASE:v1")`, `sha256(graphRoot)`, `sha256(policyRoot)`, `sha256(bundleRoot)`, `sha256(verifier)`, `text(target)`, `git20(boundaryBaseline)`, `git20(sourceCommit)`, `u32(releaseSequence)`. Signature input is these bytes without another wrapper.
+
+A required machine-readable `boundary-policy/canonical-vectors.json` must carry complete field values, canonical artifact bytes and roots for empty/single/odd/multi-level trees and every rejection case. Minimum concrete zero vector (`target=node`, both commits and all fixed hashes zero, one ESM node `a` with no dependencies/exports, one allow rule `a -> b`, bundle record `a` with byte `0x78`, sequence 1) has:
+
+- graph root `690e769a1fea8c2fd5f374869c50136b2523568059fd5bb794d96a17786e9895`
+- policy root `44bc96c81ee4a220fc73dbbc8411bcb9ae382e9422faf86d29e67a041077e207`
+- bundle root `474f4629b3d03fe2eceb34c205c2340e598aedcf7e5a8f70521a4a4035d58645`
+- release SHA-256 `1a58d516fd384b853a61301e4b54a641de54c1227428ddb0dfaf5141ae6f815f`
+
+The named vector artifact must include the full canonical hex, not only these roots, and must be generated identically by independent Rust and non-Rust reference implementations. Any discrepancy blocks certification.
+
+Release CI signs only the normative release bytes. Runtime reconstructs all canonical bytes from parsed bounded values, verifies roots/signature and then verifies every referenced digest before evaluation.
 
 The graph object visible to application code is a deep-frozen data projection without loader hooks. The authoritative runtime graph and resolver tables stay in the trusted bootstrap closure. No application reference points to them.
 
