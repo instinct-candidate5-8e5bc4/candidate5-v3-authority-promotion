@@ -1,0 +1,15 @@
+#!/bin/sh
+# Candidate bytes only. Not authorized for execution or boot.
+ROOT_HASH=db80c3e07b4c75dfa92804761b198a9ef45783805fd78965a8fdaa414e8f0d55
+/bin/busybox insmod /lib/modules/5.15.0-191-generic/kernel/drivers/md/dm-bufio.ko
+/bin/busybox insmod /lib/modules/5.15.0-191-generic/kernel/drivers/md/dm-verity.ko
+# Candidate external data and hash block-device names are fixed by reviewed platform integration.
+/sbin/dmsetup create v3-root-admitter --readonly --table "0 16384 verity 1 /dev/v3-rootfs-data /dev/v3-rootfs-hash 4096 4096 2048 0 sha256 $ROOT_HASH -"
+/bin/busybox mount -t ext4 -o ro /dev/mapper/v3-root-admitter /verity-root
+/bin/busybox mkdir -p /verity-root/external-admission /verity-root/reviewed-root /verity-root/reviewed-input /verity-root/reviewed-output /verity-root/reviewed-evidence
+/bin/busybox mount --bind -o ro /external-admission /verity-root/external-admission
+/bin/busybox mount --bind -o ro /reviewed-root /verity-root/reviewed-root
+/bin/busybox mount --bind -o rw /reviewed-input /verity-root/reviewed-input
+/bin/busybox mount --bind -o rw /reviewed-output /verity-root/reviewed-output
+/bin/busybox mount --bind -o rw /reviewed-evidence /verity-root/reviewed-evidence
+exec /bin/measured-supervisor "$ROOT_HASH" /reviewed-root /reviewed-input /reviewed-output /reviewed-evidence/final

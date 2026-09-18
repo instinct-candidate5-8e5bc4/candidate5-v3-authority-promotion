@@ -1,0 +1,7 @@
+schema=v3.root-admitter-boot-policy.v1
+secureBoot=REQUIRED
+uki=EXACT_SIGNED_SINGLE_DB_KEY
+verityRootSource=EXACT_SIGNED_UKI_CMDLINE
+verityDeviceName=v3-root-admitter
+verityMode=READ_ONLY
+failurePolicy=HALT

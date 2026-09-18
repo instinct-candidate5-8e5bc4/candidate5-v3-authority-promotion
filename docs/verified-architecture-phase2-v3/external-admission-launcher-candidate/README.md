@@ -14,7 +14,7 @@ The candidate requires `/reviewed-root` as the exact repository mount; mount tar
 
 The script is opened once as descriptor 9. Length, mode, owner, SHA-256, Git blob framing and device/inode identity are checked through that descriptor. The pathname device/inode must match at admission, but final handoff is `/proc/self/fd/9`, never the script pathname. A rename or path replacement after open cannot change the object read or handed to Bash. The read-only exact root mount prevents mutation through the authoritative namespace. Guarantees are limited to these enforced conditions and the approved reduced threat model; hostile kernel/hypervisor behavior is out of scope.
 
-The domain-separated signed binding record joins candidate artifact bytes/identity, complete 24-file runtime closure, approved cross/signature, repository, commit, tree and script identity. The artifact reconstructs and exact-compares that record. A valid signature over a stale or wrong admission identity fails `E_ADMISSION_BINDING`.
+The domain-separated signed binding record joins candidate artifact bytes/identity, complete 30-file runtime closure, approved cross/signature, repository, commit, tree and script identity. The artifact reconstructs and exact-compares that record. A valid signature over a stale or wrong admission identity fails `E_ADMISSION_BINDING`.
 
 ## Evidence and cleanup
 
