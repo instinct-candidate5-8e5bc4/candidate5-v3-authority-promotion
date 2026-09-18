@@ -1,10 +1,16 @@
 # CANDIDATE REVIEW INPUT ONLY. NO SHEBANG. DO NOT EXECUTE WITHOUT LATER OWNER APPROVAL AND GO.
 set -euf
 fail() { /usr/bin/printf '%s\n' "$1" >&2; exit 97; }
-[ "$PATH" = /usr/bin ] && [ "$LANG" = C ] && [ "$LC_ALL" = C ] && [ "$TZ" = UTC ] || fail E_ENVIRONMENT
-while IFS='=' read -r name value; do
- case "$name=$value" in PATH=/usr/bin|LANG=C|LC_ALL=C|TZ=UTC|SHLVL=1|_=/usr/bin/env) ;; *) fail E_ENVIRONMENT;; esac
-done < <(/usr/bin/env)
+[ "$PATH" = /usr/bin ] && [ "$LANG" = C ] && [ "$LC_ALL" = C ] && [ "$TZ" = UTC ] && [ "$SHLVL" = 1 ] && [ "$PWD" = / ] || fail E_ENVIRONMENT
+for high_risk in LD_PRELOAD LD_AUDIT BASH_ENV ENV GIT_CONFIG GIT_CONFIG_COUNT GIT_CONFIG_SYSTEM GIT_CONFIG_GLOBAL GIT_CONFIG_NOSYSTEM; do [[ ! -v "$high_risk" ]] || fail E_ENVIRONMENT; done
+exported_names=$(compgen -e) || fail E_ENVIRONMENT_ENUM
+exported_count=0
+while IFS= read -r name; do
+ [ -n "$name" ] || fail E_ENVIRONMENT_ENUM
+ case "$name" in PATH|LANG|LC_ALL|TZ|SHLVL|PWD) ;; *) fail E_ENVIRONMENT;; esac
+ exported_count=$((exported_count+1))
+done <<<"$exported_names"
+[ "$exported_count" -eq 6 ] || fail E_ENVIRONMENT_COUNT
 [ "$#" -eq 4 ] || fail E_ADMISSION_ARGUMENTS
 REPO=$1; INPUT=$2; OUTPUT=$3; EVIDENCE=$4
 case "$EVIDENCE" in /*/*) ;; *) fail E_EVIDENCE_PATH;; esac
@@ -32,7 +38,7 @@ for f in "$SELF" "$ADMISSION" "$ADMISSION_SIG" "$ADMISSION_PUB" "$CLOSURE" "$CRO
 sum=$(/usr/bin/sha256sum "$ADMISSION_PUB") || fail E_ADMISSION_KEY
 [ "${sum%% *}" = 47b7a738cb78956fd2be8074d2f89b69dc172abe57cfe792ba03d911f62aa3b1 ] || fail E_ADMISSION_KEY
 sum=$(/usr/bin/sha256sum "$CLOSURE") || fail E_ADMISSION_CLOSURE
-[ "${sum%% *}" = eb5e6655c556882613fc8a7cf33a619edee7f62232ab31682c3422a5d33e0721 ] || fail E_ADMISSION_CLOSURE
+[ "${sum%% *}" = 709f8ddc63321aee68b17e14e21cf8cf71b4e85181a5aaeb07161e30329a73d8 ] || fail E_ADMISSION_CLOSURE
 count=0; previous=; while IFS= read -r -d '' path && IFS= read -r -d '' role && IFS= read -r -d '' length && IFS= read -r digest; do
  case "$path" in /usr/bin/*|/usr/lib/*|/lib/*) ;; *) fail E_CLOSURE_PATH;; esac
  [ -z "$previous" ] || [[ "$previous" < "$path" ]] || fail E_CLOSURE_ORDER; previous=$path
@@ -43,7 +49,7 @@ count=0; previous=; while IFS= read -r -d '' path && IFS= read -r -d '' role && 
  [ "${actual_sum%% *}" = "$digest" ] || fail E_CLOSURE_DIGEST
  count=$((count+1))
 done <"$CLOSURE"
-[ "$count" -eq 31 ] || fail E_CLOSURE_COUNT
+[ "$count" -eq 30 ] || fail E_CLOSURE_COUNT
 tool_target=$(/usr/bin/findmnt -n -o TARGET --target /usr/bin) || fail E_TOOL_MOUNT_QUERY
 tool_vfs=$(/usr/bin/findmnt -n -o VFS-OPTIONS --target /usr/bin) || fail E_TOOL_MOUNT_QUERY
 case ",$tool_vfs," in *,ro,*) ;; *) fail E_TOOL_MOUNT_READONLY;; esac
@@ -93,7 +99,7 @@ blob=$({ /usr/bin/printf 'blob 8738\0'; /usr/bin/cat "$fd"; } | /usr/bin/sha1sum
 self_sum=$(/usr/bin/sha256sum "$SELF") || fail E_ADMISSION_SELF
 self_bytes=$(/usr/bin/stat -c %s "$SELF") || fail E_ADMISSION_SELF
 self_blob=$({ /usr/bin/printf 'blob %s\0' "$self_bytes"; /usr/bin/cat "$SELF"; } | /usr/bin/sha1sum) || fail E_ADMISSION_SELF
-/usr/bin/printf '{"admissionArtifact":{"blob":"%s","byteLength":%s,"mode":"100644","sha256":"%s"},"approvedCrossBindingSha256":"5de911f8823cbcec9d8e9be54c85b4388a829c085ab540a5b892e3f4b4ca8f4a","approvedCrossBindingSignatureSha256":"6d8349592d6522e39e646167be88b6a7a39c95d932ae55f1b354a121ffcec080","authority":"CANDIDATE_FOR_OWNER_APPROVAL","closure":{"blob":"ecbbf1a5c53bc0314005a023b449c20af78d0989","byteLength":3523,"pathCount":31,"sha256":"eb5e6655c556882613fc8a7cf33a619edee7f62232ab31682c3422a5d33e0721"},"commit":"b768d48e58b6ddcf66ed482ee06e7d62b3162edb","domain":"V3BOOTSTRAP-EXTERNAL-ADMISSION:v1","executionRole":"REPLACES_EXISTING_LAUNCHER_ADMISSION_AND_EXECUTION_ROLE","repository":"https://github.com/instinct-candidate5-8e5bc4/candidate5-v3-authority-promotion","schema":"v3.external-admission-binding.v1","script":{"blob":"2622618addebf7385bda722295965540cf51c849","byteLength":8738,"canonicalPath":"docs/verified-architecture-phase2-v3/future-rust-provisioning-script.review-bytes","mode":"100644","sha256":"7d6b7c6399919ebfc4c9f3eea4455b5033ec6ed0a57ffed570ecfe525fde9b33"},"tree":"dd2228b69a45b9b963189ade090032946a60fdcb"}\n' "${self_blob%% *}" "$self_bytes" "${self_sum%% *}" | /usr/bin/cmp -s "$ADMISSION" - || fail E_ADMISSION_BINDING
+/usr/bin/printf '{"admissionArtifact":{"blob":"%s","byteLength":%s,"mode":"100644","sha256":"%s"},"approvedCrossBindingSha256":"5de911f8823cbcec9d8e9be54c85b4388a829c085ab540a5b892e3f4b4ca8f4a","approvedCrossBindingSignatureSha256":"6d8349592d6522e39e646167be88b6a7a39c95d932ae55f1b354a121ffcec080","authority":"CANDIDATE_FOR_OWNER_APPROVAL","closure":{"blob":"1931ddd698576c312a20174449a23f15a2b675e2","byteLength":3428,"pathCount":30,"sha256":"709f8ddc63321aee68b17e14e21cf8cf71b4e85181a5aaeb07161e30329a73d8"},"commit":"b768d48e58b6ddcf66ed482ee06e7d62b3162edb","domain":"V3BOOTSTRAP-EXTERNAL-ADMISSION:v1","executionRole":"REPLACES_EXISTING_LAUNCHER_ADMISSION_AND_EXECUTION_ROLE","repository":"https://github.com/instinct-candidate5-8e5bc4/candidate5-v3-authority-promotion","schema":"v3.external-admission-binding.v1","script":{"blob":"2622618addebf7385bda722295965540cf51c849","byteLength":8738,"canonicalPath":"docs/verified-architecture-phase2-v3/future-rust-provisioning-script.review-bytes","mode":"100644","sha256":"7d6b7c6399919ebfc4c9f3eea4455b5033ec6ed0a57ffed570ecfe525fde9b33"},"tree":"dd2228b69a45b9b963189ade090032946a60fdcb"}\n' "${self_blob%% *}" "$self_bytes" "${self_sum%% *}" | /usr/bin/cmp -s "$ADMISSION" - || fail E_ADMISSION_BINDING
 path_object=$(/usr/bin/stat -Lc %d:%i "$SCRIPT") || fail E_PATH_OBJECT
 fd_object=$(/usr/bin/stat -Lc %d:%i "$fd") || fail E_DESCRIPTOR_OBJECT
 [ "$path_object" = "$fd_object" ] || fail E_PATH_DESCRIPTOR_MISMATCH

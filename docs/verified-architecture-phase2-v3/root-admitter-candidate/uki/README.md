@@ -1,3 +1,3 @@
-# Exact UKI closed-environment candidate
+# Exact UKI synchronous environment candidate
 
-Initramfs `cbb4a5b5329ce9390eb2def6e3cc0d2368f2055b8d8475f72194853d4e416e5c`, signed UKI `9ec13012930db1f34a70959d062cf655132f475a05ca9244f432c14ad5095c9c`, verity root `71f373bfd2144b68e7f26d7f278f01d18e24df320e56460c110b942adbeb9b90`, db certificate DER `9e210583657ab6c1cb85ec82652bf0aea93e98cecc5c32a3706872eccb28f7ec`. Candidate only; never executed, mounted, activated or booted.
+Initramfs `0e2c0d9c375277c3d1b13caab5b3ff15dd5a2c3c680e26404ddb80f112df2836`, signed UKI `7e9b1c5a1475f659c44867b2da198dfdc35c3f1b76fd2f4dab269c3a8431b091`, root `b041c0e4a712890a37b0e0f0cb77eac6265bd5f98fcbecfbd93030460e81cc63`, db cert DER `60a3db4c0664caf8052f5fec06942a15ed041b2fb47a0c41b7fec13541bc1764`. Candidate only.

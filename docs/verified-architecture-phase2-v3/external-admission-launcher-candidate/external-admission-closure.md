@@ -1,15 +1,14 @@
 # External admission runtime closure
 
-31 exact path records: 16 executables and 15 dynamic libraries. Canonical bytes are NUL-framed in `external-admission-closure.v1.bin`.
+30 exact path records: 15 executables and 15 dynamic libraries.
 
-- byte length: 3523
-- SHA-256: eb5e6655c556882613fc8a7cf33a619edee7f62232ab31682c3422a5d33e0721
+- byte length: 3428
+- SHA-256: 709f8ddc63321aee68b17e14e21cf8cf71b4e85181a5aaeb07161e30329a73d8
 
 - `/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2` | dynamic-library | 240936 | `9739c1dc9bff2b11533a38d4218a1a926638a4d8262ef1c9d75c17290ac257e9`
 - `/usr/bin/bash` | executable | 1396520 | `59474588a312b6b6e73e5a42a59bf71e62b55416b6c9d5e4a6e1c630c2a9ecd4`
 - `/usr/bin/cat` | executable | 35288 | `210ffa7daedb3ef6e9230d391e9a10043699ba81080ebf40c6de70ed77e278ba`
 - `/usr/bin/cmp` | executable | 43408 | `b355472d3c90ea94d11ebb8b750e6946ccd348edc6fca4aefc1235c3994ef791`
-- `/usr/bin/env` | executable | 43976 | `854a8d7f147ff1bf3562edd1aa0b2f2ac28ef432811533f03c43dc9162fe3af3`
 - `/usr/bin/findmnt` | executable | 65136 | `2668fe017172fa496ca506b99879d1c3bc3c7e3f54f71ec0c6e24b1562610d60`
 - `/usr/bin/git` | executable | 3710360 | `5a39a7909c023f92a84b77b49e6b008f3f152b833135b96d73ac7c403314a88a`
 - `/usr/bin/mkdir` | executable | 68104 | `bd2f081ac37d653181332bd27f35a6041dbf215a7957f65838a9cbec9e64928b`
