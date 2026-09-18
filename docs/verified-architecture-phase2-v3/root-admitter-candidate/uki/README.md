@@ -1,3 +1,3 @@
-# Exact UKI dm-table validation candidate
+# Exact UKI target-offset candidate
 
-Initramfs `4a71b79f2e778b137af22d04a53b2139eae04e73f43e94126246dd964d23779c`, signed UKI `1c71597a97ba339634f756b236244108e1b016123d0bd6bb8b4eb5777935ba4d`, root `6ef70b71bda61f7a988f82072f0ee6e4611f02f557196df4499d27568406cffa`, db cert DER `82513a65c7cfb3155c0c79db16279ff054c1cdd3f1f36f03160b2ed86eb42d88`. Candidate only.
+Signed UKI `b4df97b31b346d30de8b5d2566cf101043ec928e808296b10a2b1bac3f2ec500`, root `f8a939607ab5a8a946692c47ef0267fb448c8228aa3c5e6d93563d65d22da95e`, db cert DER `1720f7db7710366842675d6cfca78149f55a8f0b959cdf6d985a33b7ad7e68a0`. Candidate only.
