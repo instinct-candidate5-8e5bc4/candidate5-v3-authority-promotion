@@ -1,3 +1,3 @@
-# Exact UKI monotonic-success candidate
+# Exact UKI latched-successor-wait candidate
 
-Signed UKI `5b833c46e7a978029722cf85fdb983cce3d7a93c4aa9b61b3407e5cbaebe79aa`, root `8336e9edf12ac8d86d98080e01447c617136374cc5ca4a1c5ab8aedfe8dda857`, db cert DER `79127e5632e81a2b2ad2a45cf1912b00ce3cddbc3c518d461f956c81730df233`. Candidate only.
+Signed UKI `9f2e0e2ae8f519bce80659218d3be4342747fa24b027dd7b87e6958e3f571578`, root `d9389413ac650d94d50d1068b702f2ee737a92b870f21d2ba6b5b26ca39a8592`, db cert DER `5a16b8aedb862361e41ea1a500c3ffc1ae979acfc30325defa5cf928225c3357`. Candidate only.

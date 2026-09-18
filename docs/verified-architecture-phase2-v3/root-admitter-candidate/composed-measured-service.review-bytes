@@ -84,9 +84,13 @@ fail E_CANDIDATE_AUTHORITY
  oldifs=$IFS;IFS=,;for record in $map;do IFS=:;set -- $record;IFS=$oldifs;name=$1;fd=$2;length=$3;digest=$4;src=/proc/self/fd/$fd;dst=$stage/$name;[ -f "$src" ]||fail E_STAGE_DESCRIPTOR;/usr/bin/cat "$src" >"$dst"||fail E_STAGE_COPY;/usr/bin/chmod 400 "$dst"||fail E_STAGE_MODE;[ "$(/usr/bin/stat -c %s "$dst")" = "$length" ]||fail E_STAGE_LENGTH;actual=$(/usr/bin/sha256sum -- "$dst")||fail E_STAGE_HASH_TOOL;actual=${actual%% *};[ "$actual" = "$digest" ]||fail E_STAGE_DIGEST;done;IFS=$oldifs
  /usr/bin/mount -o remount,ro,bind "$stage" || fail E_STAGE_FREEZE
  vfs=$(/usr/bin/findmnt -n -o VFS-OPTIONS --target "$stage")||fail E_STAGE_QUERY;case ",$vfs," in *,ro,*) :;;*) fail E_STAGE_READONLY;;esac
- /usr/bin/bash --noprofile --norc "$launcher" "$root" "$stage" "$output" "$evidence" || fail E_SUCCESSOR
- # Monotonic commit publication: signals latch across publication and final cleanup; committed success is never downgraded by an ordinary signal.
- cleanup_signal_code=0;latch_traps;success=1;cleanup;exit 0
+ # Latch before child creation and keep latching through spawn, wait/reap, exact status classification, success publication and cleanup. Signals are not forwarded: the trusted child reaches one unambiguous terminal status.
+ cleanup_signal_code=0;latch_traps
+ /usr/bin/bash --noprofile --norc "$launcher" "$root" "$stage" "$output" "$evidence" & child=$!
+ child_status=;while :;do wait_rc=0;wait "$child"||wait_rc=$?;running=0;while IFS= read -r jobpid;do [ "$jobpid" = "$child" ]&&running=1;done < <(jobs -pr);if [ "$running" -eq 1 ];then continue;fi;child_status=$wait_rc;break;done
+ [ -n "$child_status" ]||fail E_SUCCESSOR_WAIT;[ "$child_status" -eq 0 ]||fail E_SUCCESSOR
+ # Monotonic commit publication while still latched. Committed success is never downgraded by an ordinary signal.
+ success=1;cleanup;exit 0
  # Success cleanup owns only the private input stage. Durable OUTPUT/EVIDENCE are preserved; replay is intentionally rejected as already complete.
  exit 0
 ' composed-private-stage "$SERVICE_STAGE" "$LAUNCHER_FD" "$ROOT" "$OUTPUT" "$EVIDENCE" "$fdmap"

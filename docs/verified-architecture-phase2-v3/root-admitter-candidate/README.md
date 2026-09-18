@@ -1,3 +1,3 @@
-# Monotonic-success candidate
+# Latched successor-wait candidate
 
-Signals latch from trusted child zero through success publication and final private-stage cleanup. Ordinary later signals never downgrade committed success; cleanup faults remain distinct committed-with-cleanup-fault outcomes. Image `2326405871ee5e13d36d5098edf184271edda680ede85dd5f4097a5d95320ac5`, root `8336e9edf12ac8d86d98080e01447c617136374cc5ca4a1c5ab8aedfe8dda857`, UKI `5b833c46e7a978029722cf85fdb983cce3d7a93c4aa9b61b3407e5cbaebe79aa`. Candidate only.
+Signals latch before child spawn through explicit PID wait/reap, exact child status classification, success publication and cleanup. Signals are not forwarded; the trusted child runs to one exact terminal status. Image `007f8b1a9bd89cc7c6840b2535ea76cc1f170734c92e3f22d2939e45d9bc5177`, root `d9389413ac650d94d50d1068b702f2ee737a92b870f21d2ba6b5b26ca39a8592`, UKI `9f2e0e2ae8f519bce80659218d3be4342747fa24b027dd7b87e6958e3f571578`. Candidate only.
