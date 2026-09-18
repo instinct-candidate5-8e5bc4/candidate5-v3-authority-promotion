@@ -48,39 +48,44 @@ All existing fail-closed Foundation meanings remain normative. Packaging failure
 
 The certified Foundation baseline's current immutable policy forbids every production import into the six Foundation modules. On that baseline, adding the proposed three edges correctly makes `tests/clean-runtime/v3-promotion-authority-audit.js` report `FORBIDDEN_INBOUND_FOUNDATION_IMPORT` three times and makes static-boundaries test 4 fail. SES, a bundle, or a compiler cannot override this repository-level rule. Therefore the three edges MUST NOT be implemented on `127f284` and this preflight is not implementation-ready.
 
-Before implementation, a separate owner-approved boundary-policy reopen must be independently delivered and certified. The prerequisite commit contains this closed certified set:
+Before implementation, a separate owner-approved boundary-policy reopen must be independently delivered and certified. The prerequisite commit contains this acyclic certified set:
 
-- `boundary-policy/root.json`: the trust anchor inside the commit, with baseline and hashes of every other artifact below.
-- `boundary-policy/exact-three-edges.json`: the three canonical resolved edges and endpoint source digests.
-- `boundary-policy/foundation-files.json`: the six unchanged `127f284` Foundation paths/blob IDs.
-- `boundary-policy/inbound-import-policy.json`: default deny with exactly those three exceptions.
-- `boundary-policy/audit-contract.json`: exact audit/static argv and expected results.
-- `boundary-policy/certification.json`: owner/reviewer certification envelope.
-- `boundary-policy/canonical-vectors.json`: complete canonical encoding vectors.
+- `boundary-policy/root.json`: hashes the six unsigned child artifacts below; never itself or the detached signature.
+- `boundary-policy/exact-three-edges.json`
+- `boundary-policy/foundation-files.json`
+- `boundary-policy/inbound-import-policy.json`
+- `boundary-policy/audit-contract.json`
+- `boundary-policy/certification-payload.json`: unsigned owner/reviewer assertions.
+- `boundary-policy/canonical-vectors.json`
+- `boundary-policy/certification.sig`: detached Ed25519 signature over the root binding, not hashed by `root.json`.
 
-`BOUNDARY_POLICY_BASELINE_COMMIT` is currently `UNASSIGNED`. After assignment it is the 40-lowercase-hex commit containing all seven artifacts. `root.json` does not hash itself. Its canonical fields are schema version, baseline commit, Foundation baseline, and SHA-256 of the other six artifacts in the order listed above. Trust is anchored by three checks together: the configured baseline commit ID, `git show <baseline>:boundary-policy/root.json`, and the certification signature over `SHA-256(root.json canonical bytes)`. A changed root changes the commit and invalidates the configured baseline; a changed child breaks the root hash; there is no recursive manifest.
+`BOUNDARY_POLICY_BASELINE_COMMIT` is currently `UNASSIGNED`. After assignment it is the 40-lowercase-hex commit containing all eight artifacts. `root.json` canonical fields are schema, baseline commit, Foundation baseline, and ordered SHA-256 values of exact-edges, Foundation-files, inbound-policy, audit-contract, certification-payload and vectors. It excludes `root.json` and `certification.sig`. `certification.sig` signs `text("V3CERT:v2") || sha256(rootCanonicalBytes) || git20(baseline)`. It cannot change bytes that feed its signed root, so there is no cycle. Trust requires configured baseline object ID, child hashes, payload checks, and detached signature.
 
-The dependency chain is acyclic and MUST be evaluated in this order: `(foundation-files, exact-three-edges, canonical-vectors) -> inbound policy -> audit contract -> root.json -> certification signature`. The policy header contains only Foundation and exact-edge roots, never an audit root. The audit contract contains the already-computed policy root. The certification contains the already-computed audit and root digests. No earlier artifact contains a later root.
+The dependency chain is acyclic: `(foundation-files, exact-three-edges, canonical-vectors, certification-payload) -> inbound policy -> audit contract -> root.json -> detached certification.sig`. Policy binds only Foundation/exact-edge roots. Audit binds computed policy root. Root binds all six final unsigned children. Detached signature binds root. No earlier artifact contains a later root.
 
-`audit-contract.json` contains schema version, baseline commit, policy root, ordered command records, expected result digests and an audit root. Each command has command ID, exact argv array, working directory, tool path/git blob/SHA-256, expected exit code/schema/rule IDs/counts/result digest. Audit root uses domain `V3AUDIT`. The baseline contains all named tools at those blobs.
+`audit-contract.json` contains schema, baseline, computed policy root, ordered command records, expected results and audit root. Each command has ID, exact argv, working directory, tool path/git blob/SHA-256, expected exit/schema/rule IDs/counts/result digest. Audit root uses `V3AUDIT`.
 
-`certification.json` canonical fields are schema version; baseline/Foundation commits; root, policy, audit and vectors roots; result `PASS`; owner approval record; owner checkpoint; reviewer record; and signature. Owner approval records service, conversation/message IDs, observed timestamp, owner handle and exact UTF-8 body SHA-256. The guard independently retrieves it from the trusted owner channel and verifies scoped approval. Reviewer record binds verified identity/connection, key ID, `PASS`, timestamp and reviewed roots; Ed25519 signs `text("V3CERT:v1") || sha256(rootCanonicalBytes) || sha256(auditRoot) || sha256(vectorsArtifact) || git20(baseline)`.
+`certification-payload.json` contains schema; baseline/Foundation commits; policy/audit/vectors roots; result `PASS`; owner approval record; owner checkpoint; reviewer identity/key/verdict/timestamp/reviewed roots; revocation-log namespace/checkpoint; and control-infrastructure identifiers. Owner approval records trusted service, conversation/message IDs, timestamp, handle and exact body SHA-256. The guard independently retrieves and checks scoped approval. A peer claim or copied text fails.
 
-Owner revocation is fail-closed. Certification records an owner-channel checkpoint consisting of service, conversation ID, monotonically ordered provider message ID/cursor, checkpoint timestamp and signed checkpoint digest. Before each guard run and signing, the trusted channel adapter reads from the approval message through a fresh checkpoint, orders by provider sequence then timestamp/message ID, and evaluates later owner-authored restrictions/revocations under the same normalized scope. A matching later revocation, ambiguous ordering, changed/deleted source, cursor rollback, unavailable adapter, incomplete page, stale checkpoint older than 15 minutes, or inability to prove end-of-stream fails. The guard result records approval and checkpoint digests. Production also consumes an independently hosted, signed revocation log keyed by certification root; a newer revocation-log sequence or unavailable/stale log fails.
+Owner evidence and revocation are fail-closed. The trusted-channel adapter has a public key pinned in the independently installed guard. It signs `text("V3OWNER-CHECKPOINT:v1") || text(accountNamespace) || text(conversationId) || u64(providerSequence) || text(providerCursor) || u64(observedUnixMs) || sha256(orderedMessages)`. Sequence namespace is the stable provider account/conversation pair. The guard uses a trusted clock from two pinned authenticated time sources and requires agreement within 30 seconds. At guard completion, checkpoint age must be at most 5 minutes. It reads from approval through provider-confirmed end-of-stream and rejects later matching owner revocation/restriction, ambiguous order, deletion/change, cursor or sequence rollback, incomplete page, unavailable adapter/time source, stale checkpoint, or signature/key mismatch.
 
-### Executable implementation guard contract
+The independently hosted revocation service has a separate offline-root-authorized signing key pinned in the guard. It signs `text("V3REVOCATION:v1") || text(repositoryId) || sha256(certificationRoot) || u64(sequence) || u64(issuedUnixMs) || u64(expiresUnixMs) || sha256(entries)`. Namespace is `(repositoryId, certificationRoot)`. The minimum accepted sequence is stored in the installed guard's append-only transparency checkpoint and the signed release metadata; use the greater value. Max checkpoint age is 5 minutes and expiry may not exceed issue time by 10 minutes. Missing, stale, expired, rolled-back, equivocating, unknown-key or unavailable state fails.
 
-The control is installed before any implementation branch exists, not merely requested from those workflows:
+### Realizable integration and release guard
 
-- A centrally owned reusable workflow and guard binary are pinned by full commit and SHA-256 in an organization ruleset that repository writers cannot edit.
-- The ruleset runs on every push and pull request to this repository, including new branches, and is required before merge or release. It checks the complete `BASE...HEAD` tree diff itself, not caller path filters.
-- Exact implementation classifier: any changed path other than the two design-only paths in this preflight is implementation scope; any commit adding/modifying workflow YAML, `src/**`, `tests/**`, `tools/**`, `evidence/**`, `boundary-policy/**`, package/lock/build/container files, generated bundles, bootstrap/verifier/compiler files, or a branch/ref containing `structural`, `authority-routing`, or `promotion` is implementation scope. Unknown/new paths default to implementation scope. Renames inspect both paths. Deletions and submodules are implementation scope.
-- The central workflow's identity, guard digest, ruleset ID/version and required check name `structural-boundary-policy-guard` are recorded in `root.json` and certification. Organization audit evidence proves repository admins cannot bypass/dismiss it; bypass actors are empty.
-- A separate release environment accepts artifacts only with a fresh signed guard result bound to repository ID, full `HEAD`, baseline/root, diff digest, ruleset version and check-run ID. Thus a renamed/omitted local workflow cannot release.
+Live repository ownership is a blocking infrastructure fact: `instinct-candidate5-8e5bc4` is a GitHub User account, not an organization, and no suitable organization ruleset/required-workflow infrastructure is currently inspectable. GitHub organization/enterprise required workflows cannot be claimed here. Before implementation integration, the repository MUST move to a named suitable GitHub organization/plan and the following live control evidence must be independently inspected. Until then, design can continue but implementation cannot merge or release.
 
-While baseline is `UNASSIGNED`, the central guard fails every implementation-scope change before downstream jobs. After assignment it fetches the exact commit, proves ancestry, reads `root.json` and all six children by git object ID, verifies the acyclic hash/signature chain, unchanged Foundation blobs, fresh owner/revocation state, reviewer binding, canonical vectors, exact policy, and audit/static argv/results. It emits the signed result above only on complete success. Negative conformance tests create arbitrary new paths/workflows, renames, deletions, caller-filter omissions and narrowed workflows and prove the central check/release environment block them.
+Realizable GitHub controls are PR/integration and release controls, not a false claim that a ruleset executes on every push/new branch:
 
-This design branch does not install the central ruleset or guard. Therefore it remains non-authorizing even while its own CI is green. `UNASSIGNED`, absent controls/artifacts, stale/unavailable approval/revocation evidence, or any chain mismatch is a hard stop.
+- Organization ruleset ID/version targets the default/integration branches, blocks direct pushes and force pushes, requires pull requests, requires the centrally owned `structural-boundary-policy-guard` status check, requires signed commits/review, and has no bypass actors. Feature branches may be pushed, but cannot merge or release without the guard.
+- The central reusable workflow and guard binary live in a separately protected organization repository, pinned by full commit and SHA-256. Every PR to integration is evaluated by an organization-installed required workflow or GitHub App check that repository writers cannot alter.
+- The check fetches the complete base/head trees and computes rename-aware diff itself. Exact classifier: only these two design paths are non-implementation; every other changed/added/deleted/renamed path, submodule, unknown path, and workflow/package/build/policy/source/test/tool/evidence path is implementation. Unknown defaults closed.
+- While baseline is `UNASSIGNED`, every implementation-scope PR check fails. After assignment, the guard verifies commit ancestry, eight artifacts by git object, acyclic hashes/signature, Foundation blobs, vectors, fresh owner/revocation state, reviewer binding, policy and audit/static results.
+- Protected release environment has no repository-writer bypass and accepts only artifacts bound to repository ID, merged integration commit, base/head diff digest, baseline/root, ruleset ID/version, central workflow/guard digest, check-run ID and fresh signed guard result. A feature branch cannot deploy directly.
+
+Prerequisite evidence names organization/plan, migrated repository ID, ruleset URL/ID/version, branch targets, empty bypass list, central workflow repository/full commit, guard digest, GitHub App identity if used, required check run, protected environment ID and a negative conformance run. Tests prove direct push is blocked and PR merge/release fail for omitted/narrowed workflows, arbitrary/new paths, renames/deletions/submodules, `UNASSIGNED`, bad artifacts/evidence and stale revocation state. These controls must exist and be independently inspectable; prose is not readiness.
+
+This design branch remains non-authorizing. Missing migration/live controls, `UNASSIGNED`, absent artifacts, stale/unavailable evidence, or chain mismatch is a hard stop.
 
 ## Exact trust boundaries
 
@@ -174,7 +179,146 @@ A required machine-readable `boundary-policy/canonical-vectors.json` is part of 
 }
 ```
 
-The artifact additionally carries independently generated empty/single/odd/multi-level and rejection vectors. This checked-in full-hex vector is executable by the future guard; the stated roots are not deferred prose.
+The complete Merkle vectors below use raw record hex `61`, `62`, `63`, `64`; empty values exercise the defined empty hash even though graph/policy/bundle artifacts reject empty record sets.
+
+```json
+{
+  "V3GRAPH": {
+    "empty": {
+      "recordsHex": [],
+      "rootHex": "9e50018a4c1e260f08c985cc8c0c956678a383e06c95e9bdc7842679c7356b2a"
+    },
+    "single": {
+      "recordsHex": [
+        "61"
+      ],
+      "rootHex": "38acb3f63d9fbfe94538c9ab344f39a0c2ff8a3d5d46f2741d09c7dfc4326ecc"
+    },
+    "odd": {
+      "recordsHex": [
+        "61",
+        "62",
+        "63"
+      ],
+      "rootHex": "1ae0ad23df23de2b160e8044cc83e52c636e0416a0dada94549d28d4a6fcf8f9"
+    },
+    "multi": {
+      "recordsHex": [
+        "61",
+        "62",
+        "63",
+        "64"
+      ],
+      "rootHex": "66458dd0549f0f8e20b2180940c1b7b8150179cc5ea5847ac47667f165005908"
+    }
+  },
+  "V3POLICY": {
+    "empty": {
+      "recordsHex": [],
+      "rootHex": "9cfae1cb720d41d9e7a86f1b95ba2305338c3c12a1b5ed93d284421dff08732c"
+    },
+    "single": {
+      "recordsHex": [
+        "61"
+      ],
+      "rootHex": "2c378ede32479527b9bbbe9304cefc9ae3ebc34bcbcce8136b4f073b3b8895db"
+    },
+    "odd": {
+      "recordsHex": [
+        "61",
+        "62",
+        "63"
+      ],
+      "rootHex": "add93892d38a955e73223e94a6883ef04aa176744e9c78d626d5b3192e38f5cd"
+    },
+    "multi": {
+      "recordsHex": [
+        "61",
+        "62",
+        "63",
+        "64"
+      ],
+      "rootHex": "c34857a63744e2f49d3f1eccea1ba089dac6dcb2cc30bbac0217c9f96884418f"
+    }
+  },
+  "V3BUNDLE": {
+    "empty": {
+      "recordsHex": [],
+      "rootHex": "88a3cf0f5e6bc4f1ce7cabe59fd120c5fd585e0c9e1ebbb98fe02516f111aa32"
+    },
+    "single": {
+      "recordsHex": [
+        "61"
+      ],
+      "rootHex": "8d3eeec6e7c58a976a58769ea6283e5d065ecad69cdd266cac190d18f515ed36"
+    },
+    "odd": {
+      "recordsHex": [
+        "61",
+        "62",
+        "63"
+      ],
+      "rootHex": "6623f6a03dfaffcb3bf541c0649871da8b9a7d58d3ae691b4a07eebbbce52f29"
+    },
+    "multi": {
+      "recordsHex": [
+        "61",
+        "62",
+        "63",
+        "64"
+      ],
+      "rootHex": "7cf04bb053b06817fd10e1391b691fc69e4eb199a2492fda40e35a88d1d702c9"
+    }
+  },
+  "V3AUDIT": {
+    "empty": {
+      "recordsHex": [],
+      "rootHex": "2bc052a839f690206dfe135610122646040b7a1faa77035697fafd1b74fced77"
+    },
+    "single": {
+      "recordsHex": [
+        "61"
+      ],
+      "rootHex": "2759e29bc786e1286175d8170ddf2514ef3f380821bddb649a97adf0c7b34511"
+    },
+    "odd": {
+      "recordsHex": [
+        "61",
+        "62",
+        "63"
+      ],
+      "rootHex": "32564d21e6af533fdb336976381144fccabbbd9116d187f169d194a574c350b8"
+    },
+    "multi": {
+      "recordsHex": [
+        "61",
+        "62",
+        "63",
+        "64"
+      ],
+      "rootHex": "598fb3ecaaf8667ed1d50afce0c162995681d7de792096ac7f5c28456b3a6a56"
+    }
+  }
+}
+```
+
+Executable rejection vectors are canonical inputs with exact expected codes:
+
+| Input hex / construction | Expected code |
+| --- | --- |
+| `text` length `00000002` followed by overlong UTF-8 `c0af` | `NON_CANONICAL_UTF8` |
+| identifier bytes `2e2e2f61` (`../a`) | `NON_CANONICAL_ID` |
+| two equal node blobs in one graph | `DUPLICATE_NODE_ID` |
+| node dependency `x -> b` without equal edge | `DEPENDENCY_EDGE_MISMATCH` |
+| header nodeCount `00000002` with one node | `COUNT_MISMATCH` |
+| empty graph records | `EMPTY_GRAPH` |
+| policy allow and deny for same tuple | `POLICY_CONFLICT` |
+| bundle record hash all zero for record byte `78` | `RECORD_DIGEST_MISMATCH` |
+| bundle header containing a nonmatching graph root | `GRAPH_BUNDLE_MISMATCH` |
+| release target `web` with graph target `node` | `TARGET_MISMATCH` |
+| certification signature bytes included in root child list | `CERTIFICATION_CYCLE_FORBIDDEN` |
+
+`canonical-vectors.json` must reproduce these exact values and codes; the guard executes all of them. Independent Rust and non-Rust implementations must match full bytes, roots and failures.
 
 Release CI signs only the normative release bytes. Runtime reconstructs all canonical bytes from parsed bounded values, verifies roots/signature and then verifies every referenced digest before evaluation.
 
@@ -369,11 +513,11 @@ The existing JavaScript authority audit remains defense-in-depth. Its success is
 
 ## Gate sequence and stop conditions
 
-1. Obtain owner approval for a separate boundary-policy reopen; independently certify it and replace `UNASSIGNED` with its immutable 40-hex commit plus the seven named boundary artifacts.
+1. Obtain owner approval for a separate boundary-policy reopen; independently certify it and replace `UNASSIGNED` with its immutable 40-hex commit plus the eight named boundary artifacts.
 2. Run that baseline's named audit/static suite and prove exactly the three policy edges are allowed while all others remain denied.
 3. Approve compiler provenance/reproducibility, signing/key controls, external Web root, SES/Endo ABI, exact engine builds, and protocol limits.
 4. Implement only the graph compiler, artifact verifier, isolated worker compartment, fixtures, and evidence generator on a new implementation branch.
 5. Run independent security review and the complete proof matrix.
 6. Only after independent certification may a separate Authority Routing Gate review consider runtime promotion.
 
-HARD STOP and request owner review if the boundary baseline remains `UNASSIGNED` or uncertified, its central ruleset/guard, seven artifacts, or suite are absent, any step requires changing a certified Foundation production module, weakening Foundation fail-closed behavior, adding a fourth Gate-to-Foundation edge, exposing a loader/host object, accepting an undeclared dependency, relaxing a failed target, or replacing behavioral proof with a source blacklist.
+HARD STOP and request owner review if the boundary baseline remains `UNASSIGNED` or uncertified, its organization migration/live controls, eight artifacts, or suite are absent, any step requires changing a certified Foundation production module, weakening Foundation fail-closed behavior, adding a fourth Gate-to-Foundation edge, exposing a loader/host object, accepting an undeclared dependency, relaxing a failed target, or replacing behavioral proof with a source blacklist.
