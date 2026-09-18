@@ -15,7 +15,15 @@ CROSS=$ROOT/docs/verified-architecture-phase2-v3/bootstrap-concrete-candidates/c
 CROSS_SIG=$ROOT/docs/verified-architecture-phase2-v3/bootstrap-concrete-candidates/cross-binding.v1.sig
 SCRIPT=$ROOT/docs/verified-architecture-phase2-v3/future-rust-provisioning-script.review-bytes
 [ "$REPO" = "$ROOT" ] || fail E_REPOSITORY_PATH
-[ "$0" = "$SELF" ] || fail E_ADMISSION_PATH
+case "$0" in /proc/self/fd/[0-9]*) ;; *) fail E_ADMISSION_DESCRIPTOR_PATH;; esac
+ADMISSION_FD=$0
+[ -f "$ADMISSION_FD" ] && [ ! -L "$SELF" ] || fail E_ADMISSION_DESCRIPTOR
+admission_fd_object=$(/usr/bin/stat -Lc %d:%i "$ADMISSION_FD") || fail E_ADMISSION_DESCRIPTOR
+admission_path_object=$(/usr/bin/stat -Lc %d:%i "$SELF") || fail E_ADMISSION_PATH_OBJECT
+[ "$admission_fd_object" = "$admission_path_object" ] || fail E_ADMISSION_DESCRIPTOR_OBJECT
+admission_fd_sum=$(/usr/bin/sha256sum "$ADMISSION_FD") || fail E_ADMISSION_DESCRIPTOR_DIGEST
+admission_path_sum=$(/usr/bin/sha256sum "$SELF") || fail E_ADMISSION_PATH_DIGEST
+[ "${admission_fd_sum%% *}" = "${admission_path_sum%% *}" ] || fail E_ADMISSION_DESCRIPTOR_DIGEST
 for f in "$SELF" "$ADMISSION" "$ADMISSION_SIG" "$ADMISSION_PUB" "$CLOSURE" "$CROSS" "$CROSS_SIG"; do [ -f "$f" ] && [ ! -L "$f" ] || fail E_ADMISSION_ARTIFACT; done
 sum=$(/usr/bin/sha256sum "$ADMISSION_PUB") || fail E_ADMISSION_KEY
 [ "${sum%% *}" = 47b7a738cb78956fd2be8074d2f89b69dc172abe57cfe792ba03d911f62aa3b1 ] || fail E_ADMISSION_KEY
