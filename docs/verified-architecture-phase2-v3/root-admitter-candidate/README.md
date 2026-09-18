@@ -1,3 +1,3 @@
-# Acquisition-race-closed candidate
+# Tri-state cleanup-probe candidate
 
-Signals are latched across mkdir/mount and state publication. Every exit probes actual mount/path state independent of flags, and removal requires this run's recorded directory object identity. Image `6b673206a37ec09909f70a9d698db551bc6a7a09e511ed60d7759f655e1fd856`, root `56f10154aa4d893f2193484e62ece55991577637f4d09f2741e9f81322b12c87`, UKI `6d9a0c3070dbde32c3574a3ed9413c5d79dc5e61367599e449cd7ca63467a264`. Candidate only.
+Cleanup distinguishes exact-stage mounted, positively absent via a successful enclosing-target query, and query failure/malformed output. Only positive absence clears mounted state; failure retries or terminates explicitly without a freshness claim. Image `abd9bf87bdb6c6ad253a9164a30ca2dbc2f3f5132c07d21c37406a821026eb19`, root `f462d45fdbcaa13eb6e48d039797c211939aad08430ca4e378323a8132742bee`, UKI `7444eaaa4a187ad5dbd1be19a18278b44bfd4a86db3c2939c59357fa540ce0b1`. Candidate only.

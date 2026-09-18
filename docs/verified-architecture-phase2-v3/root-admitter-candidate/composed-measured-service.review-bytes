@@ -53,12 +53,14 @@ fail E_CANDIDATE_AUTHORITY
  latch_traps(){ trap 'cleanup_signal 129' HUP;trap 'cleanup_signal 130' INT;trap 'cleanup_signal 143' TERM; }
  exit_traps(){ trap 'exit_signal 129' HUP;trap 'exit_signal 130' INT;trap 'exit_signal 143' TERM; }
  cleanup(){ code=$?; [ "$cleaning" -eq 0 ]||return;cleaning=1;cleanup_signal_code=0;latch_traps
-  # Probe actual namespace state on every exit, independent of publication flags.
-  target=$(/usr/bin/findmnt -n -o TARGET --target "$stage" 2>/dev/null)||target=
-  if [ "$target" = "$stage" ];then
-   [ "$created" -eq 1 ]||{ /usr/bin/printf '%s\n' E_STAGE_CLEANUP_UNOWNED_MOUNT >&2;trap - EXIT;exit 123; }
-   gone=0;attempt=0;while [ "$attempt" -lt 3 ];do attempt=$((attempt+1));/usr/bin/umount -- "$stage"||:;target=$(/usr/bin/findmnt -n -o TARGET --target "$stage" 2>/dev/null)||target=;if [ "$target" != "$stage" ];then gone=1;mounted=0;break;fi;done
-   if [ "$gone" -ne 1 ];then /usr/bin/printf '%s\n' E_STAGE_CLEANUP_MOUNT_RESIDUE >&2;trap - EXIT;exit 124;fi
+  # Tri-state probe: 0 exact stage mounted, 1 positively absent via successful enclosing target, 2 query failure/malformed output.
+  probe_mount(){ probe_target=$(/usr/bin/findmnt -rn -o TARGET --target "$stage" 2>/dev/null)||return 2;case "$probe_target" in /*) :;;*) return 2;;esac;case "$probe_target" in *$'\n'*|*$'\r'*|*[[:space:]]*) return 2;;esac;[ "$probe_target" = "$stage" ]&&return 0;return 1; }
+  probe_rc=0;probe_mount||probe_rc=$?
+  if [ "$probe_rc" -ne 1 ];then
+   [ "$created" -eq 1 ]||{ if [ "$probe_rc" -eq 2 ];then fault=E_STAGE_CLEANUP_QUERY_UNPROVEN;else fault=E_STAGE_CLEANUP_UNOWNED_MOUNT;fi;/usr/bin/printf '%s\n' "$fault" >&2;trap - EXIT;exit 123; }
+   gone=0;query_failed=0;attempt=0
+   while [ "$attempt" -lt 3 ];do attempt=$((attempt+1));/usr/bin/umount -- "$stage"||:;probe_rc=0;probe_mount||probe_rc=$?;if [ "$probe_rc" -eq 1 ];then gone=1;mounted=0;break;fi;[ "$probe_rc" -ne 2 ]||query_failed=1;done
+   if [ "$gone" -ne 1 ];then if [ "$query_failed" -eq 1 ];then fault=E_STAGE_CLEANUP_QUERY_UNPROVEN;else fault=E_STAGE_CLEANUP_MOUNT_RESIDUE;fi;/usr/bin/printf '%s\n' "$fault" >&2;trap - EXIT;exit 124;fi
   else mounted=0;fi
   if [ -e "$stage" ];then
    [ "$created" -eq 1 ]||{ /usr/bin/printf '%s\n' E_STAGE_CLEANUP_UNOWNED_PATH >&2;trap - EXIT;exit 122; }
