@@ -1,3 +1,3 @@
-# Exact UKI descriptor-closed candidate
+# Exact UKI cleanup-closed candidate
 
-Signed UKI `60ceaafb533ef2170559e7a4117eff768d2d616438c389b6a0f4c4c01cadfdc8`, root `d91fa3218b71bc28a30f012f0be291fbeeb292218470023111aa7f80fced4000`, db cert DER `1bc21cdf3b66838350c363db183d14a6e8cf74d89520cc86cdc3b77d3cfd8b99`. Candidate only.
+Signed UKI `80557a7c0083174228840d01f7a0806c94ce3b5b26dcead5dce6773096ebbb3c`, root `1ab5a8625089a4206d59afe35249835edd4d2cc65cb0e55af173ee9d29187819`, db cert DER `5dc03dd73ff808790af024ff97155263eb81e42e0cffe5b3f311560aa8b5e3bc`. Candidate only.

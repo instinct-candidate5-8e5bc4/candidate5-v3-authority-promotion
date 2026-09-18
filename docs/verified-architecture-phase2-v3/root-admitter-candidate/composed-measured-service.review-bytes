@@ -27,17 +27,17 @@ sha(){ actual=$(/usr/bin/sha256sum -- "$1") || fail E_HASH_TOOL; digest=${actual
 [ "$(sha "$CLOSURE")" = 5e0b440d868e0c9ad21743cd8a4903f43047cbf13993380d39bfd45349dd028d ] || fail E_CLOSURE
 [ "$(sha "$APPROVED_SERVICE")" = e470199b00cc047e7b020909c8d6f200113bf3e770debe2b69f1de8226079aa1 ] || fail E_APPROVED_SERVICE
 [ "$(sha /usr/bin/mount)" = bad230d68e012eb1a2fcaa3b42688d912940f5c61f041ae9451eee7dfb858ff1 ] || fail E_STAGE_MOUNT_TOOL
+[ "$(sha /usr/bin/umount)" = 80e84907e5cb4248255c3985e2f7ed55d14fbd45d344a599fdb5cac314b9473c ] || fail E_STAGE_UMOUNT_TOOL
 seal(){ domain=$1 record=$2 sig=$3; /usr/bin/openssl pkeyutl -verify -pubin -inkey "$PUB" -rawin -in <({ /usr/bin/printf 'V3BOOTSTRAP-SEAL:v1\0%s\0' "$domain"; /usr/bin/cat "$record"; }) -sigfile "$sig" >/dev/null 2>&1 || fail E_SIGNATURE; }
 seal pin-record "$PIN" "$PIN_SIG"; seal cross-binding "$CROSS" "$CROSS_SIG"; seal offline-input-manifest "$MANIFEST" "$MANIFEST_SIG"
 count=0;previous=;while IFS= read -r -d '' path&&IFS= read -r -d '' role&&IFS= read -r -d '' length&&IFS= read -r digest;do [ -z "$previous" ]||[[ "$previous" < "$path" ]]||fail E_CLOSURE_ORDER;previous=$path;[ -f "$path" ]&&[ ! -L "$path" ]||fail E_CLOSURE_TYPE;[ "$(/usr/bin/stat -c %s "$path")" = "$length" ]||fail E_CLOSURE_LENGTH;[ "$(sha "$path")" = "$digest" ]||fail E_CLOSURE_DIGEST;count=$((count+1));done <"$CLOSURE"
 [ "$count" -eq 44 ] || fail E_CLOSURE_COUNT
-# Enumerate the mount itself before admitting any record. Extras of every type are fatal.
-declare -A expected=(); expected_text=; count=0
-while IFS= read -r -d '' name&&IFS= read -r -d '' length&&IFS= read -r digest;do case "$name" in */*|*..*|*$'\n'*) fail E_INPUT_NAME;;esac;[[ -z "${expected[$name]+x}" ]]||fail E_INPUT_DUPLICATE;expected[$name]=1;expected_text=$expected_text$name$'\n';count=$((count+1));done <"$MANIFEST"
+# Compare NUL-delimited sorted raw basenames. Hostile newlines cannot split or alias names.
+count=0;previous=;while IFS= read -r -d '' name&&IFS= read -r -d '' length&&IFS= read -r digest;do case "$name" in */*|*..*|*$'\n'*) fail E_INPUT_NAME;;esac;[ -z "$previous" ]||[[ "$previous" < "$name" ]]||fail E_INPUT_ORDER;previous=$name;count=$((count+1));done <"$MANIFEST"
 [ "$count" -eq 9 ] || fail E_INPUT_COUNT
-actual_text=$(/usr/bin/find "$INPUT" -xdev -mindepth 1 -maxdepth 1 -printf '%f\n') || fail E_INPUT_ENUM_TOOL
-actual_count=0;while IFS= read -r name;do [ -n "$name" ]||fail E_INPUT_NAME;[[ -n "${expected[$name]+x}" ]]||fail E_INPUT_EXTRA;actual_count=$((actual_count+1));done <<<"$actual_text"
-[ "$actual_count" -eq 9 ] || fail E_INPUT_EXACT_SET
+set -o pipefail
+/usr/bin/find "$INPUT" -xdev -mindepth 1 -maxdepth 1 -printf '%f\0' | /usr/bin/sort -z | /usr/bin/cmp -s - <(/usr/bin/printf '%s\0' cargo-1.98.1-x86_64-unknown-linux-gnu.tar.xz channel-rust-1.98.1.toml channel-rust-1.98.1.toml.asc channel-rust-1.98.1.toml.sha256 expected-channel-rust-1.98.1.toml.sha256 rust-1.98.1-license-notice-manifest.bin rust-key.gpg.ascii rust-std-1.98.1-x86_64-unknown-linux-gnu.tar.xz rustc-1.98.1-x86_64-unknown-linux-gnu.tar.xz) || fail E_INPUT_EXACT_SET
+set +o pipefail
 # Open each approved object once. Hash, length and type admission and successor copying use these descriptors, never reopened paths.
 fdmap=;count=0;previous=
 while IFS= read -r -d '' name&&IFS= read -r -d '' length&&IFS= read -r digest;do [ -z "$previous" ]||[[ "$previous" < "$name" ]]||fail E_INPUT_ORDER;previous=$name;p=$INPUT/$name;[ -f "$p" ]&&[ ! -L "$p" ]||fail E_INPUT_FILE;exec {input_fd}<"$p"||fail E_INPUT_OPEN;f=/proc/self/fd/$input_fd;[ -f "$f" ]||fail E_INPUT_DESCRIPTOR;[ "$(/usr/bin/stat -Lc %s "$f")" = "$length" ]||fail E_INPUT_LENGTH;[ "$(sha "$f")" = "$digest" ]||fail E_INPUT_DIGEST;fdmap=$fdmap${fdmap:+,}$name:$input_fd:$length:$digest;count=$((count+1));done <"$MANIFEST"
@@ -47,11 +47,16 @@ while IFS= read -r -d '' name&&IFS= read -r -d '' length&&IFS= read -r digest;do
 fail E_CANDIDATE_AUTHORITY
 # Operational successor: enter denied network/user/mount/pid namespaces, copy only admitted descriptors to private tmpfs, verify copies, freeze it ro, then hand that immutable path to the admitted launcher descriptor.
 /usr/bin/unshare --user --map-root-user --mount --pid --fork --kill-child --net /usr/bin/bash --noprofile --norc -c '
- set -euf; fail(){ /usr/bin/printf "%s\n" "$1" >&2; exit 94; }; stage=$1; launcher=$2; root=$3; output=$4; evidence=$5; map=$6
- /usr/bin/mkdir -m 700 "$stage" || fail E_STAGE_CREATE
- /usr/bin/mount -t tmpfs -o rw,nosuid,nodev,noexec,mode=0700 tmpfs "$stage" || fail E_STAGE_MOUNT
+ set -euf; fail(){ /usr/bin/printf "%s\n" "$1" >&2; exit 94; }; stage=$1; launcher=$2; root=$3; output=$4; evidence=$5; map=$6; created=0; mounted=0
+ cleanup(){ code=$?; trap - EXIT HUP INT TERM; if [ "$mounted" -eq 1 ];then /usr/bin/umount -- "$stage"||code=94;mounted=0;fi;if [ "$created" -eq 1 ];then /usr/bin/rm -rf -- "$stage"||code=94;created=0;fi;exit "$code"; }
+ hup(){ exit 129; };intr(){ exit 130; };term(){ exit 143; };trap cleanup EXIT;trap hup HUP;trap intr INT;trap term TERM
+ [ ! -e "$stage" ]||fail E_STAGE_FRESH
+ /usr/bin/mkdir -m 700 "$stage" || fail E_STAGE_CREATE;created=1
+ /usr/bin/mount -t tmpfs -o rw,nosuid,nodev,noexec,mode=0700 tmpfs "$stage" || fail E_STAGE_MOUNT;mounted=1
  oldifs=$IFS;IFS=,;for record in $map;do IFS=:;set -- $record;IFS=$oldifs;name=$1;fd=$2;length=$3;digest=$4;src=/proc/self/fd/$fd;dst=$stage/$name;[ -f "$src" ]||fail E_STAGE_DESCRIPTOR;/usr/bin/cat "$src" >"$dst"||fail E_STAGE_COPY;/usr/bin/chmod 400 "$dst"||fail E_STAGE_MODE;[ "$(/usr/bin/stat -c %s "$dst")" = "$length" ]||fail E_STAGE_LENGTH;actual=$(/usr/bin/sha256sum -- "$dst")||fail E_STAGE_HASH_TOOL;actual=${actual%% *};[ "$actual" = "$digest" ]||fail E_STAGE_DIGEST;done;IFS=$oldifs
  /usr/bin/mount -o remount,ro,bind "$stage" || fail E_STAGE_FREEZE
  vfs=$(/usr/bin/findmnt -n -o VFS-OPTIONS --target "$stage")||fail E_STAGE_QUERY;case ",$vfs," in *,ro,*) :;;*) fail E_STAGE_READONLY;;esac
- exec /usr/bin/bash --noprofile --norc "$launcher" "$root" "$stage" "$output" "$evidence"
+ /usr/bin/bash --noprofile --norc "$launcher" "$root" "$stage" "$output" "$evidence" || fail E_SUCCESSOR
+ # Success owns no durable input artifact: EXIT cleanup unmounts and removes this private stage created by this run, preserving retry freshness.
+ exit 0
 ' composed-private-stage "$SERVICE_STAGE" "$LAUNCHER_FD" "$ROOT" "$OUTPUT" "$EVIDENCE" "$fdmap"
