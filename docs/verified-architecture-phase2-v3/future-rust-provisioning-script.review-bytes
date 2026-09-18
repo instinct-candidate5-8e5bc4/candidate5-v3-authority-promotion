@@ -1,6 +1,9 @@
 # REVIEW INPUT ONLY. NO SHEBANG. DO NOT EXECUTE WITHOUT LATER OWNER GO.
 set -euf
 umask 077
+CREATED=
+cleanup() { code=$?; if [ $code -ne 0 ] && [ -n "$CREATED" ]; then /usr/bin/rm -rf -- "$OUTPUT" "$OUTPUT.stage" "$OUTPUT.gnupg" "$OUTPUT.gpg-import.out" "$OUTPUT.gpg-import.err" "$OUTPUT.gpg-status" "$OUTPUT.gpg-verify.err" "$OUTPUT.archive-list" "$OUTPUT.archive-types" "$OUTPUT.license.generated" "$OUTPUT.input-list"; fi; exit $code; }
+trap cleanup EXIT
 fail() { code=$1; /usr/bin/printf '%s\n' "$code" >&2; exit 97; }
 [ "$#" -eq 2 ] || fail E_ARGUMENT_COUNT
 case $1 in /*) ;; *) fail E_INPUT_PATH;; esac
@@ -18,7 +21,9 @@ SIGNATURE=$INPUT/channel-rust-1.98.1.toml.asc
 RUSTC=$INPUT/rustc-1.98.1-x86_64-unknown-linux-gnu.tar.xz
 CARGO=$INPUT/cargo-1.98.1-x86_64-unknown-linux-gnu.tar.xz
 STD=$INPUT/rust-std-1.98.1-x86_64-unknown-linux-gnu.tar.xz
-for f in "$KEY" "$MANIFEST" "$CHECKSUM" "$SIGNATURE" "$RUSTC" "$CARGO" "$STD"; do [ -f "$f" ] && [ ! -L "$f" ] || fail E_INPUT_TYPE; done
+LICENSE=$INPUT/rust-1.98.1-license-notice-manifest.bin
+EXPECTED_CHECKSUM=$INPUT/expected-channel-rust-1.98.1.toml.sha256
+for f in "$KEY" "$MANIFEST" "$CHECKSUM" "$SIGNATURE" "$RUSTC" "$CARGO" "$STD" "$LICENSE" "$EXPECTED_CHECKSUM"; do [ -f "$f" ] && [ ! -L "$f" ] || fail E_INPUT_TYPE; done
 check() { expected=$1; file=$2; actual=$(/usr/bin/sha256sum "$file") || fail E_HASH_TOOL; actual=${actual%% *}; [ "$actual" = "$expected" ] || fail E_DIGEST; }
 check e54b09a439647e006b4831eec9785cbaaf3e07ab371c3a6ee6a68e1bdb9fbc6b "$KEY"
 check a7c8774a5fd8441c997d94c029776cbc5eb111e9d72ab5d256fa69866644347e "$MANIFEST"
@@ -27,7 +32,13 @@ check a9fed69b47daaaf29a6207af9df13aedb66d502ab0acc4ea557602edf87fd1aa "$SIGNATU
 check e974f036b28565f37c0f3bd92ddefa809bee16c04f9dcf07b9ed96e05aaaf7c4 "$RUSTC"
 check ea1de9f9e23107d97ee2b41a72c552f34064a593da503789218387aee59f3ba4 "$CARGO"
 check fa3ff450172a16c026944030230c5069947af93c728d9179971d44e5e0cfb561 "$STD"
-/usr/bin/cmp -s "$CHECKSUM" "$INPUT/expected-channel-rust-1.98.1.toml.sha256" || fail E_CHECKSUM_BYTES
+check e01f11e6bdba74f2b87a36c86b75691682850ee6e8b3466c5c6f18166dff8200 "$LICENSE"
+/usr/bin/find "$INPUT" -xdev -mindepth 1 -maxdepth 1 -printf '%f\n' | /usr/bin/sort >"$OUTPUT.input-list" || fail E_INPUT_LIST
+/usr/bin/printf '%s\n' cargo-1.98.1-x86_64-unknown-linux-gnu.tar.xz channel-rust-1.98.1.toml channel-rust-1.98.1.toml.asc channel-rust-1.98.1.toml.sha256 expected-channel-rust-1.98.1.toml.sha256 rust-1.98.1-license-notice-manifest.bin rust-key.gpg.ascii rust-std-1.98.1-x86_64-unknown-linux-gnu.tar.xz rustc-1.98.1-x86_64-unknown-linux-gnu.tar.xz | /usr/bin/sort >"$OUTPUT.input-expected" || fail E_INPUT_LIST
+/usr/bin/cmp -s "$OUTPUT.input-list" "$OUTPUT.input-expected" || fail E_EXTRA_INPUT
+/usr/bin/cmp -s "$CHECKSUM" "$EXPECTED_CHECKSUM" || fail E_CHECKSUM_BYTES
+/usr/bin/mkdir -m 700 "$OUTPUT" || fail E_DIRECTORY
+CREATED=1
 GNUPGHOME=$OUTPUT.gnupg
 /usr/bin/mkdir -m 700 "$GNUPGHOME" || fail E_GPG_HOME
 export GNUPGHOME
@@ -39,14 +50,53 @@ export GNUPGHOME
 [ "$(/usr/bin/grep -Fc 'manifest-version = "2"' "$MANIFEST")" = 1 ] || fail E_MANIFEST_DUPLICATE
 [ "$(/usr/bin/grep -Fc 'date = "2026-09-03"' "$MANIFEST")" = 1 ] || fail E_MANIFEST_DUPLICATE
 STAGE=$OUTPUT.stage
-/usr/bin/mkdir -m 700 "$STAGE" "$OUTPUT" || fail E_DIRECTORY
-for archive in "$RUSTC" "$CARGO" "$STD"; do
+/usr/bin/mkdir -m 700 "$STAGE" || fail E_DIRECTORY
+for archive in "$RUSTC" "$CARGO" "$STD" "$LICENSE" "$EXPECTED_CHECKSUM"; do
   /usr/bin/tar --use-compress-program=/usr/bin/xz -tf "$archive" >$OUTPUT.archive-list || fail E_ARCHIVE_LIST
+  /usr/bin/tar --use-compress-program=/usr/bin/xz -tvf "$archive" >$OUTPUT.archive-types || fail E_ARCHIVE_LIST
+  /usr/bin/grep -Ev '^[-d]' "$OUTPUT.archive-types" >/dev/null && fail E_ARCHIVE_TYPE
   /usr/bin/grep -E '(^/|(^|/)\.\.(/|$)|\\)' "$OUTPUT.archive-list" >/dev/null && fail E_ARCHIVE_PATH
   /usr/bin/tar --use-compress-program=/usr/bin/xz --no-same-owner --no-same-permissions -xf "$archive" -C "$STAGE" || fail E_ARCHIVE_EXTRACT
 done
 /usr/bin/find "$STAGE" -xdev -printf '%y\0%p\0%m\0%s\0%l\0' | /usr/bin/sort -z >$OUTPUT.extracted.inventory || fail E_INVENTORY
 for component in rustc-1.98.1-x86_64-unknown-linux-gnu cargo-1.98.1-x86_64-unknown-linux-gnu rust-std-1.98.1-x86_64-unknown-linux-gnu; do [ -d "$STAGE/$component" ] || fail E_COMPONENT; done
+/usr/bin/rm -f "$OUTPUT.license.generated"
+while IFS= read -r rel; do
+  file=$STAGE/$rel
+  [ -f "$file" ] && [ ! -L "$file" ] || fail E_LICENSE_PATH
+  size=$(/usr/bin/stat -c %s "$file") || fail E_LICENSE_STAT
+  sum=$(/usr/bin/sha256sum "$file") || fail E_LICENSE_HASH
+  sum=${sum%% *}
+  /usr/bin/printf '%s\0%s\0%s\n' "$rel" "$size" "$sum" >>"$OUTPUT.license.generated" || fail E_LICENSE_EVIDENCE
+done <<'LICENSE_PATHS'
+cargo-1.98.1-x86_64-unknown-linux-gnu/LICENSE-APACHE
+cargo-1.98.1-x86_64-unknown-linux-gnu/LICENSE-MIT
+cargo-1.98.1-x86_64-unknown-linux-gnu/LICENSE-THIRD-PARTY
+cargo-1.98.1-x86_64-unknown-linux-gnu/cargo/share/doc/cargo/LICENSE-APACHE
+cargo-1.98.1-x86_64-unknown-linux-gnu/cargo/share/doc/cargo/LICENSE-MIT
+cargo-1.98.1-x86_64-unknown-linux-gnu/cargo/share/doc/cargo/LICENSE-THIRD-PARTY
+rust-std-1.98.1-x86_64-unknown-linux-gnu/COPYRIGHT
+rust-std-1.98.1-x86_64-unknown-linux-gnu/LICENSE-APACHE
+rust-std-1.98.1-x86_64-unknown-linux-gnu/LICENSE-MIT
+rustc-1.98.1-x86_64-unknown-linux-gnu/COPYRIGHT
+rustc-1.98.1-x86_64-unknown-linux-gnu/LICENSE-APACHE
+rustc-1.98.1-x86_64-unknown-linux-gnu/LICENSE-MIT
+rustc-1.98.1-x86_64-unknown-linux-gnu/rustc/share/doc/rust/COPYRIGHT-library.html
+rustc-1.98.1-x86_64-unknown-linux-gnu/rustc/share/doc/rust/COPYRIGHT.html
+rustc-1.98.1-x86_64-unknown-linux-gnu/rustc/share/doc/rust/licenses/Apache-2.0.txt
+rustc-1.98.1-x86_64-unknown-linux-gnu/rustc/share/doc/rust/licenses/BSD-2-Clause.txt
+rustc-1.98.1-x86_64-unknown-linux-gnu/rustc/share/doc/rust/licenses/CC-BY-SA-4.0.txt
+rustc-1.98.1-x86_64-unknown-linux-gnu/rustc/share/doc/rust/licenses/GCC-exception-3.1.txt
+rustc-1.98.1-x86_64-unknown-linux-gnu/rustc/share/doc/rust/licenses/GPL-2.0-only.txt
+rustc-1.98.1-x86_64-unknown-linux-gnu/rustc/share/doc/rust/licenses/GPL-3.0-or-later.txt
+rustc-1.98.1-x86_64-unknown-linux-gnu/rustc/share/doc/rust/licenses/ISC.txt
+rustc-1.98.1-x86_64-unknown-linux-gnu/rustc/share/doc/rust/licenses/LLVM-exception.txt
+rustc-1.98.1-x86_64-unknown-linux-gnu/rustc/share/doc/rust/licenses/MIT.txt
+rustc-1.98.1-x86_64-unknown-linux-gnu/rustc/share/doc/rust/licenses/NCSA.txt
+rustc-1.98.1-x86_64-unknown-linux-gnu/rustc/share/doc/rust/licenses/OFL-1.1.txt
+rustc-1.98.1-x86_64-unknown-linux-gnu/rustc/share/doc/rust/licenses/Unicode-3.0.txt
+LICENSE_PATHS
+/usr/bin/cmp -s "$OUTPUT.license.generated" "$LICENSE" || fail E_LICENSE_MANIFEST
 /usr/bin/cp -a --no-preserve=ownership "$STAGE/rustc-1.98.1-x86_64-unknown-linux-gnu/rustc/." "$OUTPUT/" || fail E_INSTALL_COPY
 /usr/bin/cp -a --no-preserve=ownership "$STAGE/cargo-1.98.1-x86_64-unknown-linux-gnu/cargo/." "$OUTPUT/" || fail E_INSTALL_COPY
 /usr/bin/cp -a --no-preserve=ownership "$STAGE/rust-std-1.98.1-x86_64-unknown-linux-gnu/rust-std-x86_64-unknown-linux-gnu/." "$OUTPUT/" || fail E_INSTALL_COPY

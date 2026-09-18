@@ -10,7 +10,7 @@ OUTPUT=$4
 [ "$SCRIPT" = /reviewed-root/docs/verified-architecture-phase2-v3/future-rust-provisioning-script.review-bytes ] || fail E_SCRIPT_PATH
 [ -f "$SCRIPT" ] && [ ! -L "$SCRIPT" ] || fail E_SCRIPT_TYPE
 actual=$(/usr/bin/sha256sum "$SCRIPT") || fail E_SCRIPT_HASH_TOOL
-[ "${actual%% *}" = e9aac6e92dd2c8f6c53c90c8eb81a2520ba0edb774acefe76e493a0912608e58 ] || fail E_SCRIPT_DIGEST
-[ "$(/usr/bin/stat -c %s "$SCRIPT")" = 5032 ] || fail E_SCRIPT_LENGTH
+[ "${actual%% *}" = 297e3baca8152a96e999a3ebe52150ebb81f0ea299a32df9a95c349a5ef04f2a ] || fail E_SCRIPT_DIGEST
+[ "$(/usr/bin/stat -c %s "$SCRIPT")" = 8876 ] || fail E_SCRIPT_LENGTH
 [ "$(/usr/bin/stat -c %a "$SCRIPT")" = 644 ] || fail E_SCRIPT_MODE
 exec /usr/bin/bash --noprofile --norc "$SCRIPT" "$INPUT" "$OUTPUT"
