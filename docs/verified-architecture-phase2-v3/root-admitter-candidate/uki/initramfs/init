@@ -2,7 +2,7 @@
 # Candidate bytes only. Not authorized for execution or boot.
 set -eu
 fail() { /bin/busybox echo "$1" >&2; exit 99; }
-ROOT_HASH=d860cb10c45261bf76a4c8c886dfe6373516ee693eba224dbbeef5bcbc73b935
+ROOT_HASH=d6c28baa046ab220dd6fb27feb645596246511a694745d9a9aa200ecd0a63aaa
 DATA=/dev/v3-rootfs-data
 HASH=/dev/v3-rootfs-hash
 [ -b "$DATA" ] || fail E_DATA_DEVICE

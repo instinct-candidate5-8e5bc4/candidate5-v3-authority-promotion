@@ -1,3 +1,3 @@
-# Native PID-lifetime candidate
+# Pre-fork parent-authentication candidate
 
-The admitted helper itself calls unshare(CLONE_NEWPID), forks PID1, and supervises it directly. PID1 sets PDEATHSIG SIGKILL against the helper with parent recheck. No external wrapper remains; helper death kills PID1 and kernel teardown kills all namespace members. Image `55a2686939ae0adb8060bf4bceea2eb96cb7d0188576787f140a6ddc676bff74`, root `d860cb10c45261bf76a4c8c886dfe6373516ee693eba224dbbeef5bcbc73b935`, UKI `5e1264dcbdea6f31f8683fa41cca09da9763cd37fd204cfcad50b1b416a88675`. Candidate only.
+Native helper captures expected_parent=getpid() before fork. PID1 inherits it, installs PDEATHSIG SIGKILL, then requires getppid()==expected_parent before work. Helper death at every clone/fork/prctl/recheck boundary leaves no surviving namespace init or descendants. Image `a59b177d84367ca2f3133040bb7a43194dd3594cdc8cadf798cf2a10e8a8b11b`, root `d6c28baa046ab220dd6fb27feb645596246511a694745d9a9aa200ecd0a63aaa`, UKI `7e5e70c00e74ec00272248be0a6559fb72335009d903414882c228e134b8a634`. Candidate only.
