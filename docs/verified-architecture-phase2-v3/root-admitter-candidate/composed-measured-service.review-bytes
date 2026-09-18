@@ -86,10 +86,9 @@ fail E_CANDIDATE_AUTHORITY
  vfs=$(/usr/bin/findmnt -n -o VFS-OPTIONS --target "$stage")||fail E_STAGE_QUERY;case ",$vfs," in *,ro,*) :;;*) fail E_STAGE_READONLY;;esac
  # Latch before child creation and keep latching through spawn, wait/reap, exact status classification, success publication and cleanup. Signals are not forwarded: the trusted child reaches one unambiguous terminal status.
  cleanup_signal_code=0;latch_traps
- # The admitted native supervisor blocks termination signals around waitpid and maps child zero to 0, every child failure to 1, and helper failure to 2. Thus 128+ can only be shell wait interruption and is always retried.
- /measured-supervisor.elf --wait-success /usr/bin/bash --noprofile --norc "$launcher" "$root" "$stage" "$output" "$evidence" & child=$!
- child_status=;while :;do wait_rc=0;wait "$child"||wait_rc=$?;if [ "$wait_rc" -ge 128 ];then continue;fi;child_status=$wait_rc;break;done
- [ -n "$child_status" ]||fail E_SUCCESSOR_WAIT;[ "$child_status" -eq 0 ]||fail E_SUCCESSOR
+ # Native helper emits one exact result record only after blocked-signal waitpid classification. Wrapper death yields nonzero/EOF, never a retry loop.
+ helper_rc=0;wait_record=$(/measured-supervisor.elf --wait-success /usr/bin/bash --noprofile --norc "$launcher" "$root" "$stage" "$output" "$evidence")||helper_rc=$?
+ [ "$helper_rc" -eq 0 ]||fail E_SUCCESSOR_HELPER;case "$wait_record" in V3WAIT:0) :;;V3WAIT:1) fail E_SUCCESSOR;;V3WAIT:2) fail E_SUCCESSOR_HELPER;;*) fail E_SUCCESSOR_RESULT;;esac
  # Monotonic commit publication while still latched. Committed success is never downgraded by an ordinary signal.
  success=1;cleanup;exit 0
  # Success cleanup owns only the private input stage. Durable OUTPUT/EVIDENCE are preserved; replay is intentionally rejected as already complete.

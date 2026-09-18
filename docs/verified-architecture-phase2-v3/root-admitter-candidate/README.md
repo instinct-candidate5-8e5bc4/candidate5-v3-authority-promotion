@@ -1,3 +1,3 @@
-# Native wait-classifier candidate
+# Native result-channel candidate
 
-The existing measured static-PIE supervisor provides a wait mode: it blocks HUP/INT/TERM before fork, uses waitpid, and classifies zero/nonzero/helper-fault while signals remain blocked. Shell accepts only the helper's finite terminal domain and retries 128+ interrupted waits. Image `f6e4d693c730a0b6c53d54bbbdc9618a80e8471bfd7783011d9b49c0341e6883`, root `57f52e9c8d52c1cf7fb48581f64d02852d01a4c4fd37f6fee245da7f90d47f33`, UKI `970e007bea6988a71427a60e9d0dc443b483b3f87c92f59e274e16c1ce749ff7`. Candidate only.
+The native wait helper writes exactly one V3WAIT result only after waitpid classification. Shell validates helper status and exact result separately. Helper kill/crash/OOM or missing/malformed/duplicate output is bounded terminal failure with stage cleanup, never a wait loop. Image `cc12c83666e7005606bb676312717539df70f21ba5edbb1b1f7a0d1018f83d2e`, root `18dda0b1b4bac0048cf3040c969b80b2f06a55ceeec5a153749d0ec1736d58e9`, UKI `088b1794012b032b168393a6fe75a23905f008583333880c86c96d3774d9820e`. Candidate only.
