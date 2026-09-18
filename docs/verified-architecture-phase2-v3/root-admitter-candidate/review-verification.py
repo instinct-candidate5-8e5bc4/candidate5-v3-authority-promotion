@@ -14,5 +14,16 @@ D=(R/'root-admitter-rootfs.ext4').read_bytes();levels=[];cur=D
 while len(cur)>4096:
  packed=b''.join(hashlib.sha256(cur[i:i+4096]).digest() for i in range(0,len(cur),4096));packed+=b'\0'*(-len(packed)%4096);levels.append(packed);cur=packed
 assert b''.join(levels)==(R/'root-admitter-rootfs.verity').read_bytes() and hashlib.sha256(cur).hexdigest()==m['rootHash']
+
+# Regression: complete in-chroot closure, immutable bind targets, fail-closed init.
+cb=(R.parent/'external-admission-launcher-candidate/external-admission-closure.v1.bin').read_bytes();pos=0;count=0
+while pos<len(cb):
+ fs=[]
+ for _ in range(3): e=cb.index(b'\0',pos);fs.append(cb[pos:e].decode());pos=e+1
+ e=cb.index(b'\n',pos);want=cb[pos:e].decode();pos=e+1;p=R/'rootfs'/fs[0].lstrip('/');assert p.stat().st_size==int(fs[2]) and h(p)==want;count+=1
+assert count==30
+for d in ('reviewed-root','reviewed-input','reviewed-output','reviewed-evidence','proc'): assert (R/'rootfs'/d).is_dir()
+init=(U/'initramfs/init').read_text();assert 'set -eu' in init and init.count('|| fail ')>=20 and 'dmsetup table' in init and 'mountpoint -q' in init and ' -ef ' in init
+
 assert len(json.load(open(R/'build/build-inputs.v1.json'))['inputs'])>100 and len(json.load(open(R/'hostile-review.v1.json'))['cases'])>=19
 print('ROOT_ADMITTER_STATIC_REVIEW=PASS')

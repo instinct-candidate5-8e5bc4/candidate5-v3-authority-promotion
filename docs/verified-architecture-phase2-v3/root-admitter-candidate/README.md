@@ -29,18 +29,14 @@ The supervisor accepts the externally supplied 64-hex root hash, requires the sa
 
 No approved b768d48 concrete artifact changed. The external-admission candidate is the affected chain: its operational successor mechanics now concretely fresh-check a root-owned non-writable evidence parent; stop before mutation; then arm run-owned stage cleanup, create mode-0700 stage, write deterministic evidence, `sync -f` file and stage, atomically rename stage to fresh EVIDENCE, clear cleanup, verify committed evidence, sync parent and hand descriptor 9 to Bash. Its binding/signatures must be regenerated and re-reviewed because its bytes changed.
 
-## Frozen candidate identity vector
+## Corrected candidate identity vector
 
-- supervisor source: 5619 bytes, SHA-256 `ddbb033a8ae0fb0b5a1fd8b804580e57f0dd34bcf4cae8b3f0d250854c36b606`
-- reproducible static-PIE ELF: 950600 bytes, SHA-256 `e8e5622521be45ec3cf8cfcd836ae382a2de27a3b369e3032e4b759715abb9fa`
-- deterministic ext4: SHA-256 `8bdc101e0448ae5e9a1f90b02c912a06a00bef4bbe855167b34627b1f0ca56e9`
-- deterministic verity tree: SHA-256 `d5d84ba18011d744e9bfac16c29034f27576206f8752b7554da3be1308415c51`
-- dm-verity root: `db80c3e07b4c75dfa92804761b198a9ef45783805fd78965a8fdaa414e8f0d55`
-- kernel: SHA-256 `b253def256f2560ed9b658830ca9ec2783bb51f3c5dcb0d9b5c695b6554d70fb`
-- initramfs: SHA-256 `14a4ee8c4115613ca9c7c3f8935f7fbaa63ca5d30bbaf8ebeef9f427ef508266`
-- signed UKI: SHA-256 `ade85007ddc6741397468b57ff0541942d08d416b031b21b10683dbc725100ca`
-- sole UEFI db certificate DER SHA-256: `2e840d03e075c39b0678e8f8defc0a4fa56b05986c73ebdce4ff13a72d91c383`
-- external-admission artifact: SHA-256 `dd66b2f91de6f8bfb6e7daacf55d4bfcf43c525d33295e0866c454271e0bbb75`
-- external-admission closure: 30 paths, SHA-256 `709f8ddc63321aee68b17e14e21cf8cf71b4e85181a5aaeb07161e30329a73d8`
+- supervisor ELF: `e8e5622521be45ec3cf8cfcd836ae382a2de27a3b369e3032e4b759715abb9fa`
+- 64 MiB ext4 with exact 30-record authoritative runtime closure and immutable bind targets: `508730db37fd8cf33679e1ae982f50bc0b8aceceb2bf0b7e88ecac63e97e838e`
+- verity tree: `509eb42233bf32431d6b71dc00b9e20dac2484e8c3aa32d7dd42aebf3fd12ee5`
+- dm-verity root: `41c0a61e166d385bf0ed13719650b0cebab46a15fe3369cd01e66b9e15da909f`
+- initramfs: `e0bfd8c022b4a8b070ff46bd09ba0e72e8b8ecf36dc3074a2262bb721380ca06`
+- signed UKI: `b29c847b6d1c70ca8433e3f540541d6c2a0a92c1c6a5de2d89fbd40687f3b80c`
+- sole UEFI db certificate DER: `a3de89512c31c7e9e97c428dfc7876be02a329327362017529c419d1c6fc8fd5`
 
-The dm-verity root is stored only outside the verity-protected image, in the exact signed UKI command line, so there is no image/self-hash cycle. The exact package provenance, build recipes and hostile/static evidence are committed beside the artifacts. No generated supervisor, launcher or script was executed; no generated image was mounted, activated or booted.
+The rootfs contains every path and exact digest in the signed external-admission closure plus all immutable chroot/bind targets. Init is `set -eu`, checks every device/module/dm/mount/bind operation, confirms dm table, source mountpoints, target object identity and options, and only then invokes the supervisor. No generated artifact was executed, mounted, activated or booted during generation or review.
