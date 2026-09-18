@@ -1,0 +1,40 @@
+# COMPOSED CANDIDATE REVIEW BYTES. NO SHEBANG. DO NOT EXECUTE WITHOUT OWNER GO.
+set -euf
+fail(){ /usr/bin/printf '%s\n' "$1" >&2; exit 94; }
+[ "$#" -eq 6 ] || fail E_COMPOSED_ARGUMENTS
+LAUNCHER_FD=$1; ROOT=$2; INPUT=$3; OUTPUT=$4; EVIDENCE=$5; SERVICE_STAGE=$6
+[ "$ROOT" = /reviewed-root ] || fail E_ROOT
+case "$LAUNCHER_FD" in /proc/self/fd/[0-9]*) ;; *) fail E_LAUNCHER_DESCRIPTOR;; esac
+[ -f "$LAUNCHER_FD" ] || fail E_LAUNCHER_DESCRIPTOR
+[ -d "$INPUT" ] && [ ! -e "$OUTPUT" ] && [ ! -e "$OUTPUT.stage" ] && [ ! -e "$EVIDENCE" ] && [ ! -e "$EVIDENCE.admission-stage" ] && [ ! -e "$SERVICE_STAGE" ] || fail E_FRESHNESS
+input_target=$(/usr/bin/findmnt -n -o TARGET --target "$INPUT") || fail E_INPUT_MOUNT
+[ "$input_target" = "$INPUT" ] || fail E_INPUT_MOUNT
+input_source=$(/usr/bin/findmnt -n -o SOURCE --target "$INPUT") || fail E_INPUT_MOUNT
+input_vfs=$(/usr/bin/findmnt -n -o VFS-OPTIONS --target "$INPUT") || fail E_INPUT_MOUNT
+case ",$input_vfs," in *,ro,*) ;; *) fail E_INPUT_READONLY;; esac
+input_object=$(/usr/bin/stat -Lc %d:%i "$INPUT") || fail E_INPUT_OBJECT
+D=/approved-service; PUB=$D/offline-root-ed25519-public.pem; POLICY=$D/protected-pin-store-policy.v1.json; CROSS=$D/cross-binding.v1.json; CROSS_SIG=$D/cross-binding.v1.sig; MANIFEST=$D/offline-input-manifest.v1.bin; MANIFEST_SIG=$D/offline-input-manifest.v1.sig; PIN=$D/protected-pin-record.v1.json; PIN_SIG=$D/protected-pin-record.v1.sig; CLOSURE=$D/measured-execution-service-closure.v1.bin; APPROVED_SERVICE=$D/measured-execution-service.review-bytes
+for f in "$PUB" "$POLICY" "$CROSS" "$CROSS_SIG" "$MANIFEST" "$MANIFEST_SIG" "$PIN" "$PIN_SIG" "$CLOSURE" "$APPROVED_SERVICE";do [ -f "$f" ] && [ ! -L "$f" ] || fail E_RECORD;done
+sha(){ /usr/bin/sha256sum "$1"|{ read -r x rest; /usr/bin/printf %s "$x"; }; }
+[ "$(sha "$PUB")" = 6be9ac5779bbc11d2102da23ba03d4ffd13ff56aaf9adbd3e81cb170678fbf29 ] || fail E_ROOT_KEY
+[ "$(sha "$POLICY")" = 2f2b4ef7afebbde05901dc6732c6002725cb38864461e34d44a6cdeedacf698c ] || fail E_POLICY
+[ "$(sha "$MANIFEST")" = 30044b7453c89eb195df394a0236faf5ef7c7ec4ccf8dbe20766f5690d5f13e3 ] || fail E_MANIFEST
+[ "$(sha "$MANIFEST_SIG")" = 90889cbbe5d0e35802546714108b994e4e814564ba5225148076a2c2df455c66 ] || fail E_MANIFEST_SIGNATURE_IDENTITY
+[ "$(sha "$PIN")" = 98b24718530ac02d406a1ce851c2b931d7e67d75cc4d008e2a04adbca6441c9a ] || fail E_PIN
+[ "$(sha "$PIN_SIG")" = f2141805b267077709f3009941c2669ba2984e3d6be117bad6e65ba90dd9379b ] || fail E_PIN_SIGNATURE_IDENTITY
+[ "$(sha "$CROSS")" = 5de911f8823cbcec9d8e9be54c85b4388a829c085ab540a5b892e3f4b4ca8f4a ] || fail E_CROSS
+[ "$(sha "$CROSS_SIG")" = 6d8349592d6522e39e646167be88b6a7a39c95d932ae55f1b354a121ffcec080 ] || fail E_CROSS_SIGNATURE_IDENTITY
+[ "$(sha "$CLOSURE")" = 5e0b440d868e0c9ad21743cd8a4903f43047cbf13993380d39bfd45349dd028d ] || fail E_CLOSURE
+[ "$(sha "$APPROVED_SERVICE")" = e470199b00cc047e7b020909c8d6f200113bf3e770debe2b69f1de8226079aa1 ] || fail E_APPROVED_SERVICE
+seal(){ domain=$1 record=$2 sig=$3; /usr/bin/openssl pkeyutl -verify -pubin -inkey "$PUB" -rawin -in <({ /usr/bin/printf 'V3BOOTSTRAP-SEAL:v1\0%s\0' "$domain"; /usr/bin/cat "$record"; }) -sigfile "$sig" >/dev/null 2>&1 || fail E_SIGNATURE; }
+seal pin-record "$PIN" "$PIN_SIG"; seal cross-binding "$CROSS" "$CROSS_SIG"; seal offline-input-manifest "$MANIFEST" "$MANIFEST_SIG"
+# Exact approved service runtime closure in the dm-verity namespace.
+count=0;previous=;while IFS= read -r -d '' path&&IFS= read -r -d '' role&&IFS= read -r -d '' length&&IFS= read -r digest;do [ -z "$previous" ]||[[ "$previous" < "$path" ]]||fail E_CLOSURE_ORDER;previous=$path;[ -f "$path" ]&&[ ! -L "$path" ]||fail E_CLOSURE_TYPE;[ "$(/usr/bin/stat -c %s "$path")" = "$length" ]||fail E_CLOSURE_LENGTH;[ "$(sha "$path")" = "$digest" ]||fail E_CLOSURE_DIGEST;count=$((count+1));done <"$CLOSURE"
+[ "$count" -eq 44 ] || fail E_CLOSURE_COUNT
+# Exact signed nine-record offline input manifest, enforced against immutable input mount.
+count=0;previous=;while IFS= read -r -d '' name&&IFS= read -r -d '' length&&IFS= read -r digest;do case "$name" in */*|*..*) fail E_INPUT_NAME;;esac;[ -z "$previous" ]||[[ "$previous" < "$name" ]]||fail E_INPUT_ORDER;previous=$name;p=$INPUT/$name;[ -f "$p" ]&&[ ! -L "$p" ]||fail E_INPUT_FILE;[ "$(/usr/bin/stat -c %s "$p")" = "$length" ]||fail E_INPUT_LENGTH;[ "$(sha "$p")" = "$digest" ]||fail E_INPUT_DIGEST;count=$((count+1));done <"$MANIFEST"
+[ "$count" -eq 9 ] || fail E_INPUT_COUNT
+[ "$input_object" = "$(/usr/bin/stat -Lc %d:%i "$INPUT")" ] && [ "$input_source" = "$(/usr/bin/findmnt -n -o SOURCE --target "$INPUT")" ] || fail E_INPUT_IDENTITY
+# Candidate authority stop precedes namespace creation, evidence mutation, launcher or provisioning.
+fail E_CANDIDATE_AUTHORITY
+/usr/bin/unshare --user --map-root-user --mount --pid --fork --kill-child --net /usr/bin/bash --noprofile --norc "$LAUNCHER_FD" "$ROOT" "$INPUT" "$OUTPUT" "$EVIDENCE"

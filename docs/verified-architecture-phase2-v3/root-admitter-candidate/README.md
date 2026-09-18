@@ -1,3 +1,3 @@
-# Fresh-child output/evidence argument candidate
+# Publishable 96 MiB composed-service candidate
 
-Init binds root-owned restrictive rw parents, verifies mount identities/options, requires output `/reviewed-output/final`, evidence `/reviewed-evidence/final`, and evidence stage absent, then passes those child paths through supervisor to launcher and provisioning. Argument-flow fixture and evaluator prove simultaneous preconditions. Root `501df761f691580f6ae3c59e360ac6eba6d9898848e487d5f6d112fea52b83ec`, initramfs `2dd534fd87bbfc451d5db6324c778d9f326c8a040fbb7f21d96a7187f6bbcac9`, UKI `5d0138524d4b61022ec19d1384e3f00d57d388bdf66cbeb0b1d97e8af6c2f38d`. Candidate only.
+The full approved 44-path closure fits a deterministic 96 MiB ext4, below GitHub's 100 MiB single-file limit. All composed-service semantics are unchanged. Image `c08dfb6fb07eba44d8625a003592e76dc4428702ad06ea8a661d7c09db29d50d`, root `f3ff4be7688694d4e1d574fd48237c555b6254c61dc160ef2f3c852891787351`, UKI `bc2675ffd30286d46377fcc0d8dd4223a86e80f3c670907065385234604d13e8`. Candidate only.

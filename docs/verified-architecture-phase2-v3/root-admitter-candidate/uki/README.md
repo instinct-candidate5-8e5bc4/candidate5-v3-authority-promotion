@@ -1,3 +1,3 @@
-# Exact UKI fresh-child argument candidate
+# Exact UKI 96 MiB root candidate
 
-Initramfs `2dd534fd87bbfc451d5db6324c778d9f326c8a040fbb7f21d96a7187f6bbcac9`, signed UKI `5d0138524d4b61022ec19d1384e3f00d57d388bdf66cbeb0b1d97e8af6c2f38d`, root `501df761f691580f6ae3c59e360ac6eba6d9898848e487d5f6d112fea52b83ec`, db cert DER `eef67a8369dedf77460581972436e6ec9331349d182653bd50784a3260962117`. Candidate only.
+Signed UKI `bc2675ffd30286d46377fcc0d8dd4223a86e80f3c670907065385234604d13e8`, root `f3ff4be7688694d4e1d574fd48237c555b6254c61dc160ef2f3c852891787351`, db cert DER `7fe7d234f96fd5c1b26e76149715d6f93de397f96ed8a0195a73c07142cf0fa2`. Candidate only.

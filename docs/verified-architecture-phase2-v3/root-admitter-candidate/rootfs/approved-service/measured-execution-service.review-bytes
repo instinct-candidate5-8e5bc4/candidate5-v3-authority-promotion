@@ -1,0 +1,48 @@
+# REVIEW INPUT ONLY. NO SHEBANG. DO NOT EXECUTE WITHOUT LATER OWNER GO.
+set -euf
+fail() { /usr/bin/printf '%s\n' "$1" >&2; exit 95; }
+[ "$#" -eq 3 ] || fail E_SERVICE_ARGUMENTS
+ROOT=$1; INPUT=$2; OUTPUT=$3
+[ "$ROOT" = /reviewed-root ] || fail E_SERVICE_ROOT
+[ -d "$INPUT" ] && [ ! -e "$OUTPUT" ] && [ ! -e "$OUTPUT.service-verify" ] || fail E_SERVICE_PATH
+STAGE=$OUTPUT.service-verify
+cleanup() { code=$?; if [ -e "$STAGE" ]; then /usr/bin/rm -rf -- "$STAGE"; fi; exit $code; }
+trap cleanup EXIT
+/usr/bin/mkdir -m 700 "$STAGE" || fail E_SERVICE_STAGE
+D=$ROOT/docs/verified-architecture-phase2-v3/bootstrap-concrete-candidates
+PUB=$D/offline-root-ed25519-public.pem; POLICY=$D/protected-pin-store-policy.v1.json; CROSS=$D/cross-binding.v1.json; CROSS_SIG=$D/cross-binding.v1.sig; MANIFEST=$D/offline-input-manifest.v1.bin; MANIFEST_SIG=$D/offline-input-manifest.v1.sig; PIN=$D/protected-pin-record.v1.json; PIN_SIG=$D/protected-pin-record.v1.sig; CLOSURE=$D/measured-execution-service-closure.v1.bin; SERVICE=$D/measured-execution-service.review-bytes; LAUNCHER=$ROOT/docs/verified-architecture-phase2-v3/future-bootstrap-launcher.review-bytes; SCRIPT=$ROOT/docs/verified-architecture-phase2-v3/future-rust-provisioning-script.review-bytes
+for f in "$PUB" "$POLICY" "$CROSS" "$CROSS_SIG" "$MANIFEST" "$MANIFEST_SIG" "$PIN" "$PIN_SIG" "$CLOSURE" "$SERVICE" "$LAUNCHER" "$SCRIPT"; do [ -f "$f" ] && [ ! -L "$f" ] || fail E_SERVICE_RECORD; done
+# Immutable trust-root expectations prevent a valid signature from blessing substituted artifacts.
+expect_sha() { expected=$1; file=$2; set -- $(/usr/bin/sha256sum "$file") || fail E_SERVICE_HASH; [ "$1" = "$expected" ] || fail E_TRUST_ROOT_IDENTITY; }
+expect_sha "6be9ac5779bbc11d2102da23ba03d4ffd13ff56aaf9adbd3e81cb170678fbf29" "$PUB"
+expect_sha "2f2b4ef7afebbde05901dc6732c6002725cb38864461e34d44a6cdeedacf698c" "$POLICY"
+expect_sha "30044b7453c89eb195df394a0236faf5ef7c7ec4ccf8dbe20766f5690d5f13e3" "$MANIFEST"
+expect_sha "5e0b440d868e0c9ad21743cd8a4903f43047cbf13993380d39bfd45349dd028d" "$CLOSURE"
+expect_sha "7d6b7c6399919ebfc4c9f3eea4455b5033ec6ed0a57ffed570ecfe525fde9b33" "$SCRIPT"
+expect_sha "e9d40303c39310761a4f3c0ebb3374806ed420b008926ae6a3ea2e14fcc55232" "$LAUNCHER"
+sha() { set -- $(/usr/bin/sha256sum "$1") || fail E_SERVICE_HASH; /usr/bin/printf %s "$1"; }
+sha_value() { set -- $(/usr/bin/sha256sum "$1") || fail E_SERVICE_HASH; /usr/bin/printf %s "$1"; }
+bytes() { /usr/bin/wc -c <"$1" | /usr/bin/tr -d ' '; }
+blob() { n=$(bytes "$1"); /usr/bin/printf 'blob %s\0' "$n" >"$STAGE/blob"; /usr/bin/cat "$1" >>"$STAGE/blob"; set -- $(/usr/bin/sha1sum "$STAGE/blob") || fail E_SERVICE_HASH; /usr/bin/printf %s "$1"; }
+sealverify() { domain=$1; record=$2; sig=$3; msg=$4; /usr/bin/printf 'V3BOOTSTRAP-SEAL:v1\0%s\0' "$domain" >"$msg" || fail E_SERVICE_EVIDENCE; /usr/bin/cat "$record" >>"$msg" || fail E_SERVICE_EVIDENCE; /usr/bin/openssl pkeyutl -verify -pubin -inkey "$PUB" -rawin -in "$msg" -sigfile "$sig" >/dev/null 2>&1 || fail E_SERVICE_SIGNATURE; }
+sealverify pin-record "$PIN" "$PIN_SIG" "$STAGE/pin.msg"; sealverify cross-binding "$CROSS" "$CROSS_SIG" "$STAGE/cross.msg"; sealverify offline-input-manifest "$MANIFEST" "$MANIFEST_SIG" "$STAGE/manifest.msg"
+# Exact canonical pin record. Any unknown, missing, duplicate, reordered, stale or substituted field changes bytes and fails.
+/usr/bin/printf '{"authority":"CANDIDATE_FOR_OWNER_APPROVAL","crossBindingSha256":"%s","crossBindingSignatureSha256":"%s","domain":"V3BOOTSTRAP-PIN-RECORD:v1","offlineManifestSha256":"%s","offlineManifestSignatureSha256":"%s","policySha256":"%s","publicKeySha256":"%s","schema":"v3.bootstrap-pin-record.v1","sequence":1,"sequenceFloor":1}\n' "$(sha_value "$CROSS")" "$(sha_value "$CROSS_SIG")" "$(sha_value "$MANIFEST")" "$(sha_value "$MANIFEST_SIG")" "$(sha_value "$POLICY")" "$(sha_value "$PUB")" >"$STAGE/pin.expected" || fail E_SERVICE_EVIDENCE
+/usr/bin/cmp -s "$PIN" "$STAGE/pin.expected" || fail E_PIN_BINDING
+# Closure is a canonical sorted raw-path record set. Verify every recorded byte identity against the measured root.
+count=0; previous=; while IFS= read -r -d '' path && IFS= read -r -d '' role && IFS= read -r -d '' length && IFS= read -r digest; do
+ case "$path" in /*) ;; *) fail E_CLOSURE_PATH;; esac; case "$path" in *..*|*//*|*$'\n'*) fail E_CLOSURE_PATH;; esac
+ [ -z "$previous" ] || [[ "$previous" < "$path" ]] || fail E_CLOSURE_ORDER; previous=$path
+ [ "$role" = executable ] || [ "$role" = dynamic-library ] || fail E_CLOSURE_ROLE
+ actual=$ROOT$path; [ -f "$actual" ] && [ ! -L "$actual" ] || fail E_CLOSURE_TYPE
+ [ "$(bytes "$actual")" = "$length" ] || fail E_CLOSURE_LENGTH; [ "$(sha_value "$actual")" = "$digest" ] || fail E_CLOSURE_DIGEST
+ count=$((count+1))
+done <"$CLOSURE"; [ "$count" -eq 44 ] || fail E_CLOSURE_COUNT
+layers='[["sha256:af6eca94c8104c8e90d3f9efe59c2b3a02b20aad3d985e31c7cd009ea104c447",29536818],["sha256:a882c2cc2b3487f954b121776f38449e97c30ef32043eb9907c13c525178e473",7106046],["sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1",32],["sha256:12c93b5583979a7d13f6ff26d931ce85a70aa8e67a297bd540067597305f90cc",409],["sha256:c9256a3af7e784cf519a20765ba85f5b956d5dbac91dacd9092fd1561893aeba",134],["sha256:2b62d4d7d888e294e5b21d2b5e8468466d639056b834f68a67fff77a4f5bd08f",224],["sha256:aa495d524226038e8ccdbbd81b9b9f1f0828dc0c02df175b344ae54a8b45cfda",233],["sha256:91e9b1d165c3015e827dae4fb9971d7feeec6960feb06a6bcd198d2bf4486ca3",79190102],["sha256:2ff92fda94519df2185de490898e8b0c994d5961ec77f1fb56aac7a10cb1e0ff",153095936]]'
+# Construct the only accepted canonical cross-binding from measured artifact bytes and immutable platform identities.
+/usr/bin/printf '{"authority":"CANDIDATE_FOR_OWNER_APPROVAL","baseImage":{"closureDigest":"sha256:90e044c4586fb42bfa3932b9804fe31b719b91731a567c092d830bdd4ec70f0b","configDigest":"sha256:04996d625578186e972c7e0e7e355d82c1e92f158fb0820ff04bcac68dda5d20","indexDigest":"sha256:81380e4c9c14e8a629ff39029639e4b7893e67400246fa7782a0fe7dc193a02a","linuxAmd64ManifestDigest":"sha256:c60167d590a5b777953097a5d3647cb0753465748d1a9d6442e4088305d90c46"},"domain":"V3BOOTSTRAP-CROSS-BINDING:v1","futureScript":{"blob":"%s","byteLength":%s,"mode":"100644","sha256":"%s"},"launcher":{"blob":"%s","byteLength":%s,"mode":"100644","sha256":"%s"},"layers":%s,"measuredExecutionService":{"blob":"%s","byteLength":%s,"mode":"100644","sha256":"%s"},"offlineDelivery":{"algorithm":"sha256","manifestByteLength":%s,"manifestSha256":"%s","manifestSignatureSha256":"%s","network":"DENIED"},"protectedPinStore":{"policyBlob":"%s","policyByteLength":%s,"policySha256":"%s","sequenceFloor":1},"publicKey":{"algorithm":"Ed25519","sha256":"%s"},"schema":"v3.bootstrap-cross-binding.v1","sequence":1,"serviceClosure":{"blob":"%s","byteLength":%s,"pathCount":44,"sha256":"%s"}}\n' "$(blob "$SCRIPT")" "$(bytes "$SCRIPT")" "$(sha_value "$SCRIPT")" "$(blob "$LAUNCHER")" "$(bytes "$LAUNCHER")" "$(sha_value "$LAUNCHER")" "$layers" "$(blob "$SERVICE")" "$(bytes "$SERVICE")" "$(sha_value "$SERVICE")" "$(bytes "$MANIFEST")" "$(sha_value "$MANIFEST")" "$(sha_value "$MANIFEST_SIG")" "$(blob "$POLICY")" "$(bytes "$POLICY")" "$(sha_value "$POLICY")" "$(sha_value "$PUB")" "$(blob "$CLOSURE")" "$(bytes "$CLOSURE")" "$(sha_value "$CLOSURE")" >"$STAGE/cross.expected" || fail E_SERVICE_EVIDENCE
+/usr/bin/cmp -s "$CROSS" "$STAGE/cross.expected" || fail E_CROSS_BINDING
+# Candidate authority is never runtime authority. Owner-approved operational records require later regeneration/review.
+fail E_CANDIDATE_AUTHORITY
+/usr/bin/rm -rf -- "$STAGE" || fail E_SERVICE_CLEANUP
+/usr/bin/unshare --user --map-root-user --mount --pid --fork --kill-child --net /usr/bin/bash --noprofile --norc "$LAUNCHER" "$ROOT" "$SCRIPT" "$INPUT" "$OUTPUT"
