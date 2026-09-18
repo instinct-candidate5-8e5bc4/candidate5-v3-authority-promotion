@@ -48,38 +48,39 @@ All existing fail-closed Foundation meanings remain normative. Packaging failure
 
 The certified Foundation baseline's current immutable policy forbids every production import into the six Foundation modules. On that baseline, adding the proposed three edges correctly makes `tests/clean-runtime/v3-promotion-authority-audit.js` report `FORBIDDEN_INBOUND_FOUNDATION_IMPORT` three times and makes static-boundaries test 4 fail. SES, a bundle, or a compiler cannot override this repository-level rule. Therefore the three edges MUST NOT be implemented on `127f284` and this preflight is not implementation-ready.
 
-Before implementation, a separate owner-approved boundary-policy reopen must be independently delivered and certified. Certification must assign the baseline and all six immutable artifacts below:
+Before implementation, a separate owner-approved boundary-policy reopen must be independently delivered and certified. The prerequisite commit contains this closed certified set:
 
-- `BOUNDARY_POLICY_BASELINE_COMMIT`: a full 40-hex commit. Current value: `UNASSIGNED`.
-- `boundary-policy/baseline.env`: exactly one canonical assignment of the full baseline commit and no other keys.
-- `boundary-policy/exact-three-edges.json`: canonical resolved source/target IDs, all three required edges, no wildcard, and expected source blob/digest for each endpoint.
-- `boundary-policy/foundation-files.json`: the six certified Foundation paths and their unchanged `127f284` blob IDs.
-- `boundary-policy/inbound-import-policy.json`: default-deny policy whose sole production exception is the exact three-edge artifact.
-- `boundary-policy/audit-contract.json`: exact commands, expected rule IDs, schema versions, and tool blob/digests for the replacement audit and static suite.
-- `boundary-policy/certification.json`: canonical certification envelope, defined below.
+- `boundary-policy/root.json`: the trust anchor inside the commit, with baseline and hashes of every other artifact below.
+- `boundary-policy/exact-three-edges.json`: the three canonical resolved edges and endpoint source digests.
+- `boundary-policy/foundation-files.json`: the six unchanged `127f284` Foundation paths/blob IDs.
+- `boundary-policy/inbound-import-policy.json`: default deny with exactly those three exceptions.
+- `boundary-policy/audit-contract.json`: exact audit/static argv and expected results.
+- `boundary-policy/certification.json`: owner/reviewer certification envelope.
+- `boundary-policy/canonical-vectors.json`: complete canonical encoding vectors.
 
-`certification.json` MUST contain, in canonical field order: schema version; baseline commit; Foundation baseline; exact SHA-256 of the other five artifacts (`baseline.env` plus four non-certification JSON artifacts); audit-contract root; certification result exactly `PASS`; trusted owner-observation service, conversation ID, message ID, observed timestamp, owner handle, and SHA-256 of the exact UTF-8 owner words; reviewer verified identity/connection ID, reviewer key ID, verdict exactly `PASS`, review timestamp, reviewed baseline/artifact root; and an Ed25519 signature over the domain-separated canonical certification bytes. CI independently retrieves the owner observation from the trusted owner channel, verifies identifier/handle/body digest and that its scoped words approve this boundary reopen, then verifies reviewer identity binding, signature, verdict, and reviewed roots. A reference string, peer claim, copied owner text, unknown signer, or unbound reviewer fails.
+`BOUNDARY_POLICY_BASELINE_COMMIT` is currently `UNASSIGNED`. After assignment it is the 40-lowercase-hex commit containing all seven artifacts. `root.json` does not hash itself. Its canonical fields are schema version, baseline commit, Foundation baseline, and SHA-256 of the other six artifacts in the order listed above. Trust is anchored by three checks together: the configured baseline commit ID, `git show <baseline>:boundary-policy/root.json`, and the certification signature over `SHA-256(root.json canonical bytes)`. A changed root changes the commit and invalidates the configured baseline; a changed child breaks the root hash; there is no recursive manifest.
 
-`audit-contract.json` MUST contain, in canonical field order: schema version, baseline commit, policy-root digest, ordered audit/static command records, and contract root. Each command record contains command ID, exact argv array (no shell string), working directory, tool path, tool git blob, tool SHA-256, expected exit code, expected result schema, and expected rule IDs/counts. Its root uses the policy canonical/Merkle rules below with domain `V3AUDIT`; `certification.json` signs that root. The baseline commit MUST contain the byte-identical audit contract and all named tools at their declared blobs. CI executes only these argv records from that baseline and hashes results into the certification result.
+The dependency chain is acyclic and MUST be evaluated in this order: `(foundation-files, exact-three-edges, canonical-vectors) -> inbound policy -> audit contract -> root.json -> certification signature`. The policy header contains only Foundation and exact-edge roots, never an audit root. The audit contract contains the already-computed policy root. The certification contains the already-computed audit and root digests. No earlier artifact contains a later root.
 
-Those names describe required artifacts, not artifacts present in this branch. `UNASSIGNED`, a missing artifact, a non-ancestor baseline, a changed Foundation blob, or a policy/audit mismatch is a hard stop. The implementation branch must start from the named certified boundary-policy commit, not from this preflight head and not directly from `127f284`. Its CI must run the boundary baseline's audit/static commands. The old `127f284` audit/static suite remains a regression witness for this design-only branch but is not an implementation acceptance suite after the approved policy reopen.
+`audit-contract.json` contains schema version, baseline commit, policy root, ordered command records, expected result digests and an audit root. Each command has command ID, exact argv array, working directory, tool path/git blob/SHA-256, expected exit code/schema/rule IDs/counts/result digest. Audit root uses domain `V3AUDIT`. The baseline contains all named tools at those blobs.
+
+`certification.json` canonical fields are schema version; baseline/Foundation commits; root, policy, audit and vectors roots; result `PASS`; owner approval record; owner checkpoint; reviewer record; and signature. Owner approval records service, conversation/message IDs, observed timestamp, owner handle and exact UTF-8 body SHA-256. The guard independently retrieves it from the trusted owner channel and verifies scoped approval. Reviewer record binds verified identity/connection, key ID, `PASS`, timestamp and reviewed roots; Ed25519 signs `text("V3CERT:v1") || sha256(rootCanonicalBytes) || sha256(auditRoot) || sha256(vectorsArtifact) || git20(baseline)`.
+
+Owner revocation is fail-closed. Certification records an owner-channel checkpoint consisting of service, conversation ID, monotonically ordered provider message ID/cursor, checkpoint timestamp and signed checkpoint digest. Before each guard run and signing, the trusted channel adapter reads from the approval message through a fresh checkpoint, orders by provider sequence then timestamp/message ID, and evaluates later owner-authored restrictions/revocations under the same normalized scope. A matching later revocation, ambiguous ordering, changed/deleted source, cursor rollback, unavailable adapter, incomplete page, stale checkpoint older than 15 minutes, or inability to prove end-of-stream fails. The guard result records approval and checkpoint digests. Production also consumes an independently hosted, signed revocation log keyed by certification root; a newer revocation-log sequence or unavailable/stale log fails.
 
 ### Executable implementation guard contract
 
-Every future workflow whose changed paths intersect `src/`, implementation `tools/`, runtime tests, structural evidence, bundle/compiler/bootstrap/verifier/policy code, or any Authority Routing branch MUST invoke one versioned guard from the certified baseline before build or test. Required check name: `structural-boundary-policy-guard`; repository branch protection must require it for every structural/routing implementation branch and merge target. A workflow that omits the reusable guard is itself rejected by an organization-level required workflow. This design-only workflow may stay green and MUST be labeled non-authorizing.
+The control is installed before any implementation branch exists, not merely requested from those workflows:
 
-The guard reads `boundary-policy/baseline.env`, whose only accepted assignment is `BOUNDARY_POLICY_BASELINE_COMMIT=<40 lowercase hex>`; `UNASSIGNED`, missing, extra keys, or malformed values exit 1. While it is `UNASSIGNED`, any implementation-scope diff or implementation branch exits 1 before other jobs. After assignment the guard MUST:
+- A centrally owned reusable workflow and guard binary are pinned by full commit and SHA-256 in an organization ruleset that repository writers cannot edit.
+- The ruleset runs on every push and pull request to this repository, including new branches, and is required before merge or release. It checks the complete `BASE...HEAD` tree diff itself, not caller path filters.
+- Exact implementation classifier: any changed path other than the two design-only paths in this preflight is implementation scope; any commit adding/modifying workflow YAML, `src/**`, `tests/**`, `tools/**`, `evidence/**`, `boundary-policy/**`, package/lock/build/container files, generated bundles, bootstrap/verifier/compiler files, or a branch/ref containing `structural`, `authority-routing`, or `promotion` is implementation scope. Unknown/new paths default to implementation scope. Renames inspect both paths. Deletions and submodules are implementation scope.
+- The central workflow's identity, guard digest, ruleset ID/version and required check name `structural-boundary-policy-guard` are recorded in `root.json` and certification. Organization audit evidence proves repository admins cannot bypass/dismiss it; bypass actors are empty.
+- A separate release environment accepts artifacts only with a fresh signed guard result bound to repository ID, full `HEAD`, baseline/root, diff digest, ruleset version and check-run ID. Thus a renamed/omitted local workflow cannot release.
 
-1. fetch the named commit by object ID from the pinned delivery repository and require it to be an ancestor of `HEAD`;
-2. read all six artifacts from that commit, reject worktree overrides, and verify their exact SHA-256 values from a guard-owned digest manifest committed at the same baseline;
-3. verify unchanged Foundation blobs against `foundation-files.json` and `127f284`;
-4. canonicalize and verify the exact-edge, inbound-policy, audit-contract, certification and digest-manifest chains;
-5. independently retrieve and validate owner approval evidence and reviewer identity/signature as specified above;
-6. require certification `PASS`, exact baseline/root binding, and no revocation;
-7. execute the audit/static argv records from the named baseline and compare exit codes, schema, rule IDs/counts and result digests;
-8. emit a signed machine-readable guard result bound to `HEAD`, then allow downstream jobs only through `needs: structural-boundary-policy-guard`.
+While baseline is `UNASSIGNED`, the central guard fails every implementation-scope change before downstream jobs. After assignment it fetches the exact commit, proves ancestry, reads `root.json` and all six children by git object ID, verifies the acyclic hash/signature chain, unchanged Foundation blobs, fresh owner/revocation state, reviewer binding, canonical vectors, exact policy, and audit/static argv/results. It emits the signed result above only on complete success. Negative conformance tests create arbitrary new paths/workflows, renames, deletions, caller-filter omissions and narrowed workflows and prove the central check/release environment block them.
 
-Future implementation workflows must include the reusable workflow by immutable commit SHA, expose no `continue-on-error`, and make build/sign/release jobs depend on its success. Organization rules must reject edits that narrow its path classifier. The implementation delivery must include a negative CI fixture proving `UNASSIGNED`, absent artifacts, wrong ancestry, artifact substitution, stale owner evidence, bad reviewer signature, command drift, or an uncovered implementation path blocks all downstream jobs. This preflight does not install that future cross-workflow/organization control; therefore it cannot be cited as mechanical implementation authorization.
+This design branch does not install the central ruleset or guard. Therefore it remains non-authorizing even while its own CI is green. `UNASSIGNED`, absent controls/artifacts, stale/unavailable approval/revocation evidence, or any chain mismatch is a hard stop.
 
 ## Exact trust boundaries
 
@@ -100,7 +101,7 @@ Untrusted inside this boundary: source text, package metadata supplied by the ap
 
 ### Graph authority boundary
 
-The canonical graph is the sole module authority for the compartment. Each node records normalized module ID, source SHA-256, format, ordered dependency specifiers, resolved target IDs, transform identity, and output record SHA-256. The graph header records schema version, policy digest, compiler digest/version, target (`node` or `web`), Foundation baseline, and bundle root.
+The canonical graph is the sole module authority for the compartment. Each node records normalized module ID, source SHA-256, format, ordered dependency specifiers, resolved target IDs, transform identity, and output record SHA-256. The graph header records schema version, policy root, compiler/transform identities, target, boundary baseline and source commit. It deliberately omits the bundle root. The acyclic runtime chain is `policyRoot -> graphRoot -> bundleRoot -> release signature`: policy is computed first, graph binds policy, bundle binds graph, and release binds all three.
 
 Canonical encoding has one normative primitive set. `u8` is one byte. `u32` is unsigned big-endian. `sha256` is exactly 32 raw bytes. `git20` is exactly 20 raw bytes decoded from a 40-lowercase-hex commit. `text` is `u32(byteLength) || UTF8`; UTF-8 must be shortest-form, valid scalar values, no BOM, and input is not normalized. Canonical identifiers/specifiers are ASCII and reject `NUL`, `\`, empty/dot segments, duplicate separators, absolute paths, percent encoding and traversal. `blob` is `u32(byteLength) || raw bytes`. Target is `text` constrained to exactly `node` or `web`. Other enums are `u8`: format `1=esm, 2=cjs-lowered, 3=synthetic`; policy action `1=allow, 2=deny`. Arrays encode `u32(count)` followed by records. Every count/length is bounded before allocation. Fixed-width values are never wrapped in `text`/`blob`.
 
@@ -120,7 +121,7 @@ A dependency appears exactly once in its node table and exactly once as an equal
 
 | Record | Exact fields, in byte order |
 | --- | --- |
-| policy header | `text("V3POLICY:HEADER:v1")`, `text(schemaVersion)`, `git20(boundaryBaseline)`, `sha256(foundationFilesArtifact)`, `sha256(auditContractRoot)`, `u32(ruleCount)` |
+| policy header | `text("V3POLICY:HEADER:v1")`, `text(schemaVersion)`, `git20(boundaryBaseline)`, `sha256(foundationFilesArtifact)`, `sha256(exactThreeEdgesArtifact)`, `u32(ruleCount)` |
 | policy rule | `text("V3POLICY:RULE:v1")`, `u8(action)`, `text(referrerId)`, `text(targetId)`, `sha256(referrerSource)`, `sha256(targetSource)` |
 | policy artifact | `text("V3POLICY:ARTIFACT:v1")`, `blob(header)`, rules sorted by `(action,referrer,target,referrerSource,targetSource)` raw bytes as `blob(rule)` |
 
@@ -142,14 +143,38 @@ For each domain `D` in `V3GRAPH`, `V3POLICY`, `V3BUNDLE`, or `V3AUDIT`: leaf `i`
 
 Release bytes are exactly: `text("V3RELEASE:v1")`, `sha256(graphRoot)`, `sha256(policyRoot)`, `sha256(bundleRoot)`, `sha256(verifier)`, `text(target)`, `git20(boundaryBaseline)`, `git20(sourceCommit)`, `u32(releaseSequence)`. Signature input is these bytes without another wrapper.
 
-A required machine-readable `boundary-policy/canonical-vectors.json` must carry complete field values, canonical artifact bytes and roots for empty/single/odd/multi-level trees and every rejection case. Minimum concrete zero vector (`target=node`, both commits and all fixed hashes zero, one ESM node `a` with no dependencies/exports, one allow rule `a -> b`, bundle record `a` with byte `0x78`, sequence 1) has:
+A required machine-readable `boundary-policy/canonical-vectors.json` is part of the certified set and hashed by `root.json`. It contains field values, complete canonical hex and roots. The minimum vector fixes: graph schema `v3-graph/1`; policy schema `v3-policy/1`; bundle schema `v3-bundle/1`; target `node`; both commits, Foundation/exact-edge/compiler/transform/verifier/audit/vector hashes all zero; one ESM node `a` with no dependencies/exports; one allow rule `a -> b`; one bundle record `a` containing `0x78`; sequence 1. Policy is computed first; its computed root enters the graph header; computed graph root enters bundle header; computed roots enter release.
 
-- graph root `690e769a1fea8c2fd5f374869c50136b2523568059fd5bb794d96a17786e9895`
-- policy root `44bc96c81ee4a220fc73dbbc8411bcb9ae382e9422faf86d29e67a041077e207`
-- bundle root `474f4629b3d03fe2eceb34c205c2340e598aedcf7e5a8f70521a4a4035d58645`
-- release SHA-256 `1a58d516fd384b853a61301e4b54a641de54c1227428ddb0dfaf5141ae6f815f`
+```json
+{
+  "values": {
+    "graphSchemaVersion": "v3-graph/1",
+    "policySchemaVersion": "v3-policy/1",
+    "bundleSchemaVersion": "v3-bundle/1",
+    "target": "node",
+    "boundaryBaselineHex": "0000000000000000000000000000000000000000",
+    "sourceCommitHex": "0000000000000000000000000000000000000000",
+    "foundationRootHex": "0000000000000000000000000000000000000000000000000000000000000000",
+    "exactEdgesRootHex": "0000000000000000000000000000000000000000000000000000000000000000",
+    "compilerBinaryHex": "0000000000000000000000000000000000000000000000000000000000000000",
+    "transformSetHex": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verifierHex": "0000000000000000000000000000000000000000000000000000000000000000",
+    "auditRootHex": "0000000000000000000000000000000000000000000000000000000000000000",
+    "vectorsRootHex": "0000000000000000000000000000000000000000000000000000000000000000",
+    "releaseSequence": 1
+  },
+  "policyArtifactHex": "000000145633504f4c4943593a41525449464143543a76310000007d000000125633504f4c4943593a4845414445523a76310000000b76332d706f6c6963792f31000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000005f000000105633504f4c4943593a52554c453a7631010000000161000000016200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+  "policyRootHex": "44bc96c81ee4a220fc73dbbc8411bcb9ae382e9422faf86d29e67a041077e207",
+  "graphArtifactHex": "00000013563347524150483a41525449464143543a7631000000bb00000011563347524150483a4845414445523a76310000000a76332d67726170682f31000000046e6f64650000000000000000000000000000000000000000000000000000000000000000000000000000000044bc96c81ee4a220fc73dbbc8411bcb9ae382e9422faf86d29e67a041077e207000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000810000000f563347524150483a4e4f44453a76310000000161000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+  "graphRootHex": "a2f53978d0d1210bdd16d3f7b31c98cc83aff43beb7d87498cc002dc55a82b04",
+  "bundleArtifactHex": "00000014563342554e444c453a41525449464143543a76310000005100000012563342554e444c453a4845414445523a76310000000b76332d62756e646c652f31000000046e6f6465a2f53978d0d1210bdd16d3f7b31c98cc83aff43beb7d87498cc002dc55a82b04000000010000004100000012563342554e444c453a5245434f52443a763100000001610100000001782d711642b726b04401627ca9fbac32f5c8530fb1903cc4db02258717921a4881",
+  "bundleRootHex": "df58f63a9d410d35f21b3d73295705fb2a9cda430abad6e018e71021fb3ef21d",
+  "releaseBytesHex": "0000000c563352454c454153453a7631a2f53978d0d1210bdd16d3f7b31c98cc83aff43beb7d87498cc002dc55a82b0444bc96c81ee4a220fc73dbbc8411bcb9ae382e9422faf86d29e67a041077e207df58f63a9d410d35f21b3d73295705fb2a9cda430abad6e018e71021fb3ef21d000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000046e6f64650000000000000000000000000000000000000000000000000000000000000000000000000000000000000001",
+  "releaseSha256Hex": "b7b9da67513ac475832bb37f94e1f8151a76c9610180d3ee97d7e5f1bdc0866f"
+}
+```
 
-The named vector artifact must include the full canonical hex, not only these roots, and must be generated identically by independent Rust and non-Rust reference implementations. Any discrepancy blocks certification.
+The artifact additionally carries independently generated empty/single/odd/multi-level and rejection vectors. This checked-in full-hex vector is executable by the future guard; the stated roots are not deferred prose.
 
 Release CI signs only the normative release bytes. Runtime reconstructs all canonical bytes from parsed bounded values, verifies roots/signature and then verifies every referenced digest before evaluation.
 
@@ -344,11 +369,11 @@ The existing JavaScript authority audit remains defense-in-depth. Its success is
 
 ## Gate sequence and stop conditions
 
-1. Obtain owner approval for a separate boundary-policy reopen; independently certify it and replace `UNASSIGNED` with its immutable 40-hex commit plus the six named policy/certification artifacts.
+1. Obtain owner approval for a separate boundary-policy reopen; independently certify it and replace `UNASSIGNED` with its immutable 40-hex commit plus the seven named boundary artifacts.
 2. Run that baseline's named audit/static suite and prove exactly the three policy edges are allowed while all others remain denied.
 3. Approve compiler provenance/reproducibility, signing/key controls, external Web root, SES/Endo ABI, exact engine builds, and protocol limits.
 4. Implement only the graph compiler, artifact verifier, isolated worker compartment, fixtures, and evidence generator on a new implementation branch.
 5. Run independent security review and the complete proof matrix.
 6. Only after independent certification may a separate Authority Routing Gate review consider runtime promotion.
 
-HARD STOP and request owner review if the boundary baseline remains `UNASSIGNED` or uncertified, its artifacts/suite are absent, any step requires changing a certified Foundation production module, weakening Foundation fail-closed behavior, adding a fourth Gate-to-Foundation edge, exposing a loader/host object, accepting an undeclared dependency, relaxing a failed target, or replacing behavioral proof with a source blacklist.
+HARD STOP and request owner review if the boundary baseline remains `UNASSIGNED` or uncertified, its central ruleset/guard, seven artifacts, or suite are absent, any step requires changing a certified Foundation production module, weakening Foundation fail-closed behavior, adding a fourth Gate-to-Foundation edge, exposing a loader/host object, accepting an undeclared dependency, relaxing a failed target, or replacing behavioral proof with a source blacklist.
