@@ -16,7 +16,7 @@ Every item below is `CANDIDATE_FOR_OWNER_APPROVAL`. Inclusion, identity, digest,
 
 ## Candidate B - launcher
 
-- Artifact: `future-bootstrap-launcher.review-bytes`, mode `100644`, 851 bytes, SHA-256 `8c34f04ab1f799380e8595c5ffe257cdc8ed864230eb4e60c96fb01ba26fcf70`, Git blob `d1966f6e95456ab7fd4e408f17bf6fc297d31177`.
+- Artifact: `future-bootstrap-launcher.review-bytes`, mode `100644`, 851 bytes, SHA-256 `e9d40303c39310761a4f3c0ebb3374806ed420b008926ae6a3ea2e14fcc55232`, Git blob `fa2ecf9e40a07221ba9f849e402d4d27822faa23` before final commit.
 - Provenance: exact repository bytes in this review package; owner-approved descendant lineage from `d274fc8`. It has no shebang and was not executed.
 - Role: runs only after a higher-level measured-execution service has verified the OCI/rootfs and protected pin-store digest. It checks fixed script path, type, mode, length and digest, then invokes admitted Bash by absolute path.
 - Immutable build/retrieval: no build; reviewers hash raw committed bytes and compare Git blob. Later execution copies the exact reviewed blob by commit/tree identity.
@@ -26,7 +26,7 @@ Every item below is `CANDIDATE_FOR_OWNER_APPROVAL`. Inclusion, identity, digest,
 
 ## Candidate C - protected pin store
 
-- Artifact: `bootstrap-pin-store.candidate.json`, canonical sorted-key compact JSON plus LF, mode `100644`, 958 bytes, SHA-256 `adabd19cac20cd97cfbfa4f007e22267ab1720852390a7b6d9e50b322966b51e`, Git blob `e102b2fe254e67bdbb37a0fe2585a6b7b0dacb07`.
+- Artifact: `bootstrap-pin-store.candidate.json`, canonical sorted-key compact JSON plus LF, mode `100644`, 958 bytes, SHA-256 `a0fe3cae00b8bcd3df52819daa9d4ad579ad744eb4a49326cdb5a1024d36275e`, Git blob `177c809961298bc6846faf59222a5a29bbffae79` before final commit.
 - Provenance: exact reviewed repository bytes and owner-approved descendant lineage from `d274fc8`.
 - Role: binds candidate base image and exact future script identity. It grants no execution authority while its `authority` field is `CANDIDATE_FOR_OWNER_APPROVAL`.
 - Protection/persistence: candidate storage is Git only. Proposed approved persistence is an offline-root-signed, append-only pin record replicated into the external launcher's protected read-only configuration, with monotonic sequence and rollback floor. The signer key, protected store product and measurement service require explicit owner selection; this JSON does not self-authorize them.
@@ -38,7 +38,7 @@ Because the protected-store product, its offline signer and measured-execution s
 
 ## Exact future script review artifact
 
-`future-rust-provisioning-script.review-bytes` is the complete proposed future script: mode `100644`, no shebang, 8,876 bytes, SHA-256 `297e3baca8152a96e999a3ebe52150ebb81f0ea299a32df9a95c349a5ef04f2a`, Git blob `681a18f87749d71fac4bb53a442e7e2accc4304a`. It was written and hashed as data and never invoked. Its path, raw bytes, hash, length, mode and final commit blob comprise `PINNED_SCRIPT_IDENTITY` after review. `PINNED_SCRIPT_IDENTITY` never means `EXECUTION_AUTHORIZED`. Any byte or metadata change invalidates review.
+`future-rust-provisioning-script.review-bytes` is the complete proposed future script: mode `100644`, no shebang, 8,738 bytes, SHA-256 `7d6b7c6399919ebfc4c9f3eea4455b5033ec6ed0a57ffed570ecfe525fde9b33`, Git blob `2622618addebf7385bda722295965540cf51c849` before final commit. It was written and hashed as data and never invoked. Its path, raw bytes, hash, length, mode and final commit blob comprise `PINNED_SCRIPT_IDENTITY` after review. `PINNED_SCRIPT_IDENTITY` never means `EXECUTION_AUTHORIZED`. Any byte or metadata change invalidates review.
 
 The review artifact consumes already-downloaded exact Rust inputs. Retrieval is a distinct launcher-controlled phase using admitted `/usr/bin/curl` and the pinned CA/resolver closure, before the script runs. This prevents downloaded bytes from being executed before the script's validations.
 
@@ -135,6 +135,20 @@ There is no fourth category. Every authoritative path is `protocol -> exact laun
 | `/usr/lib/x86_64-linux-gnu/libunistring.so.2.2.0` | PINNED_AND_VERIFIED | dynamic-library | 1743016 | `9c28d59500f186fc28bf7e77e9b1a71129f66731c52ac1e974b9acd1a760911a` | exact file from MCR OCI manifest `sha256:c60167d590a5b777953097a5d3647cb0753465748d1a9d6442e4088305d90c46`; package origin mapped by embedded dpkg database |
 | `/usr/lib/x86_64-linux-gnu/libz.so.1.2.11` | PINNED_AND_VERIFIED | dynamic-library | 108936 | `64c206f0146cc58bbddc4f22054436f4ff278f5a554aa3ce6921ddf7e9133370` | exact file from MCR OCI manifest `sha256:c60167d590a5b777953097a5d3647cb0753465748d1a9d6442e4088305d90c46`; package origin mapped by embedded dpkg database |
 | `/usr/lib/x86_64-linux-gnu/libzstd.so.1.4.8` | PINNED_AND_VERIFIED | dynamic-library | 841808 | `5df4f4df42d76270bb6981fabc7c1fdccd8ad28a23d84d67f73203fb3f537667` | exact file from MCR OCI manifest `sha256:c60167d590a5b777953097a5d3647cb0753465748d1a9d6442e4088305d90c46`; package origin mapped by embedded dpkg database |
+## Archive-type hostile fixtures
+
+Exact deterministic GNU-format `.tar.xz` review fixtures prove the pinned listing parser rejects each special type before extraction:
+
+| Fixture | Bytes | SHA-256 | Required result |
+|---|---:|---|---|
+| `block-device.tar.xz` | 156 | `d5984776126fa10bd08e60d4160fc66bed3b9be9065960fe7463dbb8cce9a78f` | `E_ARCHIVE_TYPE` before extraction |
+| `char-device.tar.xz` | 156 | `be118ed40deb14eb4e3d4089986e59e594b1ec2873e95a140ff900983b0cb798` | `E_ARCHIVE_TYPE` before extraction |
+| `fifo.tar.xz` | 148 | `621a9ebef2ede194ef051e4277a80076e13393132aa521433e23391dd361338e` | `E_ARCHIVE_TYPE` before extraction |
+| `hardlink.tar.xz` | 180 | `4e47c655bad5e7d16305f8c2a7fa61bdad1e1c092de982ff1c6e896fff01ae6b` | `E_ARCHIVE_TYPE` before extraction |
+| `symlink.tar.xz` | 152 | `7e64f11491d5b0e3ccf7d30d5def02239e8f0dd25f632a8ba2cce9c0b501c77c` | `E_ARCHIVE_TYPE` before extraction |
+
+The parser runs with `LC_ALL=C`, `--quoting-style=escape`, `--numeric-owner` and `--full-time`, accepts listing records beginning only `-` or `d`, and requires `E_ARCHIVE_TYPE` for each fixture. Review records that no extraction command was invoked. Any GNU tar formatting change requires new fixtures and review; a future machine-readable verifier is preferred.
+
 ## Runtime-data candidates
 
 | Path | Class | Bytes | SHA-256 | Purpose/provenance |
@@ -146,6 +160,16 @@ There is no fourth category. Every authoritative path is `protocol -> exact laun
 | `/etc/ssl/certs/ca-certificates.crt` | PINNED_AND_VERIFIED | 219342 | `6d84ab71cb726c0641b0af84303c316e3fa50db941dc8507d09045eb2fa5d238` | exact CA trust store from MCR candidate; no ambient host store |
 | `/usr/lib/x86_64-linux-gnu/libnss_dns.so.2` | PINNED_AND_VERIFIED | 14352 | `f334ba8e66e7d0bbbd4f72d2771fc63ebcb6daef89438e4eff8815696b5c024d` | exact NSS DNS module from MCR candidate |
 | `/usr/lib/x86_64-linux-gnu/libnss_files.so.2` | PINNED_AND_VERIFIED | 14352 | `8f8501037e70fdf85f0c5d894e38e857998bbc4909f00e329bb3e98b76913499` | exact NSS files module from MCR candidate |
+
+### Resolver candidates requiring owner choice
+
+The immutable image's `/etc/resolv.conf` is empty, so network retrieval cannot be approved without choosing exactly one concrete alternative:
+
+- `RESOLVER_CANDIDATE_STATIC_IP`: resolve all `static.rust-lang.org` HTTPS endpoints outside the candidate; pin the exact IP set, TLS SNI/Host, retrieval time window and external signed resolver evidence. Curl uses reviewed `--resolve host:443:IP` vectors and the pinned CA bundle. Replacement requires a new signed mapping and owner approval. Risk: CDN IP churn and expiry.
+- `RESOLVER_CANDIDATE_PINNED_FILE`: add a canonical `/etc/resolv.conf` review artifact containing exactly one approved DNS endpoint, with byte length/SHA-256 in the pin store; pin `/etc/hosts`, `/etc/gai.conf`, route/network namespace and the endpoint's authenticated operator identity. Replacement requires review and owner approval. Risk: DNS operator/network compromise and environment coupling.
+- `RESOLVER_CANDIDATE_OFFLINE_INPUTS`: perform no network inside the measured candidate. A separately approved delivery service supplies the nine exact preverified input files into a content-addressed read-only input mount. Its signer/transport/launcher graph must be approved, but DNS, curl, CA and resolver nodes become `NON_AUTHORITATIVE/OUT_OF_SCOPE` for script execution. This is the preferred smaller runtime graph.
+
+Each remains `CANDIDATE_FOR_OWNER_APPROVAL`. An empty or ambient resolver, injected host resolver, mutable DNS server or implicit container-runtime `/etc/resolv.conf` MUST FAIL CLOSED.
 
 GPG uses `--no-options`, an explicit empty mode-0700 `GNUPGHOME`, the exact pinned key, no agent configuration and no ambient keyring. Locale is `C`, timezone is `UTC`, HOME is `/nonexistent`, PATH is empty and network proxy variables are rejected. The candidate image must prove that locale/timezone need no additional loaded data for these operations. `/dev/null`, shell/glibc/kernel file-test and filesystem semantics, `/etc/hosts`, `/etc/gai.conf`, `/etc/host.conf`, entropy source, kernel syscalls, mount policy and container runtime are explicit `NON_AUTHORITATIVE/OUT_OF_SCOPE` nodes under the reduced trusted-environment boundary; if a later threat model makes any authoritative, it must be pinned before approval.
 

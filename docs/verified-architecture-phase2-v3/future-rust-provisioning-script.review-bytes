@@ -2,7 +2,7 @@
 set -euf
 umask 077
 CREATED=
-cleanup() { code=$?; if [ $code -ne 0 ] && [ -n "$CREATED" ]; then /usr/bin/rm -rf -- "$OUTPUT" "$OUTPUT.stage" "$OUTPUT.gnupg" "$OUTPUT.gpg-import.out" "$OUTPUT.gpg-import.err" "$OUTPUT.gpg-status" "$OUTPUT.gpg-verify.err" "$OUTPUT.archive-list" "$OUTPUT.archive-types" "$OUTPUT.license.generated" "$OUTPUT.input-list"; fi; exit $code; }
+cleanup() { code=$?; if [ $code -ne 0 ] && [ -n "$CREATED" ]; then /usr/bin/rm -rf -- "$OUTPUT" "$OUTPUT.stage"; fi; exit $code; }
 trap cleanup EXIT
 fail() { code=$1; /usr/bin/printf '%s\n' "$code" >&2; exit 97; }
 [ "$#" -eq 2 ] || fail E_ARGUMENT_COUNT
@@ -33,41 +33,41 @@ check e974f036b28565f37c0f3bd92ddefa809bee16c04f9dcf07b9ed96e05aaaf7c4 "$RUSTC"
 check ea1de9f9e23107d97ee2b41a72c552f34064a593da503789218387aee59f3ba4 "$CARGO"
 check fa3ff450172a16c026944030230c5069947af93c728d9179971d44e5e0cfb561 "$STD"
 check e01f11e6bdba74f2b87a36c86b75691682850ee6e8b3466c5c6f18166dff8200 "$LICENSE"
-/usr/bin/find "$INPUT" -xdev -mindepth 1 -maxdepth 1 -printf '%f\n' | /usr/bin/sort >"$OUTPUT.input-list" || fail E_INPUT_LIST
-/usr/bin/printf '%s\n' cargo-1.98.1-x86_64-unknown-linux-gnu.tar.xz channel-rust-1.98.1.toml channel-rust-1.98.1.toml.asc channel-rust-1.98.1.toml.sha256 expected-channel-rust-1.98.1.toml.sha256 rust-1.98.1-license-notice-manifest.bin rust-key.gpg.ascii rust-std-1.98.1-x86_64-unknown-linux-gnu.tar.xz rustc-1.98.1-x86_64-unknown-linux-gnu.tar.xz | /usr/bin/sort >"$OUTPUT.input-expected" || fail E_INPUT_LIST
-/usr/bin/cmp -s "$OUTPUT.input-list" "$OUTPUT.input-expected" || fail E_EXTRA_INPUT
-/usr/bin/cmp -s "$CHECKSUM" "$EXPECTED_CHECKSUM" || fail E_CHECKSUM_BYTES
 /usr/bin/mkdir -m 700 "$OUTPUT" || fail E_DIRECTORY
 CREATED=1
-GNUPGHOME=$OUTPUT.gnupg
+/usr/bin/find "$INPUT" -xdev -mindepth 1 -maxdepth 1 -printf '%f\n' | /usr/bin/sort >"$OUTPUT/input-list" || fail E_INPUT_LIST
+/usr/bin/printf '%s\n' cargo-1.98.1-x86_64-unknown-linux-gnu.tar.xz channel-rust-1.98.1.toml channel-rust-1.98.1.toml.asc channel-rust-1.98.1.toml.sha256 expected-channel-rust-1.98.1.toml.sha256 rust-1.98.1-license-notice-manifest.bin rust-key.gpg.ascii rust-std-1.98.1-x86_64-unknown-linux-gnu.tar.xz rustc-1.98.1-x86_64-unknown-linux-gnu.tar.xz | /usr/bin/sort >"$OUTPUT/input-expected" || fail E_INPUT_LIST
+/usr/bin/cmp -s "$OUTPUT/input-list" "$OUTPUT/input-expected" || fail E_EXTRA_INPUT
+/usr/bin/cmp -s "$CHECKSUM" "$EXPECTED_CHECKSUM" || fail E_CHECKSUM_BYTES
+GNUPGHOME=$OUTPUT/gnupg
 /usr/bin/mkdir -m 700 "$GNUPGHOME" || fail E_GPG_HOME
 export GNUPGHOME
-/usr/bin/gpg --batch --no-options --homedir "$GNUPGHOME" --import "$KEY" >$OUTPUT.gpg-import.out 2>$OUTPUT.gpg-import.err || fail E_KEY_IMPORT
-/usr/bin/gpg --batch --no-options --homedir "$GNUPGHOME" --status-fd 1 --verify "$SIGNATURE" "$MANIFEST" >$OUTPUT.gpg-status 2>$OUTPUT.gpg-verify.err || fail E_SIGNATURE
-/usr/bin/grep -Fx '[GNUPG:] VALIDSIG 108F66205EAEB0AAA8DD5E1C85AB96E6FA1BE5FE 2026-09-03 1788440054 0 4 0 1 10 00 108F66205EAEB0AAA8DD5E1C85AB96E6FA1BE5FE' "$OUTPUT.gpg-status" >/dev/null || fail E_SIGNER
+/usr/bin/gpg --batch --no-options --homedir "$GNUPGHOME" --import "$KEY" >$OUTPUT/gpg-import.out 2>$OUTPUT/gpg-import.err || fail E_KEY_IMPORT
+/usr/bin/gpg --batch --no-options --homedir "$GNUPGHOME" --status-fd 1 --verify "$SIGNATURE" "$MANIFEST" >$OUTPUT/gpg-status 2>$OUTPUT/gpg-verify.err || fail E_SIGNATURE
+/usr/bin/grep -Fx '[GNUPG:] VALIDSIG 108F66205EAEB0AAA8DD5E1C85AB96E6FA1BE5FE 2026-09-03 1788440054 0 4 0 1 10 00 108F66205EAEB0AAA8DD5E1C85AB96E6FA1BE5FE' "$OUTPUT/gpg-status" >/dev/null || fail E_SIGNER
 /usr/bin/grep -Fx 'manifest-version = "2"' "$MANIFEST" >/dev/null || fail E_MANIFEST_FIELD
 /usr/bin/grep -Fx 'date = "2026-09-03"' "$MANIFEST" >/dev/null || fail E_MANIFEST_FIELD
 [ "$(/usr/bin/grep -Fc 'manifest-version = "2"' "$MANIFEST")" = 1 ] || fail E_MANIFEST_DUPLICATE
 [ "$(/usr/bin/grep -Fc 'date = "2026-09-03"' "$MANIFEST")" = 1 ] || fail E_MANIFEST_DUPLICATE
 STAGE=$OUTPUT.stage
 /usr/bin/mkdir -m 700 "$STAGE" || fail E_DIRECTORY
-for archive in "$RUSTC" "$CARGO" "$STD" "$LICENSE" "$EXPECTED_CHECKSUM"; do
-  /usr/bin/tar --use-compress-program=/usr/bin/xz -tf "$archive" >$OUTPUT.archive-list || fail E_ARCHIVE_LIST
-  /usr/bin/tar --use-compress-program=/usr/bin/xz -tvf "$archive" >$OUTPUT.archive-types || fail E_ARCHIVE_LIST
-  /usr/bin/grep -Ev '^[-d]' "$OUTPUT.archive-types" >/dev/null && fail E_ARCHIVE_TYPE
-  /usr/bin/grep -E '(^/|(^|/)\.\.(/|$)|\\)' "$OUTPUT.archive-list" >/dev/null && fail E_ARCHIVE_PATH
+for archive in "$RUSTC" "$CARGO" "$STD"; do
+  /usr/bin/tar --quoting-style=escape --numeric-owner --full-time --use-compress-program=/usr/bin/xz -tf "$archive" >$OUTPUT/archive-list || fail E_ARCHIVE_LIST
+  /usr/bin/tar --quoting-style=escape --numeric-owner --full-time --use-compress-program=/usr/bin/xz -tvf "$archive" >$OUTPUT/archive-types || fail E_ARCHIVE_LIST
+  /usr/bin/grep -Ev '^[-d]' "$OUTPUT/archive-types" >/dev/null && fail E_ARCHIVE_TYPE
+  /usr/bin/grep -E '(^/|(^|/)\.\.(/|$)|\\)' "$OUTPUT/archive-list" >/dev/null && fail E_ARCHIVE_PATH
   /usr/bin/tar --use-compress-program=/usr/bin/xz --no-same-owner --no-same-permissions -xf "$archive" -C "$STAGE" || fail E_ARCHIVE_EXTRACT
 done
-/usr/bin/find "$STAGE" -xdev -printf '%y\0%p\0%m\0%s\0%l\0' | /usr/bin/sort -z >$OUTPUT.extracted.inventory || fail E_INVENTORY
+/usr/bin/find "$STAGE" -xdev -printf '%y\0%p\0%m\0%s\0%l\0' | /usr/bin/sort -z >$OUTPUT/extracted.inventory || fail E_INVENTORY
 for component in rustc-1.98.1-x86_64-unknown-linux-gnu cargo-1.98.1-x86_64-unknown-linux-gnu rust-std-1.98.1-x86_64-unknown-linux-gnu; do [ -d "$STAGE/$component" ] || fail E_COMPONENT; done
-/usr/bin/rm -f "$OUTPUT.license.generated"
+/usr/bin/rm -f "$OUTPUT/license.generated"
 while IFS= read -r rel; do
   file=$STAGE/$rel
   [ -f "$file" ] && [ ! -L "$file" ] || fail E_LICENSE_PATH
   size=$(/usr/bin/stat -c %s "$file") || fail E_LICENSE_STAT
   sum=$(/usr/bin/sha256sum "$file") || fail E_LICENSE_HASH
   sum=${sum%% *}
-  /usr/bin/printf '%s\0%s\0%s\n' "$rel" "$size" "$sum" >>"$OUTPUT.license.generated" || fail E_LICENSE_EVIDENCE
+  /usr/bin/printf '%s\0%s\0%s\n' "$rel" "$size" "$sum" >>"$OUTPUT/license.generated" || fail E_LICENSE_EVIDENCE
 done <<'LICENSE_PATHS'
 cargo-1.98.1-x86_64-unknown-linux-gnu/LICENSE-APACHE
 cargo-1.98.1-x86_64-unknown-linux-gnu/LICENSE-MIT
@@ -96,15 +96,15 @@ rustc-1.98.1-x86_64-unknown-linux-gnu/rustc/share/doc/rust/licenses/NCSA.txt
 rustc-1.98.1-x86_64-unknown-linux-gnu/rustc/share/doc/rust/licenses/OFL-1.1.txt
 rustc-1.98.1-x86_64-unknown-linux-gnu/rustc/share/doc/rust/licenses/Unicode-3.0.txt
 LICENSE_PATHS
-/usr/bin/cmp -s "$OUTPUT.license.generated" "$LICENSE" || fail E_LICENSE_MANIFEST
+/usr/bin/cmp -s "$OUTPUT/license.generated" "$LICENSE" || fail E_LICENSE_MANIFEST
 /usr/bin/cp -a --no-preserve=ownership "$STAGE/rustc-1.98.1-x86_64-unknown-linux-gnu/rustc/." "$OUTPUT/" || fail E_INSTALL_COPY
 /usr/bin/cp -a --no-preserve=ownership "$STAGE/cargo-1.98.1-x86_64-unknown-linux-gnu/cargo/." "$OUTPUT/" || fail E_INSTALL_COPY
 /usr/bin/cp -a --no-preserve=ownership "$STAGE/rust-std-1.98.1-x86_64-unknown-linux-gnu/rust-std-x86_64-unknown-linux-gnu/." "$OUTPUT/" || fail E_INSTALL_COPY
-/usr/bin/find "$OUTPUT" -xdev -type l -printf '%p\0%l\0' | /usr/bin/sort -z >$OUTPUT.symlinks || fail E_SYMLINK_INVENTORY
-/usr/bin/find "$OUTPUT" -xdev -type f -print0 | /usr/bin/sort -z | /usr/bin/xargs -0 /usr/bin/sha256sum >$OUTPUT.files.sha256 || fail E_FILE_HASH
-/usr/bin/find "$OUTPUT" -xdev -printf '%y\0%p\0%m\0%s\0%l\0' | /usr/bin/sort -z >$OUTPUT.installed.inventory || fail E_INSTALL_INVENTORY
-/usr/bin/printf '%s\n' 'RUST_TOOLCHAIN_PROVISIONED' >$OUTPUT.success.tmp || fail E_EVIDENCE
-/usr/bin/sync -f "$OUTPUT.success.tmp" || fail E_FSYNC
-/usr/bin/mv "$OUTPUT.success.tmp" "$OUTPUT.success" || fail E_MARKER
+/usr/bin/find "$OUTPUT" -xdev -type l -printf '%p\0%l\0' | /usr/bin/sort -z >$OUTPUT/symlinks || fail E_SYMLINK_INVENTORY
+/usr/bin/find "$OUTPUT" -xdev -type f -print0 | /usr/bin/sort -z | /usr/bin/xargs -0 /usr/bin/sha256sum >$OUTPUT/files.sha256 || fail E_FILE_HASH
+/usr/bin/find "$OUTPUT" -xdev -printf '%y\0%p\0%m\0%s\0%l\0' | /usr/bin/sort -z >$OUTPUT/installed.inventory || fail E_INSTALL_INVENTORY
+/usr/bin/printf '%s\n' 'RUST_TOOLCHAIN_PROVISIONED' >$OUTPUT/success.tmp || fail E_EVIDENCE
+/usr/bin/sync -f "$OUTPUT/success.tmp" || fail E_FSYNC
+/usr/bin/mv "$OUTPUT/success.tmp" "$OUTPUT/success" || fail E_MARKER
 /usr/bin/sync -f "$OUTPUT" || fail E_FSYNC
 /usr/bin/chmod -R a-w "$OUTPUT" || fail E_SEAL
