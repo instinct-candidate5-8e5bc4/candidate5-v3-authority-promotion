@@ -113,6 +113,23 @@ jobs:
         run: |
           set -euo pipefail
           python3 docs/verified-architecture-phase2-v3/offline-secure-boot-signing-ceremony/assert-retired-state.py
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.10.12'}
+      - name: Successor UKI exact-head static reproduction
+        shell: bash
+        run: |
+          set -euo pipefail
+          c=docs/verified-architecture-phase2-v3/successor-uki-candidate
+          python3 "$c/verify-candidate.py"
+          test "$(python3 -c 'import platform; print(platform.python_version())')" = 3.10.12
+          rm -rf /tmp/successor-a /tmp/successor-b
+          python3 "$c/build-successor.py" /tmp/successor-a
+          python3 "$c/build-successor.py" /tmp/successor-b
+          for f in successor-initramfs.cpio successor-unsigned.efi inventory.v1.json successor-authority-record.v1.json; do
+            cmp "/tmp/successor-a/$f" "/tmp/successor-b/$f"
+            cmp "/tmp/successor-a/$f" "$c/$f"
+          done
+          python3 "$c/verify-candidate.py"
       - name: Existing Foundation focused twice
         shell: bash
         run: |
