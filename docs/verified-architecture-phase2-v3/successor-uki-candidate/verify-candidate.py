@@ -38,5 +38,11 @@ for required in ('schema=v3.cloud-boot-adapter-evidence.v2','result=ADAPTER_ENVI
 evidence=json.loads((B/'vm-harness-evidence.v1.json').read_text())
 for key in ('harness','transcript'):
  x=evidence[key]; assert hashlib.sha256((B/x['path']).read_bytes()).hexdigest()==x['sha256']
-assert 'HARNESS_RESULT=VM_BY_ID_PRODUCER_PASS' in (B/evidence['transcript']['path']).read_text()
+t=(B/evidence['transcript']['path']).read_text(errors='replace')
+assert t.count('VM_BY_ID_PRODUCER_PASS')==1
+assert t.count('VM_FAIL')==0
+assert t.count('QEMU_WRAPPER_EXIT=0')==1
+for n in ('v3-rootfs-data','v3-rootfs-hash','v3-reviewed-root','v3-reviewed-input','v3-reviewed-output','v3-reviewed-evidence'): assert t.count('VM_LINK_PASS google-'+n)==1
+for key in ('disposableInitramfs','guestInit','module'):
+ x=evidence[key]; assert hashlib.sha256((B/x['path']).read_bytes()).hexdigest()==x['sha256']
 print('SUCCESSOR_EVIDENCE_BINDINGS_PASS')
