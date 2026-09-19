@@ -22,5 +22,13 @@ assert hashlib.sha256(nm['init']['body']).hexdigest()==hashlib.sha256((B/'cloud-
 inv=json.loads((B/'inventory.v1.json').read_text()); vec={e['name']:e for e in inv['initramfsMembers']}
 for e in new:
  assert vec[e['name']]=={'name':e['name'],'mode':f"{e['mode']:08x}",'size':len(e['body']),'sha256':hashlib.sha256(e['body']).hexdigest()}
-assert inv['status']=='SUCCESSOR_UKI_CONCRETE_CANDIDATE_READY_FOR_OWNER_REVIEW'
+assert inv['status']=='RUNTIME_EVIDENCE_INCOMPLETE'
 print('SUCCESSOR_CANDIDATE_STATIC_PASS')
+
+adapter=(B/'cloud-boot-adapter.sh').read_text()
+for required in ('/bin/sh /bin/gce-by-id-producer','mount -t proc','mount -t devtmpfs','.v3-volume-role','E_ROLE_MARKER_MISMATCH','awk -v s=','nodev','nosuid','noexec','umount'):
+ assert required in adapter,required
+assert (B/'provider-producer/produce-google-by-id.sh').read_bytes()==nm['bin/gce-by-id-producer']['body']
+for path,mode in [('cloud-boot-adapter.sh','100755'),('build-successor.py','100755'),('verify-candidate.py','100755'),('provider-producer/produce-google-by-id.sh','100755'),('provider-producer/lib/udev/scsi_id','100755')]:
+ assert inv['artifacts'][path]['gitMode']==mode,(path,mode)
+print('SUCCESSOR_EXECUTABLE_PATH_ASSERTIONS_PASS')

@@ -1,6 +1,6 @@
 # Minimal Cloud Boot Adapter and Successor UKI Implementation Candidate
 
-Status: `SUCCESSOR_UKI_CONCRETE_CANDIDATE_READY_FOR_OWNER_REVIEW`
+Status: `RUNTIME_EVIDENCE_INCOMPLETE`
 
 This candidate is not authorized for execution, boot, signing, cloud use or provisioning. It contains no private key, PFX, public production certificate or signed successor UKI.
 
@@ -29,3 +29,7 @@ The canonical inventory v2 records every successor initramfs member name, CPIO m
 `verify-candidate.py` compares the old and new CPIO member vectors and every preserved header/body field. CI runs two independent output-directory builds and byte-compares CPIO, EFI, inventory and authority record against each other and committed outputs. Builder runtime pinning is in `builder-runtime.v1.json`.
 
 The resolver uses the documented GCP by-id contract and makes no claim about sysfs serial values. Review must keep hostile coverage for missing/extra/duplicate/ambiguous/swapped/substituted links, wrong underlying type, wrong mount target/type/options, adapter or old-init substitution and handoff.
+
+## Runtime evidence boundary
+
+The committed VM evidence binds the pinned disposable QEMU setup and exact producer-positive result. Full dm-verity handoff and executable hostile-matrix results remain deferred, so this candidate is explicitly `RUNTIME_EVIDENCE_INCOMPLETE`, not boot-ready. The official rule is retained with `.reference` suffix as provenance; the reviewed hand-coded producer script is the sole executed namespace policy. It uses the preserved initramfs libc/loader through pinned `scsi_id`; no second unused libc/loader copy is submitted.
