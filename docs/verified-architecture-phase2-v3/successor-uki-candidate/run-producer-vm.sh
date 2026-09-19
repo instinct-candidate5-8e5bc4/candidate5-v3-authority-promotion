@@ -12,6 +12,8 @@ for x in m['files']:
  p=r/x['path'];assert p.stat().st_size==x['bytes'];assert hashlib.sha256(p.read_bytes()).hexdigest()==x['sha256']
 PY
 Q="$QEMU_ROOT/usr/bin/qemu-system-x86_64"
+[ "$($Q --version | head -1)" = 'QEMU emulator version 6.2.0 (Debian 1:6.2+dfsg-2ubuntu6.31)' ] || exit 43
+[ "$(python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); print(d["packageVersions"]["qemu-system-x86"])' "$B/qemu-extracted-closure.v1.json")" = '1:6.2+dfsg-2ubuntu6.31' ] || exit 44
 export LD_LIBRARY_PATH="$QEMU_ROOT/usr/lib/x86_64-linux-gnu:$QEMU_ROOT/lib/x86_64-linux-gnu"
 export QEMU_MODULE_DIR="$QEMU_ROOT/usr/lib/x86_64-linux-gnu/qemu"
 args='-device virtio-scsi-pci,id=scsi0'; i=0; mkdir -p "$OUT"

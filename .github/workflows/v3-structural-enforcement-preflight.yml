@@ -129,7 +129,13 @@ jobs:
             cmp "/tmp/successor-a/$f" "/tmp/successor-b/$f"
             cmp "/tmp/successor-a/$f" "$c/$f"
           done
+          python3 "$c/build-producer-test-initrd.py" /tmp/producer-test.cpio
+          cmp /tmp/producer-test.cpio "$c/producer-test-initramfs.cpio"
           python3 "$c/verify-candidate.py"
+          test "$(git ls-tree HEAD "$c/producer-test-initramfs.cpio" | awk '{print $1}')" = 100644
+          test "$(git ls-tree HEAD "$c/producer-vm-raw-serial.txt" | awk '{print $1}')" = 100644
+          test "$(git ls-tree HEAD "$c/qemu-extracted-closure.v1.json" | awk '{print $1}')" = 100644
+          test "$(git ls-tree HEAD "$c/vm-test/virtio_scsi.ko" | awk '{print $1}')" = 100644
       - name: Existing Foundation focused twice
         shell: bash
         run: |

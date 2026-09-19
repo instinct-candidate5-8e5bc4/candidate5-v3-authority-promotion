@@ -59,3 +59,12 @@ assert hashlib.sha256(tm['virtio_scsi.ko']['body']).hexdigest()==hashlib.sha256(
 assert hashlib.sha256(tm['bin/gce-by-id-producer']['body']).hexdigest()==evidence['producerScriptSha256']
 assert hashlib.sha256(tm['sbin/scsi_id']['body']).hexdigest()==evidence['scsiIdSha256']
 print('SUCCESSOR_VM_SEMANTIC_BINDINGS_PASS')
+
+q=json.loads((B/'qemu-extracted-closure.v1.json').read_text())
+assert q['packageVersions']=={'qemu-system-x86':'1:6.2+dfsg-2ubuntu6.31','ovmf':'2022.02-3ubuntu0.22.04.6'}
+assert q['packageFiles'][0]['sha256']=='154327d064e982cd13fc26f1957f4a76054f89e5805427667d6d524af4c9fd5d'
+assert q['packageFiles'][1]['sha256']=='a3789d0a11369f94c68c9e87d3f252230a903a15aadf545f2d118902b34b2b75'
+assert 'not a complete dynamically loaded runtime closure' in q['claim']
+for path in ('producer-test-initramfs.cpio','producer-vm-raw-serial.txt','qemu-extracted-closure.v1.json','vm-test/virtio_scsi.ko'):
+ assert inv['artifacts'][path]['gitMode']=='100644',path
+print('SUCCESSOR_QEMU_PROVENANCE_AND_MODES_PASS')
