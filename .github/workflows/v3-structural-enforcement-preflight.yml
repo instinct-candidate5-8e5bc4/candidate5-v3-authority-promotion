@@ -5,6 +5,7 @@ on:
   pull_request:
     paths:
       - docs/verified-architecture-phase2-v3/structural-enforcement-preflight.md
+      - docs/verified-architecture-phase2-v3/offline-secure-boot-signing-ceremony/**
       - .github/workflows/v3-structural-enforcement-preflight.yml
 jobs:
   preflight:
@@ -107,6 +108,11 @@ jobs:
           grep -Fq 'CommonJS `arguments[1]`' "$doc"
           grep -Fq '`Object.values(arguments)`' "$doc"
           grep -Fq 'constructed strings for `constructor`, `process`, `getBuiltinModule`, and `createRequire`' "$doc"
+      - name: Retired Windows ceremony entrypoints are inert
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 docs/verified-architecture-phase2-v3/offline-secure-boot-signing-ceremony/assert-retired-state.py
       - name: Existing Foundation focused twice
         shell: bash
         run: |

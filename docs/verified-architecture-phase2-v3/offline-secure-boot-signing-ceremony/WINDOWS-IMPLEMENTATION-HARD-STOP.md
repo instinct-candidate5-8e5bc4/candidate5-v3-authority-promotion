@@ -88,3 +88,7 @@ Authorize the non-authoritative Windows qualification run and choose how its rev
 Also authorize disposable test-key generation and destruction solely for UEFI compatibility fixtures. This does not authorize the production key.
 
 Until this qualification path is approved and its machine evidence independently passes, the ceremony cannot honestly be marked ready and the ten implementation defects cannot be closed with source prose alone. No production key, successor UKI signing, cloud deployment, Bootstrap execution, Rust provisioning, Structural Enforcement, Authority Routing, merge, School or visuals work may proceed.
+
+## Enforced retirement CI
+
+The exact-head workflow `.github/workflows/v3-structural-enforcement-preflight.yml` invokes `assert-retired-state.py` in the named step `Retired Windows ceremony entrypoints are inert`. Pull-request path filters include the entire ceremony directory and the workflow itself. This makes retirement-state enforcement part of exact-head CI rather than an uninvoked script.
