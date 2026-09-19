@@ -1,0 +1,9 @@
+HARNESS_RESULT=VM_BY_ID_PRODUCER_PASS
+QEMU_VERSION=6.2.0 (Debian 1:6.2+dfsg-2ubuntu6.31)
+KERNEL_SHA256=b253def256f2560ed9b658830ca9ec2783bb51f3c5dcb0d9b5c695b6554d70fb
+DISPOSABLE_INITRD_PURPOSE=exact embedded producer positive namespace test
+DISKS=v3-rootfs-data,v3-rootfs-hash,v3-reviewed-root,v3-reviewed-input,v3-reviewed-output,v3-reviewed-evidence
+DISK_BYTES_EACH=8388608
+SCSI_VENDOR=Google
+EXIT_CONDITION=all six /dev/disk/by-id/google-<name> symlinks resolve to block devices, then guest poweroff
+SCOPE=no GCP; no key; no signing; no production boot; no provisioning

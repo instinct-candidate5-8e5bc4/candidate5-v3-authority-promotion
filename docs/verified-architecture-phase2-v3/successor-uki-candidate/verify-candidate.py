@@ -32,3 +32,11 @@ assert (B/'provider-producer/produce-google-by-id.sh').read_bytes()==nm['bin/gce
 for path,mode in [('cloud-boot-adapter.sh','100755'),('build-successor.py','100755'),('verify-candidate.py','100755'),('provider-producer/produce-google-by-id.sh','100755'),('provider-producer/lib/udev/scsi_id','100755')]:
  assert inv['artifacts'][path]['gitMode']==mode,(path,mode)
 print('SUCCESSOR_EXECUTABLE_PATH_ASSERTIONS_PASS')
+
+for required in ('schema=v3.cloud-boot-adapter-evidence.v2','result=ADAPTER_ENVIRONMENT_READY','device.%s=google-%s;%s','oldInitSha256=%s','E_EVIDENCE_WRITE','E_EVIDENCE_SYNC'):
+ assert required in adapter,required
+evidence=json.loads((B/'vm-harness-evidence.v1.json').read_text())
+for key in ('harness','transcript'):
+ x=evidence[key]; assert hashlib.sha256((B/x['path']).read_bytes()).hexdigest()==x['sha256']
+assert 'HARNESS_RESULT=VM_BY_ID_PRODUCER_PASS' in (B/evidence['transcript']['path']).read_text()
+print('SUCCESSOR_EVIDENCE_BINDINGS_PASS')

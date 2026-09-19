@@ -57,4 +57,15 @@ probe "$REVIEWED_OUTPUT" reviewed-output /reviewed-output rw
 probe "$REVIEWED_EVIDENCE" reviewed-evidence /reviewed-evidence rw
 for n in reviewed-output reviewed-evidence; do "$BB" chown 0:0 "/$n"; "$BB" chmod 0700 "/$n"; done
 [ "$("$BB" sha256sum /init.root-admitter | "$BB" cut -d' ' -f1)" = "$OLD_INIT_SHA256" ] || fail E_OLD_INIT_IDENTITY
+{
+ "$BB" printf '%s\n' 'schema=v3.cloud-boot-adapter-evidence.v2'
+ "$BB" printf '%s\n' 'result=ADAPTER_ENVIRONMENT_READY'
+ for role in v3-rootfs-data v3-rootfs-hash v3-reviewed-root v3-reviewed-input v3-reviewed-output v3-reviewed-evidence; do
+  link="$BYID/google-$role"; target=$("$BB" readlink -f "$link") || fail E_EVIDENCE_IDENTITY
+  mm=$("$BB" stat -c '%t:%T' "$target") || fail E_EVIDENCE_IDENTITY
+  "$BB" printf 'device.%s=google-%s;%s\n' "$role" "$role" "$mm"
+ done
+ "$BB" printf 'oldInitSha256=%s\n' "$OLD_INIT_SHA256"
+} > /reviewed-evidence/cloud-boot-adapter.v2 || fail E_EVIDENCE_WRITE
+"$BB" sync /reviewed-evidence/cloud-boot-adapter.v2 2>/dev/null || "$BB" sync || fail E_EVIDENCE_SYNC
 exec /init.root-admitter || fail E_OLD_INIT_EXEC
