@@ -1,3 +1,5 @@
+> SUPERSEDED / HISTORICAL / NON-AUTHORITATIVE. The current key-custody and successor design is `minimal-successor-uki-design.md`. Preserve this record for review provenance only; do not use its status, blockers or next-step instructions as current authority.
+
 # Minimal Successor UKI Signing-Key Hard Stop
 
 Status: `OWNER_DECISION_REQUIRED`
