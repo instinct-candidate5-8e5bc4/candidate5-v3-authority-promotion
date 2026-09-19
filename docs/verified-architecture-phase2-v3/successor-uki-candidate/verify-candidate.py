@@ -71,3 +71,9 @@ assert t.count('PREFLIGHT_KERNEL_SHA256=b253def256f2560ed9b658830ca9ec2783bb51f3
 assert t.count('PREFLIGHT_INITRD_SHA256='+evidence['disposableInitramfs']['sha256'])==1
 assert t.count('PREFLIGHT_CLOSURE=PASS')==1
 print('SUCCESSOR_CAPTURED_PREFLIGHT_PASS')
+
+raw=(B/'vm-harness-evidence.v1.json').read_text()
+for forbidden in ('qemuPackage','ovmfPackage','packageFiles','.deb','OVMF'):
+ assert forbidden not in raw,forbidden
+assert evidence['successorHead']=='EVIDENCE_ONLY_SUCCESSOR_OF_REVIEWED_RUN_6cb84f4'
+print('SUCCESSOR_NO_UNSUPPORTED_PACKAGE_PROVENANCE_PASS')
