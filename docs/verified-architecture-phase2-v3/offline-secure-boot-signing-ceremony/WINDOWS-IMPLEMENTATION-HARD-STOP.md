@@ -4,6 +4,12 @@ Status: `OWNER_DECISION_REQUIRED`
 
 Basis: independent FAIL at `5ece95a025529dc8bf5ae4348c0cc674dbbbfbbf`. No private key was generated, no runbook was executed and no cloud or signing action occurred.
 
+## Directory authority and inert design inputs
+
+This file is the sole current status document in this directory. `README.md` and `WINDOWS-CEREMONY.md` are retired historical drafts. Both PowerShell files are inert and begin with unconditional throws. No ceremony, signer, verifier, qualification or key-generation executable is currently approved.
+
+The JSON Schemas `signing-request.schema.v1.json`, `signing-evidence.schema.v1.json` and `consumed-ledger.schema.v1.json` remain non-executable design inputs only. Their presence does not validate any instance and grants no ceremony readiness or authority. They may be consumed only by a future pinned validator that passes qualification and independent review.
+
 ## Finding accepted
 
 The PowerShell template at the parent SHA is not an implementation of its ceremony contract and must not be run. It is retired. Specifically, it lacks requestId reconstruction, schema loading, duplicate-key rejection, canonical JSON, the hash-chained atomic ledger, schema-complete evidence, correct evidence-core signing, exact certificate construction, PE section/signature verification, safe quarantine/export sequencing and measured custody/network/BitLocker state. Owner confirmation cannot repair those defects.

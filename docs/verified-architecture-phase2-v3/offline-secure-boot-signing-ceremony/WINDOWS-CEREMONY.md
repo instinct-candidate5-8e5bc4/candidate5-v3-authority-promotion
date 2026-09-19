@@ -1,6 +1,10 @@
+> RETIRED / HISTORICAL / NON-AUTHORITATIVE. Do not use this document as a ceremony, readiness claim, Owner-confirmation gate or execution instruction. The sole current status and next boundary are in `WINDOWS-IMPLEMENTATION-HARD-STOP.md` (`OWNER_DECISION_REQUIRED`). No ceremony or verifier executable is approved.
+
+Status: `RETIRED_HISTORICAL_NON_AUTHORITATIVE`
+
+## Historical draft preserved for review provenance
 # Windows-Native Offline Secure Boot Signing Ceremony
 
-Status: `OWNER_CONFIRMATION_REQUIRED`
 
 This revision binds the human-custodian ceremony to an Owner-controlled Windows 11 signing station. It does not require Linux, dual boot, WSL, a Linux VM, cloud signing, paid HSM/KMS or a second computer. No authoritative key is generated until this design passes independent review and the Owner confirms the storage policy.
 

@@ -1,8 +1,12 @@
+> RETIRED / HISTORICAL / NON-AUTHORITATIVE. Do not use this document as a ceremony, readiness claim, Owner-confirmation gate or execution instruction. The sole current status and next boundary are in `WINDOWS-IMPLEMENTATION-HARD-STOP.md` (`OWNER_DECISION_REQUIRED`). No ceremony or verifier executable is approved.
+
+Status: `RETIRED_HISTORICAL_NON_AUTHORITATIVE`
+
+## Historical draft preserved for review provenance
 > Superseded by `WINDOWS-CEREMONY.md` and the strict request/evidence/ledger schemas in this directory. Historical draft below is non-authoritative.
 
 # Windows Offline Secure Boot Signing Ceremony
 
-Status: `OWNER_CONFIRMATION_REQUIRED`
 
 This is the authoritative ceremony contract. It supersedes the earlier draft at parent `33190143c3b5584bc60df633b3abee8b16ea9388`. The Owner is the sole offline human custodian. No private key is generated before independent review and Owner confirmation of the Windows/BitLocker policy. No private material enters Git, CI, cloud, repository/evidence packages, messages, browser/password vaults or ordinary project storage.
 
