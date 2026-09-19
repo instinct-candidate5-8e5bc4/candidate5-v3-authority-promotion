@@ -15,7 +15,7 @@ The blocking property is exact external admission of the certified boot/device b
 3. Before Root Admitter starts, `/reviewed-root`, `/reviewed-input`, `/reviewed-output` and `/reviewed-evidence` must already be separate mount points with the exact read-only/read-write and ownership semantics checked by the immutable init. The certified UKI contains no cloud-agent, provider metadata, udev rule, disk-discovery rule or preparation hook that can manufacture those paths.
 4. The supervisor must observe the exact kernel command line token, the exact active kernel dm table through `/dev/mapper/control`, genuine block-device identities, and the exact approved bytes. Provider console claims or simulated success cannot substitute for those observations.
 
-Google Cloud documents custom Secure Boot variables, but its documented custom-`db` case is an addition alongside default Microsoft certificates, not proof of the certified sole-certificate `dbEntryCount=1` and reject-all-other-signers policy. Oracle documents UEFI custom-image launch and Shielded Secure Boot, but not tenant replacement of the firmware trust database with the exact sole approved certificate. Neither platform documents a way for its free VM product to expose provider-attached disks under the two exact certified device paths or pre-establish the four required guest mount points before the immutable UKI init runs. Changing the UKI/initramfs, its UEFI policy or these path semantics would change approved bytes or trust semantics and requires a new owner decision and full review.
+Google Cloud documents that custom `db` or `KEK` variables override the defaults completely and that the system ignores the default public keys. Its Images API represents explicit `pk`, `keks[]`, `dbs[]` and `dbxs[]`, so a one-element `dbs[]` is representable. GCP is therefore not rejected for mandatory coexistence with Microsoft/default keys. Its unresolved blockers are exact immutable UKI ingestion/sole boot-entry evidence, exact pre-init device naming and construction of the four required mount points without adding an authoritative boot wrapper or changing approved bytes. Oracle documents UEFI custom-image launch and Shielded Secure Boot, but not tenant replacement of the firmware trust database with the exact sole approved certificate. Neither platform closes all of the immutable UKI/device/mount requirements. Changing the UKI/initramfs or adding a boot wrapper/discovery stage would add authoritative bytes and requires a new owner decision and full review.
 
 ## Certified host requirements and classification
 
@@ -48,11 +48,11 @@ Current permanent allowance: one non-preemptible `e2-micro` VM per month in `us-
 - Linux/kernel/dm-verity: a custom Linux kernel can in principle carry device mapper, namespaces and required syscalls. This remains untested and is not the blocker.
 - block devices: persistent disks are guest block devices, but documentation does not prove exact `/dev/v3-rootfs-data` and `/dev/v3-rootfs-hash` presentation before immutable init or the four pre-mounted roots.
 - UEFI/UKI/cmdline: custom boot disks and UEFI are supported; direct proof that the exact UKI is the sole boot entry with its embedded command line is absent.
-- Secure Boot blocker: Google documents custom PK/KEK/db variables and describes custom `db` certificates alongside default Microsoft certificates. That does not satisfy `dbEntryCount=1` or rejection of every other signer.
+- Secure Boot: Google states that specifying custom `db` or `KEK` overrides defaults completely and ignores default public keys. The Images API exposes `shieldedInstanceInitialState` with explicit `pk`, `keks[]`, `dbs[]` and `dbxs[]`; a one-element `dbs[]` is representable. This evidence does not establish a GCP firmware-key blocker. Exact exported variable/negative-boot evidence would still be required before execution.
 - unexpected charges: possible after Paid upgrade or limit overrun; GPU/TPU are explicitly excluded. No resource was activated.
-- verdict: REJECT. Exact sole-key firmware policy, exact pre-init device names and pre-mounted roots are not proven.
+- verdict: REJECT. The current official evidence does not close exact immutable UKI ingestion and sole boot-entry behavior, exact pre-init device names, or pre-mounted roots. The rejection does not rely on a firmware-key coexistence claim.
 
-Sources: [Google Free features and limits](https://docs.cloud.google.com/free/docs/free-cloud-features); [custom image requirements](https://docs.cloud.google.com/compute/docs/images/building-custom-os); [manual boot-disk import](https://docs.cloud.google.com/compute/docs/import/import-existing-image); [Secure Boot certificate/custom-variable guidance](https://docs.cloud.google.com/compute/docs/security/ms-secure-boot-certificates-expiration); [KEK/db update guidance](https://docs.cloud.google.com/compute/docs/security/ms-secure-boot-certificates-update).
+Sources: [Google Free features and limits](https://docs.cloud.google.com/free/docs/free-cloud-features); [custom image requirements](https://docs.cloud.google.com/compute/docs/images/building-custom-os); [manual boot-disk import](https://docs.cloud.google.com/compute/docs/import/import-existing-image); [Secure Boot certificate/custom-variable guidance](https://docs.cloud.google.com/compute/docs/security/ms-secure-boot-certificates-expiration); [KEK/db update guidance](https://docs.cloud.google.com/compute/docs/security/ms-secure-boot-certificates-update); [Images API and `shieldedInstanceInitialState`](https://docs.cloud.google.com/compute/docs/reference/rest/v1/images).
 
 ### Oracle Cloud Infrastructure Always Free Compute
 
@@ -112,10 +112,11 @@ A future candidate is not equivalent until independently reproducible evidence s
 
 ## Owner decision required
 
-To continue, choose one of these trust-model changes for a new design round, or supply a cloud product with official evidence that closes the exact gaps:
+To continue, choose one of these design/deployment changes for a new review round, or supply a cloud product with official evidence that closes the exact gaps:
 
-1. authorize a new cloud-specific boot wrapper/initramfs and signed binding that deterministically discovers provider block devices, creates the exact reviewed mount topology and then hands control to unchanged Root Admitter bytes;
-2. authorize a cloud firmware policy that permits named platform/default Secure Boot keys in addition to the approved key, with a new threat analysis and binding; or
-3. retain the certified exact sole-key/device/mount boundary and relax `CLOUD ONLY / ZERO MANDATORY COST` to allow infrastructure that exposes tenant-controlled firmware and boot/device topology.
+1. authorize a new cloud-specific boot image/wrapper/initramfs and signed binding, then fully review deterministic UKI handoff, provider-disk discovery/naming and construction of the four required mount points while preserving unchanged Root Admitter bytes; or
+2. retain the certified exact sole-key/device/mount boundary and relax `CLOUD ONLY / ZERO MANDATORY COST` to infrastructure exposing tenant-controlled firmware and boot/device topology.
+
+A firmware-policy relaxation is relevant only for a selected provider independently shown not to support the sole approved key. On the sources reviewed, that gap remains for OCI. It is not established for GCP and is not presented as a GCP prerequisite.
 
 None is assumed here. Until a new owner decision and independent review, there is no approved zero-cost cloud execution host and no provisioning, Rust installation, Structural Enforcement, Authority Routing, merge, School or visuals work may proceed.
