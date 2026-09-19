@@ -1,1 +1,173 @@
-{"approvedPackageCommit":"b768d48e58b6ddcf66ed482ee06e7d62b3162edb","artifacts":{"cross-binding.v1.json":{"byteLength":2562,"gitBlob":"59bb41ef88d2b02efb4c99beea2a8eba7eb03813","mode":"100644","path":"docs/verified-architecture-phase2-v3/bootstrap-concrete-candidates/cross-binding.v1.json","sha256":"5de911f8823cbcec9d8e9be54c85b4388a829c085ab540a5b892e3f4b4ca8f4a"},"cross-binding.v1.sig":{"byteLength":64,"gitBlob":"bcafdd75433416212176932b9a955b8fbe550ac2","mode":"100644","path":"docs/verified-architecture-phase2-v3/bootstrap-concrete-candidates/cross-binding.v1.sig","sha256":"6d8349592d6522e39e646167be88b6a7a39c95d932ae55f1b354a121ffcec080"},"future-bootstrap-launcher.review-bytes":{"byteLength":851,"gitBlob":"fa2ecf9e40a07221ba9f849e402d4d27822faa23","mode":"100644","path":"docs/verified-architecture-phase2-v3/future-bootstrap-launcher.review-bytes","sha256":"e9d40303c39310761a4f3c0ebb3374806ed420b008926ae6a3ea2e14fcc55232"},"future-rust-provisioning-script.review-bytes":{"byteLength":8738,"gitBlob":"2622618addebf7385bda722295965540cf51c849","mode":"100644","path":"docs/verified-architecture-phase2-v3/future-rust-provisioning-script.review-bytes","sha256":"7d6b7c6399919ebfc4c9f3eea4455b5033ec6ed0a57ffed570ecfe525fde9b33"},"measured-execution-service.review-bytes":{"byteLength":7755,"gitBlob":"99266ea2b0a35ddfa8471e2d8c7c74e2f33d9677","mode":"100644","path":"docs/verified-architecture-phase2-v3/bootstrap-concrete-candidates/measured-execution-service.review-bytes","sha256":"e470199b00cc047e7b020909c8d6f200113bf3e770debe2b69f1de8226079aa1"},"offline-input-manifest.v1.bin":{"byteLength":963,"gitBlob":"7b6cb42fbb0e1ed1bfa885929e290bc72cffa78e","mode":"100644","path":"docs/verified-architecture-phase2-v3/bootstrap-concrete-candidates/offline-input-manifest.v1.bin","sha256":"30044b7453c89eb195df394a0236faf5ef7c7ec4ccf8dbe20766f5690d5f13e3"},"offline-input-manifest.v1.sig":{"byteLength":64,"gitBlob":"3444f42ef54386abb81be5d18b264244f87d302e","mode":"100644","path":"docs/verified-architecture-phase2-v3/bootstrap-concrete-candidates/offline-input-manifest.v1.sig","sha256":"90889cbbe5d0e35802546714108b994e4e814564ba5225148076a2c2df455c66"},"offline-root-ed25519-public.pem":{"byteLength":113,"gitBlob":"aed699fe2b0feba4ebd158703a43bb6cfeaaa0f3","mode":"100644","path":"docs/verified-architecture-phase2-v3/bootstrap-concrete-candidates/offline-root-ed25519-public.pem","sha256":"6be9ac5779bbc11d2102da23ba03d4ffd13ff56aaf9adbd3e81cb170678fbf29"},"protected-pin-record.v1.json":{"byteLength":694,"gitBlob":"4175fe8c25167099224c0845a95905fe43333bfd","mode":"100644","path":"docs/verified-architecture-phase2-v3/bootstrap-concrete-candidates/protected-pin-record.v1.json","sha256":"98b24718530ac02d406a1ce851c2b931d7e67d75cc4d008e2a04adbca6441c9a"},"protected-pin-record.v1.sig":{"byteLength":64,"gitBlob":"61893c4e9ef5472db425bb8c2194b94415c52498","mode":"100644","path":"docs/verified-architecture-phase2-v3/bootstrap-concrete-candidates/protected-pin-record.v1.sig","sha256":"f2141805b267077709f3009941c2669ba2984e3d6be117bad6e65ba90dd9379b"},"protected-pin-store-policy.v1.json":{"byteLength":886,"gitBlob":"2fe26ad316579e31d627eb052691fd9845ad161c","mode":"100644","path":"docs/verified-architecture-phase2-v3/bootstrap-concrete-candidates/protected-pin-store-policy.v1.json","sha256":"2f2b4ef7afebbde05901dc6732c6002725cb38864461e34d44a6cdeedacf698c"}},"baseImage":{"closureDigest":"sha256:90e044c4586fb42bfa3932b9804fe31b719b91731a567c092d830bdd4ec70f0b","configDigest":"sha256:04996d625578186e972c7e0e7e355d82c1e92f158fb0820ff04bcac68dda5d20","indexDigest":"sha256:81380e4c9c14e8a629ff39029639e4b7893e67400246fa7782a0fe7dc193a02a","layerVectorSource":"docs/verified-architecture-phase2-v3/bootstrap-concrete-candidates/cross-binding.v1.json","linuxAmd64ManifestDigest":"sha256:c60167d590a5b777953097a5d3647cb0753465748d1a9d6442e4088305d90c46"},"designPassRequires":"independent review of this exact frozen commit","executionAuthorized":false,"network":"DENIED","rust":{"components":["cargo","rust-std","rustc"],"licenseManifestSha256":"e01f11e6bdba74f2b87a36c86b75691682850ee6e8b3466c5c6f18166dff8200","release":"1.98.1","sourceCommit":"48a229ceaefd4985c50990b14116b6d856af0985","target":"x86_64-unknown-linux-gnu"},"schema":"v3.final-bootstrap-pinning-design.v1","sequenceFloor":1,"serviceClosure":{"byteLength":4943,"gitBlob":"b7bd262b419f57093b78de0d0263cc428f72a470","mode":"100644","path":"docs/verified-architecture-phase2-v3/bootstrap-concrete-candidates/measured-execution-service-closure.v1.bin","pathCount":44,"sha256":"5e0b440d868e0c9ad21743cd8a4903f43047cbf13993380d39bfd45349dd028d"},"state":"FINAL_BOOTSTRAP_PINNING_DESIGN_CANDIDATE_FOR_INDEPENDENT_REVIEW"}
+{
+  "approvedPackageCommit": "aac192071090e21f0f7373add2305ac760d10ec0",
+  "approvedRootAdmitter": {
+    "approval": {
+      "decidedAt": "2026-09-19T19:44:00+03:00",
+      "decision": "ROOT_ADMITTER_CONCRETE_CANDIDATE_APPROVED",
+      "scope": "exact reviewed bytes, identities, digests, topology, provenance, closure and hostile semantics only"
+    },
+    "authoritativeRoot": {
+      "dmVerityRoot": "c8f1ca4197a6982aa09ea53dd92ef76fded30dce84c75ff63d2e978b4d227015",
+      "imageSha256": "71e3290fa06f2017f685ebe87bc863a9b083f49dcb888305b96f37e26dc90a21",
+      "verityTreeSha256": "82423acc8145b9dd1cf83e7758732cbf121578e8afbd665a3a88694a38a5efd9"
+    },
+    "candidateLabels": {
+      "status": "CLOSED_BY_OWNER_DECISION",
+      "treatment": "immutable historical labels and E_CANDIDATE_AUTHORITY remain byte-identical and non-authoritative for final design status"
+    },
+    "candidateSubtree": "cd03b2286e57b6ee5580f3b24b32cbb7678d980c",
+    "composedServiceSha256": "17441ae384fe90fbe183a5c546e0f87321454e3fbeedbb38159cf58666fbbc3a",
+    "executionAuthorized": false,
+    "externalAdmission": {
+      "artifactSha256": "1858da09e42ce76ac5dc7bd311989bf0864c0eed235f2a24f5acf66d0a910186",
+      "bindingSha256": "ce6b288900bfa580573d1bba6d3cdcfa042dd106015a029b6fb0ad6a0303bb77",
+      "bindingSignatureSha256": "62188d040a365f1796c98099c05896c2e14605df8e293cacc679fa9279ded3f9",
+      "closureSha256": "709f8ddc63321aee68b17e14e21cf8cf71b4e85181a5aaeb07161e30329a73d8",
+      "publicKeySha256": "ebe7eccbd4180c76ca92a3932b53289938f9443ca7beed59d761be66ce90b322",
+      "scriptHandoff": "SAME_OPEN_DESCRIPTOR"
+    },
+    "externalBoundary": {
+      "bootBindingPublicKeySha256": "ec3c563696d36d8a2936ee71e08c9fd79b7657bd6361002fcc785d609f1c48c6",
+      "bootBindingSha256": "8815ee6da3cdf73a5a277e045e4a76af540da55c7fb4302a7e42467e2e21c3d6",
+      "bootBindingSignatureSha256": "449451b00beb023842bb1c1ff99687023eeba6bab8534fe7bdc5d9507c1a8040",
+      "signedUkiSha256": "7f5c339270f486a107285e9abfe0150f6e95bef0456668f34f79401f81dcc836"
+    },
+    "nativeSupervisor": {
+      "elfSha256": "a2d33af1aa9ff076d4dc2e6e5f90be8f95cacc6a45a8559263035758e17ff6eb",
+      "parentLiveness": "PREFORK_PIDFD_PLUS_PDEATHSIG_AND_POLL"
+    },
+    "parent": "f3e336c6a01030f8c58b177194587453f9a9d740",
+    "repositoryCommit": "aac192071090e21f0f7373add2305ac760d10ec0",
+    "tree": "c724e3633a673e8080ada8d9d790302fbc9d39de"
+  },
+  "artifacts": {
+    "cross-binding.v1.json": {
+      "byteLength": 2562,
+      "gitBlob": "59bb41ef88d2b02efb4c99beea2a8eba7eb03813",
+      "mode": "100644",
+      "path": "docs/verified-architecture-phase2-v3/bootstrap-concrete-candidates/cross-binding.v1.json",
+      "sha256": "5de911f8823cbcec9d8e9be54c85b4388a829c085ab540a5b892e3f4b4ca8f4a"
+    },
+    "cross-binding.v1.sig": {
+      "byteLength": 64,
+      "gitBlob": "bcafdd75433416212176932b9a955b8fbe550ac2",
+      "mode": "100644",
+      "path": "docs/verified-architecture-phase2-v3/bootstrap-concrete-candidates/cross-binding.v1.sig",
+      "sha256": "6d8349592d6522e39e646167be88b6a7a39c95d932ae55f1b354a121ffcec080"
+    },
+    "future-bootstrap-launcher.review-bytes": {
+      "byteLength": 851,
+      "gitBlob": "fa2ecf9e40a07221ba9f849e402d4d27822faa23",
+      "mode": "100644",
+      "path": "docs/verified-architecture-phase2-v3/future-bootstrap-launcher.review-bytes",
+      "sha256": "e9d40303c39310761a4f3c0ebb3374806ed420b008926ae6a3ea2e14fcc55232"
+    },
+    "future-rust-provisioning-script.review-bytes": {
+      "byteLength": 8738,
+      "gitBlob": "2622618addebf7385bda722295965540cf51c849",
+      "mode": "100644",
+      "path": "docs/verified-architecture-phase2-v3/future-rust-provisioning-script.review-bytes",
+      "sha256": "7d6b7c6399919ebfc4c9f3eea4455b5033ec6ed0a57ffed570ecfe525fde9b33"
+    },
+    "measured-execution-service.review-bytes": {
+      "byteLength": 7755,
+      "gitBlob": "99266ea2b0a35ddfa8471e2d8c7c74e2f33d9677",
+      "mode": "100644",
+      "path": "docs/verified-architecture-phase2-v3/bootstrap-concrete-candidates/measured-execution-service.review-bytes",
+      "sha256": "e470199b00cc047e7b020909c8d6f200113bf3e770debe2b69f1de8226079aa1"
+    },
+    "offline-input-manifest.v1.bin": {
+      "byteLength": 963,
+      "gitBlob": "7b6cb42fbb0e1ed1bfa885929e290bc72cffa78e",
+      "mode": "100644",
+      "path": "docs/verified-architecture-phase2-v3/bootstrap-concrete-candidates/offline-input-manifest.v1.bin",
+      "sha256": "30044b7453c89eb195df394a0236faf5ef7c7ec4ccf8dbe20766f5690d5f13e3"
+    },
+    "offline-input-manifest.v1.sig": {
+      "byteLength": 64,
+      "gitBlob": "3444f42ef54386abb81be5d18b264244f87d302e",
+      "mode": "100644",
+      "path": "docs/verified-architecture-phase2-v3/bootstrap-concrete-candidates/offline-input-manifest.v1.sig",
+      "sha256": "90889cbbe5d0e35802546714108b994e4e814564ba5225148076a2c2df455c66"
+    },
+    "offline-root-ed25519-public.pem": {
+      "byteLength": 113,
+      "gitBlob": "aed699fe2b0feba4ebd158703a43bb6cfeaaa0f3",
+      "mode": "100644",
+      "path": "docs/verified-architecture-phase2-v3/bootstrap-concrete-candidates/offline-root-ed25519-public.pem",
+      "sha256": "6be9ac5779bbc11d2102da23ba03d4ffd13ff56aaf9adbd3e81cb170678fbf29"
+    },
+    "protected-pin-record.v1.json": {
+      "byteLength": 694,
+      "gitBlob": "4175fe8c25167099224c0845a95905fe43333bfd",
+      "mode": "100644",
+      "path": "docs/verified-architecture-phase2-v3/bootstrap-concrete-candidates/protected-pin-record.v1.json",
+      "sha256": "98b24718530ac02d406a1ce851c2b931d7e67d75cc4d008e2a04adbca6441c9a"
+    },
+    "protected-pin-record.v1.sig": {
+      "byteLength": 64,
+      "gitBlob": "61893c4e9ef5472db425bb8c2194b94415c52498",
+      "mode": "100644",
+      "path": "docs/verified-architecture-phase2-v3/bootstrap-concrete-candidates/protected-pin-record.v1.sig",
+      "sha256": "f2141805b267077709f3009941c2669ba2984e3d6be117bad6e65ba90dd9379b"
+    },
+    "protected-pin-store-policy.v1.json": {
+      "byteLength": 886,
+      "gitBlob": "2fe26ad316579e31d627eb052691fd9845ad161c",
+      "mode": "100644",
+      "path": "docs/verified-architecture-phase2-v3/bootstrap-concrete-candidates/protected-pin-store-policy.v1.json",
+      "sha256": "2f2b4ef7afebbde05901dc6732c6002725cb38864461e34d44a6cdeedacf698c"
+    }
+  },
+  "authorityChain": [
+    "external protected UEFI db policy and exact signed UKI",
+    "signed external boot measurement binding",
+    "exact native measured supervisor",
+    "exact active read-only dm-verity root",
+    "descriptor-admitted composed service and admission layer",
+    "protected pin-store public key, policy and monotonic floor",
+    "signed pin, cross-binding and offline-input records",
+    "same-descriptor exact provisioning-script handoff",
+    "nine offline content-addressed Rust 1.98.1 inputs"
+  ],
+  "baseImage": {
+    "closureDigest": "sha256:90e044c4586fb42bfa3932b9804fe31b719b91731a567c092d830bdd4ec70f0b",
+    "configDigest": "sha256:04996d625578186e972c7e0e7e355d82c1e92f158fb0820ff04bcac68dda5d20",
+    "indexDigest": "sha256:81380e4c9c14e8a629ff39029639e4b7893e67400246fa7782a0fe7dc193a02a",
+    "layerVectorSource": "docs/verified-architecture-phase2-v3/bootstrap-concrete-candidates/cross-binding.v1.json",
+    "linuxAmd64ManifestDigest": "sha256:c60167d590a5b777953097a5d3647cb0753465748d1a9d6442e4088305d90c46"
+  },
+  "consistency": {
+    "authoritativeCandidatesRemaining": 0,
+    "circularSelfAdmission": false,
+    "placeholders": 0,
+    "proseOnlyAuthorityEdges": 0,
+    "unassignedEdges": 0,
+    "unresolvedTrustRootDependencies": 0
+  },
+  "designPassRequires": "independent review of one exact frozen successor commit containing this manifest",
+  "executionAuthorized": false,
+  "network": "DENIED",
+  "rust": {
+    "components": [
+      "cargo",
+      "rust-std",
+      "rustc"
+    ],
+    "licenseManifestSha256": "e01f11e6bdba74f2b87a36c86b75691682850ee6e8b3466c5c6f18166dff8200",
+    "release": "1.98.1",
+    "sourceCommit": "48a229ceaefd4985c50990b14116b6d856af0985",
+    "target": "x86_64-unknown-linux-gnu"
+  },
+  "schema": "v3.final-bootstrap-pinning-design.v1",
+  "sequenceFloor": 1,
+  "serviceClosure": {
+    "byteLength": 4943,
+    "gitBlob": "b7bd262b419f57093b78de0d0263cc428f72a470",
+    "mode": "100644",
+    "path": "docs/verified-architecture-phase2-v3/bootstrap-concrete-candidates/measured-execution-service-closure.v1.bin",
+    "pathCount": 44,
+    "sha256": "5e0b440d868e0c9ad21743cd8a4903f43047cbf13993380d39bfd45349dd028d"
+  },
+  "state": "FINAL_BOOTSTRAP_PINNING_DESIGN_READY_FOR_INDEPENDENT_REVIEW"
+}

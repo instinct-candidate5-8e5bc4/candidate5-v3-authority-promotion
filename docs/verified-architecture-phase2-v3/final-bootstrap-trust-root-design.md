@@ -1,14 +1,28 @@
 # Final Bootstrap Trust-Root Design
 
-State: `FINAL_BOOTSTRAP_PINNING_DESIGN_CANDIDATE_FOR_INDEPENDENT_REVIEW`
+State: `FINAL_BOOTSTRAP_PINNING_DESIGN_READY_FOR_INDEPENDENT_REVIEW`
 
-Governing approved package: exact tree at `b768d48e58b6ddcf66ed482ee06e7d62b3162edb`. The owner approved every concrete trust-root artifact in that package for incorporation without byte, identity, binding or semantic changes. Those approved bytes remain immutable review artifacts. Their internal `CANDIDATE_FOR_OWNER_APPROVAL` labels and `E_CANDIDATE_AUTHORITY` stop are preserved because changing either would change approved bytes. The formal owner decision resolves their design status; it does not turn review data into execution authority.
+The concrete Root-Admitter candidate is owner-approved for final-design incorporation at exact commit `aac192071090e21f0f7373add2305ac760d10ec0`, parent `f3e336c6a01030f8c58b177194587453f9a9d740`, tree `c724e3633a673e8080ada8d9d790302fbc9d39de` and root-admitter subtree `cd03b2286e57b6ee5580f3b24b32cbb7678d980c`. Approval is exclusive to the exact reviewed bytes, identities, digests, topology, provenance, closure and hostile semantics. The approved subtree is incorporated by reference and was not modified.
 
-This document is the sole current trust-root design summary. Earlier candidate alternatives and network-retrieval proposals are historical, non-authoritative review records and grant no fallback.
+Internal candidate labels and `E_CANDIDATE_AUTHORITY` in those exact bytes are preserved. The owner decision closes their design status; the runtime stop continues to deny boot, admission, launcher and provisioning execution. The 22 earlier FAIL/correction rounds are closed history and carry no current authority.
 
+## Complete authority chain
+
+1. The external protected boundary admits only the signed UKI SHA-256 `7f5c339270f486a107285e9abfe0150f6e95bef0456668f34f79401f81dcc836` under the exact approved UEFI db policy.
+2. The UKI carries the signed external-boot binding SHA-256 `8815ee6da3cdf73a5a277e045e4a76af540da55c7fb4302a7e42467e2e21c3d6`, signature `449451b00beb023842bb1c1ff99687023eeba6bab8534fe7bdc5d9507c1a8040` and public key `ec3c563696d36d8a2936ee71e08c9fd79b7657bd6361002fcc785d609f1c48c6`.
+3. The native measured supervisor ELF SHA-256 `a2d33af1aa9ff076d4dc2e6e5f90be8f95cacc6a45a8559263035758e17ff6eb` verifies the exact active dm-verity table through the kernel API. Its helper lifetime is bound by a pidfd opened before fork, inherited into PID1, plus PDEATHSIG and an immediate pidfd liveness poll.
+4. The only admitted authoritative root is image `71e3290fa06f2017f685ebe87bc863a9b083f49dcb888305b96f37e26dc90a21`, verity tree `82423acc8145b9dd1cf83e7758732cbf121578e8afbd665a3a88694a38a5efd9` and dm-verity root `c8f1ca4197a6982aa09ea53dd92ef76fded30dce84c75ff63d2e978b4d227015`, mounted read-only.
+5. From that root, the supervisor verifies the exact composed service `17441ae384fe90fbe183a5c546e0f87321454e3fbeedbb38159cf58666fbbc3a` and opens the exact admission artifact `1858da09e42ce76ac5dc7bd311989bf0864c0eed235f2a24f5acf66d0a910186` once. It hands only that verified descriptor across chroot.
+6. The admission artifact's exact 30-file closure is `709f8ddc63321aee68b17e14e21cf8cf71b4e85181a5aaeb07161e30329a73d8`. Its binding/key/signature are `ce6b288900bfa580573d1bba6d3cdcfa042dd106015a029b6fb0ad6a0303bb77`, `ebe7eccbd4180c76ca92a3932b53289938f9443ca7beed59d761be66ce90b322` and `62188d040a365f1796c98099c05896c2e14605df8e293cacc679fa9279ded3f9`. It replaces, rather than wraps, the old launcher's authority role.
+7. Admission proves the exact read-only repository, commit, tree, fixed script path/blob/mode/length/digest, opens the script once and hands the same descriptor to Bash. Rename or pathname replacement cannot substitute the object.
+8. The composed measured service validates the protected pin-store key, policy and monotonic floor, then validates and reconstructs the signed pin, cross-binding and offline-input records before any handoff.
+9. Those records bind the exact base-image layers, service/runtime closure, admission identity, provisioning script and nine offline content-addressed Rust inputs. Network and every fallback authority are denied.
+10. The exact provisioning script admits only Rust 1.98.1 source commit `48a229ceaefd4985c50990b14116b6d856af0985`, sole signer `108F66205EAEB0AAA8DD5E1C85AB96E6FA1BE5FE`, and rustc/cargo/rust-std for `x86_64-unknown-linux-gnu` with the approved license inventory.
+
+No member admits itself: the protected external boundary admits the UKI; the UKI-bound native supervisor admits the verity root; the supervisor admits the descriptor-based service/admission layer; that layer admits the protected signed graph and same script descriptor; the graph admits the offline Rust inputs.
 ## Exact approved root
 
-The only design is offline content-addressed delivery into the exact measured Linux/amd64 root. There is no DNS, live network, CA/resolver injection, mirror, cache, host file or recovery download in authoritative execution.
+Inside the admitted dm-verity root, the only provisioning-input design is offline content-addressed delivery into the exact measured Linux/amd64 OCI filesystem. There is no DNS, live network, CA/resolver injection, mirror, cache, host file or recovery download in authoritative execution.
 
 - OCI index: `sha256:81380e4c9c14e8a629ff39029639e4b7893e67400246fa7782a0fe7dc193a02a`
 - Linux/amd64 manifest: `sha256:c60167d590a5b777953097a5d3647cb0753465748d1a9d6442e4088305d90c46`
@@ -59,4 +73,4 @@ The nine signed offline records pin the Rust release key, versioned signed manif
 
 ## State and boundary
 
-This frozen design may receive `BOOTSTRAP_PINNING_DESIGN_PASS` only after independent review of one exact SHA. PASS approves design closure only. It does not authorize execution, provisioning, Rust installation, compilation, runtime changes, Gate continuation, Certified Boundary Baseline, merge, release, School work or visuals. Execution requires a later, separately authorized operational artifact/key ceremony and review; the preserved `E_CANDIDATE_AUTHORITY` stop enforces that separation.
+This integrated design may receive `BOOTSTRAP_PINNING_DESIGN_PASS` only after independent review of one exact successor SHA. PASS approves design closure only. It does not authorize execution, provisioning, Rust installation, compilation, runtime changes, Gate continuation, Certified Boundary Baseline, merge, release, School work or visuals. Execution requires a later, separately authorized operational artifact/key ceremony and review; the preserved `E_CANDIDATE_AUTHORITY` stop enforces that separation.

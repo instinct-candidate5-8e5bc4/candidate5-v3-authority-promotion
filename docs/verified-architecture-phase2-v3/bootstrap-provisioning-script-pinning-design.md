@@ -1,10 +1,10 @@
 # Bootstrap / Provisioning-Script Pinning Design
 
-Status: `FINAL BOOTSTRAP PINNING DESIGN CANDIDATE - INDEPENDENT REVIEW REQUIRED`
+Status: `FINAL BOOTSTRAP PINNING DESIGN - READY FOR INDEPENDENT REVIEW`
 
 Parent: `2b569a1294fbcc7a9d19aeeb980772bc06edc4ff`
 
-Current state: `FINAL_BOOTSTRAP_PINNING_DESIGN_CANDIDATE_FOR_INDEPENDENT_REVIEW`. The concrete trust-root package at `b768d48e58b6ddcf66ed482ee06e7d62b3162edb` is independently reviewed and owner-approved for exact incorporation. `BOOTSTRAP_PINNING_DESIGN_PASS` remains pending independent review of this final design at one frozen SHA.
+Current state: `FINAL_BOOTSTRAP_PINNING_DESIGN_READY_FOR_INDEPENDENT_REVIEW`. The concrete Root-Admitter package at exact commit `aac192071090e21f0f7373add2305ac760d10ec0`, tree `c724e3633a673e8080ada8d9d790302fbc9d39de` and root-admitter subtree `cd03b2286e57b6ee5580f3b24b32cbb7678d980c` is owner-approved for exact incorporation. Its reviewed bytes remain unchanged. `BOOTSTRAP_PINNING_DESIGN_PASS` remains pending independent review of this integrated design at one frozen successor SHA.
 
 This document designs the bootstrap and future provisioning script. It commits no executable script and performs no provisioning. It preserves every approved Rust 1.98.1 pin, signer rule, component decision and license manifest at `2b569a1` unchanged.
 
@@ -20,9 +20,9 @@ This delivery may reach `BOOTSTRAP_PINNING_DESIGN_PASS` only through independent
 
 ## Host/platform and bootstrap trust root
 
-The sole bootstrap platform is the exact owner-approved, externally measured, read-only Linux/amd64 OCI filesystem and nine-layer vector recorded in `bootstrap-concrete-candidates/cross-binding.v1.json`. Its immutable index, manifest, config and full image-closure identities are summarized in `final-bootstrap-trust-root-design.md`; no distribution, architecture, tag move or layer substitution is authorized. Kernel/hypervisor administration remains `NON_AUTHORITATIVE/OUT_OF_SCOPE` under the approved reduced guarantee and grants no application authority.
+The authority root begins outside the candidate: the exact protected UEFI db policy admits only signed UKI `7f5c3392...`. Its signed boot binding admits native supervisor `a2d33af1...`; the supervisor verifies and admits only dm-verity root `c8f1ca41...` over image `71e3290f...` and verity tree `82423acc...`. From that read-only root it descriptor-admits composed service `17441ae3...` and admission layer `1858da09...`, whose exact closure is `709f8ddc...`. The admission layer replaces the old launcher role and hands the provisioning script by the same verified open descriptor. Full identities and bindings are in `final-bootstrap-trust-root-design.md`. No distribution, architecture, tag move, layer substitution or pathname reopen is authorized. Kernel/hypervisor administration remains `NON_AUTHORITATIVE/OUT_OF_SCOPE` under the approved reduced guarantee and grants no application authority.
 
-The measured service, launcher, provisioning script, 44-record service/runtime closure, protected-store policy/floor, Ed25519 verification identity, canonical pin/cross/manifest records and detached signatures are the exact approved bytes at `b768d48e58b6ddcf66ed482ee06e7d62b3162edb`. The measured service validates this complete signed graph and denies network before any launcher path. No artifact verifies itself.
+The inner measured service, provisioning script, 44-record service/runtime closure, protected-store policy/floor, Ed25519 verification identity, canonical pin/cross/manifest records and detached signatures remain the exact approved bytes from `b768d48e58b6ddcf66ed482ee06e7d62b3162edb`. The Root-Admitter package at `aac1920...` adds the exact native supervisor, dm-verity root, composed service and descriptor-based admission layer without changing those bytes. The admission layer replaces the older launcher authority role. The composed service validates the signed graph and denies network before admission handoff. No artifact verifies itself.
 
 Offline content-addressed delivery is final. Authoritative execution uses exactly the nine signed offline records. DNS, CA/resolver injection, live retrieval, curl transport, host files, mutable cache, mirror and fallback are forbidden and absent from the authoritative execution graph. Runtime data is limited to the exact files in the approved 44-record closure plus explicit `NON_AUTHORITATIVE/OUT_OF_SCOPE` kernel/filesystem semantics named in the reduced threat model. Any newly authoritative runtime data requires a new binding and review.
 
@@ -54,9 +54,9 @@ Any later execution-authorizing commit must descend exactly from the owner-appro
 
 The graph is acyclic:
 
-`protected public key + floor -> signed pin/cross/offline records -> exact image/layers + service/44-record closure + launcher/script -> admitted bash/openssl/sha256sum/gpg/tar/xz/coreutils -> authenticated offline Rust metadata/payloads -> provisioned Rust tree -> deterministic evidence`.
+`external protected UEFI db policy -> signed UKI -> signed external-boot binding -> native supervisor -> exact dm-verity root -> descriptor-admitted composed service/admission layer -> protected public key + floor -> signed pin/cross/offline records -> same-descriptor exact script -> admitted bash/openssl/sha256sum/gpg/tar/xz/coreutils -> authenticated offline Rust metadata/payloads -> provisioned Rust tree -> deterministic evidence`.
 
-For each bootstrap verifier, the external launcher verifies executable path/digest and all loader/library/runtime-data dependencies. GPG then authenticates only Rust metadata; it does not verify itself. sha256sum then checks only already source-bound bytes; it does not verify itself. The script coordinates already admitted tools; it is not its own trust root. Any edge whose verifier or input is absent, cyclic, `UNASSIGNED`, mutable or undefined yields `HARD STOP - BOOTSTRAP_TRUST_ROOT_INCOMPLETE` before bootstrap execution.
+For each bootstrap verifier, the descriptor-admitted admission layer verifies executable path/digest and all loader/library/runtime-data dependencies. GPG then authenticates only Rust metadata; it does not verify itself. sha256sum then checks only already source-bound bytes; it does not verify itself. The script coordinates already admitted tools; it is not its own trust root. Any edge whose verifier or input is absent, cyclic, `UNASSIGNED`, mutable or undefined yields `HARD STOP - BOOTSTRAP_TRUST_ROOT_INCOMPLETE` before bootstrap execution.
 
 ## Mandatory hostile verification
 
@@ -82,6 +82,6 @@ The harness must also demonstrate that an exact approved fixture reaches only `B
 
 The design review receives this document, full closure inventory, generator source/command transcript, raw `readelf` dependency evidence, package provenance records, platform/runtime-data assumptions, hostile fixtures and expected reason codes. Independent reviewers reproduce the closure from a separately obtained immutable Ubuntu base image, compare every path/digest and audit that the script plan invokes no undeclared capability.
 
-The exact concrete package is owner-approved for incorporation, and `final-bootstrap-pinning-design.v1.json` binds its artifact identities. No unresolved authoritative candidate, placeholder, `UNASSIGNED`, prose-only edge, live-network input or undeclared runtime dependency remains in this bootstrap design. Until independent review passes this exact final-design SHA, `BOOTSTRAP_PINNING_DESIGN_PASS` remains withheld. Execution remains separately prohibited regardless of design PASS.
+The exact Root-Admitter package at `aac1920...` is owner-approved for incorporation, and `final-bootstrap-pinning-design.v1.json` binds its commit/tree/subtree and artifact identities. Candidate labels and `E_CANDIDATE_AUTHORITY` inside the immutable package are closed historical review state and a preserved execution stop, not current design authority. No unresolved authoritative candidate, placeholder, `UNASSIGNED`, circular self-admission, prose-only edge, live-network input or undeclared runtime dependency remains in this bootstrap design. Until independent review passes this exact final-design SHA, `BOOTSTRAP_PINNING_DESIGN_PASS` remains withheld. Execution remains separately prohibited regardless of design PASS.
 
 No paid GitHub plan feature is a trust root or dependency. GitHub Free CI may publish head-bound reproduction evidence only.
