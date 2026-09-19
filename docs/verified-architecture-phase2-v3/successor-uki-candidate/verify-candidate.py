@@ -11,7 +11,8 @@ def parse(blob):
   if name=='TRAILER!!!': return out
   out.append({'name':name,'ino':v[0],'mode':v[1],'uid':v[2],'gid':v[3],'nlink':v[4],'mtime':v[5],'body':body,'devmaj':v[7],'devmin':v[8],'rdevmaj':v[9],'rdevmin':v[10],'check':v[12]})
 old=parse((B.parent/'root-admitter-candidate/uki/initramfs.cpio').read_bytes()); new=parse((B/'successor-initramfs.cpio').read_bytes()); om={e['name']:e for e in old};nm={e['name']:e for e in new}
-assert set(nm)==(set(om)-{'init'})|{'init','init.root-admitter'}
+assert (set(om)-{'init'})|{'init','init.root-admitter'} <= set(nm)
+assert all(n in (set(om)-{'init'})|{'init','init.root-admitter'} or n in ('bin/gce-by-id-producer','sbin/scsi_id','gce-disk-naming.rules') for n in nm)
 for name,e in om.items():
  if name=='init': continue
  n=nm[name]
