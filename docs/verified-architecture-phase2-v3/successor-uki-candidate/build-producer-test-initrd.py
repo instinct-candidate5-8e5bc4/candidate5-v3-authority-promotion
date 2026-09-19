@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 from pathlib import Path
 import importlib.util,sys
+saved=sys.argv;sys.argv=[sys.argv[0]]
 B=Path(__file__).resolve().parent
 spec=importlib.util.spec_from_file_location('successor_builder',B/'build-successor.py')
-m=importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+m=importlib.util.module_from_spec(spec); spec.loader.exec_module(m);sys.argv=saved
 entries=m.parse_cpio((B/'successor-initramfs.cpio').read_bytes())
 for e in entries:
  if e['name']=='init': e['body']=(B/'vm-test/guest-init.sh').read_bytes(); e['mode']=(e['mode']&~0o7777)|0o755

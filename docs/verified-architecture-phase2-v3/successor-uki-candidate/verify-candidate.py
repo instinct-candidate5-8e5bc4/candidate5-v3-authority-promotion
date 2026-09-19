@@ -46,3 +46,16 @@ for n in ('v3-rootfs-data','v3-rootfs-hash','v3-reviewed-root','v3-reviewed-inpu
 for key in ('disposableInitramfs','guestInit','module'):
  x=evidence[key]; assert hashlib.sha256((B/x['path']).read_bytes()).hexdigest()==x['sha256']
 print('SUCCESSOR_EVIDENCE_BINDINGS_PASS')
+
+assert evidence['testedPredecessor']=='0a1b48863f97f8810ec568ff834a79b7c88d00fa'
+assert evidence['successorInitramfsSha256']==hashlib.sha256((B/'successor-initramfs.cpio').read_bytes()).hexdigest()
+assert evidence['producerScriptSha256']==hashlib.sha256((B/'provider-producer/produce-google-by-id.sh').read_bytes()).hexdigest()
+assert evidence['scsiIdSha256']==hashlib.sha256((B/'provider-producer/lib/udev/scsi_id').read_bytes()).hexdigest()
+for key in ('harness','qemuClosure'):
+ x=evidence[key];assert hashlib.sha256((B/x['path']).read_bytes()).hexdigest()==x['sha256']
+test_entries=parse((B/'producer-test-initramfs.cpio').read_bytes());tm={x['name']:x for x in test_entries}
+assert hashlib.sha256(tm['init']['body']).hexdigest()==hashlib.sha256((B/'vm-test/guest-init.sh').read_bytes()).hexdigest()
+assert hashlib.sha256(tm['virtio_scsi.ko']['body']).hexdigest()==hashlib.sha256((B/'vm-test/virtio_scsi.ko').read_bytes()).hexdigest()
+assert hashlib.sha256(tm['bin/gce-by-id-producer']['body']).hexdigest()==evidence['producerScriptSha256']
+assert hashlib.sha256(tm['sbin/scsi_id']['body']).hexdigest()==evidence['scsiIdSha256']
+print('SUCCESSOR_VM_SEMANTIC_BINDINGS_PASS')
