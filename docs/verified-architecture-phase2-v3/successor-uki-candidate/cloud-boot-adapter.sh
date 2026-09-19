@@ -5,38 +5,26 @@ BB=/bin/busybox
 fail() { "$BB" echo "$1" >&2; exit 98; }
 OLD_INIT_SHA256=6f6b504525b8f4f87a36422e5cc48c570220f1103514a204c36f3d70a8f2663f
 EXPECTED='v3-rootfs-data v3-rootfs-hash v3-reviewed-root v3-reviewed-input v3-reviewed-output v3-reviewed-evidence'
-
-[ -x "$BB" ] || exit 98
-[ -d /proc ] || "$BB" mkdir -m 0555 /proc || fail E_PROC_TARGET
-[ -d /sys ] || "$BB" mkdir -m 0555 /sys || fail E_SYS_TARGET
-[ -d /dev ] || "$BB" mkdir -m 0755 /dev || fail E_DEV_TARGET
-[ -r /proc/mounts ] || "$BB" mount -t proc -o nosuid,nodev,noexec proc /proc || fail E_PROC_MOUNT
-"$BB" grep -q ' /sys sysfs ' /proc/mounts || "$BB" mount -t sysfs -o nosuid,nodev,noexec,ro sysfs /sys || fail E_SYS_MOUNT
-"$BB" grep -q ' /dev devtmpfs ' /proc/mounts || "$BB" mount -t devtmpfs -o nosuid devtmpfs /dev || fail E_DEV_MOUNT
+BYID=/dev/disk/by-id
 
 resolve() {
- want=$1 found= count=0
- for node in /sys/class/block/*; do
-  [ -e "$node/partition" ] && continue
-  [ -r "$node/device/serial" ] || continue
-  serial=$("$BB" cat "$node/device/serial") || fail E_SERIAL_READ
-  [ "$serial" = "$want" ] || continue
-  name=${node##*/}; dev=/dev/$name
-  [ -b "$dev" ] || fail E_DEVICE_NODE
-  found=$dev; count=$((count+1))
- done
- [ "$count" -eq 1 ] || fail E_DEVICE_CARDINALITY
- "$BB" printf '%s' "$found"
+ want=$1; link="$BYID/google-$want"
+ [ -L "$link" ] || fail E_PROVIDER_LINK_MISSING
+ target=$("$BB" readlink -f "$link") || fail E_PROVIDER_LINK_RESOLVE
+ case "$target" in /dev/*) :;; *) fail E_PROVIDER_LINK_TARGET;; esac
+ [ -b "$target" ] || fail E_DEVICE_NODE
+ # The provider link itself and its fully resolved object must agree.
+ [ "$link" -ef "$target" ] || fail E_PROVIDER_LINK_SUBSTITUTION
+ "$BB" printf '%s' "$target"
 }
 
-# Reject extra managed disks before consuming any one of them.
-for node in /sys/class/block/*; do
- [ -e "$node/partition" ] && continue
- [ -r "$node/device/serial" ] || continue
- serial=$("$BB" cat "$node/device/serial") || fail E_SERIAL_READ
- case "$serial" in
-  v3-*) case " $EXPECTED " in *" $serial "*) :;; *) fail E_EXTRA_MANAGED_DEVICE;; esac;;
- esac
+
+# Reject extra provider-managed identities in the reserved v3 namespace.
+for link in "$BYID"/google-v3-*; do
+ [ -e "$link" ] || [ -L "$link" ] || continue
+ [ -L "$link" ] || fail E_PROVIDER_LINK_SUBSTITUTION
+ base=${link##*/}; name=${base#google-}
+ case " $EXPECTED " in *" $name "*) :;; *) fail E_EXTRA_MANAGED_DEVICE;; esac
 done
 
 DATA=$(resolve v3-rootfs-data)
@@ -62,12 +50,12 @@ for n in reviewed-root reviewed-input reviewed-output reviewed-evidence; do
 "$BB" mount -t ext4 -o rw,nodev,nosuid,noexec "$REVIEWED_EVIDENCE" /reviewed-evidence || fail E_REVIEWED_EVIDENCE_MOUNT
 
 for n in reviewed-root reviewed-input; do
- "$BB" grep -q " /$n ext4 " /proc/mounts || fail E_MOUNTPOINT
- "$BB" grep -q " /$n ext4 ro," /proc/mounts || fail E_READ_ONLY_OPTIONS
+ case "$n" in reviewed-root) source=$REVIEWED_ROOT;; reviewed-input) source=$REVIEWED_INPUT;; esac
+ "$BB" grep -q "^$source /$n ext4 ro," /proc/mounts || fail E_MOUNT_IDENTITY_OPTIONS
  done
 for n in reviewed-output reviewed-evidence; do
- "$BB" grep -q " /$n ext4 " /proc/mounts || fail E_MOUNTPOINT
- "$BB" grep -q " /$n ext4 rw," /proc/mounts || fail E_READ_WRITE_OPTIONS
+ case "$n" in reviewed-output) source=$REVIEWED_OUTPUT;; reviewed-evidence) source=$REVIEWED_EVIDENCE;; esac
+ "$BB" grep -q "^$source /$n ext4 rw," /proc/mounts || fail E_MOUNT_IDENTITY_OPTIONS
  "$BB" chown 0:0 "/$n" || fail E_RW_OWNER
  "$BB" chmod 0700 "/$n" || fail E_RW_MODE
  done

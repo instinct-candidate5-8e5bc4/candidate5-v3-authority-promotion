@@ -21,5 +21,5 @@ assert hashlib.sha256(nm['init']['body']).hexdigest()==hashlib.sha256((B/'cloud-
 inv=json.loads((B/'inventory.v1.json').read_text()); vec={e['name']:e for e in inv['initramfsMembers']}
 for e in new:
  assert vec[e['name']]=={'name':e['name'],'mode':f"{e['mode']:08x}",'size':len(e['body']),'sha256':hashlib.sha256(e['body']).hexdigest()}
-assert inv['status']=='RUNTIME_EVIDENCE_REQUIRED'
+assert inv['status']=='SUCCESSOR_UKI_CONCRETE_CANDIDATE_READY_FOR_OWNER_REVIEW'
 print('SUCCESSOR_CANDIDATE_STATIC_PASS')
