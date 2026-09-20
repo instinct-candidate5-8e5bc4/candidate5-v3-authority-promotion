@@ -2,7 +2,7 @@
 # Candidate bytes only. Not authorized for execution or boot.
 set -eu
 fail() { /bin/busybox echo "$1" >&2; exit 99; }
-ROOT_HASH=c8f1ca4197a6982aa09ea53dd92ef76fded30dce84c75ff63d2e978b4d227015
+ROOT_HASH=b1d724bb9ffdb3ecd6a0db36590090e4362b5f0aff6959eff868e83079efa7cf
 DATA=/dev/v3-rootfs-data
 HASH=/dev/v3-rootfs-hash
 [ -b "$DATA" ] || fail E_DATA_DEVICE
@@ -25,12 +25,6 @@ HHEX=$(/bin/busybox stat -L -c %t:%T "$HASH"); [ "$6" = "$((0x${HHEX%:*})):$((0x
 /bin/busybox mount -t ext4 -o ro /dev/mapper/v3-root-admitter /verity-root || fail E_ROOT_MOUNT
 /bin/busybox grep -q ' /verity-root ' /proc/mounts || fail E_ROOT_MOUNTPOINT
 /bin/busybox grep -q '^/dev/mapper/v3-root-admitter /verity-root ext4 ro,' /proc/mounts || fail E_ROOT_MOUNT_IDENTITY
-/bin/busybox chmod 755 /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 || fail E_RUNTIME_LOADER_MODE
-/bin/busybox mount --bind /lib/x86_64-linux-gnu /verity-root/lib/x86_64-linux-gnu || fail E_RUNTIME_LIB_BIND
-/bin/busybox mount -o remount,bind,ro /verity-root/lib/x86_64-linux-gnu || fail E_RUNTIME_LIB_BIND_RO
-/bin/busybox cp /verity-root/usr/lib/x86_64-linux-gnu/libtinfo.so.6.3 /lib/x86_64-linux-gnu/libtinfo.so.6 || fail E_RUNTIME_TINFO
-/bin/busybox mkdir -p /verity-root/lib64 || fail E_RUNTIME_LIB64_DIR
-/bin/busybox ln -s /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /verity-root/lib64/ld-linux-x86-64.so.2 || fail E_RUNTIME_LIB64_LINK
 /bin/busybox mount --bind /proc /verity-root/proc || fail E_PROC_BIND
 /bin/busybox mount -o remount,bind,ro /verity-root/proc || fail E_PROC_BIND_RO
 [ /proc/self -ef /verity-root/proc/self ] || fail E_PROC_BIND_IDENTITY
