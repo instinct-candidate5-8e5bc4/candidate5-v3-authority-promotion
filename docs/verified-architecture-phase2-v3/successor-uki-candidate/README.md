@@ -33,3 +33,7 @@ The resolver uses the documented GCP by-id contract and makes no claim about sys
 ## Runtime evidence boundary
 
 The canonical inventory and authority record bind the producer-positive run, full dm-verity handoff through the positive `E_CANDIDATE_AUTHORITY` boundary, twelve executable hostile VM outcomes, deterministic rebuild evidence and final recertification. This is certification-evidence complete; production signing and provisioning remain separate later authority boundaries. The official rule is retained with `.reference` suffix as provenance; the reviewed hand-coded producer script is the sole executed namespace policy. It uses the preserved initramfs libc/loader through pinned `scsi_id`; no second unused libc/loader copy is submitted.
+
+## Duplicate-provider invariant
+
+Two provider identities resolving to one canonical block path are fail-closed. The current adapter's pairwise path loop skips equal canonical strings, so the approved exact invariant is downstream rejection: the second identity cannot establish its distinct role volume and terminates at `E_ROLE_PROBE_MOUNT`. The executable `duplicate-or-ambiguous-target` QEMU case binds that exact outcome. This is not claimed as direct `E_DEVICE_ALIAS` rejection; changing it would change tested boot bytes and require fresh corresponding runtime evidence.

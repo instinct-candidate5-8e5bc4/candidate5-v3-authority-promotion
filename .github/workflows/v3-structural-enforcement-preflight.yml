@@ -131,6 +131,25 @@ jobs:
           done
           python3 "$c/build-producer-test-initrd.py" /tmp/producer-test.cpio
           cmp /tmp/producer-test.cpio "$c/producer-test-initramfs.cpio"
+          python3 "$c/build-full-handoff-test-initrd.py" /tmp/full-handoff-test.cpio
+          cmp /tmp/full-handoff-test.cpio "$c/full-handoff-test-initramfs.cpio"
+          rm -rf /tmp/hostile-inputs-a /tmp/hostile-inputs-b
+          python3 "$c/build-hostile-runtime-matrix.py" /tmp/hostile-inputs-a
+          python3 "$c/build-hostile-runtime-matrix.py" /tmp/hostile-inputs-b
+          python3 - <<'PY'
+          import hashlib,json,pathlib
+          c=pathlib.Path('docs/verified-architecture-phase2-v3/successor-uki-candidate')
+          committed=json.loads((c/'hostile-runtime-evidence/matrix-inputs.v1.json').read_text())
+          for base in ('/tmp/hostile-inputs-a','/tmp/hostile-inputs-b'):
+              fresh=json.loads((pathlib.Path(base)/'matrix-inputs.v1.json').read_text()); assert fresh==committed
+              for case in fresh['cases']:
+                  p=pathlib.Path(base)/case['initrd']; assert hashlib.sha256(p.read_bytes()).hexdigest()==case['initrdSha256']
+          for case in committed['cases']:
+              assert (pathlib.Path('/tmp/hostile-inputs-a')/case['initrd']).read_bytes()==(pathlib.Path('/tmp/hostile-inputs-b')/case['initrd']).read_bytes()
+          PY
+          python3 docs/verified-architecture-phase2-v3/root-admitter-candidate/dm-table-semantic-fixtures.py
+          python3 docs/verified-architecture-phase2-v3/root-admitter-candidate/review-verification.py
+          python3 "$c/recertification/verify-final-recertification.py"
           python3 "$c/verify-candidate.py"
           test "$(git ls-tree HEAD "$c/producer-test-initramfs.cpio" | awk '{print $1}')" = 100644
           test "$(git ls-tree HEAD "$c/producer-vm-raw-serial.txt" | awk '{print $1}')" = 100644
