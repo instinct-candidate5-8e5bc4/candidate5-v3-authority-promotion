@@ -36,7 +36,7 @@ count=0;previous=;while IFS= read -r -d '' path&&IFS= read -r -d '' role&&IFS= r
 count=0;previous=;while IFS= read -r -d '' name&&IFS= read -r -d '' length&&IFS= read -r digest;do case "$name" in */*|*..*|*$'\n'*) fail E_INPUT_NAME;;esac;[ -z "$previous" ]||[[ "$previous" < "$name" ]]||fail E_INPUT_ORDER;previous=$name;count=$((count+1));done <"$MANIFEST"
 [ "$count" -eq 9 ] || fail E_INPUT_COUNT
 set -o pipefail
-/usr/bin/find "$INPUT" -xdev -mindepth 1 -maxdepth 1 -printf '%f\0' | /usr/bin/sort -z | /usr/bin/cmp -s - <(/usr/bin/printf '%s\0' cargo-1.98.1-x86_64-unknown-linux-gnu.tar.xz channel-rust-1.98.1.toml channel-rust-1.98.1.toml.asc channel-rust-1.98.1.toml.sha256 expected-channel-rust-1.98.1.toml.sha256 rust-1.98.1-license-notice-manifest.bin rust-key.gpg.ascii rust-std-1.98.1-x86_64-unknown-linux-gnu.tar.xz rustc-1.98.1-x86_64-unknown-linux-gnu.tar.xz) || fail E_INPUT_EXACT_SET
+/usr/bin/find "$INPUT" -xdev -mindepth 1 -maxdepth 1 ! -name .v3-volume-role -printf '%f\0' | /usr/bin/sort -z | /usr/bin/cmp -s - <(/usr/bin/printf '%s\0' cargo-1.98.1-x86_64-unknown-linux-gnu.tar.xz channel-rust-1.98.1.toml channel-rust-1.98.1.toml.asc channel-rust-1.98.1.toml.sha256 expected-channel-rust-1.98.1.toml.sha256 rust-1.98.1-license-notice-manifest.bin rust-key.gpg.ascii rust-std-1.98.1-x86_64-unknown-linux-gnu.tar.xz rustc-1.98.1-x86_64-unknown-linux-gnu.tar.xz) || fail E_INPUT_EXACT_SET
 set +o pipefail
 # Open each approved object once. Hash, length and type admission and successor copying use these descriptors, never reopened paths.
 fdmap=;count=0;previous=

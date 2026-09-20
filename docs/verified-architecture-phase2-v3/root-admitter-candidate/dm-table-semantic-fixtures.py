@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-ROOT='e6ddb15916e12220c6117b6abded6550acd77df9379101662d8af78c7396dad7'
+ROOT='533d6d61d83ad8e03539549d500fb74ec6d844f18ee3bcaec238f7fb78303245'
 def ok(s,data='8:0',hashdev='8:16'):
  f=s.split();return len(f)==13 and f[:4]==['0','196608','verity','1'] and f[4:11]==[data,hashdev,'4096','4096','24576','0','sha256'] and f[11:]==[ROOT,'-']
 g=f'0 196608 verity 1 8:0 8:16 4096 4096 24576 0 sha256 {ROOT} -'

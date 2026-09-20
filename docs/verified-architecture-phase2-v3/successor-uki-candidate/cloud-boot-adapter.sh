@@ -3,7 +3,7 @@
 set -eu
 BB=/bin/busybox
 fail() { "$BB" echo "$1" >&2; exit 98; }
-OLD_INIT_SHA256=90d82085cc127358d563ea868dea96818bce60bd55e9af678304f7978a5b31f7
+OLD_INIT_SHA256=0734a4c4598651a024fd0de1f1884c3e8f6be6d898eef8181de297e11db110c4
 EXPECTED='v3-rootfs-data v3-rootfs-hash v3-reviewed-root v3-reviewed-input v3-reviewed-output v3-reviewed-evidence'
 BYID=/dev/disk/by-id
 [ -d /proc ] || "$BB" mkdir -m 0555 /proc
@@ -49,7 +49,6 @@ probe() {
  check_mount "$dev" "$target" ro
  [ -f "$target/.v3-volume-role" ] || fail E_ROLE_MARKER_MISSING
  [ "$("$BB" cat "$target/.v3-volume-role")" = "$role" ] || fail E_ROLE_MARKER_MISMATCH
- [ "$role" != reviewed-input ] || "$BB" rm -f "$target/.v3-volume-role" || fail E_ROLE_MARKER_CLEANUP
  if [ "$final" = rw ]; then "$BB" umount "$target" || fail E_ROLE_UNMOUNT; "$BB" mount -t ext4 -o rw,nodev,nosuid,noexec "$dev" "$target" || fail E_ROLE_RW_MOUNT; check_mount "$dev" "$target" rw; fi
 }
 probe "$REVIEWED_ROOT" reviewed-root /reviewed-root ro

@@ -61,7 +61,7 @@ The blocker occurs before any successor construction. The following remain uncha
 - old initramfs: `64929fe646c45d5203c3bf29065613367544576c629842fdde7a44394b1ad219`;
 - old downstream `/init`: `6f6b504525b8f4f87a36422e5cc48c570220f1103514a204c36f3d70a8f2663f`;
 - native supervisor: `a2d33af1aa9ff076d4dc2e6e5f90be8f95cacc6a45a8559263035758e17ff6eb`;
-- dm-verity root: `e6ddb15916e12220c6117b6abded6550acd77df9379101662d8af78c7396dad7`;
+- dm-verity root: `533d6d61d83ad8e03539549d500fb74ec6d844f18ee3bcaec238f7fb78303245`;
 - Root-Admitter subtree: `cd03b2286e57b6ee5580f3b24b32cbb7678d980c`.
 
 ## Owner decision required
