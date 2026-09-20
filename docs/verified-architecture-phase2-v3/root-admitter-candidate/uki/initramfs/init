@@ -11,7 +11,14 @@ HASH=/dev/v3-rootfs-hash
 /bin/busybox insmod /lib/modules/5.15.0-191-generic/kernel/drivers/md/dm-verity.ko || fail E_DM_VERITY
 TABLE="0 196608 verity 1 $DATA $HASH 4096 4096 24576 0 sha256 $ROOT_HASH -"
 /sbin/dmsetup create v3-root-admitter --readonly --table "$TABLE" || fail E_DM_CREATE
-[ "$(/sbin/dmsetup table v3-root-admitter --showkeys)" = "$TABLE" ] || fail E_DM_TABLE
+ACTUAL=$(/sbin/dmsetup table v3-root-admitter --showkeys) || fail E_DM_TABLE_READ
+set -- $ACTUAL
+[ "$#" -eq 13 ] || fail E_DM_TABLE_FIELDS
+[ "$1" = 0 ] && [ "$2" = 196608 ] && [ "$3" = verity ] && [ "$4" = 1 ] || fail E_DM_TABLE_GEOMETRY
+[ "$5" = "$(/bin/busybox stat -c %t:%T "$DATA")" ] || fail E_DM_TABLE_DATA
+[ "$6" = "$(/bin/busybox stat -c %t:%T "$HASH")" ] || fail E_DM_TABLE_HASH
+[ "$7" = 4096 ] && [ "$8" = 4096 ] && [ "$9" = 24576 ] && [ "${10}" = 0 ] || fail E_DM_TABLE_BLOCKS
+[ "${11}" = sha256 ] && [ "${12}" = "$ROOT_HASH" ] && [ "${13}" = - ] || fail E_DM_TABLE_CRYPTO
 /bin/busybox mkdir -p /verity-root || fail E_ROOT_TARGET
 /bin/busybox mount -t ext4 -o ro /dev/mapper/v3-root-admitter /verity-root || fail E_ROOT_MOUNT
 /bin/busybox mountpoint -q /verity-root || fail E_ROOT_MOUNTPOINT
