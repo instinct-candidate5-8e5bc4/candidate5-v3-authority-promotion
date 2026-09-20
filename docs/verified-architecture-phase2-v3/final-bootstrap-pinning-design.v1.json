@@ -7,9 +7,9 @@
       "scope": "exact reviewed bytes, identities, digests, topology, provenance, closure and hostile semantics only"
     },
     "authoritativeRoot": {
-      "dmVerityRoot": "b1d724bb9ffdb3ecd6a0db36590090e4362b5f0aff6959eff868e83079efa7cf",
-      "imageSha256": "b541bfef551fa845dddcb4f0d342e2f9dd2c6706b618da04bc5597125783a9a5",
-      "verityTreeSha256": "3eedbe43a7ba60e70f7bf9bbf81f75c02ce6e3d990aff04e797915b3bcee0a07"
+      "dmVerityRoot": "b78ccbc789be451715c52d661902d61abc3e149ea0e26afb2491f6a467c47646",
+      "imageSha256": "5c6b747d4b2ffa44655f3f2139e3993e2740534e0fc6c8ae67916c13238ba148",
+      "verityTreeSha256": "10552718d890533e447ef611c82de67cbc2af7c2258f44f7c2c0aaef661e8285"
     },
     "candidateLabels": {
       "status": "CLOSED_BY_OWNER_DECISION",

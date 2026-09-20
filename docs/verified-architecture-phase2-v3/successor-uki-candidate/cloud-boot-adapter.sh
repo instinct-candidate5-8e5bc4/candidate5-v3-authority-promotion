@@ -3,7 +3,7 @@
 set -eu
 BB=/bin/busybox
 fail() { "$BB" echo "$1" >&2; exit 98; }
-OLD_INIT_SHA256=c671d28c0630c4dc6c7376b55f09bcda6d51be7c6008f2740e383144c4b513e6
+OLD_INIT_SHA256=4c7abca25f97dddbf1795b127a2464f73435de61a0e9e1769012416346713a2f
 EXPECTED='v3-rootfs-data v3-rootfs-hash v3-reviewed-root v3-reviewed-input v3-reviewed-output v3-reviewed-evidence'
 BYID=/dev/disk/by-id
 [ -d /proc ] || "$BB" mkdir -m 0555 /proc
