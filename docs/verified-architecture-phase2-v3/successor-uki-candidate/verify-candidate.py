@@ -22,7 +22,7 @@ assert hashlib.sha256(nm['init']['body']).hexdigest()==hashlib.sha256((B/'cloud-
 inv=json.loads((B/'inventory.v1.json').read_text()); vec={e['name']:e for e in inv['initramfsMembers']}
 for e in new:
  assert vec[e['name']]=={'name':e['name'],'mode':f"{e['mode']:08x}",'size':len(e['body']),'sha256':hashlib.sha256(e['body']).hexdigest()}
-assert inv['status']=='RUNTIME_EVIDENCE_INCOMPLETE'
+assert inv['status']=='CERTIFICATION_EVIDENCE_COMPLETE_RUNTIME_PASS'
 print('SUCCESSOR_CANDIDATE_STATIC_PASS')
 
 adapter=(B/'cloud-boot-adapter.sh').read_text()
@@ -77,3 +77,10 @@ for forbidden in ('qemuPackage','ovmfPackage','packageFiles','.deb','OVMF'):
  assert forbidden not in raw,forbidden
 assert evidence['successorHead']=='EVIDENCE_ONLY_SUCCESSOR_OF_REVIEWED_RUN_6cb84f4'
 print('SUCCESSOR_NO_UNSUPPORTED_PACKAGE_PROVENANCE_PASS')
+
+# Canonical final certification closure.
+def blob(d): return hashlib.sha1(b"blob "+str(len(d)).encode()+b"\0"+d).hexdigest()
+for r in inv['artifacts']:
+ p=(B/r['path']).resolve();d=p.read_bytes();assert len(d)==r['bytes'] and hashlib.sha256(d).hexdigest()==r['sha256'] and blob(d)==r['gitBlob'];assert r['gitMode']==('100755' if p.stat().st_mode&0o111 else '100644')
+auth=json.loads((B/'successor-authority-record.v1.json').read_text());assert auth['status']==inv['status'];assert auth['certification']==inv['certification'];assert {r['path'] for r in auth['records']}=={r['path'] for r in inv['artifacts']}|{'inventory.v1.json'}
+print('SUCCESSOR_CANONICAL_CERTIFICATION_CLOSURE_PASS')

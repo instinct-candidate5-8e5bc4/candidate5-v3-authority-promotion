@@ -1,6 +1,6 @@
 # Minimal Cloud Boot Adapter and Successor UKI Implementation Candidate
 
-Status: `RUNTIME_EVIDENCE_INCOMPLETE`
+Status: `CERTIFICATION_EVIDENCE_COMPLETE_RUNTIME_PASS`
 
 This candidate is not authorized for execution, boot, signing, cloud use or provisioning. It contains no private key, PFX, public production certificate or signed successor UKI.
 
@@ -32,4 +32,4 @@ The resolver uses the documented GCP by-id contract and makes no claim about sys
 
 ## Runtime evidence boundary
 
-The committed VM evidence binds the pinned disposable QEMU setup and exact producer-positive result. Full dm-verity handoff and executable hostile-matrix results remain deferred, so this candidate is explicitly `RUNTIME_EVIDENCE_INCOMPLETE`, not boot-ready. The official rule is retained with `.reference` suffix as provenance; the reviewed hand-coded producer script is the sole executed namespace policy. It uses the preserved initramfs libc/loader through pinned `scsi_id`; no second unused libc/loader copy is submitted.
+The canonical inventory and authority record bind the producer-positive run, full dm-verity handoff through the positive `E_CANDIDATE_AUTHORITY` boundary, twelve executable hostile VM outcomes, deterministic rebuild evidence and final recertification. This is certification-evidence complete; production signing and provisioning remain separate later authority boundaries. The official rule is retained with `.reference` suffix as provenance; the reviewed hand-coded producer script is the sole executed namespace policy. It uses the preserved initramfs libc/loader through pinned `scsi_id`; no second unused libc/loader copy is submitted.
