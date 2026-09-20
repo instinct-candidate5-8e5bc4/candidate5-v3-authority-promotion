@@ -2,9 +2,11 @@
 from pathlib import Path
 import hashlib, importlib.util, json, shutil, stat, subprocess, sys
 B=Path(__file__).resolve().parent
+saved=sys.argv
 OUT=Path(sys.argv[1]).resolve() if len(sys.argv)>1 else B/'hostile-runtime-work'
 OUT.mkdir(parents=True,exist_ok=True)
-spec=importlib.util.spec_from_file_location('successor_builder',B/'build-successor.py'); m=importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+sys.argv=[sys.argv[0]]
+spec=importlib.util.spec_from_file_location('successor_builder',B/'build-successor.py'); m=importlib.util.module_from_spec(spec); spec.loader.exec_module(m);sys.argv=saved
 base=m.parse_cpio((B/'full-handoff-test-initramfs.cpio').read_bytes())
 base_init=next(e for e in base if e['name']=='init')['body'].decode()
 producer='/bin/sh /bin/gce-by-id-producer || fail E_PROVIDER_NAMESPACE'
