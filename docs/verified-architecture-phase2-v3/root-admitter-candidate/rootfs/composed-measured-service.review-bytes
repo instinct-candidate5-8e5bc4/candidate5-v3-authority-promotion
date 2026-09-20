@@ -28,7 +28,7 @@ sha(){ actual=$(/usr/bin/sha256sum -- "$1") || fail E_HASH_TOOL; digest=${actual
 [ "$(sha "$APPROVED_SERVICE")" = e470199b00cc047e7b020909c8d6f200113bf3e770debe2b69f1de8226079aa1 ] || fail E_APPROVED_SERVICE
 [ "$(sha /usr/bin/mount)" = bad230d68e012eb1a2fcaa3b42688d912940f5c61f041ae9451eee7dfb858ff1 ] || fail E_STAGE_MOUNT_TOOL
 [ "$(sha /usr/bin/umount)" = 80e84907e5cb4248255c3985e2f7ed55d14fbd45d344a599fdb5cac314b9473c ] || fail E_STAGE_UMOUNT_TOOL
-seal(){ domain=$1 record=$2 sig=$3; /usr/bin/openssl pkeyutl -verify -pubin -inkey "$PUB" -rawin -in <({ /usr/bin/printf 'V3BOOTSTRAP-SEAL:v1\0%s\0' "$domain"; /usr/bin/cat "$record"; }) -sigfile "$sig" >/dev/null 2>&1 || fail E_SIGNATURE; }
+seal(){ domain=$1 record=$2 sig=$3 msg=$SERVICE_STAGE.seal-input; /usr/bin/printf 'V3BOOTSTRAP-SEAL:v1\0%s\0' "$domain" >"$msg" || fail E_SIGNATURE_INPUT; /usr/bin/cat "$record" >>"$msg" || fail E_SIGNATURE_INPUT; /usr/bin/openssl pkeyutl -verify -pubin -inkey "$PUB" -rawin -in "$msg" -sigfile "$sig" >/dev/null 2>&1 || fail E_SIGNATURE; /usr/bin/rm -f "$msg" || fail E_SIGNATURE_INPUT; }
 seal pin-record "$PIN" "$PIN_SIG"; seal cross-binding "$CROSS" "$CROSS_SIG"; seal offline-input-manifest "$MANIFEST" "$MANIFEST_SIG"
 count=0;previous=;while IFS= read -r -d '' path&&IFS= read -r -d '' role&&IFS= read -r -d '' length&&IFS= read -r digest;do [ -z "$previous" ]||[[ "$previous" < "$path" ]]||fail E_CLOSURE_ORDER;previous=$path;[ -f "$path" ]&&[ ! -L "$path" ]||fail E_CLOSURE_TYPE;[ "$(/usr/bin/stat -c %s "$path")" = "$length" ]||fail E_CLOSURE_LENGTH;[ "$(sha "$path")" = "$digest" ]||fail E_CLOSURE_DIGEST;count=$((count+1));done <"$CLOSURE"
 [ "$count" -eq 44 ] || fail E_CLOSURE_COUNT

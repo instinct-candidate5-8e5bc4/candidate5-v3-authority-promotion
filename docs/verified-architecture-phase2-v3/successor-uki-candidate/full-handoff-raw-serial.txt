@@ -1,6 +1,6 @@
 c[?7l[2J[0mSeaBIOS (version 1.15.0-1)
 Booting from ROM..c[?7l[2J[    0.000000] Linux version 5.15.0-191-generic (buildd@lcy02-amd64-042) (gcc (Ubuntu 11.4.0-1ubuntu1~22.04.3) 11.4.0, GNU ld (GNU Binutils for Ubuntu) 2.38) #201-Ubuntu SMP Fri Aug 7 18:39:04 UTC 2026 (Ubuntu 5.15.0-191.201-generic 5.15.209)
-[    0.000000] Command line: console=ttyS0 panic=-1 v3.root_admitter_verity=b24dcf930604552f6624c87f1acb92069ca1bced98a726f29444ea4cb150ccb8
+[    0.000000] Command line: console=ttyS0 panic=-1 v3.root_admitter_verity=e6ddb15916e12220c6117b6abded6550acd77df9379101662d8af78c7396dad7
 [    0.000000] KERNEL supported cpus:
 [    0.000000]   Intel GenuineIntel
 [    0.000000]   AMD AuthenticAMD
@@ -75,7 +75,7 @@ Booting from ROM..c[?7l[2J[    0.000000] Linux version 5.15.0-191-generic (bu
 [    0.060317] percpu: Embedded 62 pages/cpu s217088 r8192 d28672 u2097152
 [    0.062155] Built 1 zonelists, mobility grouping on.  Total pages: 193245
 [    0.062189] Policy zone: DMA32
-[    0.062327] Kernel command line: console=ttyS0 panic=-1 v3.root_admitter_verity=b24dcf930604552f6624c87f1acb92069ca1bced98a726f29444ea4cb150ccb8
+[    0.062327] Kernel command line: console=ttyS0 panic=-1 v3.root_admitter_verity=e6ddb15916e12220c6117b6abded6550acd77df9379101662d8af78c7396dad7
 [    0.064502] Dentry cache hash table entries: 131072 (order: 8, 1048576 bytes, linear)
 [    0.065252] Inode-cache hash table entries: 65536 (order: 7, 524288 bytes, linear)
 [    0.067802] mem auto-init: stack:off, heap alloc:on, heap free:off

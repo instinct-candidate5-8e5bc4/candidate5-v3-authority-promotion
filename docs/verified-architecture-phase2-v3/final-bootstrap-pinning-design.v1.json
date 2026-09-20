@@ -7,16 +7,16 @@
       "scope": "exact reviewed bytes, identities, digests, topology, provenance, closure and hostile semantics only"
     },
     "authoritativeRoot": {
-      "dmVerityRoot": "b24dcf930604552f6624c87f1acb92069ca1bced98a726f29444ea4cb150ccb8",
-      "imageSha256": "5e8e7de6e6c405736ceb8ade688db540c29b840708e9d4224221ca283dc0fd25",
-      "verityTreeSha256": "d2e51f14b6c2b87cb1cc59d1a15e2ae6830ef8c8e6c22ed4550f840981a03394"
+      "dmVerityRoot": "e6ddb15916e12220c6117b6abded6550acd77df9379101662d8af78c7396dad7",
+      "imageSha256": "b345d4eccd3232e707cda9ff283d813a7ac9c6d2c6ff53a2e7190cf0de172689",
+      "verityTreeSha256": "65dad47fdaad4a0e2231e7638f866a6b5d67b2a8a4bf5daee4621e17e2b33fff"
     },
     "candidateLabels": {
       "status": "CLOSED_BY_OWNER_DECISION",
       "treatment": "immutable historical labels and E_CANDIDATE_AUTHORITY remain byte-identical and non-authoritative for final design status"
     },
     "candidateSubtree": "cd03b2286e57b6ee5580f3b24b32cbb7678d980c",
-    "composedServiceSha256": "17441ae384fe90fbe183a5c546e0f87321454e3fbeedbb38159cf58666fbbc3a",
+    "composedServiceSha256": "3fd0147da29dc889acde7eb90d7e52efc0ce267e399e09cd2ecb60e56b013e33",
     "executionAuthorized": false,
     "externalAdmission": {
       "artifactSha256": "1858da09e42ce76ac5dc7bd311989bf0864c0eed235f2a24f5acf66d0a910186",
