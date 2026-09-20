@@ -29,7 +29,7 @@ cases=[]
 def add(name,expected,p,disks='normal'): cases.append({'name':name,'expected':expected,'initrd':p.name,'initrdSha256':hashlib.sha256(p.read_bytes()).hexdigest(),'diskMutation':disks})
 add('missing-expected-link','E_PROVIDER_LINK_MISSING',emit('missing-expected-link',hook(base_init,'$BB rm -f "$BYID/google-v3-reviewed-evidence"')))
 add('extra-google-v3-link','E_EXTRA_MANAGED_DEVICE',emit('extra-google-v3-link',hook(base_init,'$BB ln -s /dev/sda "$BYID/google-v3-unexpected"')))
-add('duplicate-or-ambiguous-target','E_ROLE_MARKER_MISMATCH',emit('duplicate-or-ambiguous-target',hook(base_init,'$BB rm -f "$BYID/google-v3-reviewed-evidence"\n$BB ln -s "$BYID/google-v3-reviewed-output" "$BYID/google-v3-reviewed-evidence"')))
+add('duplicate-or-ambiguous-target','E_ROLE_PROBE_MOUNT',emit('duplicate-or-ambiguous-target',hook(base_init,'$BB rm -f "$BYID/google-v3-reviewed-evidence"\n$BB ln -s "$BYID/google-v3-reviewed-output" "$BYID/google-v3-reviewed-evidence"')))
 add('swapped-identity-links','E_ROLE_MARKER_MISMATCH',emit('swapped-identity-links',hook(base_init,'t=$($BB readlink "$BYID/google-v3-reviewed-root"); u=$($BB readlink "$BYID/google-v3-reviewed-input"); $BB rm "$BYID/google-v3-reviewed-root" "$BYID/google-v3-reviewed-input"; $BB ln -s "$u" "$BYID/google-v3-reviewed-root"; $BB ln -s "$t" "$BYID/google-v3-reviewed-input"')))
 add('wrong-underlying-type','E_DEVICE_NODE',emit('wrong-underlying-type',hook(base_init,'$BB rm -f "$BYID/google-v3-reviewed-root"; $BB ln -s /dev/null "$BYID/google-v3-reviewed-root"')))
 add('non-symlink-by-id-substitution','E_PROVIDER_LINK_SUBSTITUTION',emit('non-symlink-by-id-substitution',hook(base_init,'$BB rm -f "$BYID/google-v3-reviewed-root"; $BB echo x > "$BYID/google-v3-reviewed-root"')))
