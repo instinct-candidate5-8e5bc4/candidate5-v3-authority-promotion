@@ -27,6 +27,7 @@ HHEX=$(/bin/busybox stat -L -c %t:%T "$HASH"); [ "$6" = "$((0x${HHEX%:*})):$((0x
 /bin/busybox grep -q '^/dev/mapper/v3-root-admitter /verity-root ext4 ro,' /proc/mounts || fail E_ROOT_MOUNT_IDENTITY
 /bin/busybox mount --bind /lib/x86_64-linux-gnu /verity-root/lib/x86_64-linux-gnu || fail E_RUNTIME_LIB_BIND
 /bin/busybox mount -o remount,bind,ro /verity-root/lib/x86_64-linux-gnu || fail E_RUNTIME_LIB_BIND_RO
+/bin/busybox cp /verity-root/usr/lib/x86_64-linux-gnu/libtinfo.so.6.3 /lib/x86_64-linux-gnu/libtinfo.so.6 || fail E_RUNTIME_TINFO
 /bin/busybox mount --bind /proc /verity-root/proc || fail E_PROC_BIND
 /bin/busybox mount -o remount,bind,ro /verity-root/proc || fail E_PROC_BIND_RO
 [ /proc/self -ef /verity-root/proc/self ] || fail E_PROC_BIND_IDENTITY
