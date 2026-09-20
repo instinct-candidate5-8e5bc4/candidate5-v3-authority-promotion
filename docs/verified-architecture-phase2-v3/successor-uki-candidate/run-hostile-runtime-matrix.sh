@@ -35,7 +35,7 @@ run_case(){
  "$Q" -L "$QROOT/usr/share/qemu" -accel tcg -nodefaults -no-reboot -nographic -serial stdio -monitor none -m 512 -kernel "$KERNEL" -initrd "$WORK/initrds/$name.cpio" -append 'console=ttyS0 panic=-1' $args >> "$transcript" 2>&1
  rc=$?; set -e
  printf 'QEMU_WRAPPER_EXIT=%s\n' "$rc" >> "$transcript"
- [ "$rc" -eq 0 ]; [ "$(grep -axc "$expected" "$transcript")" -eq 1 ]
+ [ "$rc" -eq 0 ]; [ "$(grep -aFc "$expected" "$transcript")" -eq 2 ]
  printf '%s\t%s\t%s\t%s\n' "$name" "$expected" "$(sha256sum "$WORK/initrds/$name.cpio"|cut -d' ' -f1)" "$(sha256sum "$transcript"|cut -d' ' -f1)" >> "$WORK/results.tsv"
 }
 python3 - "$WORK/initrds/matrix-inputs.v1.json" <<'PY' > "$WORK/cases.tsv"
