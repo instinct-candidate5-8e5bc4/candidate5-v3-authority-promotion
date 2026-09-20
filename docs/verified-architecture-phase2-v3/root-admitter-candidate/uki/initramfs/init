@@ -15,8 +15,8 @@ ACTUAL=$(/sbin/dmsetup table v3-root-admitter --showkeys) || fail E_DM_TABLE_REA
 set -- $ACTUAL
 [ "$#" -eq 13 ] || fail E_DM_TABLE_FIELDS
 [ "$1" = 0 ] && [ "$2" = 196608 ] && [ "$3" = verity ] && [ "$4" = 1 ] || fail E_DM_TABLE_GEOMETRY
-DHEX=$(/bin/busybox stat -c %t:%T "$DATA"); [ "$5" = "$((0x${DHEX%:*})):$((0x${DHEX#*:}))" ] || fail E_DM_TABLE_DATA
-HHEX=$(/bin/busybox stat -c %t:%T "$HASH"); [ "$6" = "$((0x${HHEX%:*})):$((0x${HHEX#*:}))" ] || fail E_DM_TABLE_HASH
+DHEX=$(/bin/busybox stat -L -c %t:%T "$DATA"); [ "$5" = "$((0x${DHEX%:*})):$((0x${DHEX#*:}))" ] || fail E_DM_TABLE_DATA
+HHEX=$(/bin/busybox stat -L -c %t:%T "$HASH"); [ "$6" = "$((0x${HHEX%:*})):$((0x${HHEX#*:}))" ] || fail E_DM_TABLE_HASH
 [ "$7" = 4096 ] && [ "$8" = 4096 ] && [ "$9" = 24576 ] && [ "${10}" = 0 ] || fail E_DM_TABLE_BLOCKS
 [ "${11}" = sha256 ] && [ "${12}" = "$ROOT_HASH" ] && [ "${13}" = - ] || fail E_DM_TABLE_CRYPTO
 /bin/busybox mkdir -p /verity-root || fail E_ROOT_TARGET
