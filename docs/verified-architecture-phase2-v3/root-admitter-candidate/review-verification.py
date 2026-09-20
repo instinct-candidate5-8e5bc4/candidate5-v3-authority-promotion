@@ -25,7 +25,7 @@ while pos<len(cb):
  e=cb.index(b'\n',pos);want=cb[pos:e].decode();pos=e+1;p=R/'rootfs'/fs[0].lstrip('/');assert p.stat().st_size==int(fs[2]) and h(p)==want;count+=1
 assert count==30
 for d in ('reviewed-root','reviewed-input','reviewed-output','reviewed-evidence','proc'): assert (R/'rootfs'/d).is_dir()
-init=(U/'initramfs/init').read_text();assert 'set -eu' in init and init.count('|| fail ')>=20 and 'dmsetup table' in init and 'mountpoint -q' in init and ' -ef ' in init
+init=(U/'initramfs/init').read_text();assert 'set -eu' in init and init.count('|| fail ')>=20 and 'dmsetup table' in init and "grep -q ' /verity-root ' /proc/mounts" in init and 'grep -q " /$n " /proc/mounts' in init and ' -ef ' in init
 
 assert len(json.load(open(R/'build/build-inputs.v1.json'))['inputs'])>100 and len(json.load(open(R/'hostile-review.v1.json'))['cases'])>=19
 print('ROOT_ADMITTER_STATIC_REVIEW=PASS')

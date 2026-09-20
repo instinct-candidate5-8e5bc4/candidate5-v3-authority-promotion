@@ -43,7 +43,7 @@ def emit_cpio(entries,out):
  data.extend(b'\0'*(-len(data)%512)); out.write_bytes(data)
 old_entries=parse_cpio((OLD/'initramfs.cpio').read_bytes())
 old_init=next(e for e in old_entries if e['name']=='init')
-assert hashlib.sha256(old_init['body']).hexdigest()=='289b0e4800cdf32c3f639a412cf5e12c53fed05f0e6ff62986325092e2874b28'
+assert hashlib.sha256(old_init['body']).hexdigest()=='02043edb95d516a3c923f09736ca0afc543e1a38e2064f17ea363a4b69a83c8e'
 adapter=(HERE/'cloud-boot-adapter.sh').read_bytes()
 new=[]
 for e in old_entries:

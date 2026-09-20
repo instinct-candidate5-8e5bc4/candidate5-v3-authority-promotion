@@ -23,7 +23,7 @@ HHEX=$(/bin/busybox stat -L -c %t:%T "$HASH"); [ "$6" = "$((0x${HHEX%:*})):$((0x
 [ "${11}" = sha256 ] && [ "${12}" = "$ROOT_HASH" ] && [ "${13}" = - ] || fail E_DM_TABLE_CRYPTO
 /bin/busybox mkdir -p /verity-root || fail E_ROOT_TARGET
 /bin/busybox mount -t ext4 -o ro /dev/mapper/v3-root-admitter /verity-root || fail E_ROOT_MOUNT
-/bin/busybox mountpoint -q /verity-root || fail E_ROOT_MOUNTPOINT
+/bin/busybox grep -q ' /verity-root ' /proc/mounts || fail E_ROOT_MOUNTPOINT
 /bin/busybox grep -q '^/dev/mapper/v3-root-admitter /verity-root ext4 ro,' /proc/mounts || fail E_ROOT_MOUNT_IDENTITY
 /bin/busybox mount --bind /proc /verity-root/proc || fail E_PROC_BIND
 /bin/busybox mount -o remount,bind,ro /verity-root/proc || fail E_PROC_BIND_RO
@@ -31,7 +31,7 @@ HHEX=$(/bin/busybox stat -L -c %t:%T "$HASH"); [ "$6" = "$((0x${HHEX%:*})):$((0x
 /bin/busybox grep -q ' /verity-root/proc proc ro,' /proc/mounts || fail E_PROC_BIND_OPTIONS
 for n in reviewed-root reviewed-input reviewed-output reviewed-evidence; do
  [ -d "/$n" ] || fail E_BIND_SOURCE
- /bin/busybox mountpoint -q "/$n" || fail E_BIND_SOURCE_MOUNT
+ /bin/busybox grep -q " /$n " /proc/mounts || fail E_BIND_SOURCE_MOUNT
  [ -d "/verity-root/$n" ] || fail E_BIND_TARGET
  /bin/busybox mount --bind "/$n" "/verity-root/$n" || fail E_BIND_MOUNT
  [ "/$n" -ef "/verity-root/$n" ] || fail E_BIND_IDENTITY
