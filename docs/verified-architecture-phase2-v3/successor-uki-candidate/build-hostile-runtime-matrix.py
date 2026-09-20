@@ -42,6 +42,6 @@ refhash=hashlib.sha256(base_init.encode()).hexdigest()
 shim=f'''#!/bin/sh\nset -eu\nBB=/bin/busybox\n[ "$($BB sha256sum /adapter-under-test | $BB cut -d' ' -f1)" = {refhash} ] || {{ $BB echo E_ADAPTER_IDENTITY >&2; exit 98; }}\nexec /adapter-under-test\n'''
 add('adapter-substitution','E_ADAPTER_IDENTITY',emit('adapter-substitution',shim,extras=(('adapter-under-test',mut,0o755),)))
 add('old-init-substitution','E_OLD_INIT_IDENTITY',emit('old-init-substitution',base_init,old_body=b'#!/bin/sh\nexit 0\n'))
-add('incorrect-handoff','E_OLD_INIT_EXEC',emit('incorrect-handoff',base_init,old_mode=0o644))
+add('incorrect-handoff','E_OLD_INIT_EXEC',emit('incorrect-handoff',base_init.replace('exec /init.root-admitter || fail E_OLD_INIT_EXEC','exec /no-such-init || fail E_OLD_INIT_EXEC')))
 (OUT/'matrix-inputs.v1.json').write_text(json.dumps({'schema':'v3.hostile-runtime-inputs.v1','baseInitramfsSha256':hashlib.sha256((B/'full-handoff-test-initramfs.cpio').read_bytes()).hexdigest(),'cases':cases},sort_keys=True,separators=(',',':'))+'\n')
 print(OUT/'matrix-inputs.v1.json')
