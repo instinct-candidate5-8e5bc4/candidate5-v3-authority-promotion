@@ -9,7 +9,7 @@
     "authoritativeRoot": {
       "dmVerityRoot": "c8f1ca4197a6982aa09ea53dd92ef76fded30dce84c75ff63d2e978b4d227015",
       "imageSha256": "71e3290fa06f2017f685ebe87bc863a9b083f49dcb888305b96f37e26dc90a21",
-      "verityTreeSha256": "82423acc8145b9dd1cf83e7758732cbf121578e8afbd665a3a88694a38a5efd9"
+      "verityTreeSha256": "b6e19b257e83e8764fb0ccbf4dc068250dfd79c98bb3756686c217afae87747b"
     },
     "candidateLabels": {
       "status": "CLOSED_BY_OWNER_DECISION",

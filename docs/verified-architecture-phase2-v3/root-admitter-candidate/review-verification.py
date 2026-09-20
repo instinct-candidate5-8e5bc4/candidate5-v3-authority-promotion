@@ -13,7 +13,9 @@ assert db['setup']['dbEntryCount']==1 and db['boot']['bootEntryCount']==1 and db
 D=(R/'root-admitter-rootfs.ext4').read_bytes();levels=[];cur=D
 while len(cur)>4096:
  packed=b''.join(hashlib.sha256(cur[i:i+4096]).digest() for i in range(0,len(cur),4096));packed+=b'\0'*(-len(packed)%4096);levels.append(packed);cur=packed
-assert b''.join(levels)==(R/'root-admitter-rootfs.verity').read_bytes() and hashlib.sha256(cur).hexdigest()==m['rootHash']
+tree=(R/'root-admitter-rootfs.verity').read_bytes();assert b''.join(reversed(levels))==tree and hashlib.sha256(cur).hexdigest()==m['rootHash']
+# Regression: the previously certified bottom-up level order is invalid and must differ.
+assert len(levels)>1 and b''.join(levels)!=tree
 
 # Regression: complete in-chroot closure, immutable bind targets, fail-closed init.
 cb=(R.parent/'external-admission-launcher-candidate/external-admission-closure.v1.bin').read_bytes();pos=0;count=0
