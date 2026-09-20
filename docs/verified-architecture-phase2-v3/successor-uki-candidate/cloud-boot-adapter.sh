@@ -49,6 +49,7 @@ probe() {
  check_mount "$dev" "$target" ro
  [ -f "$target/.v3-volume-role" ] || fail E_ROLE_MARKER_MISSING
  [ "$("$BB" cat "$target/.v3-volume-role")" = "$role" ] || fail E_ROLE_MARKER_MISMATCH
+ [ "$role" != reviewed-input ] || "$BB" rm -f "$target/.v3-volume-role" || fail E_ROLE_MARKER_CLEANUP
  if [ "$final" = rw ]; then "$BB" umount "$target" || fail E_ROLE_UNMOUNT; "$BB" mount -t ext4 -o rw,nodev,nosuid,noexec "$dev" "$target" || fail E_ROLE_RW_MOUNT; check_mount "$dev" "$target" rw; fi
 }
 probe "$REVIEWED_ROOT" reviewed-root /reviewed-root ro
