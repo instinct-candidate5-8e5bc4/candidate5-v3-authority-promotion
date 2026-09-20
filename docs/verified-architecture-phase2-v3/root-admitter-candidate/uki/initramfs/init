@@ -25,10 +25,8 @@ HHEX=$(/bin/busybox stat -L -c %t:%T "$HASH"); [ "$6" = "$((0x${HHEX%:*})):$((0x
 /bin/busybox mount -t ext4 -o ro /dev/mapper/v3-root-admitter /verity-root || fail E_ROOT_MOUNT
 /bin/busybox grep -q ' /verity-root ' /proc/mounts || fail E_ROOT_MOUNTPOINT
 /bin/busybox grep -q '^/dev/mapper/v3-root-admitter /verity-root ext4 ro,' /proc/mounts || fail E_ROOT_MOUNT_IDENTITY
-/bin/busybox mount -t tmpfs -o mode=755,nosuid,nodev,noexec tmpfs /verity-root/dev || fail E_DEV_MOUNT
-/bin/busybox mkdir -p /verity-root/dev || fail E_DEV_DIR
-/bin/busybox touch /verity-root/dev/null || fail E_DEV_NULL_FILE
-/bin/busybox mount --bind /dev/null /verity-root/dev/null || fail E_DEV_NULL_BIND
+/bin/busybox mount --bind /dev /verity-root/dev || fail E_DEV_BIND
+/bin/busybox mount -o remount,bind,ro /verity-root/dev || fail E_DEV_BIND_RO
 /bin/busybox mount --bind /proc /verity-root/proc || fail E_PROC_BIND
 /bin/busybox mount -o remount,bind,ro /verity-root/proc || fail E_PROC_BIND_RO
 [ /proc/self -ef /verity-root/proc/self ] || fail E_PROC_BIND_IDENTITY
