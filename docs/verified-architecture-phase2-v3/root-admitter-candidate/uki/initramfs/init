@@ -11,6 +11,8 @@ HASH=/dev/v3-rootfs-hash
 /bin/busybox insmod /lib/modules/5.15.0-191-generic/kernel/drivers/md/dm-verity.ko || fail E_DM_VERITY
 TABLE="0 196608 verity 1 $DATA $HASH 4096 4096 24576 0 sha256 $ROOT_HASH -"
 /sbin/dmsetup create v3-root-admitter --readonly --table "$TABLE" || fail E_DM_CREATE
+/bin/busybox mkdir -p /dev/mapper || fail E_DM_MAPPER_DIR
+/bin/busybox ln -s /dev/dm-0 /dev/mapper/v3-root-admitter || fail E_DM_MAPPER_NODE
 ACTUAL=$(/sbin/dmsetup table v3-root-admitter --showkeys) || fail E_DM_TABLE_READ
 set -- $ACTUAL
 [ "$#" -eq 13 ] || fail E_DM_TABLE_FIELDS
