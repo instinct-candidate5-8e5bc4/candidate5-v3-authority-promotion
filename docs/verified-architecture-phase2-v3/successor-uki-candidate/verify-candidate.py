@@ -19,7 +19,7 @@ for name,e in om.items():
  for k in ('ino','mode','uid','gid','nlink','mtime','body','devmaj','devmin','rdevmaj','rdevmin','check'): assert e[k]==n[k],(name,k)
 for k in ('mode','uid','gid','nlink','mtime','body','devmaj','devmin','rdevmaj','rdevmin','check'): assert om['init'][k]==nm['init.root-admitter'][k],('init.root-admitter',k)
 assert hashlib.sha256(nm['init']['body']).hexdigest()==hashlib.sha256((B/'cloud-boot-adapter.sh').read_bytes()).hexdigest()
-inv=json.loads((B/'inventory.v1.json').read_text()); vec={e['name']:e for e in inv['initramfsMembers']}
+inv=json.loads((B/'inventory.v1.json').read_text()); artifacts={x['path']:x for x in inv['artifacts']}; vec={e['name']:e for e in inv['initramfsMembers']}
 for e in new:
  assert vec[e['name']]=={'name':e['name'],'mode':f"{e['mode']:08x}",'size':len(e['body']),'sha256':hashlib.sha256(e['body']).hexdigest()}
 assert inv['status']=='CERTIFICATION_EVIDENCE_COMPLETE_RUNTIME_PASS'
@@ -30,7 +30,7 @@ for required in ('/bin/sh /bin/gce-by-id-producer','mount -t proc','mount -t dev
  assert required in adapter,required
 assert (B/'provider-producer/produce-google-by-id.sh').read_bytes()==nm['bin/gce-by-id-producer']['body']
 for path,mode in [('cloud-boot-adapter.sh','100755'),('build-successor.py','100755'),('verify-candidate.py','100755'),('provider-producer/produce-google-by-id.sh','100755'),('provider-producer/lib/udev/scsi_id','100755')]:
- assert inv['artifacts'][path]['gitMode']==mode,(path,mode)
+ assert artifacts[path]['gitMode']==mode,(path,mode)
 print('SUCCESSOR_EXECUTABLE_PATH_ASSERTIONS_PASS')
 
 for required in ('schema=v3.cloud-boot-adapter-evidence.v2','result=ADAPTER_ENVIRONMENT_READY','device.%s=google-%s;%s','oldInitSha256=%s','E_EVIDENCE_WRITE','E_EVIDENCE_SYNC'):
@@ -63,7 +63,7 @@ print('SUCCESSOR_VM_SEMANTIC_BINDINGS_PASS')
 q=json.loads((B/'qemu-extracted-closure.v1.json').read_text())
 assert 'archive/package origin is unverified and not claimed' in q['claim']
 for path in ('producer-test-initramfs.cpio','producer-vm-raw-serial.txt','qemu-extracted-closure.v1.json','vm-test/virtio_scsi.ko'):
- assert inv['artifacts'][path]['gitMode']=='100644',path
+ assert artifacts[path]['gitMode']=='100644',path
 print('SUCCESSOR_QEMU_PROVENANCE_AND_MODES_PASS')
 
 assert t.count('PREFLIGHT_QEMU_VERSION=QEMU emulator version 6.2.0 (Debian 1:6.2+dfsg-2ubuntu6.31)')==1
