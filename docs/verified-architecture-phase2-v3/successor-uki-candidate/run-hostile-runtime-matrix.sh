@@ -32,7 +32,7 @@ run_case(){
  printf 'CASE=%s\nEXPECTED=%s\nINITRD_SHA256=%s\n' "$name" "$expected" "$(sha256sum "$WORK/initrds/$name.cpio"|cut -d' ' -f1)" > "$transcript"
  set +e
  # shellcheck disable=SC2086
- "$Q" -L "$QROOT/usr/share/qemu" -accel tcg -nodefaults -no-reboot -nographic -serial stdio -monitor none -m 512 -kernel "$KERNEL" -initrd "$WORK/initrds/$name.cpio" -append 'console=ttyS0 panic=-1' $args >> "$transcript" 2>&1
+ "$Q" -L "$QROOT/usr/share/qemu" -accel tcg -nodefaults -no-reboot -nographic -serial stdio -monitor none -m 512 -kernel "$KERNEL" -initrd "$WORK/initrds/$name.cpio" -append 'console=ttyS0 panic=-1' $args </dev/null >> "$transcript" 2>&1
  rc=$?; set -e
  printf 'QEMU_WRAPPER_EXIT=%s\n' "$rc" >> "$transcript"
  [ "$rc" -eq 0 ]; [ "$(grep -aFc "$expected" "$transcript")" -eq 2 ]
