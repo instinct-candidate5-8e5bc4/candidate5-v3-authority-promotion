@@ -1,38 +1,37 @@
-# V3 Successor UKI - Owner Production Signing Runbook (Windows) - PACKAGE v6
+# V3 Successor UKI - Owner Production Signing Runbook (Windows) - PACKAGE v7
 
-This v6 package replaces the rejected v1, v2, v3, v4 and v5 packages. If you received
-any of them, discard them and use only v6. The v5 production-script corrections passed
-owner static review and are preserved in v6 BYTE FOR BYTE (KeyName-based CNG container
-capture/deletion/absence-verification in every part; Part 4 dual KeyName+UniqueName
-checks; parsed-exact X.500 signer identity; bounds-checked Authenticode parser with the
-EOF invariant). The five production scripts therefore intentionally keep their internal
-"v5" banners - they are the exact reviewed bytes; the v6 identity is carried by the
-package, this runbook, and the CI members. v5 was rejected only over its CI workflow/proof; v6 rebuilds that proof:
+This v7 package replaces v1, v2, v3, v4, v5 and v6. If you received any of them,
+discard them and use only v7. The production scripts remain BYTE FOR BYTE the set that
+passed owner static review in v5 (they intentionally keep their internal "v5" banners;
+the v7 identity is carried by the package, this runbook, and the CI members). The CI proof and cleanup
+scripts are likewise BYTE FOR BYTE the v6 set (they keep their internal "v6" banners) -
+the v7 build order carried their behavior forward unchanged, so their bytes stay
+untouched. The v6
+workflow/proof design also passed static review; its first live run (GitHub Actions run
+35637316259) then did exactly what it was built to do: the binding STOPped with
+E_MEMBER_MISMATCH on `.gitattributes` - the one member our own line-ending rules did
+not cover - because windows-latest checkout rewrote that working-tree file to CRLF.
+That failed run is preserved as audit trail:
+https://github.com/instinct-candidate5-8e5bc4/candidate5-v3-authority-promotion/actions/runs/35637316259
 
-- THREE real cleanup lifetimes are exercised, each closed by the exact shipped helper
-  plus the 5-way absence set: the generated fixture key, a first non-exportable import
-  (SignTool + Authenticode path), and a fresh second non-exportable import (detached
-  signature path) whose distinct container is asserted. The Part 4 positive fixture
-  uses the three ACTUAL deleted identities; the negative fixture uses a live decoy.
-- The run is bound to the reviewed bytes: the reviewed zip is committed with the
-  source, the operator enters the reviewed package SHA-256 and size at dispatch, the
-  workflow verifies them EXACTLY, extracts to an ephemeral directory, compares every
-  member byte-for-byte with the reviewed source tree, and tests only the extracted
-  bytes. Run URL, commit, workflow git blob + SHA-256, package hash/size, and every
-  member hash are logged.
-- Cleanup can never false-PASS: a sentinel and cleanup manifest are written BEFORE any
-  key exists, resources are registered as created, a nested finally cleans up, and the
-  if:always() cleanup step FAILS on any remnant or on a lost manifest. A controlled
-  premature failure right after fixture key creation is exercised every run and the
-  always-cleanup must remove the real leftover.
-- The PFX copy check compares two DISTINCT files (export plus a Copy-Item copy).
-- The ephemeral password is built from cryptographic-RNG bytes appended directly into
-  a SecureString - no plaintext ever exists; debug/verbose/step-debug are refused.
+v7 rebuilds the binding mechanism per the owner's ruling (exact bytes, no
+normalization, no exclusions): every extracted package member is compared
+byte-for-byte against the CANONICAL COMMITTED BLOB at the reviewed HEAD
+(git ls-tree + git cat-file), never against the working tree, which checkout may
+transform. HEAD must equal the reviewed commit (a third dispatch input). Per member the
+log records path, Git blob ID, source-blob length + SHA-256, extracted-member length +
+SHA-256, and exact equality. A deterministic verifier fixture proves on every run that
+(a) a CRLF-mutated working tree does NOT affect the canonical comparison and (b) a
+one-byte mutation of an extracted member still fails. Everything else from v6 is
+unchanged: zip size/hash dispatch inputs, the exact 11-member set check, execution only
+of extracted package bytes, sentinel/manifest cleanup with a controlled early failure,
+three real cleanup lifetimes with the 5-way absence set, the distinct-file PFX copy
+check, and CSPRNG-built never-plaintext password handling.
 
 Process ruling (owner): this package is submitted for STATIC REVIEW FIRST - no
-dispatch. Only after static ACCEPT is the exact reviewed commit manually dispatched.
-A passing run closes the platform-transcript requirement for PACKAGE DELIVERY only;
-it grants no signing, provisioning, or private-transfer authority.
+dispatch. Only after a new static ACCEPT is the exact reviewed commit manually
+dispatched. A passing run closes the platform-transcript requirement for PACKAGE
+DELIVERY only; it grants no signing, provisioning, or private-transfer authority.
 
 You sign one file with a new production key on your own Windows computer. Everything is
 zero cost. You never design, debug, or choose anything technical: every step tells you
@@ -102,13 +101,16 @@ ceremony), under the owner's process ruling - STATIC REVIEW FIRST, NO DISPATCH u
 the exact reviewed commit is accepted:
 
 1. The reviewed package zip is committed to the repository at
-   `package/V3-PRODUCTION-SIGNING-PACKAGE-v6.zip` alongside the reviewed source tree
+   `package/V3-PRODUCTION-SIGNING-PACKAGE-v7.zip` alongside the reviewed source tree
    (same paths as inside the zip), on the exact reviewed commit.
 2. After static ACCEPT, the operator manually dispatches the workflow and enters the
-   reviewed package SHA-256 and byte size (from the accepted review) as inputs.
-3. The workflow verifies the committed zip matches those reviewed values EXACTLY,
-   extracts it to an ephemeral directory, compares every member byte-for-byte with
-   the reviewed source tree, and runs all tests ONLY against the extracted bytes.
+   reviewed commit, the reviewed package SHA-256, and the byte size (from the accepted
+   review) as inputs.
+3. The workflow enforces HEAD == reviewed commit, verifies the committed zip matches
+   the reviewed hash and size EXACTLY, extracts it to an ephemeral directory, compares
+   every member byte-for-byte against the canonical committed blob at the reviewed
+   HEAD (never the working tree), runs the deterministic verifier fixture, and runs
+   all tests ONLY against the extracted bytes.
 4. A controlled premature failure right after fixture key creation runs first (it
    must stop with E_CONTROLLED_FAILURE), and the if:always() cleanup step must remove
    the real leftover and verify absence - proving cleanup cannot false-PASS.
@@ -380,58 +382,61 @@ stop and report it exactly as printed.
 Honesty statement, same rule as every prior package: nothing is simulated or faked, and
 every claim below names exactly how it was verified.
 
-Carried forward, unchanged: the v5 production scripts passed owner static review
-(KeyName fix, Part 4 dual checks, parsed-exact X.500 identity, bounds-checked
-Authenticode parser with EOF invariant) and are preserved byte for byte. Their
-deterministic validations stand: real-PowerShell parse of every script; executed
-failure plumbing (exactly one STOP line, nonzero exit, E_UNEXPECTED conversion);
-end-to-end Authenticode verification of a real signed copy of the actual UKI (PASS)
-plus one-byte tamper (STOP E_AUTHENTICODE_DIGEST) and malformed-header STOPs; PE digest
-matching an independent implementation byte for byte; binding-record finalization and
-detached-signature structural proof matching an independent Python reference byte for
-byte, with a deliberate salt-length-20 signature caught (STOP E_PSS_SALTLEN); Microsoft
-documentation and reflection verification of every CNG API used (KeyName-based
-Exists/Open/Delete, KeyName/UniqueName properties) for .NET Framework 3.5-4.8.1.
+Audit trail (preserved, per owner ruling): v6's first live run - GitHub Actions run
+35637316259, attempt 1, head_sha 9afaefadc1f9e8bc62f5542dc4e374fd145e4226 -
+FAILED at "Verify and extract the reviewed package" with STOP E_MEMBER_MISMATCH on
+`.gitattributes`, before any fixture existed; final cleanup verified absence and the
+job failed. Root cause: the package's line-ending rules covered *.ps1/*.yml/*.md but
+not `.gitattributes` itself, so windows-latest checkout rewrote that one working-tree
+file to CRLF; all ten covered members compared byte-identical. The v6 binding compared
+against the working tree, so a benign checkout transformation was indistinguishable
+from tampering. Run preserved at:
+https://github.com/instinct-candidate5-8e5bc4/candidate5-v3-authority-promotion/actions/runs/35637316259
 
-Fixed in v6 (owner review of v5 - all five blockers were in the CI workflow/proof; the
-production scripts were explicitly not at fault):
+Fixed in v7 (owner ruling on run 35637316259):
 
-1. Three cleanup lifetimes: the proof now runs the generated key, a first
-   non-exportable import (SignTool + Authenticode), and a fresh second non-exportable
-   import (detached signature) through the exact shipped helper, each with the 5-way
-   absence set; the two import KeyNames are asserted distinct (any platform reuse
-   stops the run with E_TEST instead of being silently assumed); the Part 4 positive
-   fixture uses the three actual deleted identities.
-2. Complete package binding: the run verifies the reviewed package SHA-256 and byte
-   size (operator inputs from the accepted review), extracts the committed zip to an
-   ephemeral directory, compares every one of the 11 members byte-for-byte with the
-   reviewed source tree, logs run URL, commit, workflow git blob + SHA-256, package
-   hash/size, and all member hashes, and tests only the extracted bytes.
-3. No cleanup false-PASS: sentinel + manifest are written before any key exists;
-   resources are registered on creation; a nested finally cleans up; the if:always()
-   cleanup step fails on any remnant and fails (not passes) when the sentinel shows
-   the proof began but the manifest is lost. A controlled premature failure after
-   fixture key creation is exercised every run and the always-cleanup must remove the
-   real leftover and verify absence.
-4. The PFX copy check compares two distinct files (export plus Copy-Item copy) by
-   length and SHA-256.
-5. The ephemeral password is built from RandomNumberGenerator bytes appended
-   character-by-character directly into a SecureString (buffer cleared; no string or
-   character array ever exists, so there is no maskable plaintext); tracing, verbose,
-   and debug output are disabled and the run refuses ACTIONS_STEP_DEBUG.
+1. Canonical committed-blob comparison: each extracted zip member is compared
+   byte-for-byte against the blob committed at the reviewed HEAD (git ls-tree +
+   git cat-file, read as a raw byte stream - never the working tree, never a
+   re-encoding pipeline). HEAD must equal the reviewed commit (new dispatch input,
+   enforced before comparison). Per member the log records path, Git blob ID,
+   source-blob length + SHA-256, extracted-member length + SHA-256, and exact
+   equality. No newline normalization; no excluded member; the exact 11-member set
+   check stands; zip size/hash inputs stand; only extracted bytes are executed.
+2. A deterministic verifier fixture runs on every execution: (a) the working-tree
+   `.gitattributes` is deliberately CRLF-mutated and the canonical comparison must
+   still pass; (b) one byte is flipped in a copy of an extracted member and the
+   comparison must fail. Any deviation stops the run (E_TEST).
+3. Unchanged from v6 unless separately reviewed: zip size/hash dispatch inputs, exact
+   member set, extracted-byte execution, sentinel/manifest cleanup with the controlled
+   early failure and its always-cleanup, three real cleanup lifetimes with the 5-way
+   absence set and distinct-import assertion, distinct-file PFX copy check,
+   CSPRNG-built SecureString password handling, ACTIONS_STEP_DEBUG refusal.
+4. `.gitattributes` now also covers itself and marks package/*.zip binary - checkout
+   hygiene only, explicitly NOT the binding mechanism.
 
-Validated here for v6 (real execution on this Linux workspace; Windows-only operations
+Carried forward, unchanged: the v5 production scripts (owner static review: KeyName
+fix, Part 4 dual checks, parsed-exact X.500 identity, bounds-checked Authenticode
+parser with EOF invariant) and their deterministic validations (real-PowerShell parse;
+executed failure plumbing; end-to-end Authenticode PASS + tamper and malformed-header
+STOPs with an independent digest implementation agreeing byte for byte; record
+finalization and PSS structural proof matching an independent Python reference byte
+for byte with salt-length-20 caught; Microsoft-documented, reflection-verified CNG API
+usage for .NET Framework 3.5-4.8.1).
+
+Validated here for v7 (real execution on this Linux workspace; Windows-only operations
 are certified by the CI run, not claimed here): all eight scripts parse under the real
-PowerShell parser; the binding verification was executed end to end against the real
-packaged zip (hash/size match, extraction, byte-for-byte member comparison, set
-equality - PASS); the extraction machinery was executed against the shipped scripts
-(all nine blocks recovered, hashed, loaded; the Authenticode-verification and
-PSS-decode blocks byte-identical to the harness-validated ones); the controlled-failure
-mode, sentinel rule, and cleanup decision logic were reviewed line by line against the
-owner's ruling. The workflow YAML parses and contains no caches, no artifact upload,
-and persist-credentials: false.
+PowerShell parser; the binding verification was executed end-to-end against the real
+packaged zip in a real git repository - PACKAGE BINDING PASS with per-member blob IDs
+and hashes, the verifier fixture (a) CRLF-immunity and (b) one-byte detection both
+PASS, and negatives: wrong size STOP E_PACKAGE_SIZE, wrong commit STOP E_COMMIT, a
+tampered committed member detected; extraction machinery re-run (same nine block
+hashes as v5/v6, confirming production bytes untouched); proof and cleanup scripts
+byte-identical to v6; workflow YAML parses with the three dispatch inputs, no caches,
+no artifact upload, persist-credentials: false.
 
-Reviewed package member SHA-256 hashes (the CI log must print these exact values):
+Reviewed package member SHA-256 hashes (the CI log prints canonical blob SHA-256 for
+each member; the values below are the reviewed member contents):
 | Member | SHA-256 |
 |---|---|
 | `scripts/V3-Part0-Preflight.ps1` | `37263b251e4da1b92b2c4b4a8cdd86d05dc22590c72e921c0e0b2c66e6428157` |
@@ -439,17 +444,17 @@ Reviewed package member SHA-256 hashes (the CI log must print these exact values
 | `scripts/V3-Part2-SignUKI.ps1` | `1fb2f757954d5a08c0af7b482c6738a2b76595b677ba5d3b8700a33afc6aacb0` |
 | `scripts/V3-Part3-FinalizeAndDetachedSign.ps1` | `cca30a0c362cf41818e11227f4be240df7d43dfe9b4888a70c6320e303396a06` |
 | `scripts/V3-Part4-EvidenceAndCleanup.ps1` | `567a6e61ab532e956a1aef7ef72355d70cc8853a80e0f8d4a61fb35d663181db` |
-| `ci/V3-VerifyPackage.ps1` | `52cec3665df620e64c52b6a03d1634cea634a5591881b1b5f31fb153d76345c1` |
+| `ci/V3-VerifyPackage.ps1` | `e778d76594f1ab5c6d011e21aaf349070513cc2c754ad4a9978c15f0ae95d6d8` |
 | `ci/V3-WindowsCompatProof.ps1` | `971ce83a6076724e0c0e29b1782d550668fa24bb6eda6636cf25a385a1f5f9c8` |
 | `ci/V3-WindowsCompatCleanup.ps1` | `5d594cf46f710d985062508f3bba28c595bc9051db51cf545b3deff63b022417` |
-| `.github/workflows/v3-windows-compat-proof.yml` | `df349282fe503bfa9e3a5dd81f954acbc392f7623cff76b801be1912c8a5c2cc` |
-| `.gitattributes` | `2a60899cd8f14193e8f76d6332f0e125706853f86287863947621cc61e6c47a3` |
+| `.github/workflows/v3-windows-compat-proof.yml` | `9fbb871c8a01e69bf7423f1fa3621ca8d4b80102df7cd6ffb2aff56982d011f4` |
+| `.gitattributes` | `e5e84c057b5fd00f7a902d5a0926da775f038463d429d0a800859fe49e0fdab3` |
 
 (The runbook itself is the eleventh member; its SHA-256 is recorded in the delivery
-review and the CI log prints it as `MEMBER SHA256` like every other member.)
+review and the CI log prints it as `MEMBER` like every other member.)
 
 Extracted-block SHA-256 hashes (the CI log prints these; they bind the tested code to
-the shipped bytes; unchanged from v5 because the production scripts are unchanged):
+the shipped bytes; unchanged from v5/v6 because the production scripts are unchanged):
 | Extracted block | SHA-256 |
 |---|---|
 | `Remove-CertAndCngKey` | `acbd033d044847eeabea30f17d5246c83aa32de2abeb3bad8d50fc6d07ab5413` |

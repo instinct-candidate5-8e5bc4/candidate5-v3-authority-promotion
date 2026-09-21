@@ -1,4 +1,7 @@
 # Keep reviewed bytes identical on every checkout so the CI log hashes match the reviewed hashes.
+# (Hygiene only - the binding mechanism is canonical committed-blob comparison, not the working tree.)
+.gitattributes text eol=lf
 *.ps1 text eol=lf
 *.yml text eol=lf
 *.md text eol=lf
+package/*.zip binary

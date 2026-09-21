@@ -1,10 +1,12 @@
 name: V3 Windows PowerShell 5.1 compatibility proof
 
-# Bounded disposable compatibility proof for the v6 production signing package. MANUAL DISPATCH ONLY,
-# and only after static ACCEPT of the exact reviewed commit. The operator enters the reviewed package
-# SHA-256 and byte size (from the accepted review) as dispatch inputs: the run first verifies the
-# committed zip byte-for-byte against those values and against the reviewed source tree, then executes
-# the proof ONLY against the extracted, verified bytes - never against mutable branch-head content.
+# Bounded disposable compatibility proof for the v7 production signing package. MANUAL DISPATCH ONLY,
+# and only after static ACCEPT of the exact reviewed commit. The operator enters the reviewed commit,
+# reviewed package SHA-256 and byte size (from the accepted review) as dispatch inputs: the run first
+# enforces HEAD == reviewed commit, verifies the committed zip byte-for-byte against those values,
+# then compares every extracted member byte-for-byte against the CANONICAL COMMITTED BLOB at the
+# reviewed HEAD (never the working tree), and executes the proof ONLY against the extracted, verified
+# bytes - never against mutable or checkout-transformed content.
 # Read-only checkout, no persisted credentials, no caches, no artifact upload, no unrelated network or
 # writes. Everything runs under powershell.exe (Windows PowerShell 5.1) with disposable fixture keys
 # exclusively. Two if:always() cleanup steps fail the job on any remnant; a controlled premature
@@ -15,12 +17,16 @@ name: V3 Windows PowerShell 5.1 compatibility proof
 on:
   workflow_dispatch:
     inputs:
+      expected_commit:
+        description: 'Reviewed commit SHA (full 40-hex) that this run must bind to'
+        required: true
+        type: string
       expected_package_sha256:
-        description: 'Reviewed SHA-256 of package/V3-PRODUCTION-SIGNING-PACKAGE-v6.zip (from the accepted static review)'
+        description: 'Reviewed SHA-256 of package/V3-PRODUCTION-SIGNING-PACKAGE-v7.zip (from the accepted static review)'
         required: true
         type: string
       expected_package_size:
-        description: 'Reviewed byte size of package/V3-PRODUCTION-SIGNING-PACKAGE-v6.zip'
+        description: 'Reviewed byte size of package/V3-PRODUCTION-SIGNING-PACKAGE-v7.zip'
         required: true
         type: string
 
@@ -39,7 +45,7 @@ jobs:
       - name: Verify and extract the reviewed package
         shell: powershell
         run: |
-          powershell.exe -NoProfile -ExecutionPolicy Bypass -File ci/V3-VerifyPackage.ps1 -ExpectedSha "${{ inputs.expected_package_sha256 }}" -ExpectedSize ${{ inputs.expected_package_size }}
+          powershell.exe -NoProfile -ExecutionPolicy Bypass -File ci/V3-VerifyPackage.ps1 -ExpectedCommit "${{ inputs.expected_commit }}" -ExpectedSha "${{ inputs.expected_package_sha256 }}" -ExpectedSize ${{ inputs.expected_package_size }}
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Controlled early-failure exercise (proves always-cleanup on a real leftover)
