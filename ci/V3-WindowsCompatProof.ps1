@@ -1,4 +1,4 @@
-# V3-WindowsCompatProof.ps1 (package v6) - bounded disposable compatibility proof on a GitHub Actions
+# V3-WindowsCompatProof.ps1 (package v9) - bounded disposable compatibility proof on a GitHub Actions
 # windows-latest runner, under Windows PowerShell 5.1 ONLY. It runs ONLY against the extracted,
 # hash-verified reviewed package bytes (see V3-VerifyPackage.ps1): every helper function is pulled out
 # of the shipped production scripts through the PowerShell parser (AST), and the inline verification
@@ -7,9 +7,19 @@
 # THREE REAL CLEANUP LIFETIMES, each closed by the exact shipped helper plus the 5-way absence set:
 #   1. the generated fixture key (cleanup-1);
 #   2. the FIRST non-exportable PFX import, used for SignTool + Authenticode (cleanup-2);
-#   3. a FRESH SECOND non-exportable PFX import, used for the detached-signature path (cleanup-3).
-# The two imported KeyNames are asserted DISTINCT. The Part 4 positive fixture uses the three ACTUAL
-# deleted identities; the negative fixture uses a LIVE decoy and must produce E_KEY_CONTAINER_REMAINS.
+#   3. a SECOND non-exportable PFX import, used for the detached-signature path (cleanup-3).
+# EPOCH MODEL (owner ruling): a PFX carries its keypair AND its container name, so the second import
+# may recreate a container under the SAME KeyName. Safety is proved TEMPORALLY, never from name
+# equality: lifetime 2's full absence is re-asserted immediately before the import (epoch markers
+# bracket it), the container is then proved LIVE (cert, Exists/Open, RSACng, RSA-3072, provider,
+# modulus/exponent/thumbprint match, ExportPolicy None, UniqueName store evidence), a fresh post-import
+# nonce digest is signed by the imported private key and verified with the public certificate, and an
+# OVERLAP NEGATIVE FIXTURE proves the precondition stops on a live prior container before the positive
+# flow. Both outcomes - "SEQUENTIAL NAME REUSE OBSERVED - prior lifetime proved absent before
+# recreation" and "DISTINCT IMPORT NAME OBSERVED" - proceed through identical assertions.
+# The Part 4 positive fixture uses the three recorded lifetimes (identifiers may repeat across
+# non-overlapping lifetimes; records are never dropped); the negative fixture uses a LIVE decoy and
+# must produce E_KEY_CONTAINER_REMAINS.
 #
 # Safety: a sentinel + cleanup manifest are written BEFORE any key exists; every resource is
 # registered the moment it is created; a nested finally performs best-effort cleanup; the workflow's
@@ -90,9 +100,43 @@ function Assert-FullAbsence([string]$thumb, [string]$kn, [string]$un, [string]$p
   Write-Host "  [$label] FULL ABSENCE PASS (thumbprint; Exists(KeyName); Open(KeyName); store enumeration by KeyName and UniqueName; Open(UniqueName))"
 }
 
+# --- Liveness assertion (owner ruling): prove the freshly imported lifetime-3 container is LIVE. ----
+function Assert-FullyLive([string]$thumb, $ids, $certObj, [string]$cerFile, [string]$label) {
+  $present = [bool](Get-ChildItem 'Cert:\CurrentUser\My' | Where-Object Thumbprint -eq $thumb)
+  Write-Host "  [$label] matching certificate present in store: $present (must be True)"
+  $prov = New-Object System.Security.Cryptography.CngProvider($ids.Provider)
+  $ex = [System.Security.Cryptography.CngKey]::Exists($ids.KeyName, $prov)
+  Write-Host "  [$label] CngKey.Exists(KeyName, provider): $ex (must be True)"
+  $opened = $false
+  try { $k2 = [System.Security.Cryptography.CngKey]::Open($ids.KeyName, $prov); $k2.Dispose(); $opened = $true } catch { $opened = $false }
+  Write-Host "  [$label] CngKey.Open(KeyName, provider) succeeded: $opened (must be True)"
+  $isCng = ($null -ne $ids.Rsa) -and ($ids.Rsa -is [System.Security.Cryptography.RSACng])
+  $provOk = ($ids.Provider -eq 'Microsoft Software Key Storage Provider')
+  $sizeOk = ($ids.Rsa.KeySize -eq 3072)
+  $nonExp = ($ids.Rsa.Key.ExportPolicy -eq [System.Security.Cryptography.CngExportPolicies]::None)
+  Write-Host "  [$label] RSACng available: $isCng; provider Microsoft Software KSP: $provOk; RSA-3072: $sizeOk; ExportPolicy None: $nonExp (all must be True)"
+  $cerCert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($cerFile)
+  $cerPub = [Security.Cryptography.X509Certificates.RSACertificateExtensions]::GetRSAPublicKey($cerCert)
+  $expP = $cerPub.ExportParameters($false)
+  $gotP = $ids.Rsa.ExportParameters($false)
+  $modOk = ((Sha256Hex $expP.Modulus) -eq (Sha256Hex $gotP.Modulus))
+  $expOk = ((Sha256Hex $expP.Exponent) -eq (Sha256Hex $gotP.Exponent))
+  $thumbOk = ($certObj.Thumbprint -eq $thumb)
+  Write-Host "  [$label] public modulus matches fixture: $modOk; public exponent matches fixture: $expOk; thumbprint matches fixture: $thumbOk (all must be True)"
+  $unPresent = $false
+  $kspDir = Join-Path $env:APPDATA 'Microsoft\Crypto\Keys'
+  if (Test-Path -LiteralPath $kspDir) { $unPresent = [bool](Get-ChildItem -LiteralPath $kspDir -File | Where-Object Name -eq $ids.UniqueName) }
+  Write-Host "  [$label] UniqueName store evidence present (software KSP exposes it): $unPresent (must be True on this provider)"
+  if (-not ($present -and $ex -and $opened -and $isCng -and $provOk -and $sizeOk -and $nonExp -and $modOk -and $expOk -and $thumbOk -and $unPresent)) { Stop-Step 'E_LIVE_PROOF' "[$label] liveness proof failed; report this code." }
+  Write-Host "  [$label] LIFETIME-3 LIVE PASS (certificate present; Exists/Open by KeyName; RSACng RSA-3072 software-KSP; modulus/exponent/thumbprint match; ExportPolicy None; UniqueName store evidence)"
+}
+
 # --- Cleanup manifest (non-secret identifiers only), saved BEFORE any key exists --------------------
 $script:Manifest = @{ thumbprints = @(); containers = @(); files = @(); dirs = @($WorkDir) }
 function Save-Manifest { ($script:Manifest | ConvertTo-Json -Depth 4) | Set-Content -LiteralPath "$WorkDir\cleanup-manifest.json" -Encoding ASCII }
+# Records may repeat across non-overlapping lifetimes (sequential name reuse); cleanup stays
+# idempotent (Exists before delete) and verifies final absence per recorded lifetime. No record is
+# ever dropped; deduplication, if any, is display-only.
 function Add-ManifestContainer($kn, $un, $prov) { $script:Manifest.containers += @{ keyName = $kn; uniqueName = $un; provider = $prov } }
 
 # --- Nested best-effort cleanup (the workflow's if:always() step is the outer, verifying net) -------
@@ -299,26 +343,75 @@ try {
   Assert-FullAbsence $thumbprint $imp1.KeyName $imp1.UniqueName $imp1.Provider 'cleanup-2'
   $imported1 = $null
 
-  # ---- LIFETIME 3: FRESH SECOND non-exportable import - detached-signature path ----
+  # ---- OVERLAP NEGATIVE FIXTURE (owner ruling): a LIVE prior-lifetime container at the boundary ----
+  # ---- must STOP the lifetime-3 precondition BEFORE any second import; cleaned immediately after, ----
+  # ---- with absence proved BEFORE the positive sequential flow runs.                             ----
+  $overlap = Import-PfxCertificate -FilePath $pfx -CertStoreLocation 'Cert:\CurrentUser\My' -Password $pw -Exportable:$false
+  $ov = Capture-KeyIds $overlap 'E_PRIVATE_KEY'
+  Write-Host "OVERLAP FIXTURE live container: KeyName $($ov.KeyName); UniqueName $($ov.UniqueName)"
+  Add-ManifestContainer $ov.KeyName $ov.UniqueName $ov.Provider
+  Save-Manifest
+  $caught = $null
+  try { Assert-FullAbsence $thumbprint $ov.KeyName $ov.UniqueName $ov.Provider 'overlap-negative' } catch { $caught = $_.Exception.Message }
+  if ($caught -match '^STOP E_CLEANUP_FAILED') {
+    Write-Host "OVERLAP NEGATIVE FIXTURE PASS - the lifetime-3 precondition stopped on a live prior-lifetime container: $caught"
+  } else {
+    Stop-Step 'E_TEST' "Overlap negative fixture failed: expected STOP E_CLEANUP_FAILED, got: $caught"
+  }
+  $okO = Remove-CertAndCngKey $overlap $ov.KeyName $ov.UniqueName $ov.Provider
+  Check ($okO) 'E_CLEANUP_FAILED' 'Overlap fixture cleanup failed; report this code.'
+  Assert-FullAbsence $thumbprint $ov.KeyName $ov.UniqueName $ov.Provider 'overlap-negative-cleanup'
+  $overlap = $null
+  Write-Host 'OVERLAP NEGATIVE FIXTURE CLEANED - absence proved before the positive sequential flow.'
+
+  # ---- LIFETIME 3: second non-exportable import from the retained PFX - detached-signature path ----
+  # ---- EPOCH MODEL: safety is the proved pre/post state transition, never name equality. The PFX ----
+  # ---- intentionally carries the same RSA keypair; what must be new is the persisted container    ----
+  # ---- instance/lifetime.                                                                          ----
+  Write-Host 'PRE-IMPORT-2 BOUNDARY - re-asserting lifetime 2 FULL absence (certificate absent; Exists/Open by KeyName fail; UniqueName store file absent) before creating lifetime 3.'
+  Assert-FullAbsence $thumbprint $imp1.KeyName $imp1.UniqueName $imp1.Provider 'pre-import-2-boundary'
+  $epochPre = [DateTime]::UtcNow.ToString('o')
+  Write-Host "EPOCH MARKER pre-import-2:  $epochPre"
   $imported2 = Import-PfxCertificate -FilePath $pfx -CertStoreLocation 'Cert:\CurrentUser\My' -Password $pw -Exportable:$false
+  Check ($null -ne $imported2) 'E_PRIVATE_KEY' 'Second import did not return a certificate.'
+  $epochPost = [DateTime]::UtcNow.ToString('o')
+  Write-Host "EPOCH MARKER post-import-2: $epochPost (import command succeeded from the retained PFX)"
   $pw = $null
   [GC]::Collect()
   $imp2 = Capture-KeyIds $imported2 'E_PRIVATE_KEY'
-  Check ($imp2.Rsa.Key.ExportPolicy -eq [System.Security.Cryptography.CngExportPolicies]::None) 'E_KEY_EXPORTABLE' 'Second imported fixture key is exportable.'
   Write-Host "IMPORT 2 KeyName: $($imp2.KeyName); UniqueName: $($imp2.UniqueName) (provider $($imp2.Provider)); ExportPolicy: $($imp2.Rsa.Key.ExportPolicy)"
-  Check ($imp2.KeyName -ne $imp1.KeyName) 'E_TEST' "The two imports produced the SAME KeyName ($($imp2.KeyName)); the production design assumes a fresh container per import - report this platform behavior, do not proceed."
-  Write-Host 'IMPORT DISTINCTNESS PASS - the fresh second import has its own CNG container (distinct KeyName).'
+  Assert-FullyLive $thumbprint $imp2 $imported2 $cerF 'lifetime-3-live'
+  if ($imp2.KeyName -eq $imp1.KeyName) {
+    Write-Host 'SEQUENTIAL NAME REUSE OBSERVED - prior lifetime proved absent before recreation'
+    Write-Host '  (same keypair by design; the persisted container instance/lifetime is new, proven temporally: absence at the pre-import boundary, then a live container after the import - never inferred from name equality.)'
+  } else {
+    Write-Host 'DISTINCT IMPORT NAME OBSERVED'
+  }
   Add-ManifestContainer $imp2.KeyName $imp2.UniqueName $imp2.Provider
   Save-Manifest
 
+  # ---- Fresh nonce challenge: a NEW digest constructed after import, signed with the imported ----
+  # ---- private key, verified with the public certificate. ----
   $rsa = $imp2.Rsa
+  $rngN = [System.Security.Cryptography.RandomNumberGenerator]::Create()
+  $nonce = New-Object byte[] 32
+  $rngN.GetBytes($nonce)
+  $rngN.Dispose()
+  $noncePre = [Text.Encoding]::UTF8.GetBytes('V3-LIFETIME-3-NONCE:v1') + [byte]0 + $nonce
+  $nonceDigest = ([Security.Cryptography.SHA256]::Create()).ComputeHash($noncePre)
+  $nonceSig = $rsa.SignHash($nonceDigest, [Security.Cryptography.HashAlgorithmName]::SHA256, [Security.Cryptography.RSASignaturePadding]::Pss)
+  $pubN = [Security.Cryptography.X509Certificates.RSACertificateExtensions]::GetRSAPublicKey($imported2)
+  $nonceOk = $pubN.VerifyHash($nonceDigest, $nonceSig, [Security.Cryptography.HashAlgorithmName]::SHA256, [Security.Cryptography.RSASignaturePadding]::Pss)
+  Check ($nonceOk) 'E_LIVE_PROOF' 'Lifetime-3 nonce challenge failed: the imported private key could not sign a fresh digest verifiable by the public certificate.'
+  Write-Host 'LIFETIME-3 NONCE CHALLENGE PASS - fresh post-import digest signed by the imported private key, verified with the public certificate (bound to lifetime 3).'
+
   $pre = [Text.Encoding]::UTF8.GetBytes('V3-WINDOWS-COMPAT-PROOF:v1') + [byte]0 + [IO.File]::ReadAllBytes($staged)
   $digest = ([Security.Cryptography.SHA256]::Create()).ComputeHash($pre)
   $sig = $rsa.SignHash($digest, [Security.Cryptography.HashAlgorithmName]::SHA256, [Security.Cryptography.RSASignaturePadding]::Pss)
   Check ($sig.Length -eq 384) 'E_SIG_LENGTH' "Signature $($sig.Length) bytes, expected 384."
   $selfOk = $rsa.VerifyHash($digest, $sig, [Security.Cryptography.HashAlgorithmName]::SHA256, [Security.Cryptography.RSASignaturePadding]::Pss)
   Check ($selfOk) 'E_DETACHED_VERIFY' 'RSACng VerifyHash self-check failed.'
-  Write-Host 'DETACHED SIGN PASS - RSACng SignHash/VerifyHash (RSA-PSS-SHA256) with import 2 under PS 5.1.'
+  Write-Host 'DETACHED SIGN PASS - RSACng SignHash/VerifyHash (RSA-PSS-SHA256) with import 2 under PS 5.1; digest freshly constructed AFTER import 2 and explicitly bound to lifetime 3.'
   . ([ScriptBlock]::Create($blkDecode))
 
   try { $rsa.Dispose() } catch {}
@@ -355,7 +448,7 @@ try {
     Part3KeyName = $imp2.KeyName; Part3KeyUniqueName = $imp2.UniqueName; Part3KeyProvider = $imp2.Provider
   }
   . ([ScriptBlock]::Create($blkPart4))
-  Write-Host 'PART4 POSITIVE PASS - the three ACTUAL deleted identities (generated key, import 1, import 2) verified absent by the shipped block.'
+  Write-Host 'PART4 POSITIVE PASS - three recorded lifetimes (generated key, import 1, import 2) verified absent by the shipped block; identifiers may repeat across non-overlapping lifetimes; every record kept, deduplication is display-only.'
 
   $okd = Remove-CertAndCngKey $decoy $dec.KeyName $dec.UniqueName $dec.Provider
   Check ($okd) 'E_CLEANUP_FAILED' 'Decoy cleanup failed; report this code.'

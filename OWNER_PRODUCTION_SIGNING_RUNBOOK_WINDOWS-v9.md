@@ -1,29 +1,36 @@
-# V3 Successor UKI - Owner Production Signing Runbook (Windows) - PACKAGE v8
+# V3 Successor UKI - Owner Production Signing Runbook (Windows) - PACKAGE v9
 
-This v8 package replaces v1 through v7. If you received any of them, discard them and
-use only v8. v8 is v7 with exactly one defect fixed: the controlled-failure exercise
-step in the workflow. Everything else is BYTE FOR BYTE the accepted v7 content - the
-production scripts (internal "v5" banners), the CI proof and cleanup scripts (internal
-"v6" banners), the canonical-blob binding, the verifier fixture, all cleanup
-mechanics. The v7 run (GitHub Actions run 35638387311) proved every substantive
-mechanism on the real runner - canonical binding 11/11, both verifier fixtures, the
-controlled-failure semantics, always-cleanup on a real leftover, final absence - and
-failed only on step-exit plumbing: the wrapper validated the intentional inner failure
-and printed its PASS line, but the inner process's deliberate exit 1 remained in
-$LASTEXITCODE and the step reported failure, skipping the full proof. That run is
-preserved as audit trail (with v6's run 35637316259):
+This v9 package replaces v1 through v8. If you received any of them, discard them and
+use only v9. The v8 run (GitHub Actions run 35639381011) advanced the furthest yet:
+binding, both verifier fixtures, the wrapper assertion, the controlled failure with
+always-cleanup on a real leftover, lifetimes 1 and 2, and the SignTool + Authenticode
+path all PASSED on the real runner - and the run then surfaced a genuine platform
+fact: importing the same PFX twice recreates the CNG container under the SAME KeyName
+(a PFX carries its key's container name; the import honors it). The proof's
+distinct-import gate stopped by design (STOP E_TEST) before lifetime 3. All three
+failed runs are preserved as audit trail:
+https://github.com/instinct-candidate5-8e5bc4/candidate5-v3-authority-promotion/actions/runs/35639381011
 https://github.com/instinct-candidate5-8e5bc4/candidate5-v3-authority-promotion/actions/runs/35638387311
 https://github.com/instinct-candidate5-8e5bc4/candidate5-v3-authority-promotion/actions/runs/35637316259
 
-The v8 wrapper follows the owner's required pattern: the inner exit code is captured
-IMMEDIATELY after the inner process, each unexpected case exits 1 explicitly, and the
-explicit success exit 0 comes only after BOTH validations (nonzero inner exit AND the
-expected STOP E_CONTROLLED_FAILURE line), with $global:LASTEXITCODE = 0 as
-defense-in-depth. No error suppression, no continue-on-error. A static wrapper
-assertion now runs inside the binding verification on every execution: it reads the
-canonical workflow blob and requires the exact ordered pattern (immediate capture,
-explicit exit 1 per unexpected case, PASS line, reset, exit 0), stopping with
-E_WRAPPER on any deviation.
+v9 implements the owner's Path A ruling with the EPOCH MODEL: safety is proved
+TEMPORALLY, never inferred from name equality. The PFX intentionally carries the same
+RSA keypair; what must be new each lifetime is the persisted container instance.
+Around the second import the proof now: re-asserts lifetime 2's FULL absence
+immediately before the import (certificate absent; Exists/Open by KeyName fail;
+UniqueName store file absent); brackets the import with UTC epoch markers; proves the
+container LIVE after import (matching certificate, Exists/Open by KeyName, RSACng,
+RSA-3072 on the Microsoft software KSP, public modulus/exponent and thumbprint match
+the fixture, ExportPolicy None, UniqueName store evidence present); runs a fresh
+post-import nonce challenge signed by the imported private key and verified with the
+public certificate; and only then proceeds to the detached signature, its structural
+proof, cleanup 3 and full absence. An OVERLAP NEGATIVE FIXTURE runs first: a live
+prior-lifetime container at the boundary must STOP the precondition, and it is cleaned
+with absence proved before the positive flow. Both outcomes proceed identically:
+"SEQUENTIAL NAME REUSE OBSERVED - prior lifetime proved absent before recreation" or
+"DISTINCT IMPORT NAME OBSERVED". Production scripts stay frozen (the owner found no
+equality/distinctness dependency in them); the cleanup helper, binding, wrapper and
+fixtures are byte-identical to v8.
 
 Process ruling (owner): this package is submitted for STATIC REVIEW FIRST - no
 dispatch. Only after a new static ACCEPT is the exact reviewed commit manually
@@ -98,7 +105,7 @@ ceremony), under the owner's process ruling - STATIC REVIEW FIRST, NO DISPATCH u
 the exact reviewed commit is accepted:
 
 1. The reviewed package zip is committed to the repository at
-   `package/V3-PRODUCTION-SIGNING-PACKAGE-v8.zip` alongside the reviewed source tree
+   `package/V3-PRODUCTION-SIGNING-PACKAGE-v9.zip` alongside the reviewed source tree
    (same paths as inside the zip), on the exact reviewed commit.
 2. After static ACCEPT, the operator manually dispatches the workflow and enters the
    reviewed commit, the reviewed package SHA-256, and the byte size (from the accepted
@@ -381,6 +388,17 @@ every claim below names exactly how it was verified.
 
 Audit trail (preserved, per owner ruling):
 
+Run 35639381011 (v8), attempt 1: binding PASSED (11/11 canonical blob equality), both
+verifier fixtures PASSED, wrapper static assertion PASSED, controlled-failure exercise
+SUCCESS with always-cleanup on a real leftover, lifetimes 1+2 and SignTool +
+Authenticode PASSED. The run STOPPED by design (STOP E_TEST) at the lifetime-3 gate:
+the second same-PFX import recreated the container under the SAME KeyName as the first
+(te-cd44bdf7-5050-4f7b-b131-5b39e25280dd) - deterministic platform name reuse from
+PFX-carried container identity. Lifetime 3, the Part 4 positives and the PSS salt=32
+detail were not reached; final cleanup PASS, nothing residual. v9 replaces the
+distinctness gate with the epoch model (see header and the v9 fix section).
+https://github.com/instinct-candidate5-8e5bc4/candidate5-v3-authority-promotion/actions/runs/35639381011
+
 Run 35638387311 (v7), attempt 1: the canonical binding PASSED (11/11 members equal to
 their committed blobs), both verifier fixtures PASSED, the controlled-failure exercise
 produced E_CONTROLLED_FAILURE as designed and the always-cleanup removed the real
@@ -403,6 +421,26 @@ file to CRLF; all ten covered members compared byte-identical. The v6 binding co
 against the working tree, so a benign checkout transformation was indistinguishable
 from tampering. Run preserved at:
 https://github.com/instinct-candidate5-8e5bc4/candidate5-v3-authority-promotion/actions/runs/35637316259
+
+Fixed in v9 (owner ruling on run 35639381011, Path A with epoch/liveness conditions):
+the import-distinctness gate is removed; in its place the proof enforces the temporal
+safety chain around the second import - pre-import full-absence re-assertion, UTC
+epoch markers bracketing the import, post-import liveness (certificate present,
+Exists/Open by KeyName, RSACng, RSA-3072 on the Microsoft software KSP, public
+modulus/exponent and thumbprint matching the fixture, ExportPolicy None, UniqueName
+store evidence), and a fresh post-import nonce challenge signed by the imported
+private key and verified with the public certificate (the detached-signature digest is
+likewise freshly constructed after import and explicitly bound to lifetime 3). An
+overlap negative fixture proves the precondition stops on a live prior-lifetime
+container before the positive flow. Both branches - "SEQUENTIAL NAME REUSE OBSERVED -
+prior lifetime proved absent before recreation" and "DISTINCT IMPORT NAME OBSERVED" -
+proceed through identical lifetime-3 assertions. Part 4 uses the three recorded
+lifetimes (identifiers may repeat across non-overlapping lifetimes; records are never
+dropped; deduplication is display-only). Production scripts remain byte-identical to
+the owner-reviewed v5 set - inspection confirmed no equality/distinctness dependency
+(the only "distinct" claims concern the two PFX storage volumes, an unrelated
+requirement). The cleanup helper, binding, wrapper and verifier fixtures are
+byte-identical to v8.
 
 Fixed in v8 (owner ruling on run 35638387311): the controlled-failure exercise step
 captures the inner exit code immediately after the inner process, exits 1 explicitly
@@ -444,17 +482,23 @@ finalization and PSS structural proof matching an independent Python reference b
 for byte with salt-length-20 caught; Microsoft-documented, reflection-verified CNG API
 usage for .NET Framework 3.5-4.8.1).
 
-Validated here for v8 (real execution on this Linux workspace; Windows-only operations
+Validated here for v9 (real execution on this Linux workspace; Windows-only operations
 are certified by the CI run, not claimed here): all eight scripts parse under the real
-PowerShell parser; the binding verification was executed end-to-end against the real
-packaged zip in a real git repository - PACKAGE BINDING PASS with per-member blob IDs
-and hashes, verifier fixture (a) CRLF-immunity and (b) one-byte detection both PASS,
-the static wrapper assertion PASS, and negatives: wrong size STOP E_PACKAGE_SIZE,
-wrong commit STOP E_COMMIT, a tampered committed member detected, and a wrapper
-missing its explicit success exit detected as STOP E_WRAPPER; extraction machinery
-re-run (same nine block hashes as v5/v6/v7, confirming production bytes untouched);
-proof and cleanup scripts byte-identical to v6/v7; workflow YAML parses with the three
-dispatch inputs, no caches, no artifact upload, persist-credentials: false.
+PowerShell parser; the binding verification executed end-to-end against the real
+packaged zip in a real git repository - PACKAGE BINDING PASS, verifier fixture (a) and
+(b) PASS, wrapper static assertion PASS, with negatives (wrong commit E_COMMIT,
+tampered committed member E_MEMBER_MISMATCH, broken wrapper E_WRAPPER); the NEW v9
+logic was executed where the platform allows - the nonce-challenge crypto sequence
+(fresh digest sign/verify with tamper rejection, modulus/exponent comparison) runs
+correctly with the same API calls, and both exact branch labels execute; the overlap
+negative was executed against the exact shipped Assert-FullAbsence bytes with a
+simulated live leftover and it NEVER passes with presence - on this Linux workspace
+CNG is unsupported so the stop surfaces through the guard, while on Windows the same
+presence completes all six checks and stops with E_CLEANUP_FAILED (the aggregate gate
+requires ALL six absence checks false, statically verified); extraction machinery
+re-run (same nine block hashes, production bytes untouched); proof and cleanup scripts
+carry the v9 epoch changes; workflow YAML parses with the three dispatch inputs, no
+caches, no artifact upload, persist-credentials: false.
 
 Reviewed package member SHA-256 hashes (the CI log prints canonical blob SHA-256 for
 each member; the values below are the reviewed member contents):
@@ -465,10 +509,10 @@ each member; the values below are the reviewed member contents):
 | `scripts/V3-Part2-SignUKI.ps1` | `1fb2f757954d5a08c0af7b482c6738a2b76595b677ba5d3b8700a33afc6aacb0` |
 | `scripts/V3-Part3-FinalizeAndDetachedSign.ps1` | `cca30a0c362cf41818e11227f4be240df7d43dfe9b4888a70c6320e303396a06` |
 | `scripts/V3-Part4-EvidenceAndCleanup.ps1` | `567a6e61ab532e956a1aef7ef72355d70cc8853a80e0f8d4a61fb35d663181db` |
-| `ci/V3-VerifyPackage.ps1` | `0f3ca29921193c64e028173d8c5219f393830ae3b5cd180c85ddf62c7bff7513` |
-| `ci/V3-WindowsCompatProof.ps1` | `971ce83a6076724e0c0e29b1782d550668fa24bb6eda6636cf25a385a1f5f9c8` |
+| `ci/V3-VerifyPackage.ps1` | `0dc7e6cafb1dfe0da4c0814824b893f4bfa11a7b518e643b549edbd9a96eccc7` |
+| `ci/V3-WindowsCompatProof.ps1` | `6b18d5281664463889a0617a48936ca62f170e1bfde833f94f0e3b5ec0c61c51` |
 | `ci/V3-WindowsCompatCleanup.ps1` | `5d594cf46f710d985062508f3bba28c595bc9051db51cf545b3deff63b022417` |
-| `.github/workflows/v3-windows-compat-proof.yml` | `31962f1884beb814cb99c008f83672ccedfe5cf2f1a8f080a004e08df0336cd9` |
+| `.github/workflows/v3-windows-compat-proof.yml` | `d2f5735c1128f3276c364faffdb3729192b333d4cd14e7ae7750b73f2948c2a9` |
 | `.gitattributes` | `e5e84c057b5fd00f7a902d5a0926da775f038463d429d0a800859fe49e0fdab3` |
 
 (The runbook itself is the eleventh member; its SHA-256 is recorded in the delivery

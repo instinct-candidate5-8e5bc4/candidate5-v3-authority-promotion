@@ -1,4 +1,4 @@
-# V3-VerifyPackage.ps1 (package v8) - binds the CI run to the EXACT reviewed package bytes. Runs
+# V3-VerifyPackage.ps1 (package v9) - binds the CI run to the EXACT reviewed package bytes. Runs
 # first, from the checkout, and trusts nothing mutable: the operator supplies the reviewed commit,
 # package SHA-256 and byte size as workflow_dispatch inputs from the accepted review; HEAD must BE
 # the reviewed commit; the committed zip must match the reviewed hash/size EXACTLY; the zip is
@@ -13,7 +13,7 @@ param(
   [Parameter(Mandatory=$true)][string]$ExpectedSha,
   [Parameter(Mandatory=$true)][long]$ExpectedSize,
   [string]$RepoRoot = '.',
-  [string]$ZipPath = 'package\V3-PRODUCTION-SIGNING-PACKAGE-v8.zip',
+  [string]$ZipPath = 'package\V3-PRODUCTION-SIGNING-PACKAGE-v9.zip',
   [string]$ExtractDir = (Join-Path $env:RUNNER_TEMP 'v3-pkg')
 )
 $ErrorActionPreference = 'Stop'
@@ -69,7 +69,7 @@ function Compare-MemberToBlob([string]$member, [string]$extractedPath) {
 $script:ExitCode = 0
 try {
   Check ($env:ACTIONS_STEP_DEBUG -ne 'true') 'E_DEBUG' 'ACTIONS_STEP_DEBUG is enabled on this run; rerun with step debugging disabled.'
-  Write-Host '== V3 PACKAGE BINDING VERIFICATION (v8, canonical committed-blob comparison) =='
+  Write-Host '== V3 PACKAGE BINDING VERIFICATION (v9, canonical committed-blob comparison) =='
   Write-Host "Run URL: $env:GITHUB_SERVER_URL/$env:GITHUB_REPOSITORY/actions/runs/$env:GITHUB_RUN_ID"
   $head = (& git -C $RepoRoot rev-parse HEAD 2>$null)
   Check ($head) 'E_GIT' 'git rev-parse HEAD failed.'
@@ -97,7 +97,7 @@ try {
   Expand-Archive -LiteralPath $zip -DestinationPath $ExtractDir
 
   $expected = @(
-    'OWNER_PRODUCTION_SIGNING_RUNBOOK_WINDOWS-v8.md',
+    'OWNER_PRODUCTION_SIGNING_RUNBOOK_WINDOWS-v9.md',
     'scripts/V3-Part0-Preflight.ps1',
     'scripts/V3-Part1-KeyCreation.ps1',
     'scripts/V3-Part2-SignUKI.ps1',

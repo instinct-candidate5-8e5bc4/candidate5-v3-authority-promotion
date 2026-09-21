@@ -1,6 +1,6 @@
 name: V3 Windows PowerShell 5.1 compatibility proof
 
-# Bounded disposable compatibility proof for the v8 production signing package. MANUAL DISPATCH ONLY,
+# Bounded disposable compatibility proof for the v9 production signing package. MANUAL DISPATCH ONLY,
 # and only after static ACCEPT of the exact reviewed commit. The operator enters the reviewed commit,
 # reviewed package SHA-256 and byte size (from the accepted review) as dispatch inputs: the run first
 # enforces HEAD == reviewed commit, verifies the committed zip byte-for-byte against those values,
@@ -22,11 +22,11 @@ on:
         required: true
         type: string
       expected_package_sha256:
-        description: 'Reviewed SHA-256 of package/V3-PRODUCTION-SIGNING-PACKAGE-v8.zip (from the accepted static review)'
+        description: 'Reviewed SHA-256 of package/V3-PRODUCTION-SIGNING-PACKAGE-v9.zip (from the accepted static review)'
         required: true
         type: string
       expected_package_size:
-        description: 'Reviewed byte size of package/V3-PRODUCTION-SIGNING-PACKAGE-v8.zip'
+        description: 'Reviewed byte size of package/V3-PRODUCTION-SIGNING-PACKAGE-v9.zip'
         required: true
         type: string
 
