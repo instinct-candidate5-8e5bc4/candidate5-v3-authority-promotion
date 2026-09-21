@@ -1,0 +1,88 @@
+{
+ "schema": "v3.provisioning-binding-verification.v1",
+ "bindingSha256": "2311040d82f48a86ef41cfb3bf0905f30234585e5a67766a3ffb2a4ec458d9c9",
+ "acceptedSourceCommit": "92741cbdefaa78adc33bc3c74935a45f9558b88c",
+ "acceptedSourceTree": "9cc2e40fab25c2231d5a6cefa285d2e3e65a7bee",
+ "files": [
+  {
+   "path": "docs/verified-architecture-phase2-v3/successor-uki-candidate/successor-unsigned.efi",
+   "bytes": 21164544,
+   "sha256": "ed5d9d72be40592af3b14bd1fd9dc91a5976b14f350f9124ea414b975464d536",
+   "match": true
+  },
+  {
+   "path": "docs/verified-architecture-phase2-v3/successor-uki-candidate/successor-authority-record.v1.json",
+   "bytes": 46963,
+   "sha256": "c09245ae3b60db34f050e29fd9f457a83fde95bd44efc70e9afda14fcbee0e88",
+   "match": true
+  },
+  {
+   "path": "docs/verified-architecture-phase2-v3/successor-uki-candidate/inventory.v1.json",
+   "bytes": 52390,
+   "sha256": "a34edbf31bdacca8b2f836d496d01da5d57a8e8a1f46fcc7d63a9ab0dc297236",
+   "match": true
+  },
+  {
+   "path": "docs/verified-architecture-phase2-v3/successor-uki-candidate/successor-initramfs.cpio",
+   "bytes": 9371136,
+   "sha256": "d62e7c879186110c9767f52337bfef23040a034871cdc4138b1ec601f0a78d59",
+   "match": true
+  },
+  {
+   "path": "docs/verified-architecture-phase2-v3/root-admitter-candidate/root-admitter-rootfs.ext4",
+   "bytes": 100663296,
+   "sha256": "77a3bd99ad9dbfa18952dcc7b2bd180bbebd57843ac8c21edcec63dc737b64f0",
+   "match": true
+  },
+  {
+   "path": "docs/verified-architecture-phase2-v3/root-admitter-candidate/root-admitter-rootfs.verity",
+   "bytes": 798720,
+   "sha256": "331502b7de57f7899fa1af25158c398e9603ee2644a9d1e165ebc955d59118e4",
+   "match": true
+  },
+  {
+   "path": "docs/verified-architecture-phase2-v3/root-admitter-candidate/dm-verity-metadata.v1.json",
+   "bytes": 482,
+   "sha256": "0b230a7e7b411e7f7915de569f37e7d54c39598c23d64901b0e29196ebea6021",
+   "match": true
+  },
+  {
+   "path": "docs/verified-architecture-phase2-v3/root-admitter-candidate/rootfs/trust/boot-policy.v1",
+   "bytes": 206,
+   "sha256": "faf5a2913ebe44cb6c453b55456a7af8d35ff5179c8228f838157d7bf634747e",
+   "match": true
+  }
+ ],
+ "checks": [
+  {
+   "check": "dmVerity",
+   "match": true
+  },
+  {
+   "check": "bootPolicy",
+   "match": true
+  },
+  {
+   "check": "deviceNames",
+   "adapterExpected": [
+    "v3-rootfs-data",
+    "v3-rootfs-hash",
+    "v3-reviewed-root",
+    "v3-reviewed-input",
+    "v3-reviewed-output",
+    "v3-reviewed-evidence"
+   ],
+   "match": true
+  },
+  {
+   "check": "peerVerifiedIdentities",
+   "status": "FORMAT_ONLY__BYTES_NOT_HELD__P1_INGESTION_GATE"
+  },
+  {
+   "check": "requiredBindings",
+   "status": "FORMAT_ONLY__CRYPTOGRAPHIC_VERIFICATION_PEER_SIDE"
+  }
+ ],
+ "mutationPerformed": false,
+ "result": "PROVISIONING_BINDING_VERIFICATION_PASS"
+}

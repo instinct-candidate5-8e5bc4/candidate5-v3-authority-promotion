@@ -1,0 +1,204 @@
+{
+ "schema": "v3.provisioning-binding.v1",
+ "domain": "V3-SUCCESSOR-PROVISIONING:v1",
+ "status": "PROVISIONING_PLAN_BINDING__NO_TARGET_MUTATION",
+ "summary": "Plan-level immutable binding for the Provisioning stage of the accepted successor candidate. Binds the four required PROVISIONING GATE identities, the repo-reproducible certified inputs, and the six-device staging plan. This record creates no authority, performs no provisioning, and mutates no target. Physical target/device mutation remains an owner-level gate that must return through the independent reviewer.",
+ "source": {
+  "acceptedSourceCommit": "92741cbdefaa78adc33bc3c74935a45f9558b88c",
+  "acceptedSourceTree": "9cc2e40fab25c2231d5a6cefa285d2e3e65a7bee",
+  "repository": "https://github.com/instinct-candidate5-8e5bc4/candidate5-v3-authority-promotion",
+  "note": "The successor candidate was ACCEPTED 2026-09-20 17:33 UTC at a non-authorizing, pre-signing/pre-provisioning boundary. Signing is now complete under the owner ceremony; this binding carries its accepted public outputs forward into Provisioning planning only."
+ },
+ "requiredBindings": {
+  "signedUkiSha256": "133096976ee70a8c272cbcc8c28d369bfc65d93d994cbff4174b947df00239d1",
+  "certificateDerSha256": "7cda4ddc149849cc61191d4b5b3d218d14770c0401e9e66dd9617b82ba1ae441",
+  "certificateThumbprintSha1": "DA1ED260911F93F41C0914108EA45DC0BD85B171",
+  "finalAuthorityRecordSha256": "07f88bfc5a98ef471c05451cc8077af4d7b61015aae5ba0395deb6c935dc1694",
+  "acceptedSourceCommit": "92741cbdefaa78adc33bc3c74935a45f9558b88c"
+ },
+ "peerVerifiedIdentities": {
+  "provenance": "Independent reviewer verdict (PROVISIONING GATE: ACCEPT, 2026-09-22). The signed UKI, certificate DER and final authority record bytes are owner/peer-held public evidence; they are not in this repository and are NOT reproduced by the local validator. Values here are recorded for binding and later P1 evidence-ingestion checks only.",
+  "signedUkiBytes": 21166416,
+  "peAuthenticodeDigestSha256": "ab95a4c3fcf946679d2a46e87e64f28912ca5a7b27d642c70e6d5713f4065219",
+  "pkcs7Bytes": 1864,
+  "pkcs7Sha256": "440aebd415335218df88abbb9b858fabd3fa30d7d238c8e368f7adc6835de1e5",
+  "detachedSignaturePreimageDigestSha256": "fec736a6a7e50f030164d76bd2015925621b5edfa1eefb4980ffcb8c18142b45",
+  "detachedSignatureConstruction": "RSA-PSS-SHA256 salt=32 over SHA256( UTF8(\"V3-SUCCESSOR-UKI-EXTERNAL-BINDING:v1\") || 0x00 || finalAuthorityRecordBytes ); 384-byte signature for RSA-3072",
+  "certificateProperties": {
+   "type": "self-signed X.509 DER",
+   "key": "RSA-3072, exponent 65537",
+   "signatureAlgorithm": "SHA256-with-RSA",
+   "subject": "CN=V3 Successor UKI Secure Boot Authority",
+   "issuer": "CN=V3 Successor UKI Secure Boot Authority",
+   "keyUsage": "critical digitalSignature only",
+   "extendedKeyUsage": "codeSigning",
+   "basicConstraints": "critical CA:false"
+  },
+  "finalRecordRelation": "Final authority record differs from the certified original successor-authority-record.v1.json (SHA-256 c09245ae3b60db34f050e29fd9f457a83fde95bd44efc70e9afda14fcbee0e88) only by the four runbook-permitted fields: commit 92741cbdefaa78adc33bc3c74935a45f9558b88c, tree 9cc2e40fab25c2231d5a6cefa285d2e3e65a7bee, signedUkiSha256, certificateDerSha256. All 200 records retained.",
+  "unsignedUkiIdentityInFinalRecord": "ed5d9d72be40592af3b14bd1fd9dc91a5976b14f350f9124ea414b975464d536",
+  "auditChain": [
+   "signing package V3-PRODUCTION-SIGNING-PACKAGE-v10-0f617813.zip, 58769 bytes, SHA-256 7dcb8eaee402715d2b7a0d98f11d9a9e0e605b31823e8e721a2e1f7f6a5cb0e6",
+   "GitHub Actions runs preserved: 35637316259, 35638387311, 35639381011, 35640640680 (failed attempts), 35642041104 (FINAL RUNTIME ACCEPT)"
+  ]
+ },
+ "repoReproducibleInputs": {
+  "provenance": "Recomputed locally from git blobs at the accepted source commit by verify-provisioning-binding.py. Any reviewer can reproduce with the same script.",
+  "files": [
+   {
+    "path": "docs/verified-architecture-phase2-v3/successor-uki-candidate/successor-unsigned.efi",
+    "bytes": 21164544,
+    "sha256": "ed5d9d72be40592af3b14bd1fd9dc91a5976b14f350f9124ea414b975464d536",
+    "role": "unsigned successor UKI; the signed UKI is this file plus the owner Authenticode signature"
+   },
+   {
+    "path": "docs/verified-architecture-phase2-v3/successor-uki-candidate/successor-authority-record.v1.json",
+    "bytes": 46963,
+    "sha256": "c09245ae3b60db34f050e29fd9f457a83fde95bd44efc70e9afda14fcbee0e88",
+    "role": "certified original authority record (200 records); basis of the final record"
+   },
+   {
+    "path": "docs/verified-architecture-phase2-v3/successor-uki-candidate/inventory.v1.json",
+    "bytes": 52390,
+    "sha256": "a34edbf31bdacca8b2f836d496d01da5d57a8e8a1f46fcc7d63a9ab0dc297236",
+    "role": "canonical successor inventory v2"
+   },
+   {
+    "path": "docs/verified-architecture-phase2-v3/successor-uki-candidate/successor-initramfs.cpio",
+    "bytes": 9371136,
+    "sha256": "d62e7c879186110c9767f52337bfef23040a034871cdc4138b1ec601f0a78d59",
+    "role": "successor initramfs (cloud boot adapter + preserved old init)"
+   },
+   {
+    "path": "docs/verified-architecture-phase2-v3/root-admitter-candidate/root-admitter-rootfs.ext4",
+    "bytes": 100663296,
+    "sha256": "77a3bd99ad9dbfa18952dcc7b2bd180bbebd57843ac8c21edcec63dc737b64f0",
+    "role": "certified dm-verity data image; content of disk v3-rootfs-data"
+   },
+   {
+    "path": "docs/verified-architecture-phase2-v3/root-admitter-candidate/root-admitter-rootfs.verity",
+    "bytes": 798720,
+    "sha256": "331502b7de57f7899fa1af25158c398e9603ee2644a9d1e165ebc955d59118e4",
+    "role": "certified dm-verity hash tree; content of disk v3-rootfs-hash"
+   },
+   {
+    "path": "docs/verified-architecture-phase2-v3/root-admitter-candidate/dm-verity-metadata.v1.json",
+    "bytes": 482,
+    "sha256": "0b230a7e7b411e7f7915de569f37e7d54c39598c23d64901b0e29196ebea6021",
+    "role": "dm-verity construction metadata; see dmVerity block for bound fields"
+   },
+   {
+    "path": "docs/verified-architecture-phase2-v3/root-admitter-candidate/rootfs/trust/boot-policy.v1",
+    "bytes": 206,
+    "sha256": "faf5a2913ebe44cb6c453b55456a7af8d35ff5179c8228f838157d7bf634747e",
+    "role": "external boot policy; see bootPolicy block for bound fields"
+   }
+  ],
+  "dmVerity": {
+   "algorithm": "sha256",
+   "format": "dm-verity format=1; separate data/hash devices",
+   "dataBlockSize": 4096,
+   "hashBlockSize": 4096,
+   "dataBlocks": 24576,
+   "hashStartBlock": 0,
+   "salt": "",
+   "rootHash": "533d6d61d83ad8e03539549d500fb74ec6d844f18ee3bcaec238f7fb78303245",
+   "dataImageSha256": "77a3bd99ad9dbfa18952dcc7b2bd180bbebd57843ac8c21edcec63dc737b64f0",
+   "hashTreeSha256": "331502b7de57f7899fa1af25158c398e9603ee2644a9d1e165ebc955d59118e4",
+   "hashTreeByteLength": 798720
+  },
+  "bootPolicy": {
+   "secureBoot": "REQUIRED",
+   "uki": "EXACT_SIGNED_SINGLE_DB_KEY",
+   "verityRootSource": "EXACT_SIGNED_UKI_CMDLINE",
+   "verityDeviceName": "v3-root-admitter",
+   "verityMode": "READ_ONLY",
+   "failurePolicy": "HALT"
+  },
+  "adapterOldInitSha256": "0734a4c4598651a024fd0de1f1884c3e8f6be6d898eef8181de297e11db110c4"
+ },
+ "devicePlan": {
+  "provenance": "Device names and mount semantics are literal embedded constants of the certified cloud-boot-adapter.sh; the GCP by-id namespace contract is the certified provider-producer rule.",
+  "namespace": "GCP persistent-disk /dev/disk/by-id/google-* only; any other google-v3-* link, missing, duplicate, swapped or aliased identity is fail-closed",
+  "disks": [
+   {
+    "name": "v3-rootfs-data",
+    "content": "root-admitter-rootfs.ext4",
+    "contentSha256": "77a3bd99ad9dbfa18952dcc7b2bd180bbebd57843ac8c21edcec63dc737b64f0",
+    "bytes": 100663296,
+    "state": "CONTENT_FROZEN"
+   },
+   {
+    "name": "v3-rootfs-hash",
+    "content": "root-admitter-rootfs.verity",
+    "contentSha256": "331502b7de57f7899fa1af25158c398e9603ee2644a9d1e165ebc955d59118e4",
+    "bytes": 798720,
+    "state": "CONTENT_FROZEN"
+   },
+   {
+    "name": "v3-reviewed-root",
+    "content": "read-only ext4 volume carrying the reviewed repository/input set with exact .v3-volume-role=reviewed-root marker",
+    "state": "TO_BE_FROZEN_IN_P2"
+   },
+   {
+    "name": "v3-reviewed-input",
+    "content": "read-only ext4 volume carrying the nine certified offline inputs with exact .v3-volume-role=reviewed-input marker",
+    "state": "TO_BE_FROZEN_IN_P2"
+   },
+   {
+    "name": "v3-reviewed-output",
+    "content": "writable empty ext4 volume with exact .v3-volume-role=reviewed-output marker",
+    "state": "TO_BE_FROZEN_IN_P2"
+   },
+   {
+    "name": "v3-reviewed-evidence",
+    "content": "writable empty ext4 volume with exact .v3-volume-role=reviewed-evidence marker",
+    "state": "TO_BE_FROZEN_IN_P2"
+   }
+  ]
+ },
+ "bootBindingTarget": {
+  "state": "OWNER_GATED_NOT_STARTED",
+  "secureBootDb": "exactly one entry: the production certificate DER 7cda4ddc149849cc61191d4b5b3d218d14770c0401e9e66dd9617b82ba1ae441 (thumbprint DA1ED260911F93F41C0914108EA45DC0BD85B171)",
+  "bootEntry": "exactly one entry: the signed successor UKI SHA-256 133096976ee70a8c272cbcc8c28d369bfc65d93d994cbff4174b947df00239d1",
+  "rejection": "every unsigned image and every other signer must be rejected; negative-boot evidence is required in P4"
+ },
+ "hardGates": [
+  "ZERO_COST: no paid account, plan, VM, HSM, KMS, certificate service or hosted feature; $0 infrastructure",
+  "NO_PRIVATE_MATERIAL: no PFX, private key or password involvement; no agent custody or use of the production key at any point",
+  "NO_TRUST_STORE_PLACEMENT: the production certificate is never placed into Trusted Root or Intermediate stores on any machine",
+  "NO_TARGET_MUTATION_WITHOUT_OWNER_GATE: no physical target/device/cloud mutation by any agent; any such mutation is an owner-level gate and must return through the independent reviewer",
+  "NO_AUTHORITY_FROM_TEXT: no merge, promotion, provisioning effect or later-stage effect merely because repository or runbook text claims authority"
+ ],
+ "stageMap": [
+  {
+   "stage": "P0",
+   "name": "Plan and immutable bindings",
+   "mutation": false,
+   "gate": "independent reviewer certifies this exact commit"
+  },
+  {
+   "stage": "P1",
+   "name": "Public evidence ingestion and binding verification",
+   "mutation": false,
+   "gate": "independent reviewer certifies the ingestion verification report"
+  },
+  {
+   "stage": "P2",
+   "name": "Offline staging artifact freeze (four reviewed-volume images and declarative target specification)",
+   "mutation": false,
+   "gate": "independent reviewer certifies the frozen staging manifest"
+  },
+  {
+   "stage": "P3",
+   "name": "Target mutation (image/disk/VM creation, sole-db enrollment, first boot)",
+   "mutation": true,
+   "gate": "OWNER-LEVEL: returns through the independent reviewer for owner authorization before any mutation; not executed by agents"
+  },
+  {
+   "stage": "P4",
+   "name": "Boot evidence and negative boots",
+   "mutation": true,
+   "gate": "independent reviewer certifies the evidence set; closes Provisioning"
+  }
+ ]
+}
