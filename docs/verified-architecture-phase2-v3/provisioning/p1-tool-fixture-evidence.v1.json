@@ -1,0 +1,51 @@
+{
+ "note": "Fixture validation of verify-p1-evidence.py and the OpenSSL second implementation. Fixture keys/certs are ephemeral random RSA-3072 and carry no authority; they exercise the verifier's positive and negative paths. The finalRecord block is NOT fixture data: it is the deterministic reconstruction from the certified original record at 92741cbdefaa78adc33bc3c74935a45f9558b88c plus the four runbook-permitted accepted fields, whose SHA-256 equals the accepted final record 07f88bfc5a98ef471c05451cc8077af4d7b61015aae5ba0395deb6c935dc1694 and whose detached preimage digest equals fec736a6a7e50f030164d76bd2015925621b5edfa1eefb4980ffcb8c18142b45. Negative-path E_ lines observed during the run are the designed rejections (tampered certificate, wrong CMS digest, tampered final record, unsigned PE).",
+ "realIdentityReconstruction": {
+  "finalRecordBytes": 47246,
+  "finalRecordSha256": "07f88bfc5a98ef471c05451cc8077af4d7b61015aae5ba0395deb6c935dc1694",
+  "preimageDigestSha256": "fec736a6a7e50f030164d76bd2015925621b5edfa1eefb4980ffcb8c18142b45",
+  "reconstruction": "BYTE_EXACT from repo original c09245ae3b60db34f050e29fd9f457a83fde95bd44efc70e9afda14fcbee0e88 + certificateDerSha256/gitCommit/gitTree/signedUkiSha256"
+ },
+ "results": {
+  "cert": {
+   "extensions": [
+    "2.5.29.14",
+    "2.5.29.15",
+    "2.5.29.19",
+    "2.5.29.37"
+   ],
+   "modulusBits": 3072,
+   "selfSignature": "VERIFIED_PURE_PYTHON",
+   "serial": 360812728894918543710146507339763761781092413859,
+   "subjectCN": "V3 Successor UKI Secure Boot Authority"
+  },
+  "cert_tamper_rejected": true,
+  "cms": {
+   "eContentType": "1.2.840.113549.1.7.1",
+   "signature": "VERIFIED_PURE_PYTHON",
+   "signerCertEquality": "BYTE_EXACT",
+   "spcContentBytes": 69
+  },
+  "cms_openssl_crosscheck": "PASS",
+  "cms_wrong_digest_rejected": true,
+  "finalRecord": {
+   "delta": [
+    "certificateDerSha256",
+    "gitCommit",
+    "gitTree",
+    "signedUkiSha256"
+   ],
+   "finalRecordBytes": 47246,
+   "preimageDigestSha256": "fec736a6a7e50f030164d76bd2015925621b5edfa1eefb4980ffcb8c18142b45",
+   "reconstruction": "BYTE_EXACT",
+   "records": 200
+  },
+  "final_record_tamper_rejected": true,
+  "pe_authenticode_digest": "PASS synthetic PE32+ (216/296 layout)",
+  "pe_unsigned_rejected": true,
+  "pss_openssl_crosscheck": "PASS",
+  "pss_pure_python": "PASS salt=32 structural decode",
+  "pss_salt20_rejected": "E_PSS_DELIM"
+ },
+ "schema": "v3.provisioning-p1-tool-fixture-evidence.v1"
+}
