@@ -1,4 +1,4 @@
-# V3-VerifyPackage.ps1 (package v7) - binds the CI run to the EXACT reviewed package bytes. Runs
+# V3-VerifyPackage.ps1 (package v8) - binds the CI run to the EXACT reviewed package bytes. Runs
 # first, from the checkout, and trusts nothing mutable: the operator supplies the reviewed commit,
 # package SHA-256 and byte size as workflow_dispatch inputs from the accepted review; HEAD must BE
 # the reviewed commit; the committed zip must match the reviewed hash/size EXACTLY; the zip is
@@ -13,7 +13,7 @@ param(
   [Parameter(Mandatory=$true)][string]$ExpectedSha,
   [Parameter(Mandatory=$true)][long]$ExpectedSize,
   [string]$RepoRoot = '.',
-  [string]$ZipPath = 'package\V3-PRODUCTION-SIGNING-PACKAGE-v7.zip',
+  [string]$ZipPath = 'package\V3-PRODUCTION-SIGNING-PACKAGE-v8.zip',
   [string]$ExtractDir = (Join-Path $env:RUNNER_TEMP 'v3-pkg')
 )
 $ErrorActionPreference = 'Stop'
@@ -69,7 +69,7 @@ function Compare-MemberToBlob([string]$member, [string]$extractedPath) {
 $script:ExitCode = 0
 try {
   Check ($env:ACTIONS_STEP_DEBUG -ne 'true') 'E_DEBUG' 'ACTIONS_STEP_DEBUG is enabled on this run; rerun with step debugging disabled.'
-  Write-Host '== V3 PACKAGE BINDING VERIFICATION (v7, canonical committed-blob comparison) =='
+  Write-Host '== V3 PACKAGE BINDING VERIFICATION (v8, canonical committed-blob comparison) =='
   Write-Host "Run URL: $env:GITHUB_SERVER_URL/$env:GITHUB_REPOSITORY/actions/runs/$env:GITHUB_RUN_ID"
   $head = (& git -C $RepoRoot rev-parse HEAD 2>$null)
   Check ($head) 'E_GIT' 'git rev-parse HEAD failed.'
@@ -97,7 +97,7 @@ try {
   Expand-Archive -LiteralPath $zip -DestinationPath $ExtractDir
 
   $expected = @(
-    'OWNER_PRODUCTION_SIGNING_RUNBOOK_WINDOWS-v7.md',
+    'OWNER_PRODUCTION_SIGNING_RUNBOOK_WINDOWS-v8.md',
     'scripts/V3-Part0-Preflight.ps1',
     'scripts/V3-Part1-KeyCreation.ps1',
     'scripts/V3-Part2-SignUKI.ps1',
@@ -142,6 +142,27 @@ try {
   Write-Host 'VERIFIER FIXTURE (b) PASS - one-byte mutation of an extracted member correctly compares unequal (E_MEMBER_MISMATCH would fire).'
   Remove-Item -LiteralPath $mutCopy -Force
   Write-Host 'VERIFIER FIXTURE PASS - the binding detects byte mutations and is immune to checkout transformations.'
+
+  # ---- Static wrapper assertion (owner requirement): the controlled-failure exercise step in the ---
+  # ---- canonical workflow blob must capture the inner exit immediately, fail explicitly on each  ---
+  # ---- unexpected case, and reach its explicit success exit ONLY after both validations.        ---
+  $wfText = [Text.Encoding]::UTF8.GetString($wfBytes)
+  $stepStart = $wfText.IndexOf('- name: Controlled early-failure exercise')
+  Check ($stepStart -ge 0) 'E_WRAPPER' 'Controlled-failure exercise step not found in the canonical workflow blob.'
+  $stepEnd = $wfText.IndexOf('- name:', $stepStart + 10)
+  Check ($stepEnd -gt $stepStart) 'E_WRAPPER' 'Controlled-failure exercise step has no following step boundary.'
+  $step = $wfText.Substring($stepStart, $stepEnd - $stepStart)
+  $iInvoke = $step.IndexOf('-SimulateFailureAfterKeyCreation')
+  $iCapture = $step.IndexOf('$innerExit = $LASTEXITCODE')
+  $iFail1 = $step.IndexOf('if ($innerExit -eq 0)')
+  $iExit1a = $step.IndexOf('exit 1', $iFail1)
+  $iFail2 = $step.IndexOf("STOP E_CONTROLLED_FAILURE')")
+  $iExit1b = $step.IndexOf('exit 1', $iFail2)
+  $iPass = $step.IndexOf('CONTROLLED FAILURE EXERCISE PASS')
+  $iReset = $step.IndexOf('$global:LASTEXITCODE = 0')
+  $iExit0 = $step.IndexOf('exit 0')
+  Check (($iInvoke -ge 0) -and ($iCapture -gt $iInvoke) -and ($iFail1 -gt $iCapture) -and ($iExit1a -gt $iFail1) -and ($iFail2 -gt $iExit1a) -and ($iExit1b -gt $iFail2) -and ($iPass -gt $iExit1b) -and ($iReset -gt $iPass) -and ($iExit0 -gt $iReset)) 'E_WRAPPER' 'Controlled-failure exercise wrapper does not match the required pattern: immediate inner-exit capture, explicit exit 1 per unexpected case, and explicit exit 0 only after both validations.'
+  Write-Host 'WRAPPER STATIC ASSERTION PASS - exercise step captures the inner exit immediately, has explicit exit 1 for each unexpected case, and reaches exit 0 only after both validations.'
 } catch {
   Write-Failure $_
   $script:ExitCode = 1

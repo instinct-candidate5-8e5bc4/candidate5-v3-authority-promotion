@@ -1,32 +1,29 @@
-# V3 Successor UKI - Owner Production Signing Runbook (Windows) - PACKAGE v7
+# V3 Successor UKI - Owner Production Signing Runbook (Windows) - PACKAGE v8
 
-This v7 package replaces v1, v2, v3, v4, v5 and v6. If you received any of them,
-discard them and use only v7. The production scripts remain BYTE FOR BYTE the set that
-passed owner static review in v5 (they intentionally keep their internal "v5" banners;
-the v7 identity is carried by the package, this runbook, and the CI members). The CI proof and cleanup
-scripts are likewise BYTE FOR BYTE the v6 set (they keep their internal "v6" banners) -
-the v7 build order carried their behavior forward unchanged, so their bytes stay
-untouched. The v6
-workflow/proof design also passed static review; its first live run (GitHub Actions run
-35637316259) then did exactly what it was built to do: the binding STOPped with
-E_MEMBER_MISMATCH on `.gitattributes` - the one member our own line-ending rules did
-not cover - because windows-latest checkout rewrote that working-tree file to CRLF.
-That failed run is preserved as audit trail:
+This v8 package replaces v1 through v7. If you received any of them, discard them and
+use only v8. v8 is v7 with exactly one defect fixed: the controlled-failure exercise
+step in the workflow. Everything else is BYTE FOR BYTE the accepted v7 content - the
+production scripts (internal "v5" banners), the CI proof and cleanup scripts (internal
+"v6" banners), the canonical-blob binding, the verifier fixture, all cleanup
+mechanics. The v7 run (GitHub Actions run 35638387311) proved every substantive
+mechanism on the real runner - canonical binding 11/11, both verifier fixtures, the
+controlled-failure semantics, always-cleanup on a real leftover, final absence - and
+failed only on step-exit plumbing: the wrapper validated the intentional inner failure
+and printed its PASS line, but the inner process's deliberate exit 1 remained in
+$LASTEXITCODE and the step reported failure, skipping the full proof. That run is
+preserved as audit trail (with v6's run 35637316259):
+https://github.com/instinct-candidate5-8e5bc4/candidate5-v3-authority-promotion/actions/runs/35638387311
 https://github.com/instinct-candidate5-8e5bc4/candidate5-v3-authority-promotion/actions/runs/35637316259
 
-v7 rebuilds the binding mechanism per the owner's ruling (exact bytes, no
-normalization, no exclusions): every extracted package member is compared
-byte-for-byte against the CANONICAL COMMITTED BLOB at the reviewed HEAD
-(git ls-tree + git cat-file), never against the working tree, which checkout may
-transform. HEAD must equal the reviewed commit (a third dispatch input). Per member the
-log records path, Git blob ID, source-blob length + SHA-256, extracted-member length +
-SHA-256, and exact equality. A deterministic verifier fixture proves on every run that
-(a) a CRLF-mutated working tree does NOT affect the canonical comparison and (b) a
-one-byte mutation of an extracted member still fails. Everything else from v6 is
-unchanged: zip size/hash dispatch inputs, the exact 11-member set check, execution only
-of extracted package bytes, sentinel/manifest cleanup with a controlled early failure,
-three real cleanup lifetimes with the 5-way absence set, the distinct-file PFX copy
-check, and CSPRNG-built never-plaintext password handling.
+The v8 wrapper follows the owner's required pattern: the inner exit code is captured
+IMMEDIATELY after the inner process, each unexpected case exits 1 explicitly, and the
+explicit success exit 0 comes only after BOTH validations (nonzero inner exit AND the
+expected STOP E_CONTROLLED_FAILURE line), with $global:LASTEXITCODE = 0 as
+defense-in-depth. No error suppression, no continue-on-error. A static wrapper
+assertion now runs inside the binding verification on every execution: it reads the
+canonical workflow blob and requires the exact ordered pattern (immediate capture,
+explicit exit 1 per unexpected case, PASS line, reset, exit 0), stopping with
+E_WRAPPER on any deviation.
 
 Process ruling (owner): this package is submitted for STATIC REVIEW FIRST - no
 dispatch. Only after a new static ACCEPT is the exact reviewed commit manually
@@ -101,7 +98,7 @@ ceremony), under the owner's process ruling - STATIC REVIEW FIRST, NO DISPATCH u
 the exact reviewed commit is accepted:
 
 1. The reviewed package zip is committed to the repository at
-   `package/V3-PRODUCTION-SIGNING-PACKAGE-v7.zip` alongside the reviewed source tree
+   `package/V3-PRODUCTION-SIGNING-PACKAGE-v8.zip` alongside the reviewed source tree
    (same paths as inside the zip), on the exact reviewed commit.
 2. After static ACCEPT, the operator manually dispatches the workflow and enters the
    reviewed commit, the reviewed package SHA-256, and the byte size (from the accepted
@@ -382,8 +379,22 @@ stop and report it exactly as printed.
 Honesty statement, same rule as every prior package: nothing is simulated or faked, and
 every claim below names exactly how it was verified.
 
-Audit trail (preserved, per owner ruling): v6's first live run - GitHub Actions run
-35637316259, attempt 1, head_sha 9afaefadc1f9e8bc62f5542dc4e374fd145e4226 -
+Audit trail (preserved, per owner ruling):
+
+Run 35638387311 (v7), attempt 1: the canonical binding PASSED (11/11 members equal to
+their committed blobs), both verifier fixtures PASSED, the controlled-failure exercise
+produced E_CONTROLLED_FAILURE as designed and the always-cleanup removed the real
+leftover (certificate, container, temp directory) with final absence PASS. The run
+FAILED only on workflow step-exit plumbing: the exercise step validated the
+intentional inner failure and printed its PASS line, but the inner process's
+deliberate exit 1 remained in $LASTEXITCODE, the step reported failure, and the full
+proof (three cleanup lifetimes) was skipped. Fixed in v8 by the owner's required
+wrapper pattern plus the E_WRAPPER static assertion; the full proof's three
+lifetimes have NOT yet executed on the runner and remain to be certified by the
+next run.
+https://github.com/instinct-candidate5-8e5bc4/candidate5-v3-authority-promotion/actions/runs/35638387311
+
+Run 35637316259 (v6), attempt 1, head_sha 9afaefadc1f9e8bc62f5542dc4e374fd145e4226 -
 FAILED at "Verify and extract the reviewed package" with STOP E_MEMBER_MISMATCH on
 `.gitattributes`, before any fixture existed; final cleanup verified absence and the
 job failed. Root cause: the package's line-ending rules covered *.ps1/*.yml/*.md but
@@ -392,6 +403,15 @@ file to CRLF; all ten covered members compared byte-identical. The v6 binding co
 against the working tree, so a benign checkout transformation was indistinguishable
 from tampering. Run preserved at:
 https://github.com/instinct-candidate5-8e5bc4/candidate5-v3-authority-promotion/actions/runs/35637316259
+
+Fixed in v8 (owner ruling on run 35638387311): the controlled-failure exercise step
+captures the inner exit code immediately after the inner process, exits 1 explicitly
+on each unexpected case (unexpected success; missing expected STOP line), and reaches
+its explicit exit 0 only after both validations, with $global:LASTEXITCODE = 0 as
+defense-in-depth; no error suppression and no continue-on-error. A static wrapper
+assertion in the binding verification requires this exact ordered pattern in the
+canonical workflow blob on every run (E_WRAPPER on deviation). Everything else is
+byte-identical to the accepted v7 package.
 
 Fixed in v7 (owner ruling on run 35637316259):
 
@@ -424,16 +444,17 @@ finalization and PSS structural proof matching an independent Python reference b
 for byte with salt-length-20 caught; Microsoft-documented, reflection-verified CNG API
 usage for .NET Framework 3.5-4.8.1).
 
-Validated here for v7 (real execution on this Linux workspace; Windows-only operations
+Validated here for v8 (real execution on this Linux workspace; Windows-only operations
 are certified by the CI run, not claimed here): all eight scripts parse under the real
 PowerShell parser; the binding verification was executed end-to-end against the real
 packaged zip in a real git repository - PACKAGE BINDING PASS with per-member blob IDs
-and hashes, the verifier fixture (a) CRLF-immunity and (b) one-byte detection both
-PASS, and negatives: wrong size STOP E_PACKAGE_SIZE, wrong commit STOP E_COMMIT, a
-tampered committed member detected; extraction machinery re-run (same nine block
-hashes as v5/v6, confirming production bytes untouched); proof and cleanup scripts
-byte-identical to v6; workflow YAML parses with the three dispatch inputs, no caches,
-no artifact upload, persist-credentials: false.
+and hashes, verifier fixture (a) CRLF-immunity and (b) one-byte detection both PASS,
+the static wrapper assertion PASS, and negatives: wrong size STOP E_PACKAGE_SIZE,
+wrong commit STOP E_COMMIT, a tampered committed member detected, and a wrapper
+missing its explicit success exit detected as STOP E_WRAPPER; extraction machinery
+re-run (same nine block hashes as v5/v6/v7, confirming production bytes untouched);
+proof and cleanup scripts byte-identical to v6/v7; workflow YAML parses with the three
+dispatch inputs, no caches, no artifact upload, persist-credentials: false.
 
 Reviewed package member SHA-256 hashes (the CI log prints canonical blob SHA-256 for
 each member; the values below are the reviewed member contents):
@@ -444,17 +465,17 @@ each member; the values below are the reviewed member contents):
 | `scripts/V3-Part2-SignUKI.ps1` | `1fb2f757954d5a08c0af7b482c6738a2b76595b677ba5d3b8700a33afc6aacb0` |
 | `scripts/V3-Part3-FinalizeAndDetachedSign.ps1` | `cca30a0c362cf41818e11227f4be240df7d43dfe9b4888a70c6320e303396a06` |
 | `scripts/V3-Part4-EvidenceAndCleanup.ps1` | `567a6e61ab532e956a1aef7ef72355d70cc8853a80e0f8d4a61fb35d663181db` |
-| `ci/V3-VerifyPackage.ps1` | `e778d76594f1ab5c6d011e21aaf349070513cc2c754ad4a9978c15f0ae95d6d8` |
+| `ci/V3-VerifyPackage.ps1` | `0f3ca29921193c64e028173d8c5219f393830ae3b5cd180c85ddf62c7bff7513` |
 | `ci/V3-WindowsCompatProof.ps1` | `971ce83a6076724e0c0e29b1782d550668fa24bb6eda6636cf25a385a1f5f9c8` |
 | `ci/V3-WindowsCompatCleanup.ps1` | `5d594cf46f710d985062508f3bba28c595bc9051db51cf545b3deff63b022417` |
-| `.github/workflows/v3-windows-compat-proof.yml` | `9fbb871c8a01e69bf7423f1fa3621ca8d4b80102df7cd6ffb2aff56982d011f4` |
+| `.github/workflows/v3-windows-compat-proof.yml` | `31962f1884beb814cb99c008f83672ccedfe5cf2f1a8f080a004e08df0336cd9` |
 | `.gitattributes` | `e5e84c057b5fd00f7a902d5a0926da775f038463d429d0a800859fe49e0fdab3` |
 
 (The runbook itself is the eleventh member; its SHA-256 is recorded in the delivery
 review and the CI log prints it as `MEMBER` like every other member.)
 
 Extracted-block SHA-256 hashes (the CI log prints these; they bind the tested code to
-the shipped bytes; unchanged from v5/v6 because the production scripts are unchanged):
+the shipped bytes; unchanged from v5/v6/v7 because the production scripts are unchanged):
 | Extracted block | SHA-256 |
 |---|---|
 | `Remove-CertAndCngKey` | `acbd033d044847eeabea30f17d5246c83aa32de2abeb3bad8d50fc6d07ab5413` |

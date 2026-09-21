@@ -1,6 +1,6 @@
 name: V3 Windows PowerShell 5.1 compatibility proof
 
-# Bounded disposable compatibility proof for the v7 production signing package. MANUAL DISPATCH ONLY,
+# Bounded disposable compatibility proof for the v8 production signing package. MANUAL DISPATCH ONLY,
 # and only after static ACCEPT of the exact reviewed commit. The operator enters the reviewed commit,
 # reviewed package SHA-256 and byte size (from the accepted review) as dispatch inputs: the run first
 # enforces HEAD == reviewed commit, verifies the committed zip byte-for-byte against those values,
@@ -22,11 +22,11 @@ on:
         required: true
         type: string
       expected_package_sha256:
-        description: 'Reviewed SHA-256 of package/V3-PRODUCTION-SIGNING-PACKAGE-v7.zip (from the accepted static review)'
+        description: 'Reviewed SHA-256 of package/V3-PRODUCTION-SIGNING-PACKAGE-v8.zip (from the accepted static review)'
         required: true
         type: string
       expected_package_size:
-        description: 'Reviewed byte size of package/V3-PRODUCTION-SIGNING-PACKAGE-v7.zip'
+        description: 'Reviewed byte size of package/V3-PRODUCTION-SIGNING-PACKAGE-v8.zip'
         required: true
         type: string
 
@@ -52,10 +52,13 @@ jobs:
         shell: powershell
         run: |
           $out = powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$env:RUNNER_TEMP\v3-pkg\ci\V3-WindowsCompatProof.ps1" -PkgRoot "$env:RUNNER_TEMP\v3-pkg" -SimulateFailureAfterKeyCreation 2>&1 | Out-String
+          $innerExit = $LASTEXITCODE
           Write-Host $out
-          if ($LASTEXITCODE -eq 0) { Write-Host 'STOP E_TEST - controlled-failure run unexpectedly succeeded'; exit 1 }
+          if ($innerExit -eq 0) { Write-Host 'STOP E_TEST - controlled-failure run unexpectedly succeeded'; exit 1 }
           if ($out -notmatch 'STOP E_CONTROLLED_FAILURE') { Write-Host 'STOP E_TEST - controlled failure did not produce the expected STOP'; exit 1 }
           Write-Host 'CONTROLLED FAILURE EXERCISE PASS - premature stop after fixture key creation occurred as designed; only the always-cleanup can remove the leftover.'
+          $global:LASTEXITCODE = 0
+          exit 0
 
       - name: Always-cleanup after the controlled failure
         if: always()
