@@ -1,17 +1,35 @@
-# V3 Successor UKI - Owner Production Signing Runbook (Windows) - PACKAGE v9
+# V3 Successor UKI - Owner Production Signing Runbook (Windows) - PACKAGE v10
 
-This v9 package replaces v1 through v8. If you received any of them, discard them and
-use only v9. The v8 run (GitHub Actions run 35639381011) advanced the furthest yet:
+This v10 package replaces v1 through v9. If you received any of them, discard them and
+use only v10. The v9 run (GitHub Actions run 35640640680) advanced the furthest yet:
 binding, both verifier fixtures, the wrapper assertion, the controlled failure with
-always-cleanup on a real leftover, lifetimes 1 and 2, and the SignTool + Authenticode
-path all PASSED on the real runner - and the run then surfaced a genuine platform
-fact: importing the same PFX twice recreates the CNG container under the SAME KeyName
-(a PFX carries its key's container name; the import honors it). The proof's
-distinct-import gate stopped by design (STOP E_TEST) before lifetime 3. All three
-failed runs are preserved as audit trail:
+always-cleanup on a real leftover, lifetimes 1 and 2, the SignTool + Authenticode
+path, the overlap negative fixture, the epoch markers, the full lifetime-3 liveness
+proof, the SEQUENTIAL NAME REUSE branch, the fresh nonce challenge, and the detached
+SignHash/VerifyHash bound to lifetime 3 all PASSED on the real runner. The run then
+STOPPED (E_UNEXPECTED) one statement later: the proof harness invoked the shipped PSS
+structural decode block without binding its production free variable $imported (the
+harness names its import-2 certificate $imported2), so GetRSAPublicKey received null.
+The defect is harness-side context plumbing, latent since v8 (that territory was first
+reached in v9); the production scripts are exonerated and stay frozen. All four failed
+runs are preserved as audit trail:
+https://github.com/instinct-candidate5-8e5bc4/candidate5-v3-authority-promotion/actions/runs/35640640680
 https://github.com/instinct-candidate5-8e5bc4/candidate5-v3-authority-promotion/actions/runs/35639381011
 https://github.com/instinct-candidate5-8e5bc4/candidate5-v3-authority-promotion/actions/runs/35638387311
 https://github.com/instinct-candidate5-8e5bc4/candidate5-v3-authority-promotion/actions/runs/35637316259
+
+v10 keeps the v9 epoch model byte-for-byte and fixes only the proof-harness context
+binding: the shipped decode block now runs inside a small adapter that binds the
+block's exact production free variables ($imported, $digest, $sig) explicitly in a
+try/finally (with $imported nulled afterwards), checks the context BEFORE any block
+execution (null certificate or wrong thumbprint -> controlled STOP E_TEST_CONTEXT,
+never a raw E_UNEXPECTED), proves completion by the block's own exact PASS marker
+(never inferred from the absence of an exception), and is guarded by a static
+AST-based free-variable contract assertion (a renamed or added implicit reference
+stops the run with E_TEST_CONTEXT before anything executes) plus a null-context
+negative fixture that must produce that controlled stop first. The production scripts,
+the shipped decode block bytes, the cleanup helper, binding, wrapper and fixtures are
+byte-identical to v9; verifier and workflow carry identity bumps only.
 
 v9 implements the owner's Path A ruling with the EPOCH MODEL: safety is proved
 TEMPORALLY, never inferred from name equality. The PFX intentionally carries the same
@@ -105,7 +123,7 @@ ceremony), under the owner's process ruling - STATIC REVIEW FIRST, NO DISPATCH u
 the exact reviewed commit is accepted:
 
 1. The reviewed package zip is committed to the repository at
-   `package/V3-PRODUCTION-SIGNING-PACKAGE-v9.zip` alongside the reviewed source tree
+   `package/V3-PRODUCTION-SIGNING-PACKAGE-v10.zip` alongside the reviewed source tree
    (same paths as inside the zip), on the exact reviewed commit.
 2. After static ACCEPT, the operator manually dispatches the workflow and enters the
    reviewed commit, the reviewed package SHA-256, and the byte size (from the accepted
@@ -388,6 +406,26 @@ every claim below names exactly how it was verified.
 
 Audit trail (preserved, per owner ruling):
 
+Run 35640640680 (v9), attempt 1: binding PASSED (11/11 canonical blob equality), both
+verifier fixtures PASSED, wrapper static assertion PASSED, controlled-failure exercise
+SUCCESS with always-cleanup on a real leftover, lifetimes 1+2 and SignTool +
+Authenticode PASSED. The new epoch-model lifetime 3 then PASSED on-runner: overlap
+negative fixture stopped the precondition on a live prior-lifetime container and was
+cleaned with absence proved; pre-import full absence and UTC epoch markers PASSED;
+the full liveness proof PASSED (certificate present, Exists/Open by KeyName, RSACng,
+RSA-3072 on the Microsoft software KSP, modulus/exponent/thumbprint match, ExportPolicy
+None, UniqueName store evidence); the branch printed "SEQUENTIAL NAME REUSE OBSERVED -
+prior lifetime proved absent before recreation"; the fresh nonce challenge PASSED; the
+detached SignHash/VerifyHash PASSED with its digest freshly constructed after import
+and bound to lifetime 3. The run then STOPPED E_UNEXPECTED at the very next statement:
+the harness dot-sourced the shipped PSS structural decode block, which reads its public
+key from the production variable $imported, without binding it (the harness variable is
+$imported2), so GetRSAPublicKey received null. The salt=32 structural line, cleanup 3
+and Part 4 were not reached; final cleanup PASS, nothing residual. Fixed in v10 (see
+header and the v10 fix section); the production scripts were exonerated - the defect is
+harness-side context plumbing, latent since v8.
+https://github.com/instinct-candidate5-8e5bc4/candidate5-v3-authority-promotion/actions/runs/35640640680
+
 Run 35639381011 (v8), attempt 1: binding PASSED (11/11 canonical blob equality), both
 verifier fixtures PASSED, wrapper static assertion PASSED, controlled-failure exercise
 SUCCESS with always-cleanup on a real leftover, lifetimes 1+2 and SignTool +
@@ -421,6 +459,31 @@ file to CRLF; all ten covered members compared byte-identical. The v6 binding co
 against the working tree, so a benign checkout transformation was indistinguishable
 from tampering. Run preserved at:
 https://github.com/instinct-candidate5-8e5bc4/candidate5-v3-authority-promotion/actions/runs/35637316259
+
+Fixed in v10 (owner ruling on run 35640640680, proof-harness variable-binding reject;
+production Part 3 stays frozen):
+
+1. The shipped PSS structural decode block executes only inside an adapter function
+   that binds its production free variables explicitly:
+   $imported = $imported2; try { . ([ScriptBlock]::Create($blkDecode)) } finally {
+   $imported = $null } - with $digest and $sig bound the same way.
+2. Before invocation the adapter requires a non-null certificate context and thumbprint
+   equality with the lifetime-3 import (controlled STOP E_TEST_CONTEXT otherwise,
+   BEFORE any block bytes execute - never a raw E_UNEXPECTED).
+3. Completion is proved by the block's own exact "PSS STRUCTURAL PROOF PASS" marker
+   (captured from the block's output stream); absence of an exception is never treated
+   as completion (E_TEST otherwise).
+4. A static AST-based assertion enumerates the extracted block's free-variable contract
+   (reads that are never assigned inside the block, excluding helper-local assignments,
+   function parameters and loop variables) and requires exactly {digest, imported, sig}
+   on every run; any drift stops with E_TEST_CONTEXT before execution.
+5. A null-context negative fixture invokes the adapter with a null certificate and must
+   produce the controlled E_TEST_CONTEXT stop before the positive execution.
+6. Explicit disposal added for the nonce-verification RSA object and the fixture CER
+   objects while editing the proof (closes the earlier non-blocking disposal note).
+Everything else is byte-identical to the accepted v9 package unless changed above: the
+structural-block extraction is exactly unchanged; verifier and workflow carry identity
+bumps only; production scripts and the cleanup helper stay frozen.
 
 Fixed in v9 (owner ruling on run 35639381011, Path A with epoch/liveness conditions):
 the import-distinctness gate is removed; in its place the proof enforces the temporal
@@ -482,23 +545,32 @@ finalization and PSS structural proof matching an independent Python reference b
 for byte with salt-length-20 caught; Microsoft-documented, reflection-verified CNG API
 usage for .NET Framework 3.5-4.8.1).
 
-Validated here for v9 (real execution on this Linux workspace; Windows-only operations
+Validated here for v10 (real execution on this Linux workspace; Windows-only operations
 are certified by the CI run, not claimed here): all eight scripts parse under the real
 PowerShell parser; the binding verification executed end-to-end against the real
 packaged zip in a real git repository - PACKAGE BINDING PASS, verifier fixture (a) and
 (b) PASS, wrapper static assertion PASS, with negatives (wrong commit E_COMMIT,
-tampered committed member E_MEMBER_MISMATCH, broken wrapper E_WRAPPER); the NEW v9
-logic was executed where the platform allows - the nonce-challenge crypto sequence
-(fresh digest sign/verify with tamper rejection, modulus/exponent comparison) runs
-correctly with the same API calls, and both exact branch labels execute; the overlap
-negative was executed against the exact shipped Assert-FullAbsence bytes with a
-simulated live leftover and it NEVER passes with presence - on this Linux workspace
-CNG is unsupported so the stop surfaces through the guard, while on Windows the same
-presence completes all six checks and stops with E_CLEANUP_FAILED (the aggregate gate
-requires ALL six absence checks false, statically verified); extraction machinery
-re-run (same nine block hashes, production bytes untouched); proof and cleanup scripts
-carry the v9 epoch changes; workflow YAML parses with the three dispatch inputs, no
-caches, no artifact upload, persist-credentials: false.
+tampered committed member E_MEMBER_MISMATCH, broken wrapper E_WRAPPER); the NEW v10
+logic was executed against the exact shipped function bytes extracted from the proof -
+the static free-variable contract PASSES on the real decode block (observed exactly
+{digest, imported, sig}) and FIRES with E_TEST_CONTEXT on a deliberately broken block
+(an added implicit reference); the null-context negative produces the controlled STOP
+E_TEST_CONTEXT (never E_UNEXPECTED); a wrong-thumbprint context likewise stops with
+E_TEST_CONTEXT before any block execution; the adapter executed the REAL shipped decode
+block bytes end-to-end (pure .NET: RSA-3072 certificate, fresh digest, PSS signature,
+full EMSA-PSS structural decode with salt length exactly 32) and observed the exact
+completion marker; a tampered signature makes the block stop with its own fail-closed
+E_PSS_TRAILER; a truncated block that ends silently stops with E_TEST (completion is
+never inferred from the absence of an exception). The v9 epoch-model validations stand
+unchanged (the nonce-challenge crypto sequence, both branch labels, and the overlap
+negative against the exact shipped Assert-FullAbsence bytes, which NEVER passes with
+presence - on this Linux workspace CNG is unsupported so the stop surfaces through the
+guard, while on Windows the same presence completes all six checks and stops with
+E_CLEANUP_FAILED, the aggregate gate requiring ALL six absence checks false, statically
+verified); extraction machinery re-run (same nine block hashes, production bytes
+untouched); proof and cleanup scripts carry the v10/v9 changes; workflow YAML parses
+with the three dispatch inputs, no caches, no artifact upload,
+persist-credentials: false.
 
 Reviewed package member SHA-256 hashes (the CI log prints canonical blob SHA-256 for
 each member; the values below are the reviewed member contents):
@@ -509,10 +581,10 @@ each member; the values below are the reviewed member contents):
 | `scripts/V3-Part2-SignUKI.ps1` | `1fb2f757954d5a08c0af7b482c6738a2b76595b677ba5d3b8700a33afc6aacb0` |
 | `scripts/V3-Part3-FinalizeAndDetachedSign.ps1` | `cca30a0c362cf41818e11227f4be240df7d43dfe9b4888a70c6320e303396a06` |
 | `scripts/V3-Part4-EvidenceAndCleanup.ps1` | `567a6e61ab532e956a1aef7ef72355d70cc8853a80e0f8d4a61fb35d663181db` |
-| `ci/V3-VerifyPackage.ps1` | `0dc7e6cafb1dfe0da4c0814824b893f4bfa11a7b518e643b549edbd9a96eccc7` |
-| `ci/V3-WindowsCompatProof.ps1` | `6b18d5281664463889a0617a48936ca62f170e1bfde833f94f0e3b5ec0c61c51` |
+| `ci/V3-VerifyPackage.ps1` | `0e7108b0f67be90d27a71ea2efb101ae773ea07c016d50a67ff4491e92c18c3e` |
+| `ci/V3-WindowsCompatProof.ps1` | `c601d5d093bc0f29afcfce6b1518881bb01ecb4619bb9aa2ae1ed49724b4341b` |
 | `ci/V3-WindowsCompatCleanup.ps1` | `5d594cf46f710d985062508f3bba28c595bc9051db51cf545b3deff63b022417` |
-| `.github/workflows/v3-windows-compat-proof.yml` | `d2f5735c1128f3276c364faffdb3729192b333d4cd14e7ae7750b73f2948c2a9` |
+| `.github/workflows/v3-windows-compat-proof.yml` | `d7a0d3273715c947bf13200d22b33925f977574f74b15863e5997694bde6ff73` |
 | `.gitattributes` | `e5e84c057b5fd00f7a902d5a0926da775f038463d429d0a800859fe49e0fdab3` |
 
 (The runbook itself is the eleventh member; its SHA-256 is recorded in the delivery

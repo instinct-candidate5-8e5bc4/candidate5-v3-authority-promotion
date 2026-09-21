@@ -1,4 +1,4 @@
-# V3-WindowsCompatProof.ps1 (package v9) - bounded disposable compatibility proof on a GitHub Actions
+# V3-WindowsCompatProof.ps1 (package v10) - bounded disposable compatibility proof on a GitHub Actions
 # windows-latest runner, under Windows PowerShell 5.1 ONLY. It runs ONLY against the extracted,
 # hash-verified reviewed package bytes (see V3-VerifyPackage.ps1): every helper function is pulled out
 # of the shipped production scripts through the PowerShell parser (AST), and the inline verification
@@ -121,6 +121,8 @@ function Assert-FullyLive([string]$thumb, $ids, $certObj, [string]$cerFile, [str
   $gotP = $ids.Rsa.ExportParameters($false)
   $modOk = ((Sha256Hex $expP.Modulus) -eq (Sha256Hex $gotP.Modulus))
   $expOk = ((Sha256Hex $expP.Exponent) -eq (Sha256Hex $gotP.Exponent))
+  try { $cerPub.Dispose() } catch {}
+  try { $cerCert.Dispose() } catch {}
   $thumbOk = ($certObj.Thumbprint -eq $thumb)
   Write-Host "  [$label] public modulus matches fixture: $modOk; public exponent matches fixture: $expOk; thumbprint matches fixture: $thumbOk (all must be True)"
   $unPresent = $false
@@ -129,6 +131,69 @@ function Assert-FullyLive([string]$thumb, $ids, $certObj, [string]$cerFile, [str
   Write-Host "  [$label] UniqueName store evidence present (software KSP exposes it): $unPresent (must be True on this provider)"
   if (-not ($present -and $ex -and $opened -and $isCng -and $provOk -and $sizeOk -and $nonExp -and $modOk -and $expOk -and $thumbOk -and $unPresent)) { Stop-Step 'E_LIVE_PROOF' "[$label] liveness proof failed; report this code." }
   Write-Host "  [$label] LIFETIME-3 LIVE PASS (certificate present; Exists/Open by KeyName; RSACng RSA-3072 software-KSP; modulus/exponent/thumbprint match; ExportPolicy None; UniqueName store evidence)"
+}
+
+# --- Static free-variable contract for an extracted shipped block (owner ruling): enumerate every ---
+# --- variable the block READS but never ASSIGNS (AST-based; helper-local assignments, function     ---
+# --- parameters and loop variables are bound inside the block) and require the exact expected set.  ---
+function Assert-BlockFreeVariables([string]$blockText, [string[]]$expectedFree, [string]$label) {
+  $tokens = $null; $parseErrs = $null
+  $ast = [System.Management.Automation.Language.Parser]::ParseInput($blockText, [ref]$tokens, [ref]$parseErrs)
+  Check ($parseErrs.Count -eq 0) 'E_TEST_CONTEXT' "[$label] shipped block text failed to parse in the harness; report this code."
+  $assigned = @{}
+  foreach ($node in $ast.FindAll({ param($n) $n -is [System.Management.Automation.Language.AssignmentStatementAst] }, $true)) {
+    $lhs = $node.Left
+    while ($lhs -is [System.Management.Automation.Language.AttributedExpressionAst]) { $lhs = $lhs.Child }
+    if ($lhs -is [System.Management.Automation.Language.VariableExpressionAst]) { $assigned[$lhs.VariablePath.UserPath.ToLowerInvariant()] = $true }
+  }
+  foreach ($node in $ast.FindAll({ param($n) $n -is [System.Management.Automation.Language.FunctionDefinitionAst] }, $true)) {
+    if ($node.Parameters) {
+      foreach ($pr in $node.Parameters) { $assigned[$pr.Name.VariablePath.UserPath.ToLowerInvariant()] = $true }
+    }
+    if ($node.Body.ParamBlock -and $node.Body.ParamBlock.Parameters) {
+      foreach ($pr in $node.Body.ParamBlock.Parameters) { $assigned[$pr.Name.VariablePath.UserPath.ToLowerInvariant()] = $true }
+    }
+  }
+  foreach ($node in $ast.FindAll({ param($n) $n -is [System.Management.Automation.Language.ForEachStatementAst] }, $true)) {
+    $assigned[$node.Variable.VariablePath.UserPath.ToLowerInvariant()] = $true
+  }
+  $automatic = @('true','false','null','_','psitem','args','input','this','matches','error','erroractionpreference','executioncontext','host','home','pid','psculture','psversiontable','shellid','pwd','foreach','switch','consolefilename')
+  $referenced = @{}
+  foreach ($node in $ast.FindAll({ param($n) $n -is [System.Management.Automation.Language.VariableExpressionAst] }, $true)) {
+    if ($node.IsConstantVariable()) { continue }
+    if ($node.VariablePath.IsQualified -or $node.VariablePath.IsScript -or $node.VariablePath.IsGlobal -or $node.VariablePath.IsLocal -or $node.VariablePath.IsPrivate) { continue }
+    $name = $node.VariablePath.UserPath
+    if ([string]::IsNullOrEmpty($name)) { continue }
+    $referenced[$name.ToLowerInvariant()] = $true
+  }
+  $free = @($referenced.Keys | Where-Object { -not $assigned.ContainsKey($_) -and $automatic -notcontains $_ } | Sort-Object)
+  $expected = @($expectedFree | ForEach-Object { $_.ToLowerInvariant() } | Sort-Object)
+  $freeStr = ($free -join ','); $expStr = ($expected -join ',')
+  Write-Host "  [$label] static free-variable contract: expected {$expStr}; observed {$freeStr}"
+  Check ($freeStr -eq $expStr) 'E_TEST_CONTEXT' "[$label] free-variable contract drift: expected {$expStr}, observed {$freeStr}; an implicit-name binding mismatch would otherwise go unnoticed. Report this code."
+  Write-Host "  [$label] FREE-VARIABLE CONTRACT PASS - the shipped block reads exactly the asserted production names."
+}
+
+# --- Decode-block context adapter (owner ruling): the shipped PSS structural decode block runs      ---
+# --- byte-exact, but only under an explicit binding of its production free variables ($imported,    ---
+# --- $digest, $sig). Context is checked BEFORE any block execution; completion is proved by the     ---
+# --- block's own exact PASS marker, never inferred from the absence of an exception.                ---
+function Invoke-PssDecodeBlock($importedCert, [string]$expectedThumb, [byte[]]$digestBytes, [byte[]]$sigBytes, [string]$blockText) {
+  Check ($null -ne $importedCert) 'E_TEST_CONTEXT' 'PSS decode block invoked with a null certificate context; the harness failed to bind the lifetime-3 import. Report this code.'
+  Check ($importedCert.Thumbprint -eq $expectedThumb) 'E_TEST_CONTEXT' 'PSS decode block certificate context does not match the lifetime-3 import thumbprint; report this code.'
+  # Bind the extracted block's contract explicitly (production variable names).
+  $imported = $importedCert
+  $digest = $digestBytes
+  $sig = $sigBytes
+  try {
+    $blkOut = @(. ([ScriptBlock]::Create($blockText)) 6>&1)
+  } finally {
+    $imported = $null
+  }
+  foreach ($line in $blkOut) { Write-Host ("$line") }
+  $marker = [bool]($blkOut | Where-Object { ("$_") -match 'PSS STRUCTURAL PROOF PASS' })
+  Check ($marker) 'E_TEST' 'PSS structural decode block ended without emitting its exact PSS STRUCTURAL PROOF PASS marker; completion is never inferred from the absence of an exception. Report this code.'
+  Write-Host 'PSS DECODE ADAPTER PASS - shipped block bytes executed under the explicit binding; the block-s own completion marker was observed.'
 }
 
 # --- Cleanup manifest (non-secret identifiers only), saved BEFORE any key exists --------------------
@@ -233,6 +298,7 @@ try {
   }
   foreach ($ft in @($fnHelper, $fnToHex, $fnX500, $fnDigest, $fnTlv, $fnPkcs7)) { . ([ScriptBlock]::Create($ft)) }
   Write-Host 'Extraction PASS - shipped helper bytes parsed, hashed, and loaded for execution.'
+  Assert-BlockFreeVariables $blkDecode @('digest','imported','sig') 'PssStructuralDecodeBlock'
 
   # ---- SignTool identity via the shipped parsed-exact X.500 comparison ----
   $binRoot = "${env:ProgramFiles(x86)}\Windows Kits\10\bin"
@@ -404,6 +470,7 @@ try {
   $nonceOk = $pubN.VerifyHash($nonceDigest, $nonceSig, [Security.Cryptography.HashAlgorithmName]::SHA256, [Security.Cryptography.RSASignaturePadding]::Pss)
   Check ($nonceOk) 'E_LIVE_PROOF' 'Lifetime-3 nonce challenge failed: the imported private key could not sign a fresh digest verifiable by the public certificate.'
   Write-Host 'LIFETIME-3 NONCE CHALLENGE PASS - fresh post-import digest signed by the imported private key, verified with the public certificate (bound to lifetime 3).'
+  try { $pubN.Dispose() } catch {}
 
   $pre = [Text.Encoding]::UTF8.GetBytes('V3-WINDOWS-COMPAT-PROOF:v1') + [byte]0 + [IO.File]::ReadAllBytes($staged)
   $digest = ([Security.Cryptography.SHA256]::Create()).ComputeHash($pre)
@@ -412,7 +479,18 @@ try {
   $selfOk = $rsa.VerifyHash($digest, $sig, [Security.Cryptography.HashAlgorithmName]::SHA256, [Security.Cryptography.RSASignaturePadding]::Pss)
   Check ($selfOk) 'E_DETACHED_VERIFY' 'RSACng VerifyHash self-check failed.'
   Write-Host 'DETACHED SIGN PASS - RSACng SignHash/VerifyHash (RSA-PSS-SHA256) with import 2 under PS 5.1; digest freshly constructed AFTER import 2 and explicitly bound to lifetime 3.'
-  . ([ScriptBlock]::Create($blkDecode))
+
+  # ---- Negative fixture: a null certificate context must produce the controlled E_TEST_CONTEXT ----
+  # ---- BEFORE any decode-block execution - never a raw E_UNEXPECTED. ----
+  $negCtx = $null
+  try { Invoke-PssDecodeBlock $null $imported2.Thumbprint $digest $sig $blkDecode } catch { $negCtx = $_.Exception.Message }
+  if ($negCtx -match '^STOP E_TEST_CONTEXT') {
+    Write-Host "DECODE NULL-CONTEXT NEGATIVE PASS - null certificate context produced the controlled stop: $negCtx"
+  } else {
+    Stop-Step 'E_TEST' "Decode null-context negative fixture failed: expected STOP E_TEST_CONTEXT, got: $negCtx"
+  }
+
+  Invoke-PssDecodeBlock $imported2 $imported2.Thumbprint $digest $sig $blkDecode
 
   try { $rsa.Dispose() } catch {}
   $ok3 = Remove-CertAndCngKey $imported2 $imp2.KeyName $imp2.UniqueName $imp2.Provider
