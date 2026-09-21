@@ -1,16 +1,33 @@
-# V3-WindowsCompatProof.ps1 (package v5) - bounded disposable compatibility proof on a GitHub Actions
-# windows-latest runner, under Windows PowerShell 5.1 ONLY. It exercises the Windows-only ceremony path
-# using the EXACT helper/verification bytes shipped in this package: functions are pulled out of the
-# shipped production scripts through the PowerShell parser (AST), and the inline verification blocks are
-# pulled out by asserted unique markers, then hashed and executed. Nothing is reimplemented for CI.
-# DISPOSABLE FIXTURES ONLY: no production subject, PFX, password, path, or signing output appears here.
-# The ephemeral PFX password is generated in-process as a SecureString, never printed, never converted.
+# V3-WindowsCompatProof.ps1 (package v6) - bounded disposable compatibility proof on a GitHub Actions
+# windows-latest runner, under Windows PowerShell 5.1 ONLY. It runs ONLY against the extracted,
+# hash-verified reviewed package bytes (see V3-VerifyPackage.ps1): every helper function is pulled out
+# of the shipped production scripts through the PowerShell parser (AST), and the inline verification
+# blocks are pulled out by asserted unique markers, hashed, and executed. Nothing is reimplemented.
+#
+# THREE REAL CLEANUP LIFETIMES, each closed by the exact shipped helper plus the 5-way absence set:
+#   1. the generated fixture key (cleanup-1);
+#   2. the FIRST non-exportable PFX import, used for SignTool + Authenticode (cleanup-2);
+#   3. a FRESH SECOND non-exportable PFX import, used for the detached-signature path (cleanup-3).
+# The two imported KeyNames are asserted DISTINCT. The Part 4 positive fixture uses the three ACTUAL
+# deleted identities; the negative fixture uses a LIVE decoy and must produce E_KEY_CONTAINER_REMAINS.
+#
+# Safety: a sentinel + cleanup manifest are written BEFORE any key exists; every resource is
+# registered the moment it is created; a nested finally performs best-effort cleanup; the workflow's
+# if:always() cleanup step is the outer net and FAILS the job on any remnant. -SimulateFailureAfterKeyCreation
+# exercises a controlled premature stop right after fixture key creation (in-process cleanup skipped)
+# so the always-cleanup step is proven against a real leftover. The ephemeral PFX password is built
+# from RandomNumberGenerator bytes appended char-by-char directly into a SecureString: no plaintext
+# string ever exists, nothing maskable is ever created, the byte buffer is cleared; tracing/verbose/
+# debug output is disabled and the run refuses ACTIONS_STEP_DEBUG. DISPOSABLE FIXTURES ONLY.
 param(
-  [string]$RepoRoot = (Split-Path $PSScriptRoot -Parent),
-  [string]$WorkDir = (Join-Path $env:RUNNER_TEMP 'v3-compat')
+  [Parameter(Mandatory=$true)][string]$PkgRoot,
+  [string]$WorkDir = (Join-Path $env:RUNNER_TEMP 'v3-compat'),
+  [switch]$SimulateFailureAfterKeyCreation
 )
 $ErrorActionPreference = 'Stop'
 $VerbosePreference = 'SilentlyContinue'
+$DebugPreference = 'SilentlyContinue'
+Set-PSDebug -Off
 function Stop-Step($code, $msg) { throw ("STOP $code - $msg") }
 function Check($cond, $code, $msg) { if (-not $cond) { Stop-Step $code $msg } }
 function Write-Failure($err) {
@@ -47,8 +64,8 @@ function Get-ShippedBlockText([string]$path, [string]$startMarker, [string]$endM
   return ($lines -join "`n")
 }
 
-# --- Full absence assertion (owner condition 5): thumbprint, Exists(KeyName), Open(KeyName), store ---
-# --- enumeration by KeyName AND UniqueName, Open(UniqueName). All must show absence.               ---
+# --- 5-way absence assertion: thumbprint, Exists(KeyName), Open(KeyName), store enumeration by ------
+# --- KeyName AND UniqueName, Open(UniqueName). All must show absence. -------------------------------
 function Assert-FullAbsence([string]$thumb, [string]$kn, [string]$un, [string]$provStr, [string]$label) {
   $certThere = [bool](Get-ChildItem 'Cert:\CurrentUser\My' | Where-Object Thumbprint -eq $thumb)
   Write-Host "  [$label] certificate thumbprint present in store: $certThere (must be False)"
@@ -73,20 +90,63 @@ function Assert-FullAbsence([string]$thumb, [string]$kn, [string]$un, [string]$p
   Write-Host "  [$label] FULL ABSENCE PASS (thumbprint; Exists(KeyName); Open(KeyName); store enumeration by KeyName and UniqueName; Open(UniqueName))"
 }
 
-# --- Cleanup manifest (non-secret identifiers only) for the guaranteed if:always() cleanup step -----
+# --- Cleanup manifest (non-secret identifiers only), saved BEFORE any key exists --------------------
 $script:Manifest = @{ thumbprints = @(); containers = @(); files = @(); dirs = @($WorkDir) }
 function Save-Manifest { ($script:Manifest | ConvertTo-Json -Depth 4) | Set-Content -LiteralPath "$WorkDir\cleanup-manifest.json" -Encoding ASCII }
 function Add-ManifestContainer($kn, $un, $prov) { $script:Manifest.containers += @{ keyName = $kn; uniqueName = $un; provider = $prov } }
+
+# --- Nested best-effort cleanup (the workflow's if:always() step is the outer, verifying net) -------
+function Invoke-BestEffortCleanup {
+  foreach ($t in @($script:Manifest.thumbprints)) {
+    foreach ($h in @(Get-ChildItem 'Cert:\CurrentUser\My' | Where-Object Thumbprint -eq $t)) {
+      try { Remove-Item -LiteralPath $h.PSPath -Force } catch {}
+    }
+  }
+  foreach ($c in @($script:Manifest.containers)) {
+    try {
+      $prov = New-Object System.Security.Cryptography.CngProvider($c.provider)
+      if ([System.Security.Cryptography.CngKey]::Exists($c.keyName, $prov)) {
+        $k = [System.Security.Cryptography.CngKey]::Open($c.keyName, $prov); $k.Delete(); $k.Dispose()
+      }
+    } catch {}
+  }
+  foreach ($f in @($script:Manifest.files)) { try { if ($f -and (Test-Path -LiteralPath $f)) { Remove-Item -LiteralPath $f -Force } } catch {} }
+}
+
+# --- New fixture certificate helper (same parameters everywhere) ------------------------------------
+function New-FixtureCert([string]$subject, [bool]$exportable) {
+  $policy = 'NonExportable'
+  if ($exportable) { $policy = 'Exportable' }
+  return New-SelfSignedCertificate `
+    -Type Custom -Subject $subject `
+    -KeyAlgorithm RSA -KeyLength 3072 -HashAlgorithm SHA256 `
+    -KeyExportPolicy $policy -KeyUsage DigitalSignature `
+    -TextExtension @('2.5.29.19={critical}{text}ca=false','2.5.29.37={text}1.3.6.1.5.5.7.3.3') `
+    -CertStoreLocation 'Cert:\CurrentUser\My' -NotBefore (Get-Date).ToUniversalTime().Date -NotAfter (Get-Date).ToUniversalTime().Date.AddDays(2)
+}
+function Capture-KeyIds($cert, [string]$code) {
+  $r = [Security.Cryptography.X509Certificates.RSACertificateExtensions]::GetRSAPrivateKey($cert)
+  Check ($null -ne $r) $code 'No private key on fixture certificate.'
+  Check ($r -is [System.Security.Cryptography.RSACng]) 'E_KEY_PROVIDER' 'Fixture key is not CNG (RSACng).'
+  Check ($r.Key.Provider.Provider -eq 'Microsoft Software Key Storage Provider') 'E_KEY_PROVIDER' "Unexpected provider '$($r.Key.Provider.Provider)'."
+  Check ($r.KeySize -eq 3072) 'E_KEY_SIZE' "Key size $($r.KeySize), expected 3072."
+  $ids = @{ KeyName = $r.Key.KeyName; UniqueName = $r.Key.UniqueName; Provider = $r.Key.Provider.Provider; Rsa = $r }
+  Check ($ids.KeyName -and $ids.UniqueName) $code 'Could not capture fixture KeyName/UniqueName.'
+  return $ids
+}
 
 $script:ExitCode = 0
 $pw = $null
 try {
   Check ($PSVersionTable.PSVersion.Major -eq 5) 'E_PLATFORM' "This proof must run under Windows PowerShell 5.1; got $($PSVersionTable.PSVersion)."
+  Check ($env:ACTIONS_STEP_DEBUG -ne 'true') 'E_DEBUG' 'ACTIONS_STEP_DEBUG is enabled on this run; rerun with step debugging disabled.'
   if (-not (Test-Path -LiteralPath $WorkDir)) { New-Item -ItemType Directory -Path $WorkDir | Out-Null }
   if (-not (Test-Path -LiteralPath "$WorkDir\work")) { New-Item -ItemType Directory -Path "$WorkDir\work" | Out-Null }
-  Write-Host '== V3 WINDOWS POWERSHELL 5.1 COMPATIBILITY PROOF (package v5, disposable fixtures only) =='
+  Set-Content -LiteralPath "$WorkDir\PROOF-BEGAN.sentinel" -Value 'proof began' -Encoding ASCII
+  Save-Manifest
+  Write-Host '== V3 WINDOWS POWERSHELL 5.1 COMPATIBILITY PROOF (package v6, disposable fixtures only) =='
 
-  # ---- Platform facts (owner condition 1) ----
+  # ---- Platform facts ----
   $ci = Get-ComputerInfo
   $ubr = (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion').UBR
   Write-Host "PSVersion: $($PSVersionTable.PSVersion.ToString())  PSEdition: $($PSVersionTable.PSEdition)  (must be 5.x / Desktop)"
@@ -96,22 +156,25 @@ try {
   $fxRel = (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full').Release
   Write-Host ".NET Framework release dword: $fxRel"
 
-  # ---- Submission binding (owner condition 9) ----
-  Write-Host "Run URL: $env:GITHUB_SERVER_URL/$env:GITHUB_REPOSITORY/actions/runs/$env:GITHUB_RUN_ID"
-  Write-Host "Commit: $env:GITHUB_SHA"
-  $wfPath = Join-Path $RepoRoot '.github\workflows\v3-windows-compat-proof.yml'
-  if (Test-Path -LiteralPath $wfPath) { Write-Host ("WORKFLOW SHA256 " + (Get-FileHash -Algorithm SHA256 -LiteralPath $wfPath).Hash.ToLower()) }
-  foreach ($mf in @('scripts\V3-Part0-Preflight.ps1','scripts\V3-Part1-KeyCreation.ps1','scripts\V3-Part2-SignUKI.ps1','scripts\V3-Part3-FinalizeAndDetachedSign.ps1','scripts\V3-Part4-EvidenceAndCleanup.ps1','ci\V3-WindowsCompatProof.ps1','ci\V3-WindowsCompatCleanup.ps1')) {
-    $fp = Join-Path $RepoRoot $mf
-    Check (Test-Path -LiteralPath $fp) 'E_PACKAGE' "Package member missing from checkout: $mf"
-    Write-Host ("MEMBER SHA256 " + $mf + " " + (Get-FileHash -Algorithm SHA256 -LiteralPath $fp).Hash.ToLower())
+  # ---- Controlled early-failure mode: create the fixture key, register it, then stop with only ----
+  # ---- the manifest surviving (in-process cleanup skipped); the if:always() step must remove it. ----
+  if ($SimulateFailureAfterKeyCreation) {
+    $cert = New-FixtureCert 'CN=V3 CONTROLLED-FAILURE FIXTURE (DISPOSABLE)' $true
+    $ids = Capture-KeyIds $cert 'E_KEYGEN'
+    try { $ids.Rsa.Dispose() } catch {}
+    Write-Host "CONTROLLED-FAILURE fixture thumbprint: $($cert.Thumbprint); KeyName: $($ids.KeyName); UniqueName: $($ids.UniqueName)"
+    $script:Manifest.thumbprints += $cert.Thumbprint
+    Add-ManifestContainer $ids.KeyName $ids.UniqueName $ids.Provider
+    Save-Manifest
+    Stop-Step 'E_CONTROLLED_FAILURE' 'Controlled premature stop immediately after fixture key creation; only the cleanup manifest survives and in-process cleanup was skipped. The if:always() cleanup step must remove the fixture and verify absence.'
   }
 
-  # ---- Extract the EXACT shipped bytes under test (owner condition 3) ----
-  $p1 = Join-Path $RepoRoot 'scripts\V3-Part1-KeyCreation.ps1'
-  $p2 = Join-Path $RepoRoot 'scripts\V3-Part2-SignUKI.ps1'
-  $p3 = Join-Path $RepoRoot 'scripts\V3-Part3-FinalizeAndDetachedSign.ps1'
-  $p4 = Join-Path $RepoRoot 'scripts\V3-Part4-EvidenceAndCleanup.ps1'
+  # ---- Extract the EXACT shipped bytes under test ----
+  $p1 = Join-Path $PkgRoot 'scripts\V3-Part1-KeyCreation.ps1'
+  $p2 = Join-Path $PkgRoot 'scripts\V3-Part2-SignUKI.ps1'
+  $p3 = Join-Path $PkgRoot 'scripts\V3-Part3-FinalizeAndDetachedSign.ps1'
+  $p4 = Join-Path $PkgRoot 'scripts\V3-Part4-EvidenceAndCleanup.ps1'
+  foreach ($pp in @($p1, $p2, $p3, $p4)) { Check (Test-Path -LiteralPath $pp) 'E_PACKAGE' "Shipped script missing: $pp" }
   $fnHelper = Get-ShippedFunctionText $p1 'Remove-CertAndCngKey'
   $fnToHex = Get-ShippedFunctionText $p2 'ToHex'
   $fnX500 = Get-ShippedFunctionText $p2 'Get-X500Field'
@@ -148,42 +211,29 @@ try {
   Check (($subCN -eq 'Microsoft Corporation') -and ($subO -eq 'Microsoft Corporation') -and ($issO -eq 'Microsoft Corporation')) 'E_SIGNTOOL_SIGNER' 'Parsed-exact SignTool identity check failed.'
   Write-Host 'SIGNTOOL IDENTITY PASS - parsed-exact X.500 comparison (shipped Get-X500Field)'
 
-  # ---- Disposable fixture identity (owner condition 2) ----
+  # ---- LIFETIME 1: generated fixture key ----
   $pfx = "$WorkDir\fixture.pfx"
+  $pfxCopy = "$WorkDir\fixture-copy.pfx"
   $cerF = "$WorkDir\fixture.cer"
-  $cert = New-SelfSignedCertificate `
-    -Type Custom -Subject 'CN=V3 DRY-RUN FIXTURE (DISPOSABLE)' `
-    -KeyAlgorithm RSA -KeyLength 3072 -HashAlgorithm SHA256 `
-    -KeyExportPolicy Exportable -KeyUsage DigitalSignature `
-    -TextExtension @('2.5.29.19={critical}{text}ca=false','2.5.29.37={text}1.3.6.1.5.5.7.3.3') `
-    -CertStoreLocation 'Cert:\CurrentUser\My' -NotBefore (Get-Date).ToUniversalTime().Date -NotAfter (Get-Date).ToUniversalTime().Date.AddDays(2)
-  $k = [Security.Cryptography.X509Certificates.RSACertificateExtensions]::GetRSAPrivateKey($cert)
-  Check ($null -ne $k) 'E_KEYGEN' 'No private key on fixture certificate.'
-  Check ($k -is [System.Security.Cryptography.RSACng]) 'E_KEY_PROVIDER' 'Fixture key is not CNG (RSACng).'
-  Check ($k.Key.Provider.Provider -eq 'Microsoft Software Key Storage Provider') 'E_KEY_PROVIDER' "Unexpected provider '$($k.Key.Provider.Provider)'."
-  Check ($k.KeySize -eq 3072) 'E_KEY_SIZE' "Key size $($k.KeySize), expected 3072."
-  $genKeyName = $k.Key.KeyName
-  $genUniqueName = $k.Key.UniqueName
-  $genProvider = $k.Key.Provider.Provider
-  Check ($genKeyName -and $genUniqueName) 'E_KEYGEN' 'Could not capture fixture KeyName/UniqueName.'
-  try { $k.Dispose() } catch {}
+  $cert = New-FixtureCert 'CN=V3 DRY-RUN FIXTURE (DISPOSABLE)' $true
+  $gen = Capture-KeyIds $cert 'E_KEYGEN'
+  try { $gen.Rsa.Dispose() } catch {}
   $thumbprint = $cert.Thumbprint
   Write-Host "FIXTURE thumbprint: $thumbprint"
-  Write-Host "FIXTURE provider:   $genProvider"
-  Write-Host "FIXTURE KeyName:    $genKeyName"
-  Write-Host "FIXTURE UniqueName: $genUniqueName"
+  Write-Host "FIXTURE provider:   $($gen.Provider)"
+  Write-Host "FIXTURE KeyName:    $($gen.KeyName)"
+  Write-Host "FIXTURE UniqueName: $($gen.UniqueName)"
   $script:Manifest.thumbprints += $thumbprint
-  Add-ManifestContainer $genKeyName $genUniqueName $genProvider
-  $script:Manifest.files += @($pfx, $cerF)
+  Add-ManifestContainer $gen.KeyName $gen.UniqueName $gen.Provider
   Save-Manifest
 
-  # ---- NEGATIVE FIXTURE (owner condition 5): UniqueName must never substitute for KeyName ----
-  $prov = New-Object System.Security.Cryptography.CngProvider($genProvider)
-  $existsByKeyName = [System.Security.Cryptography.CngKey]::Exists($genKeyName, $prov)
+  # ---- NEGATIVE FIXTURE: UniqueName must never substitute for KeyName in the CngKey API ----
+  $prov = New-Object System.Security.Cryptography.CngProvider($gen.Provider)
+  $existsByKeyName = [System.Security.Cryptography.CngKey]::Exists($gen.KeyName, $prov)
   Write-Host "CngKey.Exists(KeyName, provider) with the live fixture key present: $existsByKeyName (must be True)"
   Check ($existsByKeyName) 'E_DRYRUN_KEYNAME' 'Exists(KeyName) did not find the live fixture key - report this code.'
-  if ($genUniqueName -ne $genKeyName) {
-    $existsByUnique = [System.Security.Cryptography.CngKey]::Exists($genUniqueName, $prov)
+  if ($gen.UniqueName -ne $gen.KeyName) {
+    $existsByUnique = [System.Security.Cryptography.CngKey]::Exists($gen.UniqueName, $prov)
     Write-Host "CngKey.Exists(UniqueName, provider) with the live fixture key present: $existsByUnique"
     if (-not $existsByUnique) {
       Write-Host 'NEGATIVE FIXTURE CONFIRMED: substituting UniqueName into the KeyName API reports ABSENCE for a key that exists - a UniqueName query is NOT absence evidence.'
@@ -195,93 +245,102 @@ try {
   }
   Write-Host 'ABSENCE PROOF RULE: only KeyName-based Exists/Open results are accepted as API absence evidence; UniqueName is corroboration, never the absence proof.'
 
-  # ---- Export PFX (random in-process password, never printed/converted) + identical-copy check ----
+  # ---- Export PFX (RNG-built SecureString password, no plaintext ever) + real copy comparison ----
+  $rng = [System.Security.Cryptography.RandomNumberGenerator]::Create()
   $pw = New-Object System.Security.SecureString
-  -join ((33..126) | Get-Random -Count 24 | ForEach-Object {[char]$_}) | ForEach-Object { $pw.AppendChar($_) }
+  $buf = New-Object byte[] 24
+  $rng.GetBytes($buf)
+  foreach ($bb in $buf) { $pw.AppendChar([char](33 + ($bb % 94))) }
+  [Array]::Clear($buf, 0, $buf.Length)
+  $rng.Dispose()
+  # The password now exists only as SecureString contents: it was assembled character-by-character
+  # from CSPRNG bytes, never as a string or character array, so no maskable plaintext ever exists.
   Export-PfxCertificate -Cert $cert.PSPath -FilePath $pfx -Password $pw -CryptoAlgorithmOption AES256_SHA256 -NoProperties | Out-Null
   Export-Certificate -Cert $cert.PSPath -FilePath $cerF -Type CERT | Out-Null
-  $pfxSha1 = (Get-FileHash -Algorithm SHA256 -LiteralPath $pfx).Hash
-  $pfxSha2 = (Get-FileHash -Algorithm SHA256 -LiteralPath $pfx).Hash
-  Check ($pfxSha1 -eq $pfxSha2) 'E_PFX_CHANGED' 'Exported PFX changed on disk between reads; report this code.'
-  Write-Host 'PFX EXPORT PASS - exported once under an ephemeral in-process password; identical-copy check passed (PFX bytes and password never logged).'
-
-  # ---- CLEANUP 1: exact shipped helper, then owner condition 5 absence assertions ----
-  $ok1 = Remove-CertAndCngKey $cert $genKeyName $genUniqueName $genProvider
-  Write-Host "CLEANUP 1 (generated fixture key, shipped Remove-CertAndCngKey): $(if ($ok1) {'PASS'} else {'FAIL'})"
-  Check ($ok1) 'E_CLEANUP_FAILED' 'Shipped helper reported failure on the generated fixture key; report this code.'
-  Assert-FullAbsence $thumbprint $genKeyName $genUniqueName $genProvider 'cleanup-1'
-  $cert = $null
-
-  # ---- Non-exportable import (production Parts 2/3 path) ----
-  $imported = Import-PfxCertificate -FilePath $pfx -CertStoreLocation 'Cert:\CurrentUser\My' -Password $pw -Exportable:$false
-  $pw = $null
-  [GC]::Collect()
-  $rsa = [Security.Cryptography.X509Certificates.RSACertificateExtensions]::GetRSAPrivateKey($imported)
-  Check ($null -ne $rsa) 'E_PRIVATE_KEY' 'No private key on imported fixture.'
-  Check ($rsa -is [System.Security.Cryptography.RSACng]) 'E_KEY_PROVIDER' 'Imported fixture key is not CNG.'
-  Check ($rsa.Key.ExportPolicy -eq [System.Security.Cryptography.CngExportPolicies]::None) 'E_KEY_EXPORTABLE' 'Imported fixture key is exportable.'
-  Check ($rsa.KeySize -eq 3072) 'E_KEY_SIZE' 'Imported fixture key size mismatch.'
-  $impKeyName = $rsa.Key.KeyName
-  $impUniqueName = $rsa.Key.UniqueName
-  $impProvider = $rsa.Key.Provider.Provider
-  Check ($impKeyName -and $impUniqueName) 'E_PRIVATE_KEY' 'Could not capture imported fixture identifiers.'
-  Write-Host "IMPORTED fixture KeyName:    $impKeyName"
-  Write-Host "IMPORTED fixture UniqueName: $impUniqueName (provider $impProvider)"
-  Write-Host "IMPORTED fixture ExportPolicy: $($rsa.Key.ExportPolicy) (must be None)"
-  Add-ManifestContainer $impKeyName $impUniqueName $impProvider
+  Copy-Item -LiteralPath $pfx -Destination $pfxCopy
+  $b1 = [IO.File]::ReadAllBytes($pfx)
+  $b2 = [IO.File]::ReadAllBytes($pfxCopy)
+  Check (($b1.Length -eq $b2.Length) -and ((Get-FileHash -Algorithm SHA256 -LiteralPath $pfx).Hash -eq (Get-FileHash -Algorithm SHA256 -LiteralPath $pfxCopy).Hash)) 'E_PFX_CHANGED' 'PFX copy is not byte-identical to the export; report this code.'
+  Write-Host "PFX EXPORT PASS - exported once under an ephemeral CSPRNG password; distinct copy file is byte-identical (length $($b1.Length), matching SHA-256); bytes and password never logged."
+  $script:Manifest.files += @($pfx, $pfxCopy, $cerF)
   Save-Manifest
 
-  # ---- SignTool signing of a disposable PE fixture ----
+  # ---- CLEANUP 1: exact shipped helper + 5-way absence ----
+  $ok1 = Remove-CertAndCngKey $cert $gen.KeyName $gen.UniqueName $gen.Provider
+  Write-Host "CLEANUP 1 (generated fixture key, shipped Remove-CertAndCngKey): $(if ($ok1) {'PASS'} else {'FAIL'})"
+  Check ($ok1) 'E_CLEANUP_FAILED' 'Shipped helper reported failure on the generated fixture key; report this code.'
+  Assert-FullAbsence $thumbprint $gen.KeyName $gen.UniqueName $gen.Provider 'cleanup-1'
+  $cert = $null
+
+  # ---- LIFETIME 2: FIRST non-exportable import - SignTool + Authenticode path ----
+  $imported1 = Import-PfxCertificate -FilePath $pfx -CertStoreLocation 'Cert:\CurrentUser\My' -Password $pw -Exportable:$false
+  $imp1 = Capture-KeyIds $imported1 'E_PRIVATE_KEY'
+  Check ($imp1.Rsa.Key.ExportPolicy -eq [System.Security.Cryptography.CngExportPolicies]::None) 'E_KEY_EXPORTABLE' 'First imported fixture key is exportable.'
+  Write-Host "IMPORT 1 KeyName: $($imp1.KeyName); UniqueName: $($imp1.UniqueName) (provider $($imp1.Provider)); ExportPolicy: $($imp1.Rsa.Key.ExportPolicy)"
+  Add-ManifestContainer $imp1.KeyName $imp1.UniqueName $imp1.Provider
+  Save-Manifest
+
   $staged = "$WorkDir\fixture-app.exe"
   Copy-Item -LiteralPath 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe' -Destination $staged
   $script:Manifest.files += $staged
+  Save-Manifest
   & $signtool sign /fd SHA256 /s My /sha1 $thumbprint $staged | Out-String | Set-Content -LiteralPath "$WorkDir\work\signtool-sign.txt" -Encoding ASCII
   Check ($LASTEXITCODE -eq 0) 'E_SIGNTOOL_SIGN' "SignTool sign failed (exit $LASTEXITCODE)."
-  Write-Host 'SIGNTOOL SIGN PASS - disposable PE fixture signed.'
+  Write-Host 'SIGNTOOL SIGN PASS - disposable PE fixture signed with import 1.'
 
-  # ---- Mathematical Authenticode verification: exact shipped block ----
   $Work = $WorkDir
   . ([ScriptBlock]::Create($blkVerify))
   Write-Host 'Authenticode mathematical verification PASS (shipped block, windows-latest, PS 5.1)'
 
-  # ---- Detached RSA-PSS-SHA256 sign + VerifyHash + structural salt=32 proof (shipped block) ----
+  try { $imp1.Rsa.Dispose() } catch {}
+  $ok2 = Remove-CertAndCngKey $imported1 $imp1.KeyName $imp1.UniqueName $imp1.Provider
+  Write-Host "CLEANUP 2 (first import, shipped Remove-CertAndCngKey): $(if ($ok2) {'PASS'} else {'FAIL'})"
+  Check ($ok2) 'E_CLEANUP_FAILED' 'Shipped helper reported failure on the first import; report this code.'
+  Assert-FullAbsence $thumbprint $imp1.KeyName $imp1.UniqueName $imp1.Provider 'cleanup-2'
+  $imported1 = $null
+
+  # ---- LIFETIME 3: FRESH SECOND non-exportable import - detached-signature path ----
+  $imported2 = Import-PfxCertificate -FilePath $pfx -CertStoreLocation 'Cert:\CurrentUser\My' -Password $pw -Exportable:$false
+  $pw = $null
+  [GC]::Collect()
+  $imp2 = Capture-KeyIds $imported2 'E_PRIVATE_KEY'
+  Check ($imp2.Rsa.Key.ExportPolicy -eq [System.Security.Cryptography.CngExportPolicies]::None) 'E_KEY_EXPORTABLE' 'Second imported fixture key is exportable.'
+  Write-Host "IMPORT 2 KeyName: $($imp2.KeyName); UniqueName: $($imp2.UniqueName) (provider $($imp2.Provider)); ExportPolicy: $($imp2.Rsa.Key.ExportPolicy)"
+  Check ($imp2.KeyName -ne $imp1.KeyName) 'E_TEST' "The two imports produced the SAME KeyName ($($imp2.KeyName)); the production design assumes a fresh container per import - report this platform behavior, do not proceed."
+  Write-Host 'IMPORT DISTINCTNESS PASS - the fresh second import has its own CNG container (distinct KeyName).'
+  Add-ManifestContainer $imp2.KeyName $imp2.UniqueName $imp2.Provider
+  Save-Manifest
+
+  $rsa = $imp2.Rsa
   $pre = [Text.Encoding]::UTF8.GetBytes('V3-WINDOWS-COMPAT-PROOF:v1') + [byte]0 + [IO.File]::ReadAllBytes($staged)
   $digest = ([Security.Cryptography.SHA256]::Create()).ComputeHash($pre)
   $sig = $rsa.SignHash($digest, [Security.Cryptography.HashAlgorithmName]::SHA256, [Security.Cryptography.RSASignaturePadding]::Pss)
   Check ($sig.Length -eq 384) 'E_SIG_LENGTH' "Signature $($sig.Length) bytes, expected 384."
   $selfOk = $rsa.VerifyHash($digest, $sig, [Security.Cryptography.HashAlgorithmName]::SHA256, [Security.Cryptography.RSASignaturePadding]::Pss)
   Check ($selfOk) 'E_DETACHED_VERIFY' 'RSACng VerifyHash self-check failed.'
-  Write-Host 'DETACHED SIGN PASS - RSACng SignHash/VerifyHash (RSA-PSS-SHA256) under PS 5.1.'
+  Write-Host 'DETACHED SIGN PASS - RSACng SignHash/VerifyHash (RSA-PSS-SHA256) with import 2 under PS 5.1.'
   . ([ScriptBlock]::Create($blkDecode))
 
-  # ---- CLEANUP 2: imported fixture key, shipped helper + condition 5 assertions ----
   try { $rsa.Dispose() } catch {}
-  $ok2 = Remove-CertAndCngKey $imported $impKeyName $impUniqueName $impProvider
-  Write-Host "CLEANUP 2 (imported fixture key, shipped Remove-CertAndCngKey): $(if ($ok2) {'PASS'} else {'FAIL'})"
-  Check ($ok2) 'E_CLEANUP_FAILED' 'Shipped helper reported failure on the imported fixture key; report this code.'
-  Assert-FullAbsence $thumbprint $impKeyName $impUniqueName $impProvider 'cleanup-2'
-  $imported = $null
+  $ok3 = Remove-CertAndCngKey $imported2 $imp2.KeyName $imp2.UniqueName $imp2.Provider
+  Write-Host "CLEANUP 3 (second import, shipped Remove-CertAndCngKey): $(if ($ok3) {'PASS'} else {'FAIL'})"
+  Check ($ok3) 'E_CLEANUP_FAILED' 'Shipped helper reported failure on the second import; report this code.'
+  Assert-FullAbsence $thumbprint $imp2.KeyName $imp2.UniqueName $imp2.Provider 'cleanup-3'
+  $imported2 = $null
 
-  # ---- PART 4 BLOCK: positive and fail-closed negative tests (owner condition 6) ----
-  $decoy = New-SelfSignedCertificate `
-    -Type Custom -Subject 'CN=V3 PART4 DECOY (DISPOSABLE)' `
-    -KeyAlgorithm RSA -KeyLength 3072 -HashAlgorithm SHA256 `
-    -KeyExportPolicy NonExportable -KeyUsage DigitalSignature `
-    -CertStoreLocation 'Cert:\CurrentUser\My' -NotBefore (Get-Date).ToUniversalTime().Date -NotAfter (Get-Date).ToUniversalTime().Date.AddDays(2)
-  $dk = [Security.Cryptography.X509Certificates.RSACertificateExtensions]::GetRSAPrivateKey($decoy)
-  $decoyKeyName = $dk.Key.KeyName; $decoyUniqueName = $dk.Key.UniqueName; $decoyProvider = $dk.Key.Provider.Provider
-  try { $dk.Dispose() } catch {}
+  # ---- PART 4 BLOCK: negative (LIVE decoy) and positive (three ACTUAL deleted identities) ----
+  $decoy = New-FixtureCert 'CN=V3 PART4 DECOY (DISPOSABLE)' $false
+  $dec = Capture-KeyIds $decoy 'E_KEYGEN'
+  try { $dec.Rsa.Dispose() } catch {}
   $script:Manifest.thumbprints += $decoy.Thumbprint
-  Add-ManifestContainer $decoyKeyName $decoyUniqueName $decoyProvider
+  Add-ManifestContainer $dec.KeyName $dec.UniqueName $dec.Provider
   Save-Manifest
 
-  # Negative: mutate the recorded Part 1 KeyName to the LIVE decoy - the shipped Part 4 block must STOP.
-  $stateNeg = [pscustomobject]@{
-    GeneratedKeyName = $decoyKeyName; GeneratedKeyUniqueName = $decoyUniqueName; GeneratedKeyProvider = $decoyProvider
-    Part2KeyName = $impKeyName; Part2KeyUniqueName = $impUniqueName; Part2KeyProvider = $impProvider
-    Part3KeyName = $genKeyName; Part3KeyUniqueName = $genUniqueName; Part3KeyProvider = $genProvider
+  $state = [pscustomobject]@{
+    GeneratedKeyName = $dec.KeyName; GeneratedKeyUniqueName = $dec.UniqueName; GeneratedKeyProvider = $dec.Provider
+    Part2KeyName = $imp1.KeyName; Part2KeyUniqueName = $imp1.UniqueName; Part2KeyProvider = $imp1.Provider
+    Part3KeyName = $imp2.KeyName; Part3KeyUniqueName = $imp2.UniqueName; Part3KeyProvider = $imp2.Provider
   }
-  $state = $stateNeg
   $caught = $null
   try { . ([ScriptBlock]::Create($blkPart4)) } catch { $caught = $_.Exception.Message }
   if ($caught -match '^STOP E_KEY_CONTAINER_REMAINS') {
@@ -290,36 +349,35 @@ try {
     Stop-Step 'E_TEST' "Part 4 negative fixture failed: expected STOP E_KEY_CONTAINER_REMAINS, got: $caught"
   }
 
-  # Positive: all three recorded containers deleted - the shipped block must print Key-hygiene PASS.
-  $statePos = [pscustomobject]@{
-    GeneratedKeyName = $genKeyName; GeneratedKeyUniqueName = $genUniqueName; GeneratedKeyProvider = $genProvider
-    Part2KeyName = $impKeyName; Part2KeyUniqueName = $impUniqueName; Part2KeyProvider = $impProvider
-    Part3KeyName = $genKeyName; Part3KeyUniqueName = $genUniqueName; Part3KeyProvider = $genProvider
+  $state = [pscustomobject]@{
+    GeneratedKeyName = $gen.KeyName; GeneratedKeyUniqueName = $gen.UniqueName; GeneratedKeyProvider = $gen.Provider
+    Part2KeyName = $imp1.KeyName; Part2KeyUniqueName = $imp1.UniqueName; Part2KeyProvider = $imp1.Provider
+    Part3KeyName = $imp2.KeyName; Part3KeyUniqueName = $imp2.UniqueName; Part3KeyProvider = $imp2.Provider
   }
-  $state = $statePos
   . ([ScriptBlock]::Create($blkPart4))
+  Write-Host 'PART4 POSITIVE PASS - the three ACTUAL deleted identities (generated key, import 1, import 2) verified absent by the shipped block.'
 
-  # Decoy cleanup through the shipped helper + full absence assertions.
-  $okd = Remove-CertAndCngKey $decoy $decoyKeyName $decoyUniqueName $decoyProvider
+  $okd = Remove-CertAndCngKey $decoy $dec.KeyName $dec.UniqueName $dec.Provider
   Check ($okd) 'E_CLEANUP_FAILED' 'Decoy cleanup failed; report this code.'
-  Assert-FullAbsence $decoy.Thumbprint $decoyKeyName $decoyUniqueName $decoyProvider 'decoy-cleanup'
+  Assert-FullAbsence $decoy.Thumbprint $dec.KeyName $dec.UniqueName $dec.Provider 'decoy-cleanup'
   $decoy = $null
 
   # ---- Remove every fixture artifact; the run log is the only transcript ----
-  foreach ($f in @($pfx, $cerF, $staged)) { if (Test-Path -LiteralPath $f) { Remove-Item -LiteralPath $f -Force } }
-  Write-Host 'Fixture PFX/CER/signed fixture deleted (ephemeral password never logged; no production material was ever present).'
+  foreach ($f in @($pfx, $pfxCopy, $cerF, $staged)) { if (Test-Path -LiteralPath $f) { Remove-Item -LiteralPath $f -Force } }
+  Write-Host 'Fixture PFX files/CER/signed fixture deleted (ephemeral CSPRNG password never logged; no production material was ever present).'
   Write-Host ''
   Write-Host 'SANITIZATION NOTE: this log contains OS/PowerShell/.NET facts, source and extracted-block hashes,'
   Write-Host 'the signtool identity, public identifiers (thumbprints, providers, KeyNames, UniqueNames) of DELETED'
   Write-Host 'throwaway keys, and PASS/STOP states only. It contains no private key, no password, no PFX,'
   Write-Host 'no SecureString conversion, no state or work folder, no production path or output.'
-  Write-Host 'COMPAT PROOF PASS - all ceremony steps executed under Windows PowerShell 5.1 on windows-latest.'
+  Write-Host 'COMPAT PROOF PASS - THREE real cleanup lifetimes, each closed by the shipped helper plus the 5-way absence set.'
 } catch {
   Write-Failure $_
   $script:ExitCode = 1
 } finally {
   $pw = $null
   [GC]::Collect()
+  if (-not $SimulateFailureAfterKeyCreation) { try { Invoke-BestEffortCleanup } catch {} }
   try { Save-Manifest } catch {}
 }
 exit $script:ExitCode

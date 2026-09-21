@@ -1,13 +1,21 @@
-# V3-WindowsCompatCleanup.ps1 (package v5) - guaranteed if:always() cleanup for the compatibility
-# proof. Reads the non-secret cleanup manifest written by the proof script, removes any leftover
-# disposable certificates, CNG containers (by KeyName through the CNG API), and fixture files, then
-# verifies absence. Exits NONZERO if anything remains - the job must fail in that case.
+# V3-WindowsCompatCleanup.ps1 (package v6) - guaranteed if:always() cleanup for the compatibility
+# proof. Sentinel rule: the proof writes PROOF-BEGAN.sentinel and an initial cleanup manifest BEFORE
+# any key/certificate exists. If the manifest is missing while the sentinel is present, the proof
+# began and its manifest was lost - that is a CLEANUP FAILURE (exit 1), never a silent pass. Only a
+# missing sentinel proves fixture creation never began. Otherwise this reads the non-secret manifest,
+# removes any leftover disposable certificates, CNG containers (by KeyName through the CNG API), and
+# fixture files, verifies absence, and exits NONZERO if anything remains.
 param([string]$WorkDir = (Join-Path $env:RUNNER_TEMP 'v3-compat'))
 $ErrorActionPreference = 'Continue'
 $failed = $false
+$sentinel = Join-Path $WorkDir 'PROOF-BEGAN.sentinel'
 $manifestPath = Join-Path $WorkDir 'cleanup-manifest.json'
 if (-not (Test-Path -LiteralPath $manifestPath)) {
-  Write-Host 'CLEANUP: no manifest found (proof did not start or failed before fixture creation); nothing to do.'
+  if (Test-Path -LiteralPath $sentinel) {
+    Write-Host 'CLEANUP FAILURE: the proof began (sentinel present) but the cleanup manifest is missing; disposable material state is unknown.'
+    exit 1
+  }
+  Write-Host 'CLEANUP: sentinel absent - fixture creation never began; nothing to do.'
   exit 0
 }
 $m = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
