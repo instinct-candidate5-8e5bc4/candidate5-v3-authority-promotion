@@ -1,0 +1,4 @@
+# Keep reviewed bytes identical on every checkout so the CI log hashes match the reviewed hashes.
+*.ps1 text eol=lf
+*.yml text eol=lf
+*.md text eol=lf

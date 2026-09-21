@@ -1,0 +1,44 @@
+name: V3 Windows PowerShell 5.1 compatibility proof
+
+# Bounded disposable compatibility proof for the v5 production signing package. Manual dispatch only.
+# Read-only checkout, no persisted credentials, no caches, no artifact upload, no unrelated network or
+# writes. The proof runs ONLY under powershell.exe (Windows PowerShell 5.1), uses disposable fixture
+# keys/certs exclusively, and the if:always() cleanup step fails the job if any disposable material
+# remains. The run log is the transcript: env facts, source/extracted-block hashes, public disposable
+# identifiers, and PASS/STOP states only - never a PFX, password, private key, or production material.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  proof:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout (read-only, no persisted credentials)
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Bind run to reviewed bytes
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Write-Host "Run URL: $env:GITHUB_SERVER_URL/$env:GITHUB_REPOSITORY/actions/runs/$env:GITHUB_RUN_ID"
+          Write-Host "Commit: $env:GITHUB_SHA"
+          Write-Host "Workflow ref: $env:GITHUB_WORKFLOW_REF"
+
+      - name: Run compatibility proof under Windows PowerShell 5.1
+        shell: powershell
+        run: |
+          powershell.exe -NoProfile -ExecutionPolicy Bypass -File ci/V3-WindowsCompatProof.ps1 -RepoRoot .
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Guaranteed cleanup and final absence verification
+        if: always()
+        shell: powershell
+        run: |
+          powershell.exe -NoProfile -ExecutionPolicy Bypass -File ci/V3-WindowsCompatCleanup.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
