@@ -1,51 +1,168 @@
 {
- "note": "Fixture validation of verify-p1-evidence.py and the OpenSSL second implementation. Fixture keys/certs are ephemeral random RSA-3072 and carry no authority; they exercise the verifier's positive and negative paths. The finalRecord block is NOT fixture data: it is the deterministic reconstruction from the certified original record at 92741cbdefaa78adc33bc3c74935a45f9558b88c plus the four runbook-permitted accepted fields, whose SHA-256 equals the accepted final record 07f88bfc5a98ef471c05451cc8077af4d7b61015aae5ba0395deb6c935dc1694 and whose detached preimage digest equals fec736a6a7e50f030164d76bd2015925621b5edfa1eefb4980ffcb8c18142b45. Negative-path E_ lines observed during the run are the designed rejections (tampered certificate, wrong CMS digest, tampered final record, unsigned PE).",
- "realIdentityReconstruction": {
-  "finalRecordBytes": 47246,
-  "finalRecordSha256": "07f88bfc5a98ef471c05451cc8077af4d7b61015aae5ba0395deb6c935dc1694",
-  "preimageDigestSha256": "fec736a6a7e50f030164d76bd2015925621b5edfa1eefb4980ffcb8c18142b45",
-  "reconstruction": "BYTE_EXACT from repo original c09245ae3b60db34f050e29fd9f457a83fde95bd44efc70e9afda14fcbee0e88 + certificateDerSha256/gitCommit/gitTree/signedUkiSha256"
+ "fixtureManifest": {
+  "realPkcs7Sha256": "440aebd415335218df88abbb9b858fabd3fa30d7d238c8e368f7adc6835de1e5",
+  "schema": "v3.provisioning-p1-fixture-manifest.v1",
+  "syntheticCertSha256": "03d03899b0cd1f08fa6e545506986ca3a8286d332b9ae5258932cb298bd7d482",
+  "syntheticPeDigest": "0f3a77929bc7256dca13698f316a2a6a59687ba88ba4d7cae9c9136106999e69",
+  "syntheticPkcs7Sha256": "b8c5cbed6552d35906ea94f658ed4344bce3ab2b6edc09cfdd8236edcef68133"
  },
- "results": {
-  "cert": {
-   "extensions": [
-    "2.5.29.14",
-    "2.5.29.15",
-    "2.5.29.19",
-    "2.5.29.37"
-   ],
-   "modulusBits": 3072,
-   "selfSignature": "VERIFIED_PURE_PYTHON",
-   "serial": 360812728894918543710146507339763761781092413859,
-   "subjectCN": "V3 Successor UKI Secure Boot Authority"
+ "negatives": {
+  "real-bad-cert.pkcs7": {
+   "expect": "E_CERT_HASH",
+   "openssl": "E_CERT_HASH",
+   "python": "E_CERT_HASH"
   },
-  "cert_tamper_rejected": true,
-  "cms": {
-   "eContentType": "1.2.840.113549.1.7.1",
-   "signature": "VERIFIED_PURE_PYTHON",
-   "signerCertEquality": "BYTE_EXACT",
-   "spcContentBytes": 69
+  "real-bad-digestinfo.pkcs7": {
+   "expect": "E_AUTHENTICODE_DIGEST",
+   "openssl": "E_AUTHENTICODE_DIGEST",
+   "python": "E_AUTHENTICODE_DIGEST"
   },
-  "cms_openssl_crosscheck": "PASS",
-  "cms_wrong_digest_rejected": true,
-  "finalRecord": {
-   "delta": [
-    "certificateDerSha256",
-    "gitCommit",
-    "gitTree",
-    "signedUkiSha256"
-   ],
-   "finalRecordBytes": 47246,
-   "preimageDigestSha256": "fec736a6a7e50f030164d76bd2015925621b5edfa1eefb4980ffcb8c18142b45",
-   "reconstruction": "BYTE_EXACT",
-   "records": 200
+  "real-bad-messagedigest.pkcs7": {
+   "expect": "E_AUTHENTICODE_DIGEST",
+   "openssl": "E_AUTHENTICODE_DIGEST",
+   "python": "E_AUTHENTICODE_DIGEST"
   },
-  "final_record_tamper_rejected": true,
-  "pe_authenticode_digest": "PASS synthetic PE32+ (216/296 layout)",
-  "pe_unsigned_rejected": true,
-  "pss_openssl_crosscheck": "PASS",
-  "pss_pure_python": "PASS salt=32 structural decode",
-  "pss_salt20_rejected": "E_PSS_DELIM"
+  "real-bad-signature.pkcs7": {
+   "expect": "E_AUTHENTICODE_SIGNATURE",
+   "openssl": "E_AUTHENTICODE_SIGNATURE",
+   "python": "E_AUTHENTICODE_SIGNATURE"
+  },
+  "real-octet-wrapped.pkcs7": {
+   "expect": "E_PKCS7",
+   "openssl": "E_PKCS7",
+   "python": "E_PKCS7"
+  },
+  "synth-bad-digestinfo.pkcs7": {
+   "expect": "E_AUTHENTICODE_DIGEST",
+   "python": "E_AUTHENTICODE_DIGEST"
+  },
+  "synth-bad-messagedigest.pkcs7": {
+   "expect": "E_AUTHENTICODE_DIGEST",
+   "python": "E_AUTHENTICODE_DIGEST"
+  },
+  "synth-bad-signature.pkcs7": {
+   "expect": "E_AUTHENTICODE_SIGNATURE",
+   "python": "E_AUTHENTICODE_SIGNATURE"
+  },
+  "synth-cert-table-dwlength.efi": {
+   "expect": "E_AUTHENTICODE_TABLE",
+   "python": "E_AUTHENTICODE_TABLE"
+  },
+  "synth-cert-table-not-eof.efi": {
+   "expect": "E_AUTHENTICODE_TABLE",
+   "python": "E_AUTHENTICODE_TABLE"
+  },
+  "synth-extra-algorithm.pkcs7": {
+   "expect": "E_PKCS7",
+   "python": "E_PKCS7"
+  },
+  "synth-extra-attr.pkcs7": {
+   "expect": "E_PKCS7",
+   "python": "E_PKCS7"
+  },
+  "synth-extra-signer.pkcs7": {
+   "expect": "E_PKCS7",
+   "python": "E_PKCS7"
+  },
+  "synth-octet-wrapped.pkcs7": {
+   "expect": "E_PKCS7",
+   "openssl": "E_PKCS7",
+   "python": "E_PKCS7"
+  },
+  "synth-wrong-cert.efi": {
+   "expect": "E_AUTHENTICODE_SIGNER",
+   "python": "E_AUTHENTICODE_SIGNER"
+  },
+  "synth-wrong-cert.pkcs7": {
+   "expect": "E_CERT_HASH",
+   "python": "E_CERT_HASH"
+  },
+  "synth-wrong-oid.pkcs7": {
+   "expect": "E_PKCS7",
+   "python": "E_PKCS7"
+  },
+  "synthetic-detached-salt20.sig": {
+   "expect": "E_PSS_",
+   "python": "E_PSS_DELIM"
+  }
+ },
+ "note": "P1.1 fixture validation of verify-p1-evidence.py and verify-p1-openssl.sh after the P1-PREP REJECT. Both CMS paths now strictly require and process the real accepted Microsoft SpcIndirectDataContent encoding (eContentType 1.3.6.1.4.1.311.2.1.4, [0] eContent holding the SEQUENCE directly, zero trailing padding). openssl cms -verify is not used anywhere: the OpenSSL second implementation extracts via asn1parse and verifies cert equality, SHA-256(SpcIndirectData content)==messageDigest, and the signedAttrs signature via openssl dgst. Primary fixture is the accepted real 1,864-byte PKCS#7 blob (440aebd4...); synthetic fixtures use ephemeral RSA-3072 keys with no authority. realIdentityReconstruction is NOT fixture data: it is the deterministic reconstruction from repo data at 92741cbdefaa78adc33bc3c74935a45f9558b88c matching the accepted final record identities.",
+ "positives": {
+  "real_accepted_pkcs7_openssl": [
+   "PASS pkcs7-structure + spc-binding + signer-cert-equality + signedAttrs-signature (asn1parse + openssl dgst)",
+   "P1_OPENSSL_CROSSCHECK_PASS"
+  ],
+  "real_accepted_pkcs7_python": {
+   "pkcs7": {
+    "derBytes": 1859,
+    "eContentForm": "DIRECT_SEQUENCE",
+    "eContentType": "1.3.6.1.4.1.311.2.1.4",
+    "paddingBytes": 5,
+    "signature": "VERIFIED_PURE_PYTHON",
+    "signerCertEquality": "BYTE_EXACT",
+    "spcContentBytes": 76
+   },
+   "result": "P1_EVIDENCE_VERIFICATION_PASS"
+  },
+  "synthetic_detached_pss_python": {
+   "detachedSignature": {
+    "bytes": 384,
+    "mgf": "MGF1-SHA256",
+    "saltLength": 32,
+    "scheme": "RSA-PSS-SHA256",
+    "signature": "VERIFIED_PURE_PYTHON"
+   },
+   "result": "P1_EVIDENCE_VERIFICATION_PASS"
+  },
+  "synthetic_full_openssl": [
+   "PASS cert-self-signature (openssl dgst)",
+   "PASS pe-authenticode-digest + certificate-table layout (sha256)",
+   "PASS pkcs7-structure + spc-binding + signer-cert-equality + signedAttrs-signature (asn1parse + openssl dgst)",
+   "PASS detached-pss-sha256-salt32 (openssl pkeyutl)",
+   "P1_OPENSSL_CROSSCHECK_PASS"
+  ],
+  "synthetic_pkcs7_python": {
+   "pkcs7": {
+    "derBytes": 1857,
+    "eContentForm": "DIRECT_SEQUENCE",
+    "eContentType": "1.3.6.1.4.1.311.2.1.4",
+    "paddingBytes": 7,
+    "signature": "VERIFIED_PURE_PYTHON",
+    "signerCertEquality": "BYTE_EXACT",
+    "spcContentBytes": 76
+   },
+   "result": "P1_EVIDENCE_VERIFICATION_PASS"
+  },
+  "synthetic_signed_efi_python": {
+   "pkcs7": {
+    "derBytes": 1857,
+    "eContentForm": "DIRECT_SEQUENCE",
+    "eContentType": "1.3.6.1.4.1.311.2.1.4",
+    "paddingBytes": 7,
+    "signature": "VERIFIED_PURE_PYTHON",
+    "signerCertEquality": "BYTE_EXACT",
+    "spcContentBytes": 76
+   },
+   "result": "P1_EVIDENCE_VERIFICATION_PASS",
+   "signedUki": {
+    "bytes": 2192,
+    "peAuthenticodeDigestSha256": "0f3a77929bc7256dca13698f316a2a6a59687ba88ba4d7cae9c9136106999e69",
+    "pkcs7Bytes": 1864,
+    "pkcs7Sha256": "b8c5cbed6552d35906ea94f658ed4344bce3ab2b6edc09cfdd8236edcef68133"
+   }
+  }
+ },
+ "realIdentityReconstruction": {
+  "delta": [
+   "certificateDerSha256",
+   "gitCommit",
+   "gitTree",
+   "signedUkiSha256"
+  ],
+  "finalRecordBytes": 47246,
+  "preimageDigestSha256": "fec736a6a7e50f030164d76bd2015925621b5edfa1eefb4980ffcb8c18142b45",
+  "reconstruction": "BYTE_EXACT",
+  "records": 200
  },
  "schema": "v3.provisioning-p1-tool-fixture-evidence.v1"
 }

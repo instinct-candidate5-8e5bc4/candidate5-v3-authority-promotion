@@ -1,0 +1,209 @@
+{
+ "files": {
+  "accepted-authenticode-spc.pkcs7": {
+   "bytes": 1864,
+   "sha256": "440aebd415335218df88abbb9b858fabd3fa30d7d238c8e368f7adc6835de1e5"
+  },
+  "negatives/real-bad-cert.pkcs7": {
+   "bytes": 1864,
+   "sha256": "09d7855b2dd1412bb62ad8d59badd43df35f991e66b90de8c8dac3d0f8f60e33"
+  },
+  "negatives/real-bad-digestinfo.pkcs7": {
+   "bytes": 1864,
+   "sha256": "1f8e538ef302eadca8f36de89b80b41d0509147b60cf1a3de8448c2967d90890"
+  },
+  "negatives/real-bad-messagedigest.pkcs7": {
+   "bytes": 1864,
+   "sha256": "cb14083fd715a2df57ccf7168266e8854611cd3d605361b1b8954b89293a9dbc"
+  },
+  "negatives/real-bad-signature.pkcs7": {
+   "bytes": 1864,
+   "sha256": "1ba5da2109a1cb65ea5005dcb1db74bbe2bade6394bc49fe4c30bcd95f75a313"
+  },
+  "negatives/real-octet-wrapped.pkcs7": {
+   "bytes": 1864,
+   "sha256": "f07a77e29ee8df16ff34f5e198a75d18686f8f23d064388d930cd99952d1d432"
+  },
+  "negatives/synth-bad-digestinfo.pkcs7": {
+   "bytes": 1864,
+   "sha256": "43b3d8b2d41be505af14a2afd5d5e3bb05830fb1dae97d7ec0c5e0003f76cba7"
+  },
+  "negatives/synth-bad-messagedigest.pkcs7": {
+   "bytes": 1864,
+   "sha256": "ad34ccf80836a1ac53089da06de55ca6f41f0b444d108cd1cb203568b183ba16"
+  },
+  "negatives/synth-bad-signature.pkcs7": {
+   "bytes": 1864,
+   "sha256": "7eb3d4e0b453f79139a4bc07fdc6cb4af5697c5b644a5bca535deaf7b13cb7f3"
+  },
+  "negatives/synth-cert-table-dwlength.efi": {
+   "bytes": 2192,
+   "sha256": "4cf25e462238d7b642a4acfd0b85b0495fd8c8f4348c34d2d803c2fd7a46baee"
+  },
+  "negatives/synth-cert-table-not-eof.efi": {
+   "bytes": 2200,
+   "sha256": "eeb54baa5d1b68cc087331e465ac8f4148c18c75a82c9ff1df527d26b32f3868"
+  },
+  "negatives/synth-extra-algorithm.pkcs7": {
+   "bytes": 1872,
+   "sha256": "7387cee73ad8bf11b2a615779e333ce763a910449236870933d6c1bf11803185"
+  },
+  "negatives/synth-extra-attr.pkcs7": {
+   "bytes": 1872,
+   "sha256": "4e18c0fe03c7c65aea3aa6773ef96881265aae1417f4329e22652cbea265cb1f"
+  },
+  "negatives/synth-extra-signer.pkcs7": {
+   "bytes": 2480,
+   "sha256": "a22fd3395f0fa3d109db51dfa348626935933a58ad7916b5179ca33876369bea"
+  },
+  "negatives/synth-octet-wrapped.pkcs7": {
+   "bytes": 1864,
+   "sha256": "5d6e55b2243b60dcdbf73e4955c17beec668a26d4706a17fbcda04256808ca80"
+  },
+  "negatives/synth-wrong-cert.efi": {
+   "bytes": 2192,
+   "sha256": "d8df73fe388f9b2a24baf6efa3cf14bfbf00e621a98422f1a5db5cefeca3abdd"
+  },
+  "negatives/synth-wrong-cert.pkcs7": {
+   "bytes": 1864,
+   "sha256": "fc13f17612b1f80f70984611a1eb7701a82dbc3b281b01563c0444d60bfab838"
+  },
+  "negatives/synth-wrong-oid.pkcs7": {
+   "bytes": 1864,
+   "sha256": "13588c549e7289a539f303685d781c031cc540b394771b2f5d4c7f84fb05374f"
+  },
+  "negatives/synthetic-detached-salt20.sig": {
+   "bytes": 384,
+   "sha256": "0cfa7e397e823ccdf6cc194d95607d1e024011c30405d3f6b55ba30b546d18c7"
+  },
+  "synthetic-cert.der": {
+   "bytes": 1091,
+   "sha256": "03d03899b0cd1f08fa6e545506986ca3a8286d332b9ae5258932cb298bd7d482"
+  },
+  "synthetic-detached.sig": {
+   "bytes": 384,
+   "sha256": "a6c7bed7948c288f42cde992598c1bb975a58fe6f124a2b7134a45627fdbcb86"
+  },
+  "synthetic-signed.efi": {
+   "bytes": 2192,
+   "sha256": "38e3671fec96a97b78091d3a4086f7bb85b34112cd1c7122963dfcb8b4a268d3"
+  },
+  "synthetic-spc.pkcs7": {
+   "bytes": 1864,
+   "sha256": "b8c5cbed6552d35906ea94f658ed4344bce3ab2b6edc09cfdd8236edcef68133"
+  }
+ },
+ "negatives": {
+  "real-bad-cert.pkcs7": {
+   "expect": "E_CERT_HASH",
+   "note": "1-bit flip inside embedded certificate"
+  },
+  "real-bad-digestinfo.pkcs7": {
+   "expect": "E_AUTHENTICODE_DIGEST",
+   "note": "1-bit flip in embedded DigestInfo digest"
+  },
+  "real-bad-messagedigest.pkcs7": {
+   "expect": "E_AUTHENTICODE_DIGEST",
+   "note": "1-bit flip in signedAttrs messageDigest"
+  },
+  "real-bad-signature.pkcs7": {
+   "expect": "E_AUTHENTICODE_SIGNATURE",
+   "note": "1-bit flip in 384-byte signature"
+  },
+  "real-octet-wrapped.pkcs7": {
+   "expect": "E_PKCS7",
+   "note": "real content re-wrapped as OCTET STRING eContent; signature still valid, form check must reject"
+  },
+  "synth-bad-digestinfo.pkcs7": {
+   "expect": "E_AUTHENTICODE_DIGEST",
+   "note": "wrong embedded DigestInfo"
+  },
+  "synth-bad-messagedigest.pkcs7": {
+   "expect": "E_AUTHENTICODE_DIGEST",
+   "note": "wrong messageDigest, re-signed so the md check itself fires"
+  },
+  "synth-bad-signature.pkcs7": {
+   "expect": "E_AUTHENTICODE_SIGNATURE",
+   "note": "tampered signature"
+  },
+  "synth-cert-table-dwlength.efi": {
+   "expect": "E_AUTHENTICODE_TABLE",
+   "note": "WIN_CERTIFICATE dwLength != table size"
+  },
+  "synth-cert-table-not-eof.efi": {
+   "expect": "E_AUTHENTICODE_TABLE",
+   "note": "trailing bytes after certificate table"
+  },
+  "synth-extra-algorithm.pkcs7": {
+   "expect": "E_PKCS7",
+   "note": "digestAlgorithms {SHA-256,SHA-512}"
+  },
+  "synth-extra-attr.pkcs7": {
+   "expect": "E_PKCS7",
+   "note": "extra signedAttr OID 1.2.3.4, re-signed so the attr check itself fires"
+  },
+  "synth-extra-signer.pkcs7": {
+   "expect": "E_PKCS7",
+   "note": "two signerInfos"
+  },
+  "synth-octet-wrapped.pkcs7": {
+   "expect": "E_PKCS7",
+   "note": "SPC OID but OCTET-wrapped eContent"
+  },
+  "synth-wrong-cert.efi": {
+   "expect": "E_AUTHENTICODE_SIGNER",
+   "note": "different embedded cert vs provided .cer (signer equality in efi mode)"
+  },
+  "synth-wrong-cert.pkcs7": {
+   "expect": "E_CERT_HASH",
+   "note": "different embedded cert (identity pin in pkcs7 mode)"
+  },
+  "synth-wrong-oid.pkcs7": {
+   "expect": "E_PKCS7",
+   "note": "pkcs7-data eContentType (the P1-rejected fixture shape)"
+  },
+  "synthetic-detached-salt20.sig": {
+   "expect": "E_PSS_",
+   "note": "PSS salt length 20 must be rejected (prefix match)"
+  }
+ },
+ "note": "Pinned identities of the frozen PUBLIC P1.1 fixtures. synthetic-* material uses ephemeral RSA-3072 keys with no authority; accepted-authenticode-spc.pkcs7 is the accepted real blob SHA-256 440aebd415335218df88abbb9b858fabd3fa30d7d238c8e368f7adc6835de1e5. negatives/ are designed rejections; 'expect' is the required verifier exit code.",
+ "profiles": {
+  "realAccepted": {
+   "certDerSha256": "7cda4ddc149849cc61191d4b5b3d218d14770c0401e9e66dd9617b82ba1ae441",
+   "certSubjectCN": "V3 Successor UKI Secure Boot Authority",
+   "certThumbprintSha1": "DA1ED260911F93F41C0914108EA45DC0BD85B171",
+   "peAuthenticodeDigestSha256": "ab95a4c3fcf946679d2a46e87e64f28912ca5a7b27d642c70e6d5713f4065219",
+   "peCertDirOffset": 296,
+   "peCertTableOffset": 21164544,
+   "peCertTableSize": 1872,
+   "peChecksumOffset": 216,
+   "peMachineAmd64": 34404,
+   "pkcs7Bytes": 1864,
+   "pkcs7Sha256": "440aebd415335218df88abbb9b858fabd3fa30d7d238c8e368f7adc6835de1e5",
+   "spcIndirectDataContentBytes": 76,
+   "winCertificateRevision": 512,
+   "winCertificateType": 2
+  },
+  "synthetic": {
+   "certDerSha256": "03d03899b0cd1f08fa6e545506986ca3a8286d332b9ae5258932cb298bd7d482",
+   "certSubjectCN": "V3 Successor UKI Secure Boot Authority",
+   "certThumbprintSha1": "038CA8F074DF539AACDF234658E8F0DE497B70E5",
+   "detachedSigBytes": 384,
+   "peAuthenticodeDigestSha256": "0f3a77929bc7256dca13698f316a2a6a59687ba88ba4d7cae9c9136106999e69",
+   "peCertDirOffset": 296,
+   "peCertTableOffset": 320,
+   "peCertTableSize": 1872,
+   "peChecksumOffset": 216,
+   "peMachineAmd64": 34404,
+   "pkcs7Bytes": 1864,
+   "pkcs7Sha256": "b8c5cbed6552d35906ea94f658ed4344bce3ab2b6edc09cfdd8236edcef68133",
+   "signedUkiBytes": 2192,
+   "signedUkiSha256": "38e3671fec96a97b78091d3a4086f7bb85b34112cd1c7122963dfcb8b4a268d3",
+   "spcIndirectDataContentBytes": 76,
+   "winCertificateRevision": 512,
+   "winCertificateType": 2
+  }
+ },
+ "schema": "v3.provisioning-p1-fixture-manifest.v1"
+}

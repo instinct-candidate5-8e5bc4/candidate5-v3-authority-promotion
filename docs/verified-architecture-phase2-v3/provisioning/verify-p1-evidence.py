@@ -15,10 +15,25 @@ P1 gate, against the frozen required bindings:
       delta and all 200 records retained;
   (e) optional evidence-set allow-list check against EVIDENCE-MANIFEST.json.
 
-A second, independent implementation of every signature check lives in
-verify-p1-openssl.sh (OpenSSL CLI). No network, no writes outside --report,
-no private material accepted or used. Deterministic JSON report; exit 0 PASS,
-exit 1 with E_<CODE> on stderr on any mismatch.
+Chain (a) strictly requires the Microsoft Authenticode form of this evidence:
+eContentType SpcIndirectDataContent (1.3.6.1.4.1.311.2.1.4) with the [0]
+eContent holding the SpcIndirectData SEQUENCE DIRECTLY (an OCTET STRING
+wrapper is rejected), trailing bytes after the ContentInfo required to be
+zero padding (WIN_CERTIFICATE 8-byte alignment). openssl cms -verify cannot
+decode this encoding and is NOT used anywhere; the second, independent
+implementation in verify-p1-openssl.sh uses openssl asn1parse extraction plus
+openssl dgst signature verification instead.
+
+Fixture mode: --fixture fixture-manifest.v1.json [--fixture-profile NAME]
+overrides the pinned identities from a fixture manifest; --pkcs7 BLOB runs
+the CMS chain standalone on a PKCS#7 blob (embedded certificate pinned to the
+profile identity); --no-pin skips blob/UKI identity pins for negative-case
+runs (certificate identity pins stay active). --final-record - uses the
+in-code deterministic reconstruction.
+
+No network, no writes outside --report, no private material accepted or used.
+Deterministic JSON report; exit 0 PASS, exit 1 with E_<CODE> on stderr on any
+mismatch.
 """
 import hashlib, json, os, re, subprocess, sys
 
@@ -68,6 +83,9 @@ OID_BC = "2.5.29.19"
 OID_SKID = "2.5.29.14"
 OID_EKU = "2.5.29.37"
 OID_EKU_CODE_SIGNING = "1.3.6.1.5.5.7.3.3"
+OID_SPC_INDIRECT_DATA = "1.3.6.1.4.1.311.2.1.4"
+OID_SPC_STATEMENT_TYPE = "1.3.6.1.4.1.311.2.1.11"
+OID_SPC_OPUS_INFO = "1.3.6.1.4.1.311.2.1.12"
 
 EVIDENCE_FILES = [
  "successor-secure-boot.cer", "successor-unsigned.efi", "successor-signed.efi",
@@ -305,9 +323,36 @@ def pe_authenticode_digest(buf, exp):
     return digest, pkcs7
 
 # ---------- CMS / PKCS#7 ----------
+def cms_embedded_certs(pkcs7):
+    """Parse the SignedData envelope and return (der_len, [embedded cert DER TLVs]).
+    Tolerates trailing zero padding (WIN_CERTIFICATE 8-byte alignment)."""
+    t_top, ci_content, h_top, tl_top = tlv(pkcs7, 0)
+    if t_top != 0x30: raise DerErr("ContentInfo not one SEQUENCE")
+    if any(pkcs7[tl_top:]): raise DerErr("non-zero trailing bytes after ContentInfo")
+    ci = children(ci_content)
+    if len(ci) != 2 or der_oid(ci[0][1]) != OID_SIGNED_DATA: raise DerErr("not signedData ContentInfo")
+    t0, sd_seq, h0, tl0 = tlv(ci[1][1], 0)
+    if t0 != 0x30 or tl0 != len(ci[1][1]): raise DerErr("signedData wrapper")
+    certs = []
+    for t2, c2, h2, off, tl2 in children(sd_seq)[3:]:
+        if t2 == 0xA0:
+            i = 0
+            while i < len(c2):
+                t3, c3, h3, tl3 = tlv(c2, i)
+                certs.append(c2[i:i+tl3]); i += tl3
+    return tl_top, certs
+
 def check_cms(pkcs7, cert_der, pe_digest_bytes, exp, spc_len=None):
+    """Strict verifier for the Microsoft Authenticode form of this evidence:
+    eContentType MUST be SpcIndirectDataContent (1.3.6.1.4.1.311.2.1.4) and the
+    [0] eContent MUST hold the SpcIndirectData SEQUENCE directly (never an
+    OCTET STRING wrapper). Trailing bytes after the ContentInfo must be zero
+    padding only."""
     try:
-        ci = seq_of(pkcs7)
+        t_top, ci_content, h_top, tl_top = tlv(pkcs7, 0)
+        if t_top != 0x30: E("E_PKCS7", "ContentInfo not one SEQUENCE")
+        if any(pkcs7[tl_top:]): E("E_PKCS7", "non-zero trailing bytes after ContentInfo")
+        ci = children(ci_content)
         if len(ci) != 2 or der_oid(ci[0][1]) != OID_SIGNED_DATA: E("E_PKCS7", "not signedData ContentInfo")
         t0, sd_seq, h0, tl0 = tlv(ci[1][1], 0)
         if t0 != 0x30 or tl0 != len(ci[1][1]): E("E_PKCS7", "signedData wrapper")
@@ -316,12 +361,16 @@ def check_cms(pkcs7, cert_der, pe_digest_bytes, exp, spc_len=None):
         algs = [der_oid(children(x[1])[0][1]) for x in children(sd[1][1])]
         if algs != [OID_SHA256]: E("E_PKCS7", "digestAlgorithms not exactly {SHA-256}")
         enc = children(sd[2][1])
+        if len(enc) != 2: E("E_PKCS7", "encapsulated contentInfo element count")
         ectype = der_oid(enc[0][1])
+        if ectype != OID_SPC_INDIRECT_DATA:
+            E("E_PKCS7", "eContentType not SpcIndirectDataContent 1.3.6.1.4.1.311.2.1.4")
         if enc[1][0] != 0xA0: E("E_PKCS7", "missing eContent")
         t1, spc, h1, tl1 = tlv(enc[1][1], 0)
-        if t1 != 0x04 or tl1 != len(enc[1][1]): E("E_PKCS7", "eContent not one primitive OCTET STRING")
+        if t1 != 0x30 or tl1 != len(enc[1][1]):
+            E("E_PKCS7", "eContent not the direct SpcIndirectData SEQUENCE")
         if spc_len is not None and len(spc) != spc_len: E("E_PKCS7", "SpcIndirectData content length mismatch")
-        spc_el = seq_of(spc)
+        spc_el = children(spc)
         if len(spc_el) != 2: E("E_PKCS7", "SpcIndirectData element count")
         di = children(spc_el[1][1])
         if der_oid(children(di[0][1])[0][1]) != OID_SHA256: E("E_PKCS7", "DigestInfo alg not SHA-256")
@@ -367,7 +416,8 @@ def check_cms(pkcs7, cert_der, pe_digest_bytes, exp, spc_len=None):
             a = seq_of(attrs_raw[j:j+atl])
             attrs[der_oid(a[0][1])] = [v[1] for v in children(a[1][1])]
             j += atl
-        allowed_attrs = {OID_CONTENT_TYPE, OID_MESSAGE_DIGEST, OID_SIGNING_TIME}
+        allowed_attrs = {OID_CONTENT_TYPE, OID_MESSAGE_DIGEST, OID_SIGNING_TIME,
+                         OID_SPC_STATEMENT_TYPE, OID_SPC_OPUS_INFO}
         extra = set(attrs) - allowed_attrs
         if extra: E("E_PKCS7", "unexpected signedAttrs " + ",".join(sorted(extra)))
         if OID_CONTENT_TYPE not in attrs or OID_MESSAGE_DIGEST not in attrs:
@@ -383,7 +433,9 @@ def check_cms(pkcs7, cert_der, pe_digest_bytes, exp, spc_len=None):
             E("E_AUTHENTICODE_SIGNATURE", "authenticated-attributes signature invalid")
     except DerErr as e:
         E("E_AUTHENTICODE_PARSE", str(e))
-    return {"eContentType": ectype, "spcContentBytes": len(spc),
+    return {"eContentType": ectype, "eContentForm": "DIRECT_SEQUENCE",
+            "spcContentBytes": len(spc), "derBytes": tl_top,
+            "paddingBytes": len(pkcs7) - tl_top,
             "signerCertEquality": "BYTE_EXACT", "signature": "VERIFIED_PURE_PYTHON"}
 
 # ---------- final record ----------
@@ -406,6 +458,10 @@ def finalize_record(orig_bytes, exp):
     return fin
 
 def check_final_record(final_bytes, orig_bytes, exp):
+    # The final record is REAL evidence data, never fixture data: identity pins and
+    # the deterministic reconstruction always use the accepted EXPECTED bindings,
+    # even when --fixture overrode other profile values.
+    exp = EXPECTED
     if sha256(final_bytes) != exp["finalRecordSha256"]: E("E_FINAL_HASH", "final record SHA-256 mismatch")
     if len(final_bytes) != exp["finalRecordBytes"]: E("E_FINAL_SIZE", "final record size mismatch")
     want = finalize_record(orig_bytes, exp)
@@ -484,13 +540,24 @@ def main():
     repo = opt("--repo", ".")
     signed_p = opt("--signed-efi"); cer_p = opt("--cert-der"); fin_p = opt("--final-record")
     sig_p = opt("--detached-sig"); evd = opt("--evidence-dir"); rep_p = opt("--report")
-    exp = EXPECTED
+    fx_p = opt("--fixture"); fx_profile = opt("--fixture-profile", "synthetic")
+    p7_p = opt("--pkcs7")
+    no_pin = "--no-pin" in args
+    exp = dict(EXPECTED)
+    if fx_p:
+        fx = json.load(open(fx_p, "rb"))
+        if fx.get("schema") != "v3.provisioning-p1-fixture-manifest.v1": E("E_FIXTURE", "manifest schema")
+        prof = fx.get("profiles", {}).get(fx_profile)
+        if prof is None: E("E_FIXTURE", "unknown profile " + fx_profile)
+        exp.update(prof)
     report = {"schema": "v3.provisioning-p1-verification.v1", "implementation": "pure-python-stdlib",
               "checks": {}, "result": None}
-    orig = repo_blob(repo, exp["gitCommit"], ORIG_RECORD_REPO_PATH)
-    if sha256(orig) != exp["origRecordSha256"]: E("E_REPO", "original record identity")
+    if fx_p:
+        report["fixtureProfile"] = fx_profile
+    orig = repo_blob(repo, EXPECTED["gitCommit"], ORIG_RECORD_REPO_PATH)
+    if sha256(orig) != EXPECTED["origRecordSha256"]: E("E_REPO", "original record identity")
     if fin_p:
-        final_bytes = open(fin_p, "rb").read()
+        final_bytes = finalize_record(orig, EXPECTED) if fin_p == "-" else open(fin_p, "rb").read()
         report["checks"]["finalRecord"] = check_final_record(final_bytes, orig, exp)
     if cer_p:
         cer = open(cer_p, "rb").read()
@@ -499,16 +566,33 @@ def main():
         report["checks"]["detachedSignature"] = check_detached_signature(open(sig_p, "rb").read(), final_bytes, cer, exp)
     if signed_p and cer_p:
         signed = open(signed_p, "rb").read()
-        if len(signed) != exp["signedUkiBytes"] or sha256(signed) != exp["signedUkiSha256"]:
+        if not no_pin and (len(signed) != exp["signedUkiBytes"] or sha256(signed) != exp["signedUkiSha256"]):
             E("E_SIGNED_HASH", "signed UKI size/SHA-256 mismatch")
         digest, pkcs7 = pe_authenticode_digest(signed, exp)
-        if digest != exp["peAuthenticodeDigestSha256"]: E("E_AUTHENTICODE_DIGEST", "computed PE digest != accepted value")
-        if len(pkcs7) != exp["pkcs7Bytes"] or sha256(pkcs7) != exp["pkcs7Sha256"]:
+        if not no_pin and digest != exp["peAuthenticodeDigestSha256"]:
+            E("E_AUTHENTICODE_DIGEST", "computed PE digest != accepted value")
+        if not no_pin and (len(pkcs7) != exp["pkcs7Bytes"] or sha256(pkcs7) != exp["pkcs7Sha256"]):
             E("E_PKCS7", "PKCS#7 identity mismatch")
         report["checks"]["signedUki"] = {"bytes": len(signed), "peAuthenticodeDigestSha256": digest,
             "pkcs7Bytes": len(pkcs7), "pkcs7Sha256": sha256(pkcs7)}
         report["checks"]["pkcs7"] = check_cms(pkcs7, cer, bytes.fromhex(digest), exp,
                                               spc_len=exp["spcIndirectDataContentBytes"])
+    if p7_p:
+        blob = open(p7_p, "rb").read()
+        if not no_pin and (len(blob) != exp["pkcs7Bytes"] or sha256(blob) != exp["pkcs7Sha256"]):
+            E("E_PKCS7", "PKCS#7 identity mismatch vs pinned profile")
+        try:
+            _, ecerts = cms_embedded_certs(blob)
+        except DerErr as e:
+            E("E_PKCS7", str(e))
+        if len(ecerts) != 1: E("E_PKCS7", "exactly one embedded certificate required")
+        ecer = ecerts[0]
+        if sha256(ecer) != exp["certDerSha256"]: E("E_CERT_HASH", "embedded certificate DER SHA-256 mismatch")
+        if hashlib.sha1(ecer).hexdigest().upper() != exp["certThumbprintSha1"]:
+            E("E_CERT_THUMB", "embedded certificate thumbprint mismatch")
+        report["checks"]["embeddedCertificate"] = check_certificate(ecer, exp)
+        report["checks"]["pkcs7"] = check_cms(blob, ecer, bytes.fromhex(exp["peAuthenticodeDigestSha256"]),
+                                              exp, spc_len=exp["spcIndirectDataContentBytes"])
     if evd:
         report["checks"]["evidenceSet"] = check_evidence_set(evd, repo, exp)
     report["mutationPerformed"] = False

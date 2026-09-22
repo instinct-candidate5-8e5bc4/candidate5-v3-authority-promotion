@@ -1,6 +1,10 @@
 # V3 Successor Provisioning P1 - Public Evidence Ingestion and Verification Plan
 
-Status: `P1_TOOLING_READY_FOR_INDEPENDENT_REVIEW`
+Status: `P1.1_TOOLING_READY_FOR_INDEPENDENT_REVIEW`
+
+P1.1 corrects the fatal defect from the P1-prep REJECT: both CMS paths now
+strictly require and process the real accepted Microsoft SpcIndirectDataContent
+encoding (see Chain (a)). The rejected commit `6efee48b...` stays in history.
 
 P0 is frozen at `55a8491f570e99836b9274b315779d7f52d9bdf5` (PROVISIONING P0: ACCEPT).
 This P1 delivery adds tooling and a plan only. No evidence byte has been ingested
@@ -49,13 +53,21 @@ repo byte-equality checks. Requesting the complete folder is preferred.
    field, the certificate-table directory entry and the certificate table) and
    required to equal `ab95a4c3fcf946679d2a46e87e64f28912ca5a7b27d642c70e6d5713f4065219`.
 4. PKCS#7 extracted (1,864 bytes, SHA-256 `440aebd4...`): SignedData with exactly
-   `{SHA-256}` digest algorithms; embedded SpcIndirectData content exactly 76 bytes;
-   its DigestInfo is SHA-256 and equals the computed PE digest; exactly one signer;
-   signer issuer/serial match the certificate; signedAttrs contain only contentType
-   (equal to eContentType), messageDigest (equal to SHA-256 of the SpcIndirectData
-   content) and optional signingTime; the authenticated-attributes RSA/SHA-256
-   signature verified as pure public-key math over the re-encoded SET OF; the
-   embedded signer certificate byte-equals the returned `.cer`.
+   `{SHA-256}` digest algorithms; eContentType REQUIRED to be
+   SpcIndirectDataContent (`1.3.6.1.4.1.311.2.1.4`); the [0] eContent REQUIRED to
+   hold the SpcIndirectData SEQUENCE DIRECTLY (an OCTET STRING wrapper, or any
+   other eContentType, is rejected); SpcIndirectData content exactly 76 bytes; its
+   DigestInfo is SHA-256 and equals the computed PE digest; exactly one signer;
+   signer issuer/serial match the certificate; signedAttrs limited to
+   {contentType (equal to eContentType), messageDigest (equal to SHA-256 of the
+   exact SpcIndirectData content), optional signingTime, and the two Microsoft
+   attributes present in the accepted blob, SPC_SP_OPUS_INFO
+   (`1.3.6.1.4.1.311.2.1.12`) and SPC_STATEMENT_TYPE (`1.3.6.1.4.1.311.2.1.11`)};
+   the authenticated-attributes RSA/SHA-256 signature verified as pure public-key
+   math over the re-encoded DER SET OF; the embedded signer certificate
+   byte-equals the returned `.cer`; trailing bytes after the ContentInfo (the
+   1,864-byte blob carries 5) REQUIRED to be zero padding from the
+   WIN_CERTIFICATE 8-byte alignment.
 5. Certificate: DER SHA-256 + SHA-1 thumbprint; full X.509 parse requiring
    self-signed SHA256-with-RSA, RSA-3072 e=65537, exact subject==issuer
    `CN=V3 Successor UKI Secure Boot Authority`, KeyUsage critical digitalSignature
@@ -65,9 +77,18 @@ repo byte-equality checks. Requesting the complete folder is preferred.
 
 `verify-p1-openssl.sh` (second, independent implementation, OpenSSL CLI): certificate
 identity via `openssl x509`/RFC2253 exact match, self-signature via `openssl dgst`
-over the asn1parse-extracted TBS, CMS verification via `openssl cms -verify
--noverify`, embedded-certificate equality via `openssl pkcs7 -print_certs` + byte
-compare, detached signature via `openssl pkeyutl -verify`.
+over the asn1parse-extracted TBS, detached signature via `openssl pkeyutl
+-verify`. `openssl cms -verify` is NOT used: it cannot decode the accepted
+SpcIndirectDataContent encoding. The CMS chain is instead verified from an
+`openssl asn1parse` structural extraction with three independent checks: (1)
+embedded signer certificate byte equality (`openssl pkcs7 -print_certs` + byte
+compare against the returned `.cer`, plus SHA-256 pin), (2) SHA-256 of the exact
+SpcIndirectData content equals the signedAttrs messageDigest, (3) `openssl dgst
+-sha256 -verify` over the re-tagged DER SET OF signedAttrs with the extracted
+384-byte signature. The script also independently recomputes the PE Authenticode
+digest, the certificate-table layout (offset/size/EOF, WIN_CERTIFICATE
+dwLength/revision/type), the direct-SEQUENCE eContent form, and the zero
+trailing padding.
 
 ### Chain (b): detached authority binding
 
@@ -102,23 +123,18 @@ Exact 10-file allow-list plus the manifest; no `.pfx/.p12/.pvk/.key`, no
 password/secret/private-named file; manifest schema, git identity and all per-file
 hashes recomputed; the three repo-carried files byte-equal to their repo blobs.
 
-## Ingestion mechanics proposal (reviewer decision required)
+## Ingestion mechanics (REVIEWER RULING: R1)
 
-- **R1 (recommended): hash-bound external evidence.** The evidence zip stays
-  outside the repository, bound by its SHA-256 confirmed in the peer channel. The
-  repository receives at P1 close ONLY the deterministic verification report (and,
-  if wanted, the small `EVIDENCE-MANIFEST.json`). No repository scope widening; the
-  signed UKI's 21 MB stays out of git.
-- **R2: commit the small cryptographic core.** Additionally commit
-  `successor-secure-boot.cer`, `successor-authority-record-final.v1.json`,
-  `successor-authority-record-final.v1.sig` and `detached-preimage.sha256`
-  (~49 KB total) so every load-bearing P1 identity is repo-reproducible forever.
-  The signed UKI remains hash-bound external.
-- **R3: commit everything** (including the 21 MB signed UKI). Maximum
-  reproducibility, largest scope widening; not recommended.
-
-Recommendation: R1, or R2 if the reviewer wants the cryptographic core in git.
-This plan does not choose silently; the P1 ACCEPT should name the option.
+The reviewer has ruled **R1: external hash-bound complete REVIEW-EVIDENCE ZIP**.
+The evidence stays outside the repository, bound by the zip SHA-256 recorded in
+the authenticated peer-channel transfer message and in the P1 verification
+report. At P1 close the repository receives ONLY the deterministic verification
+report + cross-check transcript (optionally the small `EVIDENCE-MANIFEST.json`),
+never the evidence core. Evidence custody per the ruling: the reviewer side
+holds the nine-small-files zip plus the extracted public PKCS#7; the owner side
+holds the EFI bytes and reassembles the full 11-file zip once this tooling is
+accepted. The full set is required (the minimum four would not satisfy the
+allow-list/manifest/repo-equality scope).
 
 ## P1 execution (after evidence delivery)
 
@@ -142,13 +158,24 @@ This plan does not choose silently; the P1 ACCEPT should name the option.
 4. Nothing prohibited: no PFX/key/password, no trust-store placement, no
    target/cloud call, no image/disk/VM, no enrollment, no boot - the tooling is
    read-only and network-free.
-5. Ingestion mechanics: R1/R2/R3 above; no silent repository widening.
+5. Ingestion mechanics: R1 per the reviewer ruling above; no silent repository
+   widening.
 6. One frozen P1 commit + deterministic report at close; a P1 ACCEPT may authorize
    P2 construction only, never P3.
 
-## Tooling validation already performed
+## Tooling validation already performed (P1.1, real-format)
 
-See `p1-tool-fixture-evidence.v1.json`: every verifier path exercised on ephemeral
-RSA-3072 fixtures (positive and negative), both implementations cross-checked, and
-the final-record reconstruction matched byte-exactly against the accepted real
-identities using only repository data.
+See `p1-tool-fixture-evidence.v1.json` and `fixtures/`: the PRIMARY fixture is
+the accepted real 1,864-byte PKCS#7 blob itself (`440aebd4...`), which both
+implementations parse and fully verify (direct-SEQUENCE form, 76-byte
+SpcIndirectData content, embedded DigestInfo `ab95a4c3...`, embedded certificate
+byte-identity `7cda4ddc...`, signedAttrs signature). Structurally faithful
+synthetic fixtures (ephemeral RSA-3072, no authority) exercise the full
+PE/EFI path, the certificate path and the detached PSS path. 18 negative cases
+(all with the designed E_ codes) include real-format mutations: OCTET-wrapped
+eContent re-wrap of the real blob (signature still valid - only the form check
+can reject), wrong embedded DigestInfo, wrong messageDigest, tampered
+signature, different embedded certificate, extra signer/algorithm/attribute,
+malformed certificate table, and PSS salt length 20. The final-record
+reconstruction still matches the accepted real identities byte-exactly using
+only repository data. Regenerate with `fixtures/run-fixture-tests.sh`.
