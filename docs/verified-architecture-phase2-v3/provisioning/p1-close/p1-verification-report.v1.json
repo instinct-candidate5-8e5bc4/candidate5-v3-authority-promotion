@@ -1,0 +1,59 @@
+{
+ "checks": {
+  "certificate": {
+   "extensions": [
+    "2.5.29.14",
+    "2.5.29.15",
+    "2.5.29.19",
+    "2.5.29.37"
+   ],
+   "modulusBits": 3072,
+   "selfSignature": "VERIFIED_PURE_PYTHON",
+   "serial": 59808280636078747909742306287964540499,
+   "subjectCN": "V3 Successor UKI Secure Boot Authority"
+  },
+  "detachedSignature": {
+   "bytes": 384,
+   "mgf": "MGF1-SHA256",
+   "saltLength": 32,
+   "scheme": "RSA-PSS-SHA256",
+   "signature": "VERIFIED_PURE_PYTHON"
+  },
+  "evidenceSet": {
+   "files": 11,
+   "manifest": "CONSISTENT",
+   "repoByteEquality": "3/3"
+  },
+  "finalRecord": {
+   "delta": [
+    "certificateDerSha256",
+    "gitCommit",
+    "gitTree",
+    "signedUkiSha256"
+   ],
+   "finalRecordBytes": 47246,
+   "preimageDigestSha256": "fec736a6a7e50f030164d76bd2015925621b5edfa1eefb4980ffcb8c18142b45",
+   "reconstruction": "BYTE_EXACT",
+   "records": 200
+  },
+  "pkcs7": {
+   "derBytes": 1859,
+   "eContentForm": "DIRECT_SEQUENCE",
+   "eContentType": "1.3.6.1.4.1.311.2.1.4",
+   "paddingBytes": 5,
+   "signature": "VERIFIED_PURE_PYTHON",
+   "signerCertEquality": "BYTE_EXACT",
+   "spcContentBytes": 76
+  },
+  "signedUki": {
+   "bytes": 21166416,
+   "peAuthenticodeDigestSha256": "ab95a4c3fcf946679d2a46e87e64f28912ca5a7b27d642c70e6d5713f4065219",
+   "pkcs7Bytes": 1864,
+   "pkcs7Sha256": "440aebd415335218df88abbb9b858fabd3fa30d7d238c8e368f7adc6835de1e5"
+  }
+ },
+ "implementation": "pure-python-stdlib",
+ "mutationPerformed": false,
+ "result": "P1_EVIDENCE_VERIFICATION_PASS",
+ "schema": "v3.provisioning-p1-verification.v1"
+}

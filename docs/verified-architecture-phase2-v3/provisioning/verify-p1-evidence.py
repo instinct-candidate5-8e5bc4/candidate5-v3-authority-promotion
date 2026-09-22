@@ -528,8 +528,17 @@ def check_evidence_set(d, repo, exp):
     if repo_blob(repo, exp["gitCommit"], INVENTORY_REPO_PATH) != open(os.path.join(d, "inventory.v1.json"), "rb").read():
         E("E_EVIDENCE_INVENTORY", "inventory != repo blob")
     raw = open(os.path.join(d, "detached-preimage.sha256"), "rb").read()
-    txt = raw.decode(errors="strict").strip()
-    got = bytes.fromhex(txt) if re.fullmatch(r"[0-9a-fA-F]{64}", txt) else raw
+    # Accepted forms: 64-hex text (ASCII/UTF-8, optional BOM/whitespace) OR the raw
+    # 32 digest bytes. The accepted evidence carries the raw bytes; undecodable
+    # input must fall through to the raw comparison, never crash.
+    txt = None
+    try:
+        t = raw.decode("utf-8-sig").strip()
+        if re.fullmatch(r"[0-9a-fA-F]{64}", t):
+            txt = t
+    except UnicodeDecodeError:
+        txt = None
+    got = bytes.fromhex(txt) if txt is not None else raw
     if got.hex() != exp["preimageDigestSha256"]: E("E_PREIMAGE_FILE", "detached-preimage.sha256 content")
     return {"files": len(EVIDENCE_FILES) + 1, "manifest": "CONSISTENT", "repoByteEquality": "3/3"}
 

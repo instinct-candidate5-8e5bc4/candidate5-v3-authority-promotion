@@ -1,0 +1,64 @@
+{
+    "schema":  "v3.production-signing-evidence.v3",
+    "note":  "This manifest records the SHA-256 and byte length of every OTHER evidence file. It does not hash itself.",
+    "createdUtc":  "2026-09-21T22:21:21.8300789Z",
+    "gitCommit":  "92741cbdefaa78adc33bc3c74935a45f9558b88c",
+    "gitTree":  "9cc2e40fab25c2231d5a6cefa285d2e3e65a7bee",
+    "domain":  "V3-SUCCESSOR-UKI-EXTERNAL-BINDING:v1",
+    "signtoolPath":  "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\signtool.exe",
+    "signtoolVersion":  "4.00 (WinBuild.160101.0800)",
+    "signtoolSha256":  "431ee314c83988cacda86606356fd321b75ae0093481b97e3b738e99c412f2a0",
+    "certificateThumbprint":  "DA1ED260911F93F41C0914108EA45DC0BD85B171",
+    "certificateDerSha256":  "7cda4ddc149849cc61191d4b5b3d218d14770c0401e9e66dd9617b82ba1ae441",
+    "unsignedUkiSha256":  "ed5d9d72be40592af3b14bd1fd9dc91a5976b14f350f9124ea414b975464d536",
+    "signedUkiSha256":  "133096976ee70a8c272cbcc8c28d369bfc65d93d994cbff4174b947df00239d1",
+    "finalRecordSha256":  "07f88bfc5a98ef471c05451cc8077af4d7b61015aae5ba0395deb6c935dc1694",
+    "detachedSignatureSha256":  "0e76b2a823ec71b45b4563ac79bc775e32ba4c44806047f86d4d6fa799298bab",
+    "pssSaltLengthBytes":  32,
+    "pssStructuralProof":  "PASS",
+    "authenticodeMathematicalVerify":  "PASS",
+    "keyContainersAbsent":  true,
+    "twoEncryptedPfxCopiesIdentical":  true,
+    "files":  {
+                  "successor-secure-boot.cer":  {
+                                                    "bytes":  1092,
+                                                    "sha256":  "7cda4ddc149849cc61191d4b5b3d218d14770c0401e9e66dd9617b82ba1ae441"
+                                                },
+                  "successor-unsigned.efi":  {
+                                                 "bytes":  21164544,
+                                                 "sha256":  "ed5d9d72be40592af3b14bd1fd9dc91a5976b14f350f9124ea414b975464d536"
+                                             },
+                  "successor-signed.efi":  {
+                                               "bytes":  21166416,
+                                               "sha256":  "133096976ee70a8c272cbcc8c28d369bfc65d93d994cbff4174b947df00239d1"
+                                           },
+                  "successor-authority-record.v1.json":  {
+                                                             "bytes":  46963,
+                                                             "sha256":  "c09245ae3b60db34f050e29fd9f457a83fde95bd44efc70e9afda14fcbee0e88"
+                                                         },
+                  "successor-authority-record-final.v1.json":  {
+                                                                   "bytes":  47246,
+                                                                   "sha256":  "07f88bfc5a98ef471c05451cc8077af4d7b61015aae5ba0395deb6c935dc1694"
+                                                               },
+                  "successor-authority-record-final.v1.sig":  {
+                                                                  "bytes":  384,
+                                                                  "sha256":  "0e76b2a823ec71b45b4563ac79bc775e32ba4c44806047f86d4d6fa799298bab"
+                                                              },
+                  "inventory.v1.json":  {
+                                            "bytes":  52390,
+                                            "sha256":  "a34edbf31bdacca8b2f836d496d01da5d57a8e8a1f46fcc7d63a9ab0dc297236"
+                                        },
+                  "signtool-sign.txt":  {
+                                            "bytes":  89,
+                                            "sha256":  "6863dd1ffe6617165cabcd81984788b5ce3dc42ac415356327c4bb35aa416af7"
+                                        },
+                  "authenticode-verify.txt":  {
+                                                  "bytes":  1116,
+                                                  "sha256":  "6422806e6785a613daf857faaa0314b06c6ce5618fb39fe253310bb565c6b976"
+                                              },
+                  "detached-preimage.sha256":  {
+                                                   "bytes":  32,
+                                                   "sha256":  "e2f01897459a97a6030296fc0e97f3608991ff591d4ab09014c7c010083ab1d6"
+                                               }
+              }
+}
