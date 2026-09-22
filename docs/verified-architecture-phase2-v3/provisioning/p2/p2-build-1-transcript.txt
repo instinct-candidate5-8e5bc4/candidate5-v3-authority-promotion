@@ -1,0 +1,64 @@
+== build-p2-images.sh ==
+epoch=1789923381
+umask=0022 LC_ALL=C TZ=UTC
+== tool identities ==
+tool mke2fs /usr/sbin/mke2fs a7c9ea9ecd5c143f911ff4d52e5770fb18288e14e902480782ea30b6b2f99689
+tool debugfs /usr/sbin/debugfs d8d3959fe11b32233f4291b795cb4ce2b8b8e6cbd2a467eebecedfe943a6dcd2
+tool dumpe2fs /usr/sbin/dumpe2fs 31680e271fba9a60a425459df754d13926d6779b6c80409bb6abf86c8cc5882d
+tool e2fsck /usr/sbin/e2fsck 321c62ebfb0faa8274189cb735e3e189c81817508b0ad2ead84bdd62f47c72b5
+tool fakeroot /usr/bin/fakeroot bc174142d8a854551d04c068f6c771bcbd8bac6f1b1b45f3d237c8d1a4b78308
+tool python3 /usr/bin/python3 7d51cd6b48b521277f5caa4610a82126e315fa2be4df069823a8b1eeb5bd4a86
+tool git /usr/bin/git 587ef21868c948b883993e23209b86a72a6ddc06aab1545c697ffc31075acd4a
+tool tar /usr/bin/tar fd0d62eed19efd3e115aa1be44160f89d777cd1e6d6d8eb0ce7c8bdc879f59e2
+tool truncate /usr/bin/truncate 967c95883c6d438bd84d91f36036df7a5b160526bf7e32c9e3cd137d6c6e5d2a
+tool sha256sum /usr/bin/sha256sum b88ea413571562a591268213d736121fada5ba14330bfcc74b8d9f14e4018ddf
+tool-version mke2fs mke2fs 1.46.5 (30-Dec-2021)
+tool-version debugfs debugfs 1.46.5 (30-Dec-2021)
+tool-version e2fsck e2fsck 1.46.5 (30-Dec-2021)
+tool-version fakeroot fakeroot version 1.28
+tool-version python3 Python 3.10.12
+tool-version git git version 2.34.1
+== input pin verification ==
+pin-ok offline_inputs cargo-1.98.1-x86_64-unknown-linux-gnu.tar.xz 11662108 ea1de9f9e23107d97ee2b41a72c552f34064a593da503789218387aee59f3ba4
+pin-ok offline_inputs channel-rust-1.98.1.toml 898637 a7c8774a5fd8441c997d94c029776cbc5eb111e9d72ab5d256fa69866644347e
+pin-ok offline_inputs channel-rust-1.98.1.toml.asc 801 a9fed69b47daaaf29a6207af9df13aedb66d502ab0acc4ea557602edf87fd1aa
+pin-ok offline_inputs channel-rust-1.98.1.toml.sha256 91 48632299e2889ef236ef5411123148c86baef9816a662af28e98784771484260
+pin-ok offline_inputs expected-channel-rust-1.98.1.toml.sha256 91 48632299e2889ef236ef5411123148c86baef9816a662af28e98784771484260
+pin-ok offline_inputs rust-1.98.1-license-notice-manifest.bin 3685 e01f11e6bdba74f2b87a36c86b75691682850ee6e8b3466c5c6f18166dff8200
+pin-ok offline_inputs rust-key.gpg.ascii 5326 e54b09a439647e006b4831eec9785cbaaf3e07ab371c3a6ee6a68e1bdb9fbc6b
+pin-ok offline_inputs rust-std-1.98.1-x86_64-unknown-linux-gnu.tar.xz 30715684 fa3ff450172a16c026944030230c5069947af93c728d9179971d44e5e0cfb561
+pin-ok offline_inputs rustc-1.98.1-x86_64-unknown-linux-gnu.tar.xz 79727616 e974f036b28565f37c0f3bd92ddefa809bee16c04f9dcf07b9ed96e05aaaf7c4
+pin-ok review_evidence EVIDENCE-MANIFEST.json 4533 2ed610034a928940b10720b7ed3684d6f6c0339d0fca31cdba145bea6e342f2e
+pin-ok review_evidence authenticode-verify.txt 1116 6422806e6785a613daf857faaa0314b06c6ce5618fb39fe253310bb565c6b976
+pin-ok review_evidence detached-preimage.sha256 32 e2f01897459a97a6030296fc0e97f3608991ff591d4ab09014c7c010083ab1d6
+pin-ok review_evidence inventory.v1.json 52390 a34edbf31bdacca8b2f836d496d01da5d57a8e8a1f46fcc7d63a9ab0dc297236
+pin-ok review_evidence signtool-sign.txt 89 6863dd1ffe6617165cabcd81984788b5ce3dc42ac415356327c4bb35aa416af7
+pin-ok review_evidence successor-authority-record-final.v1.json 47246 07f88bfc5a98ef471c05451cc8077af4d7b61015aae5ba0395deb6c935dc1694
+pin-ok review_evidence successor-authority-record-final.v1.sig 384 0e76b2a823ec71b45b4563ac79bc775e32ba4c44806047f86d4d6fa799298bab
+pin-ok review_evidence successor-authority-record.v1.json 46963 c09245ae3b60db34f050e29fd9f457a83fde95bd44efc70e9afda14fcbee0e88
+pin-ok review_evidence successor-secure-boot.cer 1092 7cda4ddc149849cc61191d4b5b3d218d14770c0401e9e66dd9617b82ba1ae441
+pin-ok review_evidence successor-signed.efi 21166416 133096976ee70a8c272cbcc8c28d369bfc65d93d994cbff4174b947df00239d1
+pin-ok review_evidence successor-unsigned.efi 21164544 ed5d9d72be40592af3b14bd1fd9dc91a5976b14f350f9124ea414b975464d536
+pin-verification: PASS 9 offline-inputs, 11 review-evidence
+== repository identity ==
+repo 92741cbdefaa78adc33bc3c74935a45f9558b88c 9cc2e40fab25c2231d5a6cefa285d2e3e65a7bee 1789923381
+== boot pair freeze + input manifest (from repo blobs) ==
+freeze-ok rootfs 100663296 77a3bd99ad9dbfa18952dcc7b2bd180bbebd57843ac8c21edcec63dc737b64f0
+freeze-ok verity 798720 331502b7de57f7899fa1af25158c398e9603ee2644a9d1e165ebc955d59118e4
+freeze-ok boot_policy 206 faf5a2913ebe44cb6c453b55456a7af8d35ff5179c8228f838157d7bf634747e
+freeze-ok dm_verity_metadata 482 0b230a7e7b411e7f7915de569f37e7d54c39598c23d64901b0e29196ebea6021
+manifest-ok bin 963 30044b7453c89eb195df394a0236faf5ef7c7ec4ccf8dbe20766f5690d5f13e3
+manifest-ok sig 64 90889cbbe5d0e35802546714108b994e4e814564ba5225148076a2c2df455c66
+manifest-ok public_key 113 6be9ac5779bbc11d2102da23ba03d4ffd13ff56aaf9adbd3e81cb170678fbf29
+boot-pair-freeze + input-manifest: PASS
+== staging ==
+binding.v1.json 999 dbcad6d09789941c66d6e9d606b0f7ebaf43de36251ff6344c717b53d27d182c
+sb-copies-pinned 2
+image reviewed-root 301989888 94465db6545a10088383dfc9be4ce399d140309c0882565a585db26a9f47ede1
+sb-copies-pinned 2
+image reviewed-input 201326592 279d0653e561b00d067c3e07a33b6a1e2ce301924b289b59e085913d03465a69
+sb-copies-pinned 1
+image reviewed-output 16777216 12ad23aedf6543934f71e7e7816606ee5d81258dac93f52dfa416a81207376a1
+sb-copies-pinned 1
+image reviewed-evidence 16777216 a2e0e68fcd4875342c8574c6e3214153e5e4402f7a497b313869a5dfc7901669
+== build complete ==
