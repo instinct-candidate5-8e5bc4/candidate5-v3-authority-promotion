@@ -13,6 +13,12 @@
  #hud code{color:#9fd3a8;font-size:11px}
  #err{position:fixed;inset:40% 10% auto;text-align:center;color:#ff9d66;display:none}
  canvas{display:block}
+ @media (max-width:520px){
+  #hud{padding:6px 8px;font-size:11px;line-height:1.35}
+  #hud b.t{font-size:12px;display:block}
+  #hud .warn{display:block}
+  #hud code{font-size:10px;word-break:break-all}
+ }
 </style>
 </head>
 <body>
@@ -40,6 +46,8 @@ const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setSize(innerW
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x101a20);scene.fog=new THREE.Fog(0x101a20,18,42);
 const camera=new THREE.PerspectiveCamera(bundle.camera.fovDegrees,innerWidth/innerHeight,.05,120);
 camera.position.set(...bundle.camera.positionMicrounits.map(m));
+function frameForViewport(){const aspect=innerWidth/innerHeight,pull=Math.max(1,1.15/aspect);camera.position.set(...bundle.camera.positionMicrounits.map(m).map(v=>v*pull));camera.updateProjectionMatrix()}
+frameForViewport();
 const controls=new OrbitControls(camera,renderer.domElement);controls.target.set(...bundle.camera.lookAtMicrounits.map(m));controls.update();
 function box(aabb,colorHex,opts={}){const sx=m(aabb.maxX-aabb.minX),sy=m(aabb.maxY-aabb.minY),sz=m(aabb.maxZ-aabb.minZ);const mesh=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),new THREE.MeshStandardMaterial({color:parseInt(colorHex),roughness:opts.roughness??.85,metalness:opts.metalness??.05}));mesh.position.set(m(aabb.minX)+sx/2,m(aabb.minY)+sy/2,m(aabb.minZ)+sz/2);mesh.castShadow=opts.cast??true;mesh.receiveShadow=true;return mesh}
 // Room surfaces (B2, lineage-evidenced against certified physical surfaces)
@@ -53,7 +61,7 @@ for(const c of bundle.equipment.bag.components)scene.add(box(c.worldAabbMicrouni
 scene.add(new THREE.AmbientLight(parseInt(bundle.lighting.ambient.colorHex),bundle.lighting.ambient.intensity));
 const key=new THREE.DirectionalLight(parseInt(bundle.lighting.key.colorHex),bundle.lighting.key.intensity);key.position.set(...bundle.lighting.key.positionMicrounits.map(m));key.castShadow=true;scene.add(key);
 const fill=new THREE.DirectionalLight(parseInt(bundle.lighting.fill.colorHex),bundle.lighting.fill.intensity);fill.position.set(...bundle.lighting.fill.positionMicrounits.map(m));scene.add(fill);
-addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;frameForViewport();renderer.setSize(innerWidth,innerHeight)});
 // FPS meter: real-hardware measurement surface for B6 (no emulated numbers are reported anywhere)
 let frames=0,t0=performance.now();const fpsEl=document.createElement('span');fpsEl.id='fps';document.getElementById('meta').appendChild(fpsEl);
 renderer.setAnimationLoop(()=>{renderer.render(scene,camera);frames++;const dt=performance.now()-t0;if(dt>=1000){fpsEl.textContent=` · FPS(measured on this hardware): ${(frames*1000/dt).toFixed(1)}`;frames=0;t0=performance.now()}});
