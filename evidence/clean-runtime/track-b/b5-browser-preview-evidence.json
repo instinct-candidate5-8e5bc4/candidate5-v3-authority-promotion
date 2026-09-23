@@ -1,0 +1,63 @@
+{
+  "evidenceId": "TRACK-B-B5-BROWSER-PREVIEW",
+  "phase": "B5 browser 3D scene, lighting, materials, camera (presentation layer)",
+  "generatedAt": "2026-09-23T18:15:28.460Z",
+  "branch": "candidate5-track-b-visual-slice",
+  "commit": "07ef21de1c0b61454a41a8474ba267e32d6f25d7",
+  "track": "B (isolated; NO merge to main, NO production connection)",
+  "bundle": {
+    "status": "READY",
+    "inputs": {
+      "descriptorStatus": "COMMITTED",
+      "descriptorDigest": "5f6829b7b10bbbc91ff0bd7e66bd5de3c69473091d56af92f8decbc8cbecaa18",
+      "surfaceSetStatus": "LINEAGE_EVIDENCED",
+      "surfaceSetDigest": "df03ff358879ecd99cd6751596a59376036105b3b4d8d8daa7e9e7b01e225c98",
+      "casualtyStatus": "DIMENSIONED_TO_CERTIFIED_ENVELOPE",
+      "casualtyDigest": "efe6bd00ebbc4aeb13cf219d3aa1a81258b6b2f6ae2f109eb5f4c44850a535d9",
+      "equipmentStatus": "DIMENSIONED_TO_CERTIFIED_BODIES",
+      "equipmentDigest": "e97a9d885f0c431fe36fac51461d330ef20503b72ecbb2f8ca7fc27b8dcb1770",
+      "sourcePackageDigest": "187cf1a4c0af01ef12087879f44eeb88a355499a860665e29cdb2f5ab0d06aec",
+      "worldStateDigest": "fa1bbaa985a63a8bfa30c2bbd7fbaf14b2c4972d985815a093bdd68f7fe954ea"
+    },
+    "microunitsPerWorldUnit": 1000000
+  },
+  "deliverable": {
+    "page": "visual-slice/index.html",
+    "data": "visual-slice/scene-bundle.json",
+    "runInstructions": "visual-slice/README.md",
+    "hosting": "HOST-AGNOSTIC static bundle; deployment target deliberately undecided (review-loop decision); NOT deployed anywhere; NOT production ko-rishon-first-aid.pages.dev",
+    "dependencies": "pinned public CDN cdn.jsdelivr.net three@0.160.0 via import map; no paid API, no account, no credentials"
+  },
+  "visualVerification": {
+    "method": "headless Chromium (google-chrome, swiftshader software GL) via local static server; screenshot inspected at pixel level",
+    "screenshot": "track-b-b5-preview.png (attached to phase report)",
+    "observed": [
+      "banner VISUALS ARE NOT CERTIFIED PHYSICS visible with visuals-vs-physical distinction line",
+      "branch/commit/base/world/package digests rendered in HUD",
+      "5 lockers against back wall, door right, floor plane lit",
+      "supine casualty (head/torso/arms/legs) at center per adult-v1 envelope",
+      "chair with backrest at certified transform; red medical bag at authoritative transform",
+      "live FPS meter present in HUD"
+    ],
+    "canvas": "1280x800 WebGL2 context created, no page errors (favicon 404 only)"
+  },
+  "cameraHonesty": "Camera calibration formally belongs in the ScenePackage per the architecture decision; the certified ScenePackage has no camera field and was not modified. These are presentation-only defaults pending a future ScenePackage revision.",
+  "lightingHonesty": "Visual-only claims; never physical evidence.",
+  "tests": {
+    "suite": "tests/clean-runtime-school-scene-v2/*.test.js",
+    "result": "60/60 PASS via node --test",
+    "note": "host: Linux container, node v22.23.2; not a certified CI platform run"
+  },
+  "barriers": [
+    "no merge to main/default",
+    "no production connection",
+    "visuals never represented as certified physics",
+    "no physical truth from pixels",
+    "no Geometry Gate bypass",
+    "zero mandatory cost"
+  ],
+  "knownGaps": [
+    "deployment target undecided (relayed to review loop)",
+    "swiftshader FPS number is software-rendering only and is NOT a perf result - B6 real-hardware measurement pending"
+  ]
+}

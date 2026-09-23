@@ -1,0 +1,1246 @@
+{
+ "bundleVersion": "1.0.0",
+ "kind": "TRACK_B_VISUAL_SCENE_BUNDLE",
+ "generatedAt": "2026-09-23T18:13:57.624Z",
+ "git": {
+  "branch": "candidate5-track-b-visual-slice",
+  "commit": "07ef21de1c0b61454a41a8474ba267e32d6f25d7",
+  "base": "7cd96d36"
+ },
+ "banner": {
+  "title": "SCHOOL TREATMENT ROOM - VISUAL PREVIEW",
+  "warning": "VISUALS ARE NOT CERTIFIED PHYSICS",
+  "distinction": "Everything drawn here is a presentation-only projection of certified authoritative state. No physical truth is derived from pixels. Renderer values never feed authoritative state (ED-P2-02 downstream-only)."
+ },
+ "inputs": {
+  "descriptorStatus": "COMMITTED",
+  "descriptorDigest": "5f6829b7b10bbbc91ff0bd7e66bd5de3c69473091d56af92f8decbc8cbecaa18",
+  "surfaceSetStatus": "LINEAGE_EVIDENCED",
+  "surfaceSetDigest": "df03ff358879ecd99cd6751596a59376036105b3b4d8d8daa7e9e7b01e225c98",
+  "casualtyStatus": "DIMENSIONED_TO_CERTIFIED_ENVELOPE",
+  "casualtyDigest": "efe6bd00ebbc4aeb13cf219d3aa1a81258b6b2f6ae2f109eb5f4c44850a535d9",
+  "equipmentStatus": "DIMENSIONED_TO_CERTIFIED_BODIES",
+  "equipmentDigest": "e97a9d885f0c431fe36fac51461d330ef20503b72ecbb2f8ca7fc27b8dcb1770",
+  "sourcePackageDigest": "187cf1a4c0af01ef12087879f44eeb88a355499a860665e29cdb2f5ab0d06aec",
+  "worldStateDigest": "fa1bbaa985a63a8bfa30c2bbd7fbaf14b2c4972d985815a093bdd68f7fe954ea"
+ },
+ "statusCaveats": {
+  "casualty": {
+   "entityId": "school-casualty-adult-v1",
+   "gate": "GATE B",
+   "gateResult": "PASS_PENDING_LIFECYCLE_REVIEW",
+   "bodyLifecycle": "AUTHORED_NEW_DRAFT/VALIDATED/AWAITING_USER_GATE_REVIEW",
+   "verifiedForSlice": false,
+   "caveat": "Male casualty body is NOT VERIFIED_FOR_SLICE. Visual use is provisional pending lifecycle review."
+  },
+  "chair": {
+   "entityId": "school-treatment-chair",
+   "gate": "GATE C",
+   "gateResult": "PASS_PENDING_USER_REVIEW_FOR_ADMISSION",
+   "verifiedForSlice": false,
+   "caveat": "Treatment chair is PASS_PENDING_USER_REVIEW_FOR_ADMISSION. Visual use is provisional pending user review."
+  }
+ },
+ "declaredUnknowns": [
+  "panorama-geometry lineage",
+  "visual-physical lineage",
+  "final visual correctness",
+  "rotated contacts",
+  "articulation/deformation",
+  "friction/load/stability",
+  "Constraint/Entrapment/Accessibility",
+  "real posture contact regions",
+  "dynamic hazard/event contracts"
+ ],
+ "boundary": {
+  "kind": "VISUAL_BINDING_PROJECTION",
+  "readOnly": true,
+  "physicalProof": false,
+  "visualsRepresentCertifiedPhysics": false,
+  "physicalTruthFromPixels": false,
+  "geometryGateBypass": false,
+  "rendererDownstreamOfContract": "ED-P2-02",
+  "rendererMayWriteToAuthoritativeState": false
+ },
+ "microunitsPerWorldUnit": 1000000,
+ "room": [
+  {
+   "visualSurfaceId": "visual:floor",
+   "kind": "PLANE_MESH",
+   "geometryMicrounits": {
+    "minX": -9000000,
+    "maxX": 9000000,
+    "minY": -120000,
+    "maxY": 0,
+    "minZ": -9000000,
+    "maxZ": 9000000
+   },
+   "visualOnlyClaims": {
+    "colorHex": "0x555b59",
+    "authoredCall": "box('floor',[0,-.06,0],[18,.12,18],0x555b59)",
+    "variantCondition": null
+   },
+   "lineage": {
+    "visualPhysicalLineage": "EVIDENCED",
+    "sourceArtifact": {
+     "path": "index.html",
+     "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+     "classification": "RECOVERED"
+    },
+    "sourceRange": {
+     "id": "base-room",
+     "byteOffsetUtf8": 150965,
+     "sha256": "af6d27f191a1e108d30a8869e27296ab1841b51d5196b8d562b8f47231839eed",
+     "locatedInSourceBytes": true,
+     "rangeDigestMatches": true
+    },
+    "physicalSurfaceRef": {
+     "surfaceModelRef": {
+      "id": "school-surface-v1",
+      "revision": 1
+     },
+     "surfaceId": "floor"
+    },
+    "derivation": {
+     "op": "AUTHORED_BOX_METERS_TO_AABB_MICRUNITS",
+     "factor": 1000000,
+     "rounding": "Math.round (exact for all authored values)"
+    },
+    "crossCheck": {
+     "physicalSurfaceFound": true,
+     "match": true,
+     "detail": "FLOOR planeY=0 vs visual top 0; allowed region within visual extent: true"
+    }
+   }
+  },
+  {
+   "visualSurfaceId": "visual:back-wall",
+   "kind": "BOX_MESH",
+   "geometryMicrounits": {
+    "minX": -9000000,
+    "maxX": 9000000,
+    "minY": 0,
+    "maxY": 6000000,
+    "minZ": -4080000,
+    "maxZ": -3920000
+   },
+   "visualOnlyClaims": {
+    "colorHex": "0x163039",
+    "authoredCall": "box('back wall',[0,3,-4],[18,6,.16],0x163039)",
+    "variantCondition": null
+   },
+   "lineage": {
+    "visualPhysicalLineage": "EVIDENCED",
+    "sourceArtifact": {
+     "path": "index.html",
+     "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+     "classification": "RECOVERED"
+    },
+    "sourceRange": {
+     "id": "base-room",
+     "byteOffsetUtf8": 150965,
+     "sha256": "af6d27f191a1e108d30a8869e27296ab1841b51d5196b8d562b8f47231839eed",
+     "locatedInSourceBytes": true,
+     "rangeDigestMatches": true
+    },
+    "physicalSurfaceRef": {
+     "surfaceModelRef": {
+      "id": "school-surface-v1",
+      "revision": 1
+     },
+     "surfaceId": "back-wall"
+    },
+    "derivation": {
+     "op": "AUTHORED_BOX_METERS_TO_AABB_MICRUNITS",
+     "factor": 1000000,
+     "rounding": "Math.round (exact for all authored values)"
+    },
+    "crossCheck": {
+     "physicalSurfaceFound": true,
+     "match": true,
+     "detail": "EXACT_AABB_MATCH"
+    }
+   }
+  },
+  {
+   "visualSurfaceId": "visual:left-wall",
+   "kind": "BOX_MESH",
+   "geometryMicrounits": {
+    "minX": -7080000,
+    "maxX": -6920000,
+    "minY": 0,
+    "maxY": 6000000,
+    "minZ": -6000000,
+    "maxZ": 6000000
+   },
+   "visualOnlyClaims": {
+    "colorHex": "0x132931",
+    "authoredCall": "box('side wall left',[-7,3,0],[.16,6,12],0x132931)",
+    "variantCondition": null
+   },
+   "lineage": {
+    "visualPhysicalLineage": "EVIDENCED",
+    "sourceArtifact": {
+     "path": "index.html",
+     "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+     "classification": "RECOVERED"
+    },
+    "sourceRange": {
+     "id": "base-room",
+     "byteOffsetUtf8": 150965,
+     "sha256": "af6d27f191a1e108d30a8869e27296ab1841b51d5196b8d562b8f47231839eed",
+     "locatedInSourceBytes": true,
+     "rangeDigestMatches": true
+    },
+    "physicalSurfaceRef": {
+     "surfaceModelRef": {
+      "id": "school-surface-v1",
+      "revision": 1
+     },
+     "surfaceId": "left-wall"
+    },
+    "derivation": {
+     "op": "AUTHORED_BOX_METERS_TO_AABB_MICRUNITS",
+     "factor": 1000000,
+     "rounding": "Math.round (exact for all authored values)"
+    },
+    "crossCheck": {
+     "physicalSurfaceFound": true,
+     "match": true,
+     "detail": "EXACT_AABB_MATCH"
+    }
+   }
+  },
+  {
+   "visualSurfaceId": "visual:right-wall",
+   "kind": "BOX_MESH",
+   "geometryMicrounits": {
+    "minX": 6920000,
+    "maxX": 7080000,
+    "minY": 0,
+    "maxY": 6000000,
+    "minZ": -6000000,
+    "maxZ": 6000000
+   },
+   "visualOnlyClaims": {
+    "colorHex": "0x132931",
+    "authoredCall": "box('side wall right',[7,3,0],[.16,6,12],0x132931)",
+    "variantCondition": null
+   },
+   "lineage": {
+    "visualPhysicalLineage": "EVIDENCED",
+    "sourceArtifact": {
+     "path": "index.html",
+     "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+     "classification": "RECOVERED"
+    },
+    "sourceRange": {
+     "id": "base-room",
+     "byteOffsetUtf8": 150965,
+     "sha256": "af6d27f191a1e108d30a8869e27296ab1841b51d5196b8d562b8f47231839eed",
+     "locatedInSourceBytes": true,
+     "rangeDigestMatches": true
+    },
+    "physicalSurfaceRef": {
+     "surfaceModelRef": {
+      "id": "school-surface-v1",
+      "revision": 1
+     },
+     "surfaceId": "right-wall"
+    },
+    "derivation": {
+     "op": "AUTHORED_BOX_METERS_TO_AABB_MICRUNITS",
+     "factor": 1000000,
+     "rounding": "Math.round (exact for all authored values)"
+    },
+    "crossCheck": {
+     "physicalSurfaceFound": true,
+     "match": true,
+     "detail": "EXACT_AABB_MATCH"
+    }
+   }
+  },
+  {
+   "visualSurfaceId": "visual:door",
+   "kind": "BOX_MESH",
+   "geometryMicrounits": {
+    "minX": 4725000,
+    "maxX": 6075000,
+    "minY": 0,
+    "maxY": 2900000,
+    "minZ": -3900000,
+    "maxZ": -3780000
+   },
+   "visualOnlyClaims": {
+    "colorHex": "0x674b37",
+    "authoredCall": "prop('Door',[5.4,1.45,-3.84],[1.35,2.9,.12],0x674b37)",
+    "variantCondition": null
+   },
+   "lineage": {
+    "visualPhysicalLineage": "EVIDENCED",
+    "sourceArtifact": {
+     "path": "index.html",
+     "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+     "classification": "RECOVERED"
+    },
+    "sourceRange": {
+     "id": "door",
+     "byteOffsetUtf8": 167869,
+     "sha256": "2d2996bd9385e6963993154e655cc75c5549b05e14a7d52fbec26d266c2a01a8",
+     "locatedInSourceBytes": true,
+     "rangeDigestMatches": true
+    },
+    "physicalSurfaceRef": {
+     "surfaceModelRef": {
+      "id": "school-surface-v1",
+      "revision": 1
+     },
+     "surfaceId": "door"
+    },
+    "derivation": {
+     "op": "AUTHORED_BOX_METERS_TO_AABB_MICRUNITS",
+     "factor": 1000000,
+     "rounding": "Math.round (exact for all authored values)"
+    },
+    "crossCheck": {
+     "physicalSurfaceFound": true,
+     "match": true,
+     "detail": "EXACT_AABB_MATCH"
+    }
+   }
+  },
+  {
+   "visualSurfaceId": "visual:locker-0",
+   "kind": "BOX_MESH",
+   "geometryMicrounits": {
+    "minX": -4500000,
+    "maxX": -3500000,
+    "minY": 0,
+    "maxY": 2400000,
+    "minZ": -3775000,
+    "maxZ": -3225000
+   },
+   "visualOnlyClaims": {
+    "colorHex": "0x3c6680",
+    "authoredCall": "prop('Locker',[-4,1.2,-3.5],[1,2.4,.55],0x3c6680)",
+    "variantCondition": "baseVariant===8"
+   },
+   "lineage": {
+    "visualPhysicalLineage": "EVIDENCED",
+    "sourceArtifact": {
+     "path": "index.html",
+     "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+     "classification": "RECOVERED"
+    },
+    "sourceRange": {
+     "id": "school-bag-lockers",
+     "byteOffsetUtf8": 164008,
+     "sha256": "21ba7567961cbb9c022ab8a1f11359bf07049c506519a7656394cfc48fcc11ea",
+     "locatedInSourceBytes": true,
+     "rangeDigestMatches": true
+    },
+    "physicalSurfaceRef": {
+     "surfaceModelRef": {
+      "id": "school-surface-v1",
+      "revision": 1
+     },
+     "surfaceId": "locker-0"
+    },
+    "derivation": {
+     "op": "AUTHORED_BOX_METERS_TO_AABB_MICRUNITS",
+     "factor": 1000000,
+     "rounding": "Math.round (exact for all authored values)"
+    },
+    "crossCheck": {
+     "physicalSurfaceFound": true,
+     "match": true,
+     "detail": "EXACT_AABB_MATCH"
+    }
+   }
+  },
+  {
+   "visualSurfaceId": "visual:locker-1",
+   "kind": "BOX_MESH",
+   "geometryMicrounits": {
+    "minX": -2500000,
+    "maxX": -1500000,
+    "minY": 0,
+    "maxY": 2400000,
+    "minZ": -3775000,
+    "maxZ": -3225000
+   },
+   "visualOnlyClaims": {
+    "colorHex": "0x3c6680",
+    "authoredCall": "prop('Locker',[-2,1.2,-3.5],[1,2.4,.55],0x3c6680)",
+    "variantCondition": "baseVariant===8"
+   },
+   "lineage": {
+    "visualPhysicalLineage": "EVIDENCED",
+    "sourceArtifact": {
+     "path": "index.html",
+     "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+     "classification": "RECOVERED"
+    },
+    "sourceRange": {
+     "id": "school-bag-lockers",
+     "byteOffsetUtf8": 164008,
+     "sha256": "21ba7567961cbb9c022ab8a1f11359bf07049c506519a7656394cfc48fcc11ea",
+     "locatedInSourceBytes": true,
+     "rangeDigestMatches": true
+    },
+    "physicalSurfaceRef": {
+     "surfaceModelRef": {
+      "id": "school-surface-v1",
+      "revision": 1
+     },
+     "surfaceId": "locker-1"
+    },
+    "derivation": {
+     "op": "AUTHORED_BOX_METERS_TO_AABB_MICRUNITS",
+     "factor": 1000000,
+     "rounding": "Math.round (exact for all authored values)"
+    },
+    "crossCheck": {
+     "physicalSurfaceFound": true,
+     "match": true,
+     "detail": "EXACT_AABB_MATCH"
+    }
+   }
+  },
+  {
+   "visualSurfaceId": "visual:locker-2",
+   "kind": "BOX_MESH",
+   "geometryMicrounits": {
+    "minX": -500000,
+    "maxX": 500000,
+    "minY": 0,
+    "maxY": 2400000,
+    "minZ": -3775000,
+    "maxZ": -3225000
+   },
+   "visualOnlyClaims": {
+    "colorHex": "0x3c6680",
+    "authoredCall": "prop('Locker',[0,1.2,-3.5],[1,2.4,.55],0x3c6680)",
+    "variantCondition": "baseVariant===8"
+   },
+   "lineage": {
+    "visualPhysicalLineage": "EVIDENCED",
+    "sourceArtifact": {
+     "path": "index.html",
+     "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+     "classification": "RECOVERED"
+    },
+    "sourceRange": {
+     "id": "school-bag-lockers",
+     "byteOffsetUtf8": 164008,
+     "sha256": "21ba7567961cbb9c022ab8a1f11359bf07049c506519a7656394cfc48fcc11ea",
+     "locatedInSourceBytes": true,
+     "rangeDigestMatches": true
+    },
+    "physicalSurfaceRef": {
+     "surfaceModelRef": {
+      "id": "school-surface-v1",
+      "revision": 1
+     },
+     "surfaceId": "locker-2"
+    },
+    "derivation": {
+     "op": "AUTHORED_BOX_METERS_TO_AABB_MICRUNITS",
+     "factor": 1000000,
+     "rounding": "Math.round (exact for all authored values)"
+    },
+    "crossCheck": {
+     "physicalSurfaceFound": true,
+     "match": true,
+     "detail": "EXACT_AABB_MATCH"
+    }
+   }
+  },
+  {
+   "visualSurfaceId": "visual:locker-3",
+   "kind": "BOX_MESH",
+   "geometryMicrounits": {
+    "minX": 1500000,
+    "maxX": 2500000,
+    "minY": 0,
+    "maxY": 2400000,
+    "minZ": -3775000,
+    "maxZ": -3225000
+   },
+   "visualOnlyClaims": {
+    "colorHex": "0x3c6680",
+    "authoredCall": "prop('Locker',[2,1.2,-3.5],[1,2.4,.55],0x3c6680)",
+    "variantCondition": "baseVariant===8"
+   },
+   "lineage": {
+    "visualPhysicalLineage": "EVIDENCED",
+    "sourceArtifact": {
+     "path": "index.html",
+     "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+     "classification": "RECOVERED"
+    },
+    "sourceRange": {
+     "id": "school-bag-lockers",
+     "byteOffsetUtf8": 164008,
+     "sha256": "21ba7567961cbb9c022ab8a1f11359bf07049c506519a7656394cfc48fcc11ea",
+     "locatedInSourceBytes": true,
+     "rangeDigestMatches": true
+    },
+    "physicalSurfaceRef": {
+     "surfaceModelRef": {
+      "id": "school-surface-v1",
+      "revision": 1
+     },
+     "surfaceId": "locker-3"
+    },
+    "derivation": {
+     "op": "AUTHORED_BOX_METERS_TO_AABB_MICRUNITS",
+     "factor": 1000000,
+     "rounding": "Math.round (exact for all authored values)"
+    },
+    "crossCheck": {
+     "physicalSurfaceFound": true,
+     "match": true,
+     "detail": "EXACT_AABB_MATCH"
+    }
+   }
+  },
+  {
+   "visualSurfaceId": "visual:locker-4",
+   "kind": "BOX_MESH",
+   "geometryMicrounits": {
+    "minX": 3500000,
+    "maxX": 4500000,
+    "minY": 0,
+    "maxY": 2400000,
+    "minZ": -3775000,
+    "maxZ": -3225000
+   },
+   "visualOnlyClaims": {
+    "colorHex": "0x3c6680",
+    "authoredCall": "prop('Locker',[4,1.2,-3.5],[1,2.4,.55],0x3c6680)",
+    "variantCondition": "baseVariant===8"
+   },
+   "lineage": {
+    "visualPhysicalLineage": "EVIDENCED",
+    "sourceArtifact": {
+     "path": "index.html",
+     "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+     "classification": "RECOVERED"
+    },
+    "sourceRange": {
+     "id": "school-bag-lockers",
+     "byteOffsetUtf8": 164008,
+     "sha256": "21ba7567961cbb9c022ab8a1f11359bf07049c506519a7656394cfc48fcc11ea",
+     "locatedInSourceBytes": true,
+     "rangeDigestMatches": true
+    },
+    "physicalSurfaceRef": {
+     "surfaceModelRef": {
+      "id": "school-surface-v1",
+      "revision": 1
+     },
+     "surfaceId": "locker-4"
+    },
+    "derivation": {
+     "op": "AUTHORED_BOX_METERS_TO_AABB_MICRUNITS",
+     "factor": 1000000,
+     "rounding": "Math.round (exact for all authored values)"
+    },
+    "crossCheck": {
+     "physicalSurfaceFound": true,
+     "match": true,
+     "detail": "EXACT_AABB_MATCH"
+    }
+   }
+  }
+ ],
+ "casualty": {
+  "visualVersion": "1.0.0",
+  "kind": "VISUAL_CASUALTY",
+  "status": "DIMENSIONED_TO_CERTIFIED_ENVELOPE",
+  "entityRef": {
+   "entityId": "school-casualty-adult-v1",
+   "physicalBodyRef": {
+    "recordId": "casualty/adult-v1/supine-floor",
+    "revision": 1,
+    "digest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3",
+    "proofGeometryDigest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+   },
+   "profileRef": {
+    "id": "adult-v1",
+    "revision": 1,
+    "digest": "f1d973b4cfbebdfa230fe0257ccfe9c11056a7d07e52c3701d1e6772311bcc41",
+    "subjectSex": "MALE"
+   },
+   "postureRef": {
+    "id": "adult-v1/supine-floor",
+    "semanticType": "SUPINE_FLOOR",
+    "revision": 1,
+    "digest": "197a806537a3c9d9f629cf2a57d6db4031fa93ebea0618c2e18603f48301745e"
+   }
+  },
+  "authoritativeTransformMicrounits": {
+   "positionMicrounits": [
+    0,
+    0,
+    1000000
+   ],
+   "orientation": [
+    0,
+    0,
+    0,
+    1
+   ],
+   "scaleMicrounits": [
+    1000000,
+    1000000,
+    1000000
+   ]
+  },
+  "physicalPosture": {
+   "semantic": "SUPINE_FLOOR",
+   "source": "CERTIFIED_AUTHORITATIVE_STATE",
+   "visualMayAlter": false
+  },
+  "visualPose": {
+   "kind": "STATIC",
+   "matchesCertifiedPosture": true,
+   "articulation": false,
+   "deformation": false,
+   "reason": "articulation/deformation and rotated contacts are Gate D declared unknowns"
+  },
+  "envelopeMicrounits": {
+   "minX": -330000,
+   "maxX": 330000,
+   "minY": 0,
+   "maxY": 302000,
+   "minZ": -1179000,
+   "maxZ": 767000
+  },
+  "worldEnvelopeMicrounits": {
+   "minX": -330000,
+   "maxX": 330000,
+   "minY": 0,
+   "maxY": 302000,
+   "minZ": -179000,
+   "maxZ": 1767000
+  },
+  "envelopeCheck": {
+   "componentUnionEqualsAggregateBounds": true,
+   "floorContactY0": true,
+   "dimensionsMicrounits": [
+    660000,
+    302000,
+    1946000
+   ]
+  },
+  "components": [
+   {
+    "componentId": "head",
+    "kind": "BOX_MESH",
+    "dimensionsMicrounits": [
+     240000,
+     240000,
+     240000
+    ],
+    "localTransform": {
+     "translationMicrounits": [
+      0,
+      120000,
+      647000
+     ],
+     "orientation": [
+      0,
+      0,
+      0,
+      1000000
+     ]
+    },
+    "localAabbMicrounits": {
+     "minX": -120000,
+     "maxX": 120000,
+     "minY": 0,
+     "maxY": 240000,
+     "minZ": 527000,
+     "maxZ": 767000
+    },
+    "worldAabbMicrounits": {
+     "minX": -120000,
+     "maxX": 120000,
+     "minY": 0,
+     "maxY": 240000,
+     "minZ": 1527000,
+     "maxZ": 1767000
+    },
+    "floorContact": true,
+    "participationRole": "BOTH",
+    "visualOnlyAppearance": {
+     "colorHex": "0xd9b18c",
+     "label": "head",
+     "materialClaim": "VISUAL_ONLY"
+    }
+   },
+   {
+    "componentId": "left-arm",
+    "kind": "BOX_MESH",
+    "dimensionsMicrounits": [
+     50000,
+     180000,
+     700000
+    ],
+    "localTransform": {
+     "translationMicrounits": [
+      -305000,
+      90000,
+      227000
+     ],
+     "orientation": [
+      0,
+      0,
+      0,
+      1000000
+     ]
+    },
+    "localAabbMicrounits": {
+     "minX": -330000,
+     "maxX": -280000,
+     "minY": 0,
+     "maxY": 180000,
+     "minZ": -123000,
+     "maxZ": 577000
+    },
+    "worldAabbMicrounits": {
+     "minX": -330000,
+     "maxX": -280000,
+     "minY": 0,
+     "maxY": 180000,
+     "minZ": 877000,
+     "maxZ": 1577000
+    },
+    "floorContact": true,
+    "participationRole": "BOTH",
+    "visualOnlyAppearance": {
+     "colorHex": "0x3e5f8a",
+     "label": "left-arm",
+     "materialClaim": "VISUAL_ONLY"
+    }
+   },
+   {
+    "componentId": "legs",
+    "kind": "BOX_MESH",
+    "dimensionsMicrounits": [
+     460000,
+     220000,
+     1056000
+    ],
+    "localTransform": {
+     "translationMicrounits": [
+      0,
+      110000,
+      -651000
+     ],
+     "orientation": [
+      0,
+      0,
+      0,
+      1000000
+     ]
+    },
+    "localAabbMicrounits": {
+     "minX": -230000,
+     "maxX": 230000,
+     "minY": 0,
+     "maxY": 220000,
+     "minZ": -1179000,
+     "maxZ": -123000
+    },
+    "worldAabbMicrounits": {
+     "minX": -230000,
+     "maxX": 230000,
+     "minY": 0,
+     "maxY": 220000,
+     "minZ": -179000,
+     "maxZ": 877000
+    },
+    "floorContact": true,
+    "participationRole": "BOTH",
+    "visualOnlyAppearance": {
+     "colorHex": "0x2f3b52",
+     "label": "legs",
+     "materialClaim": "VISUAL_ONLY"
+    }
+   },
+   {
+    "componentId": "right-arm",
+    "kind": "BOX_MESH",
+    "dimensionsMicrounits": [
+     50000,
+     180000,
+     700000
+    ],
+    "localTransform": {
+     "translationMicrounits": [
+      305000,
+      90000,
+      227000
+     ],
+     "orientation": [
+      0,
+      0,
+      0,
+      1000000
+     ]
+    },
+    "localAabbMicrounits": {
+     "minX": 280000,
+     "maxX": 330000,
+     "minY": 0,
+     "maxY": 180000,
+     "minZ": -123000,
+     "maxZ": 577000
+    },
+    "worldAabbMicrounits": {
+     "minX": 280000,
+     "maxX": 330000,
+     "minY": 0,
+     "maxY": 180000,
+     "minZ": 877000,
+     "maxZ": 1577000
+    },
+    "floorContact": true,
+    "participationRole": "BOTH",
+    "visualOnlyAppearance": {
+     "colorHex": "0x3e5f8a",
+     "label": "right-arm",
+     "materialClaim": "VISUAL_ONLY"
+    }
+   },
+   {
+    "componentId": "torso",
+    "kind": "BOX_MESH",
+    "dimensionsMicrounits": [
+     560000,
+     302000,
+     650000
+    ],
+    "localTransform": {
+     "translationMicrounits": [
+      0,
+      151000,
+      202000
+     ],
+     "orientation": [
+      0,
+      0,
+      0,
+      1000000
+     ]
+    },
+    "localAabbMicrounits": {
+     "minX": -280000,
+     "maxX": 280000,
+     "minY": 0,
+     "maxY": 302000,
+     "minZ": -123000,
+     "maxZ": 527000
+    },
+    "worldAabbMicrounits": {
+     "minX": -280000,
+     "maxX": 280000,
+     "minY": 0,
+     "maxY": 302000,
+     "minZ": 877000,
+     "maxZ": 1527000
+    },
+    "floorContact": true,
+    "participationRole": "BOTH",
+    "visualOnlyAppearance": {
+     "colorHex": "0x3e5f8a",
+     "label": "torso",
+     "materialClaim": "VISUAL_ONLY"
+    }
+   }
+  ],
+  "statusCaveat": {
+   "entityId": "school-casualty-adult-v1",
+   "gate": "GATE B",
+   "gateResult": "PASS_PENDING_LIFECYCLE_REVIEW",
+   "bodyLifecycle": "AUTHORED_NEW_DRAFT/VALIDATED/AWAITING_USER_GATE_REVIEW",
+   "verifiedForSlice": false,
+   "caveat": "Male casualty body is NOT VERIFIED_FOR_SLICE. Visual use is provisional pending lifecycle review."
+  },
+  "boundary": {
+   "presentationOnly": true,
+   "visualPoseFeedsPhysicalPosture": false,
+   "physicalProof": false,
+   "geometryGateBypass": false,
+   "rendererDownstreamOfContract": "ED-P2-02"
+  },
+  "visualDigest": "efe6bd00ebbc4aeb13cf219d3aa1a81258b6b2f6ae2f109eb5f4c44850a535d9"
+ },
+ "equipment": {
+  "visualVersion": "1.0.0",
+  "kind": "VISUAL_EQUIPMENT",
+  "status": "DIMENSIONED_TO_CERTIFIED_BODIES",
+  "chair": {
+   "entityRef": {
+    "entityId": "school-treatment-chair",
+    "physicalBodyRef": {
+     "recordId": "school/treatment-chair",
+     "revision": 1,
+     "digest": "1e78439ad5977c6c050475b4ac692cee9fce7da034725ea88a7ed4f0b0803247",
+     "proofGeometryDigest": "1e78439ad5977c6c050475b4ac692cee9fce7da034725ea88a7ed4f0b0803247"
+    },
+    "supportSurfaceRef": {
+     "id": "school/treatment-chair-seat",
+     "revision": 1,
+     "digest": "08028ddd3faa51edaba2c202b44f91c18e3f60ac5c74b353a14d4ab89ba5501d"
+    }
+   },
+   "authoritativeTransformMicrounits": {
+    "positionMicrounits": [
+     -2000000,
+     0,
+     1000000
+    ],
+    "orientation": [
+     0,
+     0,
+     0,
+     1
+    ],
+    "scaleMicrounits": [
+     1000000,
+     1000000,
+     1000000
+    ]
+   },
+   "envelopeMicrounits": {
+    "minX": -250000,
+    "maxX": 250000,
+    "minY": 0,
+    "maxY": 900000,
+    "minZ": -250000,
+    "maxZ": 250000
+   },
+   "worldEnvelopeMicrounits": {
+    "minX": -2250000,
+    "maxX": -1750000,
+    "minY": 0,
+    "maxY": 900000,
+    "minZ": 750000,
+    "maxZ": 1250000
+   },
+   "envelopeCheck": {
+    "dimensionsMicrounits": [
+     500000,
+     900000,
+     500000
+    ],
+    "seatPlaneYMicrounits": 490000,
+    "floorContactY0": true
+   },
+   "components": [
+    {
+     "componentId": "lower-frame",
+     "kind": "BOX_MESH",
+     "dimensionsMicrounits": [
+      500000,
+      450000,
+      500000
+     ],
+     "localTransform": {
+      "translationMicrounits": [
+       0,
+       225000,
+       0
+      ],
+      "orientation": [
+       0,
+       0,
+       0,
+       1000000
+      ]
+     },
+     "localAabbMicrounits": {
+      "minX": -250000,
+      "maxX": 250000,
+      "minY": 0,
+      "maxY": 450000,
+      "minZ": -250000,
+      "maxZ": 250000
+     },
+     "worldAabbMicrounits": {
+      "minX": -2250000,
+      "maxX": -1750000,
+      "minY": 0,
+      "maxY": 450000,
+      "minZ": 750000,
+      "maxZ": 1250000
+     },
+     "floorContact": true,
+     "participationRole": "BOTH",
+     "visualOnlyAppearance": {
+      "colorHex": "0x6a7f8c",
+      "materialClaim": "VISUAL_ONLY"
+     }
+    },
+    {
+     "componentId": "seat-slab",
+     "kind": "BOX_MESH",
+     "dimensionsMicrounits": [
+      500000,
+      40000,
+      500000
+     ],
+     "localTransform": {
+      "translationMicrounits": [
+       0,
+       470000,
+       0
+      ],
+      "orientation": [
+       0,
+       0,
+       0,
+       1000000
+      ]
+     },
+     "localAabbMicrounits": {
+      "minX": -250000,
+      "maxX": 250000,
+      "minY": 450000,
+      "maxY": 490000,
+      "minZ": -250000,
+      "maxZ": 250000
+     },
+     "worldAabbMicrounits": {
+      "minX": -2250000,
+      "maxX": -1750000,
+      "minY": 450000,
+      "maxY": 490000,
+      "minZ": 750000,
+      "maxZ": 1250000
+     },
+     "floorContact": false,
+     "participationRole": "BOTH",
+     "visualOnlyAppearance": {
+      "colorHex": "0x6a7f8c",
+      "materialClaim": "VISUAL_ONLY"
+     }
+    },
+    {
+     "componentId": "backrest",
+     "kind": "BOX_MESH",
+     "dimensionsMicrounits": [
+      500000,
+      430000,
+      40000
+     ],
+     "localTransform": {
+      "translationMicrounits": [
+       0,
+       685000,
+       -230000
+      ],
+      "orientation": [
+       0,
+       0,
+       0,
+       1000000
+      ]
+     },
+     "localAabbMicrounits": {
+      "minX": -250000,
+      "maxX": 250000,
+      "minY": 470000,
+      "maxY": 900000,
+      "minZ": -250000,
+      "maxZ": -210000
+     },
+     "worldAabbMicrounits": {
+      "minX": -2250000,
+      "maxX": -1750000,
+      "minY": 470000,
+      "maxY": 900000,
+      "minZ": 750000,
+      "maxZ": 790000
+     },
+     "floorContact": false,
+     "participationRole": "COLLISION",
+     "visualOnlyAppearance": {
+      "colorHex": "0x6a7f8c",
+      "materialClaim": "VISUAL_ONLY"
+     }
+    }
+   ],
+   "provenance": {
+    "classification": "AUTHORED_NEW",
+    "decisionId": "gate-c-chair-authoring-001"
+   },
+   "statusCaveat": {
+    "entityId": "school-treatment-chair",
+    "gate": "GATE C",
+    "gateResult": "PASS_PENDING_USER_REVIEW_FOR_ADMISSION",
+    "verifiedForSlice": false,
+    "caveat": "Treatment chair is PASS_PENDING_USER_REVIEW_FOR_ADMISSION. Visual use is provisional pending user review."
+   }
+  },
+  "bag": {
+   "entityRef": {
+    "entityId": "school-medical-bag",
+    "physicalBodyRef": {
+     "recordId": "school-medical-bag-body",
+     "revision": 1,
+     "digest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+     "proofGeometryDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a"
+    }
+   },
+   "authoritativeTransformMicrounits": {
+    "positionMicrounits": [
+     -3000000,
+     175000,
+     1000000
+    ],
+    "orientation": [
+     0,
+     0,
+     0,
+     1
+    ],
+    "scaleMicrounits": [
+     1000000,
+     1000000,
+     1000000
+    ]
+   },
+   "geometryMicrounits": {
+    "minX": -275000,
+    "maxX": 275000,
+    "minY": -175000,
+    "maxY": 175000,
+    "minZ": -175000,
+    "maxZ": 175000
+   },
+   "worldAabbMicrounits": {
+    "minX": -3275000,
+    "maxX": -2725000,
+    "minY": 0,
+    "maxY": 350000,
+    "minZ": 825000,
+    "maxZ": 1175000
+   },
+   "envelopeCheck": {
+    "dimensionsMicrounits": [
+     550000,
+     350000,
+     350000
+    ],
+    "floorContactY0": true
+   },
+   "components": [
+    {
+     "componentId": "bag-body",
+     "kind": "BOX_MESH",
+     "localAabbMicrounits": {
+      "minX": -275000,
+      "maxX": 275000,
+      "minY": -175000,
+      "maxY": 175000,
+      "minZ": -175000,
+      "maxZ": 175000
+     },
+     "worldAabbMicrounits": {
+      "minX": -3275000,
+      "maxX": -2725000,
+      "minY": 0,
+      "maxY": 350000,
+      "minZ": 825000,
+      "maxZ": 1175000
+     },
+     "floorContact": true,
+     "visualOnlyAppearance": {
+      "colorHex": "0x883d46",
+      "materialClaim": "VISUAL_ONLY"
+     }
+    }
+   ],
+   "provenance": {
+    "classification": "RECOVERED",
+    "lineageStatus": "RECOVERED",
+    "sourceId": "index.html#school-bag-lockers",
+    "sourceDigest": "21ba7567961cbb9c022ab8a1f11359bf07049c506519a7656394cfc48fcc11ea",
+    "sourceRange": "school-bag-lockers"
+   },
+   "authoredVsAuthoritative": {
+    "authoredCenterMicrounits": [
+     -3000000,
+     180000,
+     1000000
+    ],
+    "authoritativePositionMicrounits": [
+     -3000000,
+     175000,
+     1000000
+    ],
+    "yDifferenceMicrounits": -5000,
+    "resolution": "AUTHORITATIVE_TRANSFORM_WINS: authored .18m center vs committed .175m exact floor-contact position; dimensions identical"
+   },
+   "statusCaveat": null
+  },
+  "equipmentBeyondBagAndChair": {
+   "included": [],
+   "policy": "REQUIRES_GATE_A_LIFECYCLE",
+   "note": "No additional equipment is included. Any further equipment is NEW authoring through the Gate A lifecycle (AUTHORED_NEW); legacy visuals are never borrowed as physical truth."
+  },
+  "boundary": {
+   "presentationOnly": true,
+   "physicalProof": false,
+   "geometryGateBypass": false,
+   "rendererDownstreamOfContract": "ED-P2-02",
+   "visualNeverFeedsAuthoritativeState": true
+  },
+  "visualDigest": "e97a9d885f0c431fe36fac51461d330ef20503b72ecbb2f8ca7fc27b8dcb1770"
+ },
+ "camera": {
+  "note": "Camera calibration formally belongs in the ScenePackage per the architecture decision; the certified ScenePackage has no camera field and was not modified. These are presentation-only defaults pending a future ScenePackage revision.",
+  "positionMicrounits": [
+   4000000,
+   3000000,
+   6000000
+  ],
+  "lookAtMicrounits": [
+   0,
+   300000,
+   0
+  ],
+  "fovDegrees": 55
+ },
+ "lighting": {
+  "note": "Visual-only claims; never physical evidence.",
+  "ambient": {
+   "colorHex": "0xbfd4e0",
+   "intensity": 0.55
+  },
+  "key": {
+   "colorHex": "0xfff2dd",
+   "intensity": 1.1,
+   "positionMicrounits": [
+    3000000,
+    5000000,
+    2000000
+   ]
+  },
+  "fill": {
+   "colorHex": "0xdde8ff",
+   "intensity": 0.35,
+   "positionMicrounits": [
+    -4000000,
+    3500000,
+    4000000
+   ]
+  }
+ },
+ "status": "READY"
+}

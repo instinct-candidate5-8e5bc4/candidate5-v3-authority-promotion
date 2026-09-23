@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>School Treatment Room - Visual Preview (NOT certified physics)</title>
+<style>
+ body{margin:0;background:#0d1417;color:#dfe9ee;font-family:system-ui,sans-serif;overflow:hidden}
+ #hud{position:fixed;top:0;left:0;right:0;padding:10px 14px;background:rgba(10,16,20,.92);border-bottom:2px solid #b8892d;font-size:13px;line-height:1.5;z-index:2}
+ #hud b.t{color:#f0c86e;font-size:14px}
+ #hud .warn{color:#ff9d66;font-weight:700}
+ #hud details{margin-top:4px}#hud summary{cursor:pointer;color:#8fb8cc}
+ #hud code{color:#9fd3a8;font-size:11px}
+ #err{position:fixed;inset:40% 10% auto;text-align:center;color:#ff9d66;display:none}
+ canvas{display:block}
+</style>
+</head>
+<body>
+<div id="hud">
+ <b class="t">SCHOOL TREATMENT ROOM &mdash; VISUAL PREVIEW</b> &nbsp;<span class="warn">VISUALS ARE NOT CERTIFIED PHYSICS</span><br>
+ <span id="distinction"></span><br>
+ <span id="meta"></span>
+ <details><summary>Status caveats, declared unknowns, digests</summary><div id="caveats"></div></details>
+</div>
+<div id="err"></div>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+const U=1e6, m=v=>v/U; // ED-P2-02 downstream-only conversion: microunits -> meters for display. Never feeds authoritative state.
+const bundle=await (await fetch('./scene-bundle.json')).json();
+if(bundle.status!=='READY'){const e=document.getElementById('err');e.style.display='block';e.textContent='Bundle not READY: '+JSON.stringify(bundle.reason||bundle.status);throw new Error('bundle not ready')}
+document.getElementById('distinction').textContent=bundle.banner.distinction;
+document.getElementById('meta').innerHTML=`branch <code>${bundle.git.branch}</code> commit <code>${bundle.git.commit}</code> base <code>${bundle.git.base}</code> &middot; world <code>${bundle.inputs.worldStateDigest.slice(0,16)}&hellip;</code> package <code>${bundle.inputs.sourcePackageDigest.slice(0,16)}&hellip;</code>`;
+document.getElementById('caveats').innerHTML=
+ `<p><b>Status caveats:</b><br>Casualty: ${bundle.statusCaveats.casualty.gate} ${bundle.statusCaveats.casualty.gateResult} &mdash; ${bundle.statusCaveats.casualty.caveat}<br>Chair: ${bundle.statusCaveats.chair.gate} ${bundle.statusCaveats.chair.gateResult} &mdash; ${bundle.statusCaveats.chair.caveat}</p>`+
+ `<p><b>Gate D declared unknowns (not certified):</b> ${bundle.declaredUnknowns.join('; ')}</p>`+
+ `<p><b>Input digests:</b><br>${Object.entries(bundle.inputs).map(([k,v])=>k+': <code>'+v+'</code>').join('<br>')}</p>`;
+const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;document.body.appendChild(renderer.domElement);
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x101a20);scene.fog=new THREE.Fog(0x101a20,18,42);
+const camera=new THREE.PerspectiveCamera(bundle.camera.fovDegrees,innerWidth/innerHeight,.05,120);
+camera.position.set(...bundle.camera.positionMicrounits.map(m));
+const controls=new OrbitControls(camera,renderer.domElement);controls.target.set(...bundle.camera.lookAtMicrounits.map(m));controls.update();
+function box(aabb,colorHex,opts={}){const sx=m(aabb.maxX-aabb.minX),sy=m(aabb.maxY-aabb.minY),sz=m(aabb.maxZ-aabb.minZ);const mesh=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),new THREE.MeshStandardMaterial({color:parseInt(colorHex),roughness:opts.roughness??.85,metalness:opts.metalness??.05}));mesh.position.set(m(aabb.minX)+sx/2,m(aabb.minY)+sy/2,m(aabb.minZ)+sz/2);mesh.castShadow=opts.cast??true;mesh.receiveShadow=true;return mesh}
+// Room surfaces (B2, lineage-evidenced against certified physical surfaces)
+for(const s of bundle.room)scene.add(box(s.geometryMicrounits,s.visualOnlyClaims.colorHex,{cast:false}));
+// Casualty (B3, static pose == certified SUPINE_FLOOR; Gate B caveat applies)
+for(const c of bundle.casualty.components)scene.add(box(c.worldAabbMicrounits,c.visualOnlyAppearance.colorHex,{roughness:.7}));
+// Chair + bag (B4; chair Gate C caveat applies)
+for(const c of bundle.equipment.chair.components)scene.add(box(c.worldAabbMicrounits,c.visualOnlyAppearance.colorHex,{roughness:.6}));
+for(const c of bundle.equipment.bag.components)scene.add(box(c.worldAabbMicrounits,c.visualOnlyAppearance.colorHex,{roughness:.5}));
+// Lighting (visual-only claims)
+scene.add(new THREE.AmbientLight(parseInt(bundle.lighting.ambient.colorHex),bundle.lighting.ambient.intensity));
+const key=new THREE.DirectionalLight(parseInt(bundle.lighting.key.colorHex),bundle.lighting.key.intensity);key.position.set(...bundle.lighting.key.positionMicrounits.map(m));key.castShadow=true;scene.add(key);
+const fill=new THREE.DirectionalLight(parseInt(bundle.lighting.fill.colorHex),bundle.lighting.fill.intensity);fill.position.set(...bundle.lighting.fill.positionMicrounits.map(m));scene.add(fill);
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+// FPS meter: real-hardware measurement surface for B6 (no emulated numbers are reported anywhere)
+let frames=0,t0=performance.now();const fpsEl=document.createElement('span');fpsEl.id='fps';document.getElementById('meta').appendChild(fpsEl);
+renderer.setAnimationLoop(()=>{renderer.render(scene,camera);frames++;const dt=performance.now()-t0;if(dt>=1000){fpsEl.textContent=` · FPS(measured on this hardware): ${(frames*1000/dt).toFixed(1)}`;frames=0;t0=performance.now()}});
+</script>
+</body>
+</html>
