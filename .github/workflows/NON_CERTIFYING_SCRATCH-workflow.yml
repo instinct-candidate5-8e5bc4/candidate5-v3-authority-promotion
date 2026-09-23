@@ -51,7 +51,7 @@ jobs:
           # D2 gate (reviewer ruling): every relative file/script argument used by later
           # steps must exist in the committed tree. Fixed list, fail-closed exit 88.
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
-          for f in             platform.lock.json             config.json             stage-platform.sh             make-shims.sh             preflight-check.py             build-ovmf-debug.sh             scan-pe-pdb-paths.py             build-enroll-app.sh             bwrap-argv.sh             enroll-predicate-check.py             rehearsal-enroll.sh             ../build-esp-image.sh             evidence/successor-signed.efi             run-ceremony.sh; do
+          for f in             platform.lock.json             config.json             stage-platform.sh             make-shims.sh             preflight-check.py             build-ovmf-debug.sh             scan-pe-pdb-paths.py             build-enroll-app.sh             bwrap-argv.sh             enroll-predicate-check.py             rehearsal-enroll.sh             ../build-esp-image.sh             evidence/successor-signed.efi             run-ceremony.sh             qemu-smoke.sh; do
             [ -e "$f" ] || { echo "E_WORKFLOW_ARG_MISSING $f"; exit 88; }
           done
       - name: NON_CERTIFYING_SCRATCH host inputs declared (B3)
@@ -215,20 +215,31 @@ jobs:
         run: |
           set -euo pipefail
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
-          # -L help must list ONLY staged paths
+          # batch1r3 scratch-1 finding: a stock Ubuntu qemu binary ALWAYS lists its three
+          # compiled-in host paths after the -L dirs; "only staged paths listed" is
+          # unsatisfiable and was a gate-design error. The load-bearing form: the two staged
+          # -L dirs must LEAD the search order (precedence), the remaining entries must be
+          # EXACTLY the three pinned compiled-in paths (inert strings), and the masked smoke
+          # below proves they are never opened.
           LOUT=$(/tmp/$PREFIX-stage/shims/qemu-system-x86_64 -L help 2>&1)
           printf '%s\n' "$LOUT"
-          BAD=$(printf '%s\n' "$LOUT" | awk '{print $NF}' | grep -v "^/tmp/$PREFIX-stage/root/" || true)
-          [ -z "$BAD" ] || { echo "E_QEMU_L_HOST $BAD"; exit 97; }
-          # masked-host startup smoke: host qemu ROM dirs hidden by bwrap tmpfs; never boots a case
-          printf '{"execute":"qmp_capabilities"}\n{"execute":"quit"}\n' | \
-            /tmp/$PREFIX-stage/shims/bwrap --ro-bind / / \
-              --tmpfs /usr/share/qemu --tmpfs /usr/share/seabios --tmpfs /usr/share/ipxe \
-              --dev-bind /dev/kvm /dev/kvm \
-              /tmp/$PREFIX-stage/shims/qemu-system-x86_64 -machine q35,smm=on -accel kvm \
-                -S -display none -qmp stdio > /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-qemu-smoke.log 2>&1 \
+          WANT_HEAD="/tmp/$PREFIX-stage/root/usr/share/qemu
+          /tmp/$PREFIX-stage/root/usr/share/seabios"
+          [ "$(printf '%s\n' "$LOUT" | head -2)" = "$WANT_HEAD" ] || { echo "E_QEMU_L_ORDER"; exit 97; }
+          WANT_REST="/usr/lib/ipxe/qemu
+          /usr/share/qemu
+          /usr/share/seabios"
+          [ "$(printf '%s\n' "$LOUT" | tail -n +3 | sort)" = "$WANT_REST" ] || { echo "E_QEMU_L_UNKNOWN"; exit 97; }
+          # masked-host startup smoke: the three pinned compiled-in dirs above are hidden by bwrap tmpfs; never boots a case
+          /tmp/$PREFIX-stage/shims/bwrap --ro-bind / / \
+            --tmpfs /usr/share/qemu --tmpfs /usr/share/seabios --tmpfs /usr/lib/ipxe \
+            --tmpfs /usr/lib/x86_64-linux-gnu/qemu \
+            --tmpfs /tmp/$PREFIX-out \
+            --dev-bind /dev/kvm /dev/kvm \
+            ./qemu-smoke.sh config.json argv-freeze.json 0 \
+              > /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-qemu-smoke.log 2>&1 \
             || { echo "E_QEMU_SMOKE"; cat /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-qemu-smoke.log; exit 97; }
-          echo "masked-host qemu startup smoke OK (staged ROMs only, no case booted)"
+          echo "masked-host binding smoke OK (exact frozen case argv + -S, four host dirs masked, no case booted)"
       - name: NON_CERTIFYING_SCRATCH ceremony (network-enforced-off, tee'd log)
         timeout-minutes: 120
         run: |
