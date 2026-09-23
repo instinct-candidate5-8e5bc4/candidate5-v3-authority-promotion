@@ -1,0 +1,282 @@
+--- a/NON_CERTIFYING_REHEARSAL-workflow.yml
++++ b/OVMF_CI_SECURE_BOOT_UKI-CERTIFICATION-workflow.yml
+@@ -1,66 +1,74 @@
+-# NON_CERTIFYING_REHEARSAL — pre-freeze rehearsal workflow (development evidence only).
+-# This workflow NEVER certifies anything. It must never emit OVMF_CI_SECURE_BOOT_UKI_PASS
+-# or any certification marker. Every artifact name begins NON_CERTIFYING_REHEARSAL.
+-# Trigger: push ONLY, exact branch filter p3-rehearsal-1 / p3-rehearsal-2 (no wildcards, no
+-# other events). Per GitHub Actions documentation a push runs the workflow file AT the pushed
+-# commit, including on non-default branches, so this file lives ONLY at .github/workflows/
+-# on the candidate commit (ONE copy; no default-branch registration, no docs/ copy).
+-# The two rehearsals are two separate fresh pushes of the SAME candidate SHA: first
+-# p3-rehearsal-1, then p3-rehearsal-2 only after -1 passes. No other commits to these refs.
+-# Fail-closed: the first step of every job aborts the run unless github.run_attempt == 1 AND
+-# github.ref is exactly one of the two filtered refs. No re-run counts; any accidental run
+-# is preserved and reported. Every GitHub action is pinned to a full-length commit SHA
+-# (reviewer condition 8; SHAs recorded in the deterministic manifest). bwrap is
+-# load-bearing for the canonical build path, so it comes ONLY from the hash-verified
+-# platform lock as a staged binary (never the host tool). KVM-only, fail-closed, no TCG.
+-# Public standard runner only ($0).
+-name: NON_CERTIFYING_REHEARSAL
++# OVMF_CI_SECURE_BOOT_UKI — Option A CI certification ceremony workflow.
++# Scope: QEMU/KVM + reproducible DEBUG OVMF Secure Boot certification of the EXACT accepted
++# signed UKI 133096976ee70a8c272cbcc8c28d369bfc65d93d994cbff4174b947df00239d1.
++# Expected pass = firmware Secure Boot accept + kernel exec + signed-init exit-98
++# (E_PROVIDER_NAMESPACE / E_PROVIDER_LINK_MISSING on non-Google hardware). This is NOT a
++# full runtime PASS, NOT a dm-verity runtime PASS, NOT a provisioning PASS, NOT a Google
++# platform certification, NOT a complete boot-chain certification; NO Google firmware,
++# vTPM, GCP-deployment or persistence claims.
++# Trigger: push ONLY, exact branch filter p3-certification (no wildcards, no other events).
++# Per GitHub Actions documentation a push runs the workflow file AT the pushed commit,
++# including on non-default branches, so this file lives ONLY at .github/workflows/ on the
++# candidate commit (ONE copy; no default-branch registration, no docs/ copy).
++# Ref discipline: the p3-certification ref MUST NOT exist before static acceptance. After
++# STATIC ACCEPT the accepted candidate SHA is pushed ONCE as p3-certification - certified
++# SHA == reviewed SHA. No re-runs, no retries, no additional commits to the ref.
++# Fail-closed: the first step of every job aborts the run unless github.run_attempt == 1
++# AND github.ref is exactly refs/heads/p3-certification. Any accidental run is preserved
++# and reported. Every GitHub action is pinned to a full-length commit SHA (reviewer
++# condition 8; SHAs recorded in the deterministic manifest). bwrap is load-bearing for
++# the canonical build path, so it comes ONLY from the hash-verified platform lock as a
++# staged binary (never the host tool). KVM-only, fail-closed, no TCG. Public standard
++# runner only ($0).
++# D1 conformance: this workflow intentionally KEEPS the rehearsal PREFIX and every
++# /tmp/NON_CERTIFYING_REHEARSAL-* scratch path - the frozen scripts/config hardcode them,
++# so certification evidence is provably produced by the exact rehearsed bytes. ONLY the
++# mode labels, artifact names, trigger/gate, the removed forbidden-marker guard and the
++# closing marker job differ from the rehearsal workflow.
++name: OVMF_CI_SECURE_BOOT_UKI
+ on:
+   push:
+-    branches: [p3-rehearsal-1, p3-rehearsal-2]
++    branches: [p3-certification]
+ permissions: {}
+ env:
+   PREFIX: NON_CERTIFYING_REHEARSAL
+ jobs:
+-  rehearsal:
++  certification:
+     # ubuntu-22.04 pinned: the canonical-path mechanism (build-ovmf-debug.sh) needs
+     # unprivileged user namespaces for bwrap; ubuntu-24.04 runners restrict them via
+     # AppArmor.
+     runs-on: ubuntu-22.04
+     timeout-minutes: 180
+     steps:
+-      - name: NON_CERTIFYING_REHEARSAL ref+attempt fail-closed gate
++      - name: OVMF_CI_SECURE_BOOT_UKI ref+attempt fail-closed gate
+         run: |
+           set -euo pipefail
+           [ "${{ github.run_attempt }}" = "1" ] || { echo "E_RERUN_FORBIDDEN run_attempt=${{ github.run_attempt }}"; exit 89; }
+-          case "${{ github.ref }}" in
+-            refs/heads/p3-rehearsal-1|refs/heads/p3-rehearsal-2) : ;;
+-            *) echo "E_REF_MISMATCH ref=${{ github.ref }}"; exit 89 ;;
+-          esac
+-      - name: NON_CERTIFYING_REHEARSAL kvm fail-closed check
++          [ "${{ github.ref }}" = "refs/heads/p3-certification" ] || { echo "E_REF_MISMATCH ref=${{ github.ref }}"; exit 89; }
++      - name: OVMF_CI_SECURE_BOOT_UKI kvm fail-closed check
+         run: |
+           set -euo pipefail
+           if [ ! -e /dev/kvm ]; then echo "E_NO_KVM"; exit 90; fi
+       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+         with: {persist-credentials: false}
+-      - name: NON_CERTIFYING_REHEARSAL platform staging (only network phase)
++      - name: OVMF_CI_SECURE_BOOT_UKI platform staging (only network phase)
+         run: |
+           set -euo pipefail
+           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+           ./stage-platform.sh platform.lock /tmp/$PREFIX-stage
+-      - name: NON_CERTIFYING_REHEARSAL userns/bwrap preflight (staged, lock-verified bwrap)
++      - name: OVMF_CI_SECURE_BOOT_UKI userns/bwrap preflight (staged, lock-verified bwrap)
+         run: |
+           set -euo pipefail
+           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+           ./make-shims.sh /tmp/$PREFIX-stage /tmp/$PREFIX-stage/shims >/dev/null
+           /tmp/$PREFIX-stage/shims/bwrap --ro-bind /usr /usr --symlink usr/bin /bin --dir /build --bind /tmp /build -- true \
+             || { echo "E_NO_USERNS: staged bwrap canonical-path mechanism unavailable on this runner"; exit 91; }
+-      - name: NON_CERTIFYING_REHEARSAL preflight static conformance
++      - name: OVMF_CI_SECURE_BOOT_UKI preflight static conformance
+         run: |
+           set -euo pipefail
+           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+           python3 preflight-check.py config.json /tmp/$PREFIX-stage
+-      - name: NON_CERTIFYING_REHEARSAL reproducible OVMF DEBUG dual build + accepted-firmware pins
++      - name: OVMF_CI_SECURE_BOOT_UKI reproducible OVMF DEBUG dual build + accepted-firmware pins
+         run: |
+           set -euo pipefail
+           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+@@ -81,7 +89,7 @@
+           sha256sum /tmp/$PREFIX-ovmf-a/OVMF_CODE.fd /tmp/$PREFIX-ovmf-a/OVMF_VARS.fd \
+             > /tmp/$PREFIX-fw-hashes.txt
+           cat /tmp/$PREFIX-fw-hashes.txt
+-      - name: NON_CERTIFYING_REHEARSAL hostile-path drift demonstration (condition 5)
++      - name: OVMF_CI_SECURE_BOOT_UKI hostile-path drift demonstration (condition 5)
+         run: |
+           set -euo pipefail
+           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+@@ -104,13 +112,13 @@
+           [ "$HH" != "fc150336fce10eb5508fa440cdf7300622c8c3ac71f2fbe10a0731422b9cef24" ] || { echo "E_HOSTILE_NO_DRIFT: hostile build equals the accepted firmware"; exit 92; }
+           echo "hostile-path build REJECTED: all $MODS modules carry the hostile path (exit exactly 43); drift confirmed $HH"
+           sha256sum /tmp/$PREFIX-hostile-out/OVMF_CODE.fd >> /tmp/$PREFIX-fw-hashes.txt
+-      - name: NON_CERTIFYING_REHEARSAL firmware hash upload (env2 comparison input)
++      - name: OVMF_CI_SECURE_BOOT_UKI firmware hash upload (env2 comparison input)
+         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+         with:
+-          name: NON_CERTIFYING_REHEARSAL-fw-hashes
++          name: OVMF_CI_SECURE_BOOT_UKI-fw-hashes
+           path: /tmp/NON_CERTIFYING_REHEARSAL-fw-hashes.txt
+           retention-days: 90
+-      - name: NON_CERTIFYING_REHEARSAL enrollment app + ESP dual builds
++      - name: OVMF_CI_SECURE_BOOT_UKI enrollment app + ESP dual builds
+         run: |
+           set -euo pipefail
+           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+@@ -121,30 +129,18 @@
+           [ "$(sha256sum /tmp/$PREFIX-esp-a/c5-root-admitter-uki-v3-esp.raw | cut -d' ' -f1)" = \
+             "2bfa621238890890765c9636f99dabfb46233bfa626afb580ce33e65858019c9" ]
+           cmp /tmp/$PREFIX-esp-a/c5-root-admitter-uki-v3-esp.raw /tmp/$PREFIX-esp-b/c5-root-admitter-uki-v3-esp.raw
+-      - name: NON_CERTIFYING_REHEARSAL ceremony (network-enforced-off, tee'd log)
++      - name: OVMF_CI_SECURE_BOOT_UKI ceremony (network-enforced-off, tee'd log)
+         run: |
+           set -euo pipefail
+           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+           mkdir -p /tmp/$PREFIX-out
+           sudo unshare -n ./run-ceremony.sh config.json /tmp/$PREFIX-stage /tmp/$PREFIX-out 2>&1 \
+             | tee /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-ceremony.log
+-      - name: NON_CERTIFYING_REHEARSAL forbidden-marker guard
+-        run: |
+-          set -euo pipefail
+-          # fail-closed form: explicit if, fixed-string binary-inclusive scan (-a -F) of the
+-          # ENTIRE evidence tree (which includes the tee'd ceremony log), then a top-level
+-          # prefix guard so no un-prefixed path can sit next to the prefixed evidence.
+-          if grep -r -a -F -l "OVMF_CI_SECURE_BOOT_UKI_PASS" /tmp/$PREFIX-out 2>/dev/null; then
+-            echo "E_FORBIDDEN_MARKER_IN_EVIDENCE"; exit 94
+-          fi
+-          if [ -n "$(find /tmp/$PREFIX-out -mindepth 1 -maxdepth 1 ! -name 'NON_CERTIFYING_REHEARSAL*' -print -quit)" ]; then
+-            echo "E_UNPREFIXED_TOPLEVEL_EVIDENCE"; exit 94
+-          fi
+-      - name: NON_CERTIFYING_REHEARSAL evidence upload (ephemeral CI artifact only)
++      - name: OVMF_CI_SECURE_BOOT_UKI evidence upload (ephemeral CI artifact only)
+         if: always()
+         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+         with:
+-          name: NON_CERTIFYING_REHEARSAL-evidence
++          name: OVMF_CI_SECURE_BOOT_UKI-evidence
+           path: |
+             /tmp/NON_CERTIFYING_REHEARSAL-out/
+             /tmp/NON_CERTIFYING_REHEARSAL-fw-hashes.txt
+@@ -154,34 +150,31 @@
+   # at the same canonical in-container path /build with identical pinned inputs. The FD
+   # hash must equal the first runner's. The Build tree is kept and every module's
+   # CodeView PDB path is parsed: all absolute paths must carry the /build/ prefix.
+-  rehearsal-env2:
++  certification-env2:
+     runs-on: ubuntu-22.04
+     timeout-minutes: 120
+-    needs: rehearsal
++    needs: certification
+     steps:
+-      - name: NON_CERTIFYING_REHEARSAL ref+attempt fail-closed gate
++      - name: OVMF_CI_SECURE_BOOT_UKI ref+attempt fail-closed gate
+         run: |
+           set -euo pipefail
+           [ "${{ github.run_attempt }}" = "1" ] || { echo "E_RERUN_FORBIDDEN run_attempt=${{ github.run_attempt }}"; exit 89; }
+-          case "${{ github.ref }}" in
+-            refs/heads/p3-rehearsal-1|refs/heads/p3-rehearsal-2) : ;;
+-            *) echo "E_REF_MISMATCH ref=${{ github.ref }}"; exit 89 ;;
+-          esac
++          [ "${{ github.ref }}" = "refs/heads/p3-certification" ] || { echo "E_REF_MISMATCH ref=${{ github.ref }}"; exit 89; }
+       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+         with: {persist-credentials: false}
+-      - name: NON_CERTIFYING_REHEARSAL env2 platform staging (only network phase)
++      - name: OVMF_CI_SECURE_BOOT_UKI env2 platform staging (only network phase)
+         run: |
+           set -euo pipefail
+           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+           ./stage-platform.sh platform.lock /tmp/$PREFIX-stage-env2
+-      - name: NON_CERTIFYING_REHEARSAL env2 userns/bwrap preflight (staged, lock-verified bwrap)
++      - name: OVMF_CI_SECURE_BOOT_UKI env2 userns/bwrap preflight (staged, lock-verified bwrap)
+         run: |
+           set -euo pipefail
+           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+           ./make-shims.sh /tmp/$PREFIX-stage-env2 /tmp/$PREFIX-stage-env2/shims >/dev/null
+           /tmp/$PREFIX-stage-env2/shims/bwrap --ro-bind /usr /usr --symlink usr/bin /bin --dir /build --bind /tmp /build -- true \
+             || { echo "E_NO_USERNS: staged bwrap canonical-path mechanism unavailable on this runner"; exit 91; }
+-      - name: NON_CERTIFYING_REHEARSAL env2 single canonical-path reproduction
++      - name: OVMF_CI_SECURE_BOOT_UKI env2 single canonical-path reproduction
+         run: |
+           set -euo pipefail
+           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+@@ -189,7 +182,7 @@
+             ./build-ovmf-debug.sh /tmp/$PREFIX-stage-env2 /tmp/$PREFIX-ovmf-env2
+           # condition 5: parse EVERY module .efi PDB path in the preserved Build tree
+           python3 scan-pe-pdb-paths.py /var/tmp/$PREFIX-env2-work/work /build/
+-      - name: NON_CERTIFYING_REHEARSAL env2 accepted-firmware pins + runner-1 hash echo
++      - name: OVMF_CI_SECURE_BOOT_UKI env2 accepted-firmware pins + runner-1 hash echo
+         run: |
+           set -euo pipefail
+           HC=$(sha256sum /tmp/$PREFIX-ovmf-env2/OVMF_CODE.fd | cut -d' ' -f1)
+@@ -201,12 +194,62 @@
+           sha256sum /tmp/$PREFIX-ovmf-env2/OVMF_CODE.fd /tmp/$PREFIX-ovmf-env2/OVMF_VARS.fd
+       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4.3.0
+         with:
+-          name: NON_CERTIFYING_REHEARSAL-fw-hashes
++          name: OVMF_CI_SECURE_BOOT_UKI-fw-hashes
+           path: /tmp/NON_CERTIFYING_REHEARSAL-fw1
+-      - name: NON_CERTIFYING_REHEARSAL env2 cross-runner byte-identity gate
++      - name: OVMF_CI_SECURE_BOOT_UKI env2 cross-runner byte-identity gate
+         run: |
+           set -euo pipefail
+           H1=$(grep "OVMF_CODE.fd" /tmp/$PREFIX-fw1/$PREFIX-fw-hashes.txt | head -1 | cut -d' ' -f1)
+           H2=$(sha256sum /tmp/$PREFIX-ovmf-env2/OVMF_CODE.fd | cut -d' ' -f1)
+           [ "$H1" = "$H2" ] || { echo "E_ENV2_HASH_MISMATCH $H1 $H2"; exit 93; }
+           echo "env2 reproduction byte-identical across runners at canonical /build"
++
++  # Marker emission: ONLY reachable when every prior step of both jobs succeeded. The
++  # marker is bound to the certified commit SHA, run id and ref on stdout AND in the
++  # marker file, so the artifact cannot be transplanted onto another commit or run.
++  # The marker line is emitted EXACTLY ONCE to stdout and EXACTLY ONCE into the evidence
++  # marker file, each immediately followed by the full non-claim block. The marker file
++  # lives under the rehearsal-prefixed scratch tree ($PREFIX-out) like every other
++  # ceremony output; only the artifact NAME carries the certification label.
++  certification-marker:
++    runs-on: ubuntu-22.04
++    timeout-minutes: 10
++    needs: [certification, certification-env2]
++    steps:
++      - name: OVMF_CI_SECURE_BOOT_UKI ref+attempt fail-closed gate
++        run: |
++          set -euo pipefail
++          [ "${{ github.run_attempt }}" = "1" ] || { echo "E_RERUN_FORBIDDEN run_attempt=${{ github.run_attempt }}"; exit 89; }
++          [ "${{ github.ref }}" = "refs/heads/p3-certification" ] || { echo "E_REF_MISMATCH ref=${{ github.ref }}"; exit 89; }
++      - name: OVMF_CI_SECURE_BOOT_UKI marker emission (only reached on full suite success)
++        run: |
++          set -euo pipefail
++          mkdir -p /tmp/$PREFIX-out
++          printf '%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\nSHA=%s\nRUN_ID=%s\nREF=%s\n' \
++            'OVMF_CI_SECURE_BOOT_UKI_PASS' \
++            'SCOPE: QEMU/KVM + reproducible DEBUG OVMF Secure Boot certification of the accepted signed UKI 133096976ee70a8c272cbcc8c28d369bfc65d93d994cbff4174b947df00239d1 only.' \
++            'EXPECTED-PASS: firmware Secure Boot accept + kernel exec + signed-init exit-98 (E_PROVIDER_NAMESPACE/E_PROVIDER_LINK_MISSING on non-Google hardware).' \
++            'NOT a full runtime PASS. NOT a dm-verity runtime PASS. NOT a provisioning PASS.' \
++            'NOT a Google platform certification. NOT a complete boot-chain certification.' \
++            'NO Google firmware, vTPM, GCP-deployment or persistence claims.' \
++            'Firmware: accepted canonical DEBUG OVMF (fc150336fce10eb5508fa440cdf7300622c8c3ac71f2fbe10a0731422b9cef24).' \
++            'Environment: GitHub-hosted ubuntu-22.04 standard runner, KVM, attempt 1, ref p3-certification.' \
++            "${{ github.sha }}" "${{ github.run_id }}" "${{ github.ref }}"
++          printf '%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\nSHA=%s\nRUN_ID=%s\nREF=%s\n' \
++            'OVMF_CI_SECURE_BOOT_UKI_PASS' \
++            'SCOPE: QEMU/KVM + reproducible DEBUG OVMF Secure Boot certification of the accepted signed UKI 133096976ee70a8c272cbcc8c28d369bfc65d93d994cbff4174b947df00239d1 only.' \
++            'EXPECTED-PASS: firmware Secure Boot accept + kernel exec + signed-init exit-98 (E_PROVIDER_NAMESPACE/E_PROVIDER_LINK_MISSING on non-Google hardware).' \
++            'NOT a full runtime PASS. NOT a dm-verity runtime PASS. NOT a provisioning PASS.' \
++            'NOT a Google platform certification. NOT a complete boot-chain certification.' \
++            'NO Google firmware, vTPM, GCP-deployment or persistence claims.' \
++            'Firmware: accepted canonical DEBUG OVMF (fc150336fce10eb5508fa440cdf7300622c8c3ac71f2fbe10a0731422b9cef24).' \
++            'Environment: GitHub-hosted ubuntu-22.04 standard runner, KVM, attempt 1, ref p3-certification.' \
++            "${{ github.sha }}" "${{ github.run_id }}" "${{ github.ref }}" \
++            > /tmp/$PREFIX-out/OVMF_CI_SECURE_BOOT_UKI-certification-marker.txt
++      - name: OVMF_CI_SECURE_BOOT_UKI marker upload (ephemeral CI artifact only)
++        if: always()
++        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
++        with:
++          name: OVMF_CI_SECURE_BOOT_UKI-marker
++          path: /tmp/NON_CERTIFYING_REHEARSAL-out/OVMF_CI_SECURE_BOOT_UKI-certification-marker.txt
++          retention-days: 90

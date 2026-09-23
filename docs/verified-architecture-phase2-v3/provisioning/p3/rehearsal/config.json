@@ -1,0 +1,132 @@
+{
+ "cases": [
+  {
+   "esp": "build-output/esp/c5-root-admitter-uki-v3-esp.raw",
+   "expect": {
+    "adapter_strings": [
+     "E_PROVIDER_NAMESPACE",
+     "E_PROVIDER_LINK_MISSING"
+    ],
+    "exit_97": false,
+    "exit_98": true,
+    "kernel_exec": true,
+    "no_reject_strings": true,
+    "reject_strings": []
+   },
+   "firmware": "build-output/ovmf-debug/OVMF_CODE.fd",
+   "id": "NON_CERTIFYING_REHEARSAL-R1-positive",
+   "settle_seconds": 45,
+   "vars_template": "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-enroll-sole/vars-enrolled.fd"
+  },
+  {
+   "esp": "build-output/esp-variant/NON_CERTIFYING_REHEARSAL-esp-unsigned.raw",
+   "expect": {
+    "adapter_strings_absent": true,
+    "exit_97": false,
+    "exit_98": false,
+    "kernel_exec": false,
+    "reject_strings": [
+     "Image is not signed and %s hash of image is not found in DB/DBX"
+    ]
+   },
+   "firmware": "build-output/ovmf-debug/OVMF_CODE.fd",
+   "id": "NON_CERTIFYING_REHEARSAL-R2-N1-unsigned",
+   "settle_seconds": 30,
+   "vars_template": "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-enroll-sole/vars-enrolled.fd"
+  },
+  {
+   "esp": "build-output/esp-variant/NON_CERTIFYING_REHEARSAL-esp-wrongsig.raw",
+   "expect": {
+    "adapter_strings_absent": true,
+    "exit_97": false,
+    "exit_98": false,
+    "kernel_exec": false,
+    "reject_strings": [
+     "Image is signed but signature is not allowed by DB and %s hash of image is not found in DB/DBX"
+    ]
+   },
+   "firmware": "build-output/ovmf-debug/OVMF_CODE.fd",
+   "id": "NON_CERTIFYING_REHEARSAL-R3-N2-wrongsig",
+   "settle_seconds": 30,
+   "vars_template": "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-enroll-sole/vars-enrolled.fd"
+  },
+  {
+   "esp": "build-output/esp-variant/NON_CERTIFYING_REHEARSAL-esp-hostile.raw",
+   "expect": {
+    "adapter_strings_absent": true,
+    "exit_97": false,
+    "exit_98": false,
+    "kernel_exec": false,
+    "reject_strings": [
+     "Image is signed but signature is not allowed by DB and %s hash of image is not found in DB/DBX"
+    ]
+   },
+   "firmware": "build-output/ovmf-debug/OVMF_CODE.fd",
+   "id": "NON_CERTIFYING_REHEARSAL-R4-N3a-hostile-sole-db",
+   "settle_seconds": 30,
+   "vars_template": "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-enroll-sole/vars-enrolled.fd"
+  },
+  {
+   "esp": "build-output/esp-variant/NON_CERTIFYING_REHEARSAL-esp-hostile.raw",
+   "expect": {
+    "kernel_exec": true,
+    "no_reject_strings": true,
+    "reject_strings": []
+   },
+   "firmware": "build-output/ovmf-debug/OVMF_CODE.fd",
+   "id": "NON_CERTIFYING_REHEARSAL-R5-N3b-hostile-widened-db",
+   "settle_seconds": 45,
+   "vars_template": "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-enroll-widened/vars-enrolled.fd"
+  },
+  {
+   "esp": "build-output/esp-variant/NON_CERTIFYING_REHEARSAL-esp-hostile.raw",
+   "expect": {
+    "adapter_strings_absent": true,
+    "exit_97": false,
+    "exit_98": false,
+    "kernel_exec": false,
+    "reject_strings": [
+     "Image is signed but signature is not allowed by DB and %s hash of image is not found in DB/DBX"
+    ]
+   },
+   "firmware": "build-output/ovmf-debug/OVMF_CODE.fd",
+   "id": "NON_CERTIFYING_REHEARSAL-R6-N3c-hostile-fresh-sole-db",
+   "settle_seconds": 30,
+   "vars_template": "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-enroll-sole-fresh/vars-enrolled.fd"
+  },
+  {
+   "esp": "build-output/esp/c5-root-admitter-uki-v3-esp.raw",
+   "expect": {
+    "exit_97": false,
+    "exit_98": true,
+    "kernel_exec": true,
+    "no_reject_strings": true,
+    "reject_strings": []
+   },
+   "firmware": "/tmp/NON_CERTIFYING_REHEARSAL-stage/root/usr/share/OVMF/OVMF_CODE_4M.secboot.fd",
+   "id": "NON_CERTIFYING_REHEARSAL-R7-release-sibling-behavior-only",
+   "settle_seconds": 45,
+   "vars_template": "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-enroll-sole/vars-enrolled.fd"
+  }
+ ],
+ "cpu_model": "Skylake-Server",
+ "disk_dir": "disks",
+ "enroll_app": "build-output/enroll-app/enroll-app.efi",
+ "firmware_release": "/tmp/NON_CERTIFYING_REHEARSAL-stage/root/usr/share/OVMF/OVMF_CODE_4M.secboot.fd",
+ "firmware_release_sha256": "1dbb7f9b7e7285b950929bbbc1494c186bfb061cde60cf531ff9756ef87dab7a",
+ "memory_mb": 4096,
+ "note": "development rehearsal only; no certification semantics; the closing marker must never appear here",
+ "ovmf_code_debug": "build-output/ovmf-debug/OVMF_CODE.fd",
+ "ovmf_vars_pristine": "/tmp/NON_CERTIFYING_REHEARSAL-stage/root/usr/share/OVMF/OVMF_VARS_4M.fd",
+ "qemu": "/tmp/NON_CERTIFYING_REHEARSAL-stage/shims/qemu-system-x86_64",
+ "schema": "NON_CERTIFYING_REHEARSAL-config/v1",
+ "v3_serials": [
+  "v3-rootfs-data",
+  "v3-rootfs-hash",
+  "v3-reviewed-root",
+  "v3-reviewed-input",
+  "v3-reviewed-output",
+  "v3-reviewed-evidence"
+ ],
+ "vars_parser": "../parse-ovmf-vars.py"
+}
