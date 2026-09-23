@@ -1,0 +1,46 @@
+{
+  "evidenceId": "TRACK-B-B6-PERF-VISUAL-TESTS",
+  "phase": "B6 mobile/browser performance + visual-quality tests",
+  "generatedAt": "2026-09-23T18:16:29.719Z",
+  "branch": "candidate5-track-b-visual-slice",
+  "track": "B (isolated; NO merge to main, NO production connection)",
+  "visualSmoke": {
+    "script": "scripts/track-b/visual-smoke.js",
+    "asserts": [
+      "canvas exists",
+      "webgl context",
+      "banner VISUALS ARE NOT CERTIFIED PHYSICS",
+      "visuals-vs-physical distinction shown",
+      "branch+commit shown",
+      "FPS meter present",
+      "no page errors",
+      "scene renders non-black pixels (avgLuma>8)",
+      "scene is not a blank dark frame (darkFrac<0.9)"
+    ],
+    "scope": "PIXELS/VISUAL BEHAVIOR ONLY - never physical legality",
+    "hostRun": {
+      "host": "Linux container, google-chrome headless + swiftshader (software GL)",
+      "result": "9/9 PASS (avgLuma=46.6, darkFrac=0.000)",
+      "meaning": "rendering smoke signal only; software-GL FPS is NOT a perf result"
+    },
+    "wrapper": "tests/clean-runtime-school-scene-v2/visual-smoke-b6.test.js skips cleanly when no browser/dev-deps on host"
+  },
+  "performance": {
+    "ownerBar": "45 FPS target; production measured 17 FPS; emulated numbers not accepted",
+    "status": "NOT DONE on this side - no real hardware available in the Linux container",
+    "procedure": "docs/track-b/real-hardware-fps-procedure.md (device/GPU/browser/window recording tuple; 10s warmup; HUD meter read; report through review loop)",
+    "owedBy": "real-hardware run on target device(s)"
+  },
+  "tests": {
+    "suite": "tests/clean-runtime-school-scene-v2/*.test.js",
+    "result": "60 PASS, 0 FAIL, 1 SKIP (visual smoke wrapper - host-dependent by design)",
+    "note": "node --test, Linux container, node v22.23.2; not a certified CI platform run"
+  },
+  "barriers": [
+    "no merge to main/default",
+    "no production connection",
+    "visual tests assert pixels/visual behavior only",
+    "emulated perf numbers never reported as results",
+    "zero mandatory cost"
+  ]
+}
