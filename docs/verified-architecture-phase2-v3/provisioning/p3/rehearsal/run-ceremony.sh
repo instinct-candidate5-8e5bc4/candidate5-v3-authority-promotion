@@ -60,7 +60,7 @@ assert_sha build-output/enroll-app/enroll-app.efi "${PINS[6]}"
 ./enroll-prep.sh "$STAGE/root" prep evidence/c5-signing-cert.der evidence/C5-HOSTILE-FIXTURE.cer
 trap 'rm -rf prep' EXIT
 for mode in sole widened sole-fresh; do
-  d="$OUT/NON_CERTIFYING_REHEARSAL-enroll-$mode"
+  d="$OUT/$PREFIX-enroll-$mode"
   mkdir -p "$d"
   if [ "$mode" = widened ]; then
     ./rehearsal-enroll.sh "$CONFIG" prep "$d/vars-enrolled.fd" "$d/evidence" db2
@@ -73,7 +73,7 @@ done
 # enroll-predicate.json evidence. (trap EXIT above also covers failure paths.)
 rm -rf prep
 # case suite (harness CLI: config + work_root)
-python3 ./rehearsal-harness.py "$CONFIG" "$OUT/NON_CERTIFYING_REHEARSAL-cases"
+python3 ./rehearsal-harness.py "$CONFIG" "$OUT/$PREFIX-cases"
 # canonical ceremony manifest (streamed reads: never loads a full dump into memory)
 python3 - "$OUT" <<'PYEOF'
 import json, hashlib, os, sys
@@ -87,6 +87,6 @@ for root,_,files in os.walk(out):
 man={'schema':'NON_CERTIFYING_REHEARSAL-manifest/v1',
      'note':'development rehearsal only; no certification semantics; closing marker must never appear',
      'files':sorted(entries,key=lambda e:e['path'])}
-open(os.path.join(out,'NON_CERTIFYING_REHEARSAL-manifest.json'),'w').write(json.dumps(man,indent=1,sort_keys=True)+'\n')
+open(os.path.join(out,os.environ.get('PREFIX','NON_CERTIFYING_REHEARSAL')+'-manifest.json'),'w').write(json.dumps(man,indent=1,sort_keys=True)+'\n')
 print('ceremony manifest:',len(entries),'evidence files')
 PYEOF

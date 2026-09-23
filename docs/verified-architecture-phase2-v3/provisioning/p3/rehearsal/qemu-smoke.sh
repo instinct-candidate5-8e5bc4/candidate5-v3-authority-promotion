@@ -10,7 +10,7 @@
 # staged tree only, plus a clean QMP handshake + quit. The CPU never starts (-S):
 # no case is booted. Exit 97 on any failure.
 set -euo pipefail
-PREFIX="${PREFIX:-NON_CERTIFYING_REHEARSAL}"
+PREFIX="${PREFIX:-NON_CERTIFYING_REHEARSAL}"; export PREFIX
 HERE="$(cd "$(dirname "$0")" && pwd)"
 
 if [ "${QEMU_SMOKE_NS:-0}" != "1" ]; then
@@ -58,6 +58,17 @@ ln -s "$HERE/build-output" "$W/build-output"
 python3 - "$CFG" "$FREEZE" "$IDX" "$W" <<'PYEOF'
 import json, os, socket, subprocess, sys, time
 cfg=json.load(open(sys.argv[1])); fz=json.load(open(sys.argv[2]))
+# Lane prefix resolution (scratch-3 ruling): committed config/argv-freeze bytes keep the
+# canonical NON_CERTIFYING_REHEARSAL prefix; at load time every /tmp/NON_CERTIFYING_REHEARSAL-
+# path prefix resolves to the running lane's /tmp/$PREFIX-. Identity in the rehearsal and
+# certification lanes; the scratch lane exports PREFIX=NON_CERTIFYING_SCRATCH.
+PREFIX=os.environ.get("PREFIX","NON_CERTIFYING_REHEARSAL")
+def _pref(x):
+    if isinstance(x,str): return x.replace("/tmp/NON_CERTIFYING_REHEARSAL-","/tmp/%s-"%PREFIX)
+    if isinstance(x,list): return [_pref(i) for i in x]
+    if isinstance(x,dict): return {k:_pref(v) for k,v in x.items()}
+    return x
+cfg=_pref(cfg); fz=_pref(fz)
 idx=int(sys.argv[3]); W=sys.argv[4]
 argv=list(fz["cases"][idx]["argv"])
 # -S immediately after the launcher: CPU never starts; every other element byte-exact.

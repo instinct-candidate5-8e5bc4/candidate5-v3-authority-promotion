@@ -3,6 +3,19 @@
 # usage: preflight-check.py <config.json> <stage_dir>
 import sys, os, json, hashlib, subprocess
 
+# Lane prefix resolution (scratch-3 ruling): committed config bytes keep the canonical
+# NON_CERTIFYING_REHEARSAL prefix; at load time every /tmp/NON_CERTIFYING_REHEARSAL- path
+# prefix resolves to the running lane's /tmp/$PREFIX-. Identity in the rehearsal and
+# certification lanes (PREFIX defaults to NON_CERTIFYING_REHEARSAL); the scratch lane
+# exports PREFIX=NON_CERTIFYING_SCRATCH.
+PREFIX=os.environ.get("PREFIX","NON_CERTIFYING_REHEARSAL")
+CANON_TMP="/tmp/NON_CERTIFYING_REHEARSAL-"; LANE_TMP="/tmp/%s-"%PREFIX
+def pref(x):
+    if isinstance(x,str): return x.replace(CANON_TMP,LANE_TMP)
+    if isinstance(x,list): return [pref(i) for i in x]
+    if isinstance(x,dict): return {k:pref(v) for k,v in x.items()}
+    return x
+
 FORBIDDEN = "OVMF_CI_SECURE_BOOT_UKI_PASS"
 E = []
 def fail(code, msg): E.append((code, msg))
@@ -90,7 +103,7 @@ for fn,(h,sz) in EXPECT.items():
     if os.path.getsize(p)!=sz or sha(p)!=h: fail("E_EVIDENCE_HASH_MISMATCH", fn)
 
 # 5) config schema: no wildcards, exact values only
-cfg=json.load(open(cfg_path))
+cfg=pref(json.load(open(cfg_path)))
 def scan_wildcards(o, path=""):
     if isinstance(o, dict):
         for k,v in o.items(): scan_wildcards(v, path+"."+k)
@@ -107,8 +120,8 @@ for c in cfg.get("cases",[]):
     for pth_key in ("vars_template","esp","firmware"):
         p=c.get(pth_key,"")
         # build-output/ and out/ are generated during the ceremony by hash-pinned producers;
-        # /tmp/NON_CERTIFYING_REHEARSAL-stage/ is the staged tree (verified above)
-        generated=("build-output/","out/","/tmp/NON_CERTIFYING_REHEARSAL-stage/","/tmp/NON_CERTIFYING_REHEARSAL-out/")
+        # /tmp/$PREFIX-stage/ is the staged tree (verified above); both are lane-prefixed
+        generated=("build-output/","out/","/tmp/%s-stage/"%PREFIX,"/tmp/%s-out/"%PREFIX)
         if p and not any(p.startswith(g) for g in generated) and not os.path.exists(p):
             fail("E_CONFIG_PATH_MISSING", c["id"]+"."+pth_key)
 

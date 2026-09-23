@@ -5,13 +5,20 @@
 # MODE (sole|db2) also selects the frozen VARS predicate set checked by enroll-predicate-check.py.
 set -euo pipefail
 CFG=${1:?}; PREP=${2:?}; OUT=${3:?}; EVD=${4:?}; MODE=${5:-sole}
+# Lane prefix resolution (scratch-3 ruling): committed config bytes keep the canonical
+# NON_CERTIFYING_REHEARSAL prefix; the two canonical /tmp paths read below resolve to the
+# running lane's /tmp/$PREFIX-. Identity in the rehearsal and certification lanes.
+PREFIX="${PREFIX:-NON_CERTIFYING_REHEARSAL}"
+CANON_TMP=/tmp/NON_CERTIFYING_REHEARSAL-; LANE_TMP=/tmp/$PREFIX-
 [ -e /dev/kvm ] || { echo "E_NO_KVM" >&2; exit 90; }
 [ -e "$EVD" ] && { echo "E_EVD_EXISTS" >&2; exit 1; }
 mkdir -p "$EVD"
 QEMU=$(python3 -c "import json;print(json.load(open('$CFG'))['qemu'])")
+QEMU=${QEMU//$CANON_TMP/$LANE_TMP}
 CPU=$(python3 -c "import json;print(json.load(open('$CFG'))['cpu_model'])")
 FW=$(python3 -c "import json;print(json.load(open('$CFG'))['ovmf_code_debug'])")
 PRISTINE=$(python3 -c "import json;print(json.load(open('$CFG'))['ovmf_vars_pristine'])")
+PRISTINE=${PRISTINE//$CANON_TMP/$LANE_TMP}
 APP=$(python3 -c "import json;print(json.load(open('$CFG'))['enroll_app'])")
 # enrollment FAT32 image (64 MiB): app as /EFI/BOOT/BOOTX64.EFI + auth blobs at the VOLUME ROOT
 # (G2/T5 F4: the app opens db.auth/kek.auth/pk.auth on the volume root and writes ENROLL.TXT there)

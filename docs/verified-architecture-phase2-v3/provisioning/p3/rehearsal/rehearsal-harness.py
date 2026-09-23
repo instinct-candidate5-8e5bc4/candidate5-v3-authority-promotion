@@ -5,6 +5,19 @@
 # usage: rehearsal-harness.py <config.json> <work_root>
 import sys, os, json, socket, hashlib, subprocess, time, shutil, signal
 
+# Lane prefix resolution (scratch-3 ruling): committed config bytes keep the canonical
+# NON_CERTIFYING_REHEARSAL prefix; at load time every /tmp/NON_CERTIFYING_REHEARSAL- path
+# prefix resolves to the running lane's /tmp/$PREFIX-. Identity in the rehearsal and
+# certification lanes (PREFIX defaults to NON_CERTIFYING_REHEARSAL); the scratch lane
+# exports PREFIX=NON_CERTIFYING_SCRATCH.
+PREFIX=os.environ.get("PREFIX","NON_CERTIFYING_REHEARSAL")
+CANON_TMP="/tmp/NON_CERTIFYING_REHEARSAL-"; LANE_TMP="/tmp/%s-"%PREFIX
+def pref(x):
+    if isinstance(x,str): return x.replace(CANON_TMP,LANE_TMP)
+    if isinstance(x,list): return [pref(i) for i in x]
+    if isinstance(x,dict): return {k:pref(v) for k,v in x.items()}
+    return x
+
 # C7 runtime-emission provenance: the signed cmdline (ro root=/dev/mapper/v3-root-admitter
 # rootfstype=ext4 v3.root_admitter_verity=533d6d61..) carries NO console= parameter, so the
 # serial channel is unsupported and the runtime-only channel is the kernel printk ring
@@ -27,11 +40,11 @@ ADAPTER_STRINGS = [s.encode() for s in ("E_PROVIDER_NAMESPACE","E_PROVIDER_LINK_
 
 # Frozen per-case VARS template binding (reviewer ruling): each case must draw its VARS from
 # exactly one of the three run-fresh post-enrollment templates, byte-identical, checked in-run.
-ALLOWED_VARS_TEMPLATES = {
+ALLOWED_VARS_TEMPLATES = {pref(t) for t in (
     "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-enroll-sole/vars-enrolled.fd",
     "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-enroll-widened/vars-enrolled.fd",
     "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-enroll-sole-fresh/vars-enrolled.fd",
-}
+)}
 
 # C4 strict closed schema (T4 F6): unknown or missing keys fail.
 TOP_KEYS = {"cases","cpu_model","disk_dir","enroll_app","enroll_app_sha256","esp_sha256",
@@ -240,7 +253,7 @@ def run_case(cfg, case, idx):
     return ok
 
 if __name__=="__main__":
-    cfg=json.load(open(sys.argv[1]))
+    cfg=pref(json.load(open(sys.argv[1])))
     check_schema(cfg)
     cfg["work_root"]=sys.argv[2]
     os.makedirs(cfg["work_root"],exist_ok=True)
