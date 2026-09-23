@@ -31,7 +31,7 @@ const U=1e6, m=v=>v/U; // ED-P2-02 downstream-only conversion: microunits -> met
 const bundle=await (await fetch('./scene-bundle.json')).json();
 if(bundle.status!=='READY'){const e=document.getElementById('err');e.style.display='block';e.textContent='Bundle not READY: '+JSON.stringify(bundle.reason||bundle.status);throw new Error('bundle not ready')}
 document.getElementById('distinction').textContent=bundle.banner.distinction;
-document.getElementById('meta').innerHTML=`branch <code>${bundle.git.branch}</code> commit <code>${bundle.git.commit}</code> base <code>${bundle.git.base}</code> &middot; world <code>${bundle.inputs.worldStateDigest.slice(0,16)}&hellip;</code> package <code>${bundle.inputs.sourcePackageDigest.slice(0,16)}&hellip;</code>`;
+document.getElementById('meta').innerHTML=`branch <code>${bundle.git.branch}</code> build commit (embedded at build time; deployed branch head differs) <code>${bundle.git.commit}</code> base <code>${bundle.git.base}</code> &middot; world <code>${bundle.inputs.worldStateDigest.slice(0,16)}&hellip;</code> package <code>${bundle.inputs.sourcePackageDigest.slice(0,16)}&hellip;</code>`;
 document.getElementById('caveats').innerHTML=
  `<p><b>Status caveats:</b><br>Casualty: ${bundle.statusCaveats.casualty.gate} ${bundle.statusCaveats.casualty.gateResult} &mdash; ${bundle.statusCaveats.casualty.caveat}<br>Chair: ${bundle.statusCaveats.chair.gate} ${bundle.statusCaveats.chair.gateResult} &mdash; ${bundle.statusCaveats.chair.caveat}</p>`+
  `<p><b>Gate D declared unknowns (not certified):</b> ${bundle.declaredUnknowns.join('; ')}</p>`+
