@@ -264,17 +264,32 @@ jobs:
           id
           stat -c '%A %a %U:%g %n' qemu-smoke.sh bwrap-argv.sh
           git ls-files -s -- qemu-smoke.sh bwrap-argv.sh
+          git config --local --get-regexp '^http\.' || echo "no token in .git/config (persist-credentials: false)"
+          echo "hashed-input SHAs BEFORE repair:"
+          sha256sum qemu-smoke.sh bwrap-argv.sh config.json argv-freeze.json make-disks.sh
           namei -l "$PWD/qemu-smoke.sh"
           sudo namei -l "$PWD/qemu-smoke.sh"
           for t in "$GITHUB_WORKSPACE" / /tmp /etc /home /usr /usr/share /usr/lib /usr/lib/x86_64-linux-gnu /dev/kvm /tmp/$PREFIX-stage /tmp/$PREFIX-ovmf-a /tmp/$PREFIX-esp-a /tmp/$PREFIX-out; do
             findmnt -T "$t" -o TARGET,SOURCE,FSTYPE,OPTIONS
           done
-          # Diagnosis test by remediation: other-traverse on every checkout-path
-          # component and other-read on the tree (ephemeral $0 runner, discarded after
-          # the job). Only directory traverse/read bits change; no script content and
-          # no exec-bit provenance is touched (committed 100755 stands, per the ruling):
-          p="$PWD"; while [ "$p" != "/" ]; do sudo chmod o+x "$p"; p="$(dirname "$p")"; done
-          chmod -R a+rX "$GITHUB_WORKSPACE"
+          # Diagnosis test by remediation, NARROWED (peer #7 boundary 1/3): directory
+          # traverse bits ONLY. The checkout materializes 0755 dirs / 0644 files
+          # (other-read already present), so NO regular-file mode ever changes, no exec
+          # bit is added anywhere, and no capital X is used. Each chmod is logged
+          # verbatim and namei is re-printed after; ephemeral $0 runner, discarded.
+          p="$PWD"; while [ "$p" != "/" ]; do echo "+ chmod o+x $p"; sudo chmod o+x "$p"; p="$(dirname "$p")"; done
+          find "$PWD" -type d ! -perm -005 -print -exec chmod o+rx {} +
+          namei -l "$PWD/qemu-smoke.sh"
+          # fail-closed verification as the OTHER permission class (nobody approximates
+          # the overflow uid the unmapped checkout owner collapses to in the namespace):
+          for f in qemu-smoke.sh bwrap-argv.sh config.json argv-freeze.json make-disks.sh; do
+            sudo -u nobody test -r "$PWD/$f" || { echo "E_SMOKE_PREP other-read $f"; exit 97; }
+          done
+          sudo -u nobody test -x "$PWD/qemu-smoke.sh" || { echo "E_SMOKE_PREP other-exec qemu-smoke.sh"; exit 97; }
+          sudo -u nobody test -x "$PWD/make-disks.sh" || { echo "E_SMOKE_PREP other-exec make-disks.sh"; exit 97; }
+          echo "hashed-input SHAs AFTER repair (must equal BEFORE):"
+          sha256sum qemu-smoke.sh bwrap-argv.sh config.json argv-freeze.json make-disks.sh
+          git ls-files -s -- qemu-smoke.sh bwrap-argv.sh
           sudo env PREFIX="$PREFIX" ./qemu-smoke.sh config.json argv-freeze.json 0 \
               > /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-qemu-smoke.log 2>&1 \
             || { echo "E_QEMU_SMOKE"; cat /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-qemu-smoke.log; exit 97; }
@@ -286,7 +301,7 @@ jobs:
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
           mkdir -p /tmp/$PREFIX-out
           date +%s >> /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-step-stamps.txt
-          sudo unshare -n ./run-ceremony.sh config.json /tmp/$PREFIX-stage /tmp/$PREFIX-out 2>&1 \
+          sudo unshare -n env PREFIX="$PREFIX" ./run-ceremony.sh config.json /tmp/$PREFIX-stage /tmp/$PREFIX-out 2>&1 \
             | tee /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-ceremony.log
       - name: OVMF_CI_SECURE_BOOT_UKI ceremony interpreter cross-check (addendum2 condition 2b)
         run: |

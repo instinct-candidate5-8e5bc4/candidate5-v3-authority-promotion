@@ -190,6 +190,36 @@ except Exception as e:
 finally:
     if _tmp: _sp.run(["rm","-rf",_tmp])
 
+# 6e2) scratch-6 ruling condition 5 (D1-class static gate extended to qemu-smoke.sh and
+# bwrap-argv.sh): the smoke's namespace argv is frozen in argv-freeze.json (smoke_namespace)
+# and consumed by qemu-smoke.sh at runtime. Statically verify the block's integrity (exact
+# masked set, sha256 of the NUL-joined structural args, sentinel tokens, no masked path
+# leaking into the structural args) and both files' declared forms: the smoke script must
+# consume the block (no inline argv/mask arrays, exactly one declared self-wrap exec), and
+# the D1 helper must retain its pinned canonical form.
+_fz2=json.load(open(os.path.join(here,"argv-freeze.json")))
+_sn=_fz2.get("smoke_namespace")
+if not isinstance(_sn,dict): fail("E_SMOKE_NS_MISSING","smoke_namespace block absent from argv-freeze.json")
+for _k in ("root","masked","structural_args","structural_sha256"):
+    if _k not in _sn: fail("E_SMOKE_NS_SCHEMA","smoke_namespace."+_k)
+if _sn["masked"]!=["/usr/share/qemu","/usr/share/seabios","/usr/lib/ipxe","/usr/lib/x86_64-linux-gnu/qemu"]:
+    fail("E_SMOKE_NS_MASKED","masked set drifted: "+repr(_sn["masked"]))
+_sa=_sn["structural_args"]
+import hashlib as _hl2
+if _hl2.sha256("\0".join(_sa).encode()).hexdigest()!=_sn["structural_sha256"]:
+    fail("E_SMOKE_NS_SHA","structural_sha256 does not match structural_args")
+for _sentinel in ("--unshare-all","--dev-bind","/dev/kvm","--tmpfs","$STAGE"):
+    if _sentinel not in _sa: fail("E_SMOKE_NS_FORM","structural_args missing "+_sentinel)
+for _m in _sn["masked"]:
+    if _m in _sa: fail("E_SMOKE_NS_LEAK","masked path inside structural_args: "+_m)
+_st=open(os.path.join(here,"qemu-smoke.sh"),errors="replace").read()
+if "smoke_namespace" not in _st: fail("E_SMOKE_NS_UNUSED","qemu-smoke.sh does not consume the frozen block")
+if "MASKED=(" in _st or "args=(--unshare-all" in _st: fail("E_SMOKE_NS_INLINE","qemu-smoke.sh carries inline namespace argv")
+if _st.count('exec "$BWRAP"')!=1: fail("E_SMOKE_NS_EXEC","qemu-smoke.sh must have exactly one declared self-wrap exec")
+_bh=open(os.path.join(here,"bwrap-argv.sh"),errors="replace").read()
+if "COMMON=(" not in _bh or _bh.count('exec "$BWRAP" "${COMMON[@]}"')!=2:
+    fail("E_BWRAP_HELPER_FORM","bwrap-argv.sh lost its pinned canonical form")
+
 # 6f) batch1r3 C7: no upload path may be a prefix of the enrollment prep dir
 prep_abs=os.path.join(here,"prep")
 for fn in ("NON_CERTIFYING_REHEARSAL-workflow.yml","OVMF_CI_SECURE_BOOT_UKI-CERTIFICATION-workflow.yml"):

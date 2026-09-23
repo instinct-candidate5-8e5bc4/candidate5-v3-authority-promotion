@@ -24,43 +24,69 @@ if [ "${QEMU_SMOKE_NS:-0}" != "1" ]; then
   STAGE="/tmp/$PREFIX-stage"
   BWRAP="$STAGE/shims/bwrap"
   [ -x "$BWRAP" ] || { echo "E_QEMU_SMOKE no staged bwrap at $BWRAP"; exit 97; }
-  ROOT=/usr
-  MASKED=(/usr/share/qemu /usr/share/seabios /usr/lib/ipxe /usr/lib/x86_64-linux-gnu/qemu)
-  # enum parents = every dir that directly holds a masked child
-  ENUMP=()
-  for m in "${MASKED[@]}"; do ENUMP+=("$(dirname "$m")"); done
-  is_enum_parent() { local e; for e in "${ENUMP[@]}"; do [ "$1" = "$e" ] && return 0; done; return 1; }
-  is_masked() { local e; for e in "${MASKED[@]}"; do [ "$1" = "$e" ] && return 0; done; return 1; }
-  under_masked() {  # canonical path $1 lives inside a masked dir (symlink re-import guard)
-    local m; for m in "${MASKED[@]}"; do case "$1" in "$m"|"$m"/*) return 0;; esac; done; return 1; }
-  # the dual-build product dirs (created and pin-verified by earlier workflow steps) must be
-  # visible inside: /tmp is tmpfs'd, so bind them explicitly (hard binds: missing = fail loud)
-  args=(--unshare-all --die-with-parent --proc /proc --dev /dev --dev-bind /dev/kvm /dev/kvm
-        --tmpfs /tmp --ro-bind "$STAGE" "$STAGE" --tmpfs "/tmp/$PREFIX-out"
-        --ro-bind "/tmp/$PREFIX-ovmf-a" "/tmp/$PREFIX-ovmf-a" --ro-bind "/tmp/$PREFIX-esp-a" "/tmp/$PREFIX-esp-a"
-        --ro-bind /etc /etc --ro-bind /home /home
-        --symlink usr/bin /bin --symlink usr/sbin /sbin --symlink usr/lib /lib --symlink usr/lib64 /lib64)
-  bind_children() {  # $1 = host dir already tmpfs-shadowed in the namespace
-    local e rp
-    shopt -s nullglob
-    for e in "$1"/*; do
-      if is_enum_parent "$e"; then
-        args+=(--tmpfs "$e"); bind_children "$e"
-      elif is_masked "$e"; then
-        :
-      else
-        rp="$(readlink -f "$e" || true)"
-        if [ -n "$rp" ] && under_masked "$rp"; then :; else args+=(--ro-bind-try "$e" "$e"); fi
-      fi
-    done
-    shopt -u nullglob
-  }
-  args+=(--tmpfs "$ROOT")
-  bind_children "$ROOT"
-  QEMU_SMOKE_NS=1 exec "$BWRAP" "${args[@]}" "$HERE/qemu-smoke.sh" "$@"
+  # namespace argv = the frozen smoke_namespace block in argv-freeze.json (D1-class static
+  # gate, scratch-6 ruling condition 5): root, masked dirs and structural args are pinned
+  # there and consumed here at runtime; only the host-enumerated sibling binds are derived,
+  # per the block's pinned policy.
+  mapfile -d '' ARGS < <(python3 - "$HERE/argv-freeze.json" "$STAGE" "$PREFIX" <<'SMOKE_NS_EOF'
+import json, os, sys
+fz=json.load(open(sys.argv[1])); stage=sys.argv[2]; prefix=sys.argv[3]
+sn=fz["smoke_namespace"]
+masked=list(sn["masked"])
+enum_parents=sorted({os.path.dirname(m) for m in masked})
+def under_masked(p):
+    return any(p==m or p.startswith(m+"/") for m in masked)
+out=[t.replace("$STAGE",stage).replace("$PREFIX",prefix) for t in sn["structural_args"]]
+out.append("--tmpfs"); out.append(sn["root"])
+def bind_children(d):
+    try: entries=sorted(os.listdir(d))
+    except OSError: return
+    for name in entries:
+        e=os.path.join(d,name)
+        if e in enum_parents:
+            out.extend(("--tmpfs",e)); bind_children(e)
+        elif e in masked:
+            continue
+        else:
+            rp=os.path.realpath(e)
+            if rp and under_masked(rp): continue
+            out.extend(("--ro-bind-try",e,e))
+bind_children(sn["root"])
+sys.stdout.buffer.write(b"\0".join(t.encode() for t in out)+b"\0")
+SMOKE_NS_EOF
+)
+  # scratch-8 peer evidence (condition 7): persist the exact emitted namespace argv with
+  # its SHA (rides the /tmp/$PREFIX-out evidence artifact), print bind counts by type,
+  # and fail closed on any undeclared rw bind; the declared device set is exactly the
+  # pinned /dev/kvm triple. The token stream itself is byte-identical to the scratch-6
+  # inline construction (local equivalence proof); these steps only observe it.
+  mkdir -p "/tmp/$PREFIX-out"
+  printf '%s\n' "${ARGS[@]}" > "/tmp/$PREFIX-out/$PREFIX-smoke-argv.txt"
+  sha256sum "/tmp/$PREFIX-out/$PREFIX-smoke-argv.txt"
+  for k in --ro-bind --ro-bind-try --bind --bind-try --dev-bind --tmpfs --symlink; do
+    printf 'bind count %s: %s\n' "$k" "$(printf '%s\n' "${ARGS[@]}" | grep -cx -- "$k" || true)"
+  done
+  rw=0; for tok in "${ARGS[@]}"; do case "$tok" in --bind|--bind-try) rw=1;; esac; done
+  [ "$rw" = "0" ] || { echo "E_QEMU_SMOKE undeclared rw bind in namespace argv"; exit 97; }
+  [ "$(printf '%s\n' "${ARGS[@]}" | grep -cx -- "--dev-bind")" = "1" ] || { echo "E_QEMU_SMOKE dev-bind count != 1"; exit 97; }
+  QEMU_SMOKE_NS=1 exec "$BWRAP" "${ARGS[@]}" "$HERE/qemu-smoke.sh" "$@"
 fi
 
 CFG="${1:?usage: qemu-smoke.sh CONFIG FREEZE IDX}"; FREEZE="${2:?}"; IDX="${3:?}"
+# in-namespace evidence (peer condition 7): what the namespace actually sees for the
+# script, the QEMU binary the frozen case argv launches, and /dev/kvm - findmnt shows the
+# bind sources, stat shows the owner mapping the traversal repair depends on.
+echo "in-namespace evidence:"
+stat -c '%A %a %U:%g %n' "$0"
+findmnt -T "$(readlink -f "$0")" -o TARGET,SOURCE,FSTYPE,OPTIONS || true
+QBIN="$(command -v qemu-system-x86_64 || true)"
+echo "frozen argv0: $(python3 -c "import json;print(json.load(open('$FREEZE'))['cases'][$IDX]['argv'][0])") resolved: ${QBIN:-MISSING}"
+if [ -n "$QBIN" ]; then
+  stat -c '%A %a %U:%g %n' "$QBIN"
+  findmnt -T "$QBIN" -o TARGET,SOURCE,FSTYPE,OPTIONS || true
+fi
+stat -c '%A %a %U:%g %n' /dev/kvm
+findmnt -T /dev/kvm -o TARGET,SOURCE,FSTYPE,OPTIONS || true
 W="/tmp/$PREFIX-smoke-work"
 rm -rf "$W"; mkdir -p "$W/build-output/ovmf-debug" "$W/build-output/esp"
 # the frozen argv carries RELATIVE paths (build-output/ovmf-debug/OVMF_CODE.fd,

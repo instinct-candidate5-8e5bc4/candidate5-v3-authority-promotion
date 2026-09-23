@@ -561,5 +561,61 @@
    ],
    "argv_sha256": "eb4d5bb4593906f65162b2e8a2012c7071454653d293121e2763eebdd73d8d82"
   }
- ]
+ ],
+  "smoke_namespace": {
+   "root": "/usr",
+   "masked": [
+    "/usr/share/qemu",
+    "/usr/share/seabios",
+    "/usr/lib/ipxe",
+    "/usr/lib/x86_64-linux-gnu/qemu"
+   ],
+   "structural_args": [
+    "--unshare-all",
+    "--die-with-parent",
+    "--proc",
+    "/proc",
+    "--dev",
+    "/dev",
+    "--dev-bind",
+    "/dev/kvm",
+    "/dev/kvm",
+    "--tmpfs",
+    "/tmp",
+    "--ro-bind",
+    "$STAGE",
+    "$STAGE",
+    "--tmpfs",
+    "/tmp/$PREFIX-out",
+    "--ro-bind",
+    "/tmp/$PREFIX-ovmf-a",
+    "/tmp/$PREFIX-ovmf-a",
+    "--ro-bind",
+    "/tmp/$PREFIX-esp-a",
+    "/tmp/$PREFIX-esp-a",
+    "--ro-bind",
+    "/etc",
+    "/etc",
+    "--ro-bind",
+    "/home",
+    "/home",
+    "--symlink",
+    "usr/bin",
+    "/bin",
+    "--symlink",
+    "usr/sbin",
+    "/sbin",
+    "--symlink",
+    "usr/lib",
+    "/lib",
+    "--symlink",
+    "usr/lib64",
+    "/lib64"
+   ],
+   "structural_sha256": "57cf90c40ae124f5573748b2dc31e4ece0a936e4841f29822333e118cfd82758",
+   "enum_parents": "dirname(each masked path), recursively; each gets --tmpfs then per-child binds",
+   "sibling_binds": "one --ro-bind-try per surviving entry of an enum parent, host-enumerated (not pinned text)",
+   "symlink_guard": "entries whose canonical target lives under a masked dir are skipped",
+   "note": "scratch-6 ruling condition 5 (D1-class static gate): the smoke's namespace argv is frozen HERE and consumed by qemu-smoke.sh at runtime; $STAGE/$PREFIX are expanded at load. Only the host-enumerated sibling binds are derived (per the pinned policy); everything else is byte-exact from this block."
+  }
 }
