@@ -1,0 +1,102 @@
+{
+  "evidenceId": "TRACK-B-B4-VISUAL-EQUIPMENT",
+  "phase": "B4 chair, bag and equipment (visual side)",
+  "generatedAt": "2026-09-23T18:12:56.579Z",
+  "branch": "candidate5-track-b-visual-slice",
+  "track": "B (isolated; NO merge to main, NO production connection)",
+  "visual": {
+    "status": "DIMENSIONED_TO_CERTIFIED_BODIES",
+    "visualDigest": "e97a9d885f0c431fe36fac51461d330ef20503b72ecbb2f8ca7fc27b8dcb1770"
+  },
+  "chair": {
+    "envelopeCheck": {
+      "dimensionsMicrounits": [
+        500000,
+        900000,
+        500000
+      ],
+      "seatPlaneYMicrounits": 490000,
+      "floorContactY0": true
+    },
+    "components": [
+      "lower-frame",
+      "seat-slab",
+      "backrest"
+    ],
+    "bodyDigest": "1e78439ad5977c6c050475b4ac692cee9fce7da034725ea88a7ed4f0b0803247",
+    "seatSurfaceDigest": "08028ddd3faa51edaba2c202b44f91c18e3f60ac5c74b353a14d4ab89ba5501d",
+    "provenance": {
+      "classification": "AUTHORED_NEW",
+      "decisionId": "gate-c-chair-authoring-001"
+    },
+    "statusCaveat": {
+      "entityId": "school-treatment-chair",
+      "gate": "GATE C",
+      "gateResult": "PASS_PENDING_USER_REVIEW_FOR_ADMISSION",
+      "verifiedForSlice": false,
+      "caveat": "Treatment chair is PASS_PENDING_USER_REVIEW_FOR_ADMISSION. Visual use is provisional pending user review."
+    }
+  },
+  "bag": {
+    "envelopeCheck": {
+      "dimensionsMicrounits": [
+        550000,
+        350000,
+        350000
+      ],
+      "floorContactY0": true
+    },
+    "bodyDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+    "provenance": {
+      "classification": "RECOVERED",
+      "lineageStatus": "RECOVERED",
+      "sourceId": "index.html#school-bag-lockers",
+      "sourceDigest": "21ba7567961cbb9c022ab8a1f11359bf07049c506519a7656394cfc48fcc11ea",
+      "sourceRange": "school-bag-lockers"
+    },
+    "authoredVsAuthoritative": {
+      "authoredCenterMicrounits": [
+        -3000000,
+        180000,
+        1000000
+      ],
+      "authoritativePositionMicrounits": [
+        -3000000,
+        175000,
+        1000000
+      ],
+      "yDifferenceMicrounits": -5000,
+      "resolution": "AUTHORITATIVE_TRANSFORM_WINS: authored .18m center vs committed .175m exact floor-contact position; dimensions identical"
+    }
+  },
+  "equipmentBeyondBagAndChair": {
+    "included": [],
+    "policy": "REQUIRES_GATE_A_LIFECYCLE",
+    "note": "No additional equipment is included. Any further equipment is NEW authoring through the Gate A lifecycle (AUTHORED_NEW); legacy visuals are never borrowed as physical truth."
+  },
+  "boundary": {
+    "presentationOnly": true,
+    "physicalProof": false,
+    "geometryGateBypass": false,
+    "rendererDownstreamOfContract": "ED-P2-02",
+    "visualNeverFeedsAuthoritativeState": true
+  },
+  "negativeChecks": [
+    "chair body digest mismatch REJECTED",
+    "bag non-identity orientation REJECTED",
+    "no extra equipment without Gate A lifecycle"
+  ],
+  "tests": {
+    "suite": "tests/clean-runtime-school-scene-v2/*.test.js",
+    "result": "55/55 PASS via node --test",
+    "note": "host: Linux container, node v22.23.2; not a certified CI platform run"
+  },
+  "barriers": [
+    "no merge to main/default",
+    "no production connection",
+    "visuals never represented as certified physics",
+    "no physical truth from pixels/legacy visuals",
+    "no Geometry Gate bypass",
+    "zero mandatory cost"
+  ]
+}
