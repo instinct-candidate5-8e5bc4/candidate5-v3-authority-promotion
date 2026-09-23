@@ -241,16 +241,14 @@ jobs:
           /usr/share/qemu
           /usr/share/seabios"
           [ "$(printf '%s\n' "$LOUT" | tail -n +3 | sort)" = "$WANT_REST" ] || { echo "E_QEMU_L_UNKNOWN"; exit 97; }
-          # masked-host startup smoke: the three pinned compiled-in dirs above are hidden by bwrap tmpfs; never boots a case
-          /tmp/$PREFIX-stage/shims/bwrap --ro-bind / / \
-            --tmpfs /usr/share/qemu --tmpfs /usr/share/seabios --tmpfs /usr/lib/ipxe \
-            --tmpfs /usr/lib/x86_64-linux-gnu/qemu \
-            --tmpfs /tmp/$PREFIX-out \
-            --dev-bind /dev/kvm /dev/kvm \
-            ./qemu-smoke.sh config.json argv-freeze.json 0 \
+          # masked-host binding smoke: qemu-smoke.sh self-wraps under the staged
+          # lock-verified bwrap with /usr assembled piecemeal so the four host qemu dirs
+          # are ABSENT by construction (bwrap cannot mkdir a mountpoint under a read-only
+          # mount - scratch run 2 finding); -S: the CPU never starts, no case is booted
+          ./qemu-smoke.sh config.json argv-freeze.json 0 \
               > /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-qemu-smoke.log 2>&1 \
             || { echo "E_QEMU_SMOKE"; cat /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-qemu-smoke.log; exit 97; }
-          echo "masked-host binding smoke OK (exact frozen case argv + -S, four host dirs masked, no case booted)"
+          echo "masked-host binding smoke OK (exact frozen case argv + -S, four host qemu dirs absent, no case booted)"
       - name: NON_CERTIFYING_REHEARSAL ceremony (network-enforced-off, tee'd log)
         timeout-minutes: 120
         run: |

@@ -1,13 +1,56 @@
 #!/bin/bash
-# NON_CERTIFYING_REHEARSAL masked-host binding smoke (batch1r3 A3 / scratch-1 ruling).
-# Runs the EXACT frozen case argv from argv-freeze.json (with -S inserted; -daemonize
-# kept) while the CALLER's bwrap masks the four host qemu dirs; proves machine init
-# (incl. firmware load from the staged tree only) plus a clean QMP handshake + quit.
-# The CPU never starts (-S): no case is booted. Exit 97 on any failure.
+# NON_CERTIFYING_REHEARSAL masked-host binding smoke (batch1r3 A3 / scratch-1 and
+# scratch-2 rulings). Self-wraps under the staged, lock-verified bwrap in a user
+# namespace where the host qemu ROM/module dirs are ABSENT BY CONSTRUCTION: ROOT
+# (/usr) is assembled piecemeal (tmpfs parents + one ro-bind per surviving entry),
+# never ro-bound wholesale, because bwrap cannot mkdir a mountpoint under a
+# read-only mount (scratch run 2: "Can't mkdir /usr/share/qemu: Read-only file
+# system"). Inside, it runs the EXACT frozen case argv from argv-freeze.json (with
+# -S inserted; -daemonize kept), proving machine init incl. firmware load from the
+# staged tree only, plus a clean QMP handshake + quit. The CPU never starts (-S):
+# no case is booted. Exit 97 on any failure.
 set -euo pipefail
-CFG="${1:?usage: qemu-smoke.sh CONFIG FREEZE IDX}"; FREEZE="${2:?}"; IDX="${3:?}"
-HERE="$(cd "$(dirname "$0")" && pwd)"
 PREFIX="${PREFIX:-NON_CERTIFYING_REHEARSAL}"
+HERE="$(cd "$(dirname "$0")" && pwd)"
+
+if [ "${QEMU_SMOKE_NS:-0}" != "1" ]; then
+  STAGE="/tmp/$PREFIX-stage"
+  BWRAP="$STAGE/shims/bwrap"
+  [ -x "$BWRAP" ] || { echo "E_QEMU_SMOKE no staged bwrap at $BWRAP"; exit 97; }
+  ROOT=/usr
+  MASKED=(/usr/share/qemu /usr/share/seabios /usr/lib/ipxe /usr/lib/x86_64-linux-gnu/qemu)
+  # enum parents = every dir that directly holds a masked child
+  ENUMP=()
+  for m in "${MASKED[@]}"; do ENUMP+=("$(dirname "$m")"); done
+  is_enum_parent() { local e; for e in "${ENUMP[@]}"; do [ "$1" = "$e" ] && return 0; done; return 1; }
+  is_masked() { local e; for e in "${MASKED[@]}"; do [ "$1" = "$e" ] && return 0; done; return 1; }
+  under_masked() {  # canonical path $1 lives inside a masked dir (symlink re-import guard)
+    local m; for m in "${MASKED[@]}"; do case "$1" in "$m"|"$m"/*) return 0;; esac; done; return 1; }
+  args=(--unshare-all --die-with-parent --proc /proc --dev /dev --dev-bind /dev/kvm /dev/kvm
+        --tmpfs /tmp --ro-bind "$STAGE" "$STAGE" --tmpfs "/tmp/$PREFIX-out"
+        --ro-bind /etc /etc --ro-bind /home /home
+        --symlink usr/bin /bin --symlink usr/sbin /sbin --symlink usr/lib /lib --symlink usr/lib64 /lib64)
+  bind_children() {  # $1 = host dir already tmpfs-shadowed in the namespace
+    local e rp
+    shopt -s nullglob
+    for e in "$1"/*; do
+      if is_enum_parent "$e"; then
+        args+=(--tmpfs "$e"); bind_children "$e"
+      elif is_masked "$e"; then
+        :
+      else
+        rp="$(readlink -f "$e" || true)"
+        if [ -n "$rp" ] && under_masked "$rp"; then :; else args+=(--ro-bind-try "$e" "$e"); fi
+      fi
+    done
+    shopt -u nullglob
+  }
+  args+=(--tmpfs "$ROOT")
+  bind_children "$ROOT"
+  QEMU_SMOKE_NS=1 exec "$BWRAP" "${args[@]}" "$HERE/qemu-smoke.sh" "$@"
+fi
+
+CFG="${1:?usage: qemu-smoke.sh CONFIG FREEZE IDX}"; FREEZE="${2:?}"; IDX="${3:?}"
 W="/tmp/$PREFIX-smoke-work"
 rm -rf "$W"; mkdir -p "$W"
 ln -s "$HERE/build-output" "$W/build-output"
@@ -58,12 +101,12 @@ gone=False
 for _ in range(20):
     pf=[a for a in argv if a.endswith("qemu.pid")]
     try:
-        pid=int(open(pf[0]).read().strip()); os.kill(pid,0)
+        pid=int(open(pf[0]).readline().strip()); os.kill(pid,0)
     except (ProcessLookupError,ValueError,FileNotFoundError,IndexError):
         gone=True; break
     time.sleep(0.2)
 if not gone:
     print("E_QEMU_SMOKE qemu still running after quit"); sys.exit(97)
-print("QEMU_SMOKE_OK exact frozen case argv + -S under masked host dirs; QMP handshake + quit clean")
+print("QEMU_SMOKE_OK exact frozen case argv + -S, host qemu dirs absent from namespace; QMP handshake + quit clean")
 PYEOF
 rm -rf "$W"
