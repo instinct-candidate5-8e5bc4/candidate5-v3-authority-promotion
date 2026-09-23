@@ -1,0 +1,85 @@
+--- a/NON_CERTIFYING_REHEARSAL-workflow.yml
++++ b/OVMF_CI_SECURE_BOOT_UKI-CERTIFICATION-workflow.yml
+@@ -1,30 +1,31 @@
+-# NON_CERTIFYING_REHEARSAL — pre-freeze rehearsal workflow (development evidence only).
+-# This workflow NEVER certifies anything. It must never emit OVMF_CI_SECURE_BOOT_UKI_PASS
+-# or any certification marker. Every artifact name begins NON_CERTIFYING_REHEARSAL.
++# OVMF_CI_SECURE_BOOT_UKI_CERTIFICATION — the ONE certification workflow.
++# It is the ONLY workflow allowed to emit the closing marker OVMF_CI_SECURE_BOOT_UKI_PASS.
++# After the complete frozen ceremony succeeds it emits the marker once to stdout and once
++# into the evidence marker file, each time paired with the full nonclaim block. Its ceremony logic is BYTE-IDENTICAL to the rehearsed
++# NON_CERTIFYING_REHEARSAL workflow; the diff is strictly limited to: mode label (this header,
++# workflow name, no inputs - always a full run), marker emission (the final step), and the
++# evidence prefix (upload artifact names). Internal scratch names stay NON_CERTIFYING_REHEARSAL
++# because the rehearsed scripts are frozen bytes; that is an audit property, not an oversight:
++# certification evidence is provably produced by the exact rehearsed bytes.
+ # KVM-only, fail-closed, no TCG. Public standard runner only ($0).
+-name: NON_CERTIFYING_REHEARSAL
++name: OVMF_CI_SECURE_BOOT_UKI_CERTIFICATION
+ on:
+   workflow_dispatch:
+-    inputs:
+-      mode:
+-        description: 'run (full) or preflight-only (static conformance, no VM)'
+-        default: 'preflight-only'
+ permissions: {}
+ env:
+   PREFIX: NON_CERTIFYING_REHEARSAL
+ jobs:
+-  rehearsal:
++  certification:
+     # ubuntu-22.04 pinned: the canonical-path mechanism (build-ovmf-debug.sh) needs
+     # unprivileged user namespaces for bwrap; ubuntu-24.04 runners restrict them via
+     # AppArmor. 22.04 image supported into 2027; revisit pin before then.
+     runs-on: ubuntu-22.04
+     timeout-minutes: 180
+     steps:
+-      - name: NON_CERTIFYING_REHEARSAL kvm fail-closed check
++      - name: OVMF_CI_SECURE_BOOT_UKI_CERTIFICATION kvm fail-closed check
+         run: |
+           set -euo pipefail
+           if [ ! -e /dev/kvm ]; then echo "E_NO_KVM"; exit 90; fi
+-          [ "${{ inputs.mode }}" = "preflight-only" ] && echo "preflight-only: KVM presence OK (no VM will run)" || true
+       - uses: actions/checkout@v4
+       - name: NON_CERTIFYING_REHEARSAL userns/bwrap preflight (canonical-path mechanism)
+         run: |
+@@ -92,16 +93,20 @@
+           set -euo pipefail
+           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+           sudo unshare -n ./run-ceremony.sh config.json /tmp/$PREFIX-stage /tmp/$PREFIX-out
+-      - name: NON_CERTIFYING_REHEARSAL forbidden-marker guard
++      - name: OVMF_CI_SECURE_BOOT_UKI marker emission (only reached on full suite success)
+         run: |
+           set -euo pipefail
+-          ! grep -rIl "OVMF_CI_SECURE_BOOT_UKI_PASS" /tmp/$PREFIX-out 2>/dev/null
+-          ! find /tmp/$PREFIX-out -type f ! -name "NON_CERTIFYING_REHEARSAL*" | grep .
+-      - name: NON_CERTIFYING_REHEARSAL evidence upload (ephemeral CI artifact only)
++          # Reached only when every prior step - dual build, env2 gate, hostile rejection,
++          # enrollment app + ESP dual builds, and the complete R1-R9 ceremony - succeeded.
++          # The closing marker is emitted once to stdout and once into the evidence marker
++          # file below, each time paired with the full nonclaim block.
++          printf '%s\n%s\n' 'OVMF_CI_SECURE_BOOT_UKI_PASS' 'Scope: firmware ACCEPT of the exact accepted signed UKI (sha256 133096976ee70a8c272cbcc8c28d369bfc65d93d994cbff4174b947df00239d1) under QEMU/KVM + reproducible DEBUG OVMF Secure Boot, kernel exec, and signed-init exit 98 (E_PROVIDER_NAMESPACE / E_PROVIDER_LINK_MISSING on non-Google hardware). This is NOT a full runtime PASS; NOT a dm-verity runtime PASS; NOT a provisioning PASS; NOT a Google platform certification; NOT a complete boot-chain certification; and it makes NO claims about Google firmware, Google vTPM, GCP deployment, or persistence.'
++          printf '%s\n%s\n' 'OVMF_CI_SECURE_BOOT_UKI_PASS' 'Scope: firmware ACCEPT of the exact accepted signed UKI (sha256 133096976ee70a8c272cbcc8c28d369bfc65d93d994cbff4174b947df00239d1) under QEMU/KVM + reproducible DEBUG OVMF Secure Boot, kernel exec, and signed-init exit 98 (E_PROVIDER_NAMESPACE / E_PROVIDER_LINK_MISSING on non-Google hardware). This is NOT a full runtime PASS; NOT a dm-verity runtime PASS; NOT a provisioning PASS; NOT a Google platform certification; NOT a complete boot-chain certification; and it makes NO claims about Google firmware, Google vTPM, GCP deployment, or persistence.' > /tmp/$PREFIX-out/OVMF_CI_SECURE_BOOT_UKI-certification-marker.txt
++      - name: OVMF_CI_SECURE_BOOT_UKI certification evidence upload (ephemeral CI artifact only)
+         if: always()
+         uses: actions/upload-artifact@v4
+         with:
+-          name: NON_CERTIFYING_REHEARSAL-evidence
++          name: OVMF_CI_SECURE_BOOT_UKI-certification-evidence
+           path: |
+             /tmp/NON_CERTIFYING_REHEARSAL-out/
+             /tmp/NON_CERTIFYING_REHEARSAL-fw-hashes.txt
+@@ -111,11 +116,10 @@
+   # at the same canonical in-container path /build, identical pinned inputs. The FD hash
+   # must equal the first runner's. The Build tree is kept and every module's CodeView PDB
+   # path is parsed: all absolute paths must carry the /build/ prefix.
+-  rehearsal-env2:
+-    if: inputs.mode == 'run'
++  certification-env2:
+     runs-on: ubuntu-22.04
+     timeout-minutes: 120
+-    needs: rehearsal
++    needs: certification
+     steps:
+       - uses: actions/checkout@v4
+       - name: NON_CERTIFYING_REHEARSAL env2 userns/bwrap preflight

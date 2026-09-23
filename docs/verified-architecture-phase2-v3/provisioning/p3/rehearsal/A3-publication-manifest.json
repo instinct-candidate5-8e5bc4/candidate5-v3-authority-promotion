@@ -1,0 +1,192 @@
+{
+  "manifest": "NON_CERTIFYING_REHEARSAL A3 publication manifest",
+  "version": 2,
+  "disclaimer": "Rehearsal assets only. The rehearsal workflow NEVER certifies anything and never emits OVMF_CI_SECURE_BOOT_UKI_PASS; only OVMF_CI_SECURE_BOOT_UKI-CERTIFICATION-workflow.yml may emit the marker - once to stdout and once into the evidence marker file, each time paired with the full nonclaim block - after the complete frozen ceremony succeeds.",
+  "branch_base_commit": "cd455a0619903f072ab8dc1bd3c9f9238d41c559",
+  "uki_source_commit": "92741cbdefaa78adc33bc3c74935a45f9558b88c",
+  "ancestry_proof": "git merge-base --is-ancestor 92741cbdefaa78adc33bc3c74935a45f9558b88c cd455a0619903f072ab8dc1bd3c9f9238d41c559 (exit 0, verified locally 2026-09-23): the UKI source commit is an ancestor of the branch base. Distinct identities; do not conflate.",
+  "assets": [
+    {
+      "path": "docs/verified-architecture-phase2-v3/provisioning/p3/build-esp-image.sh",
+      "bytes": 4954,
+      "sha256": "9a97b5baa919fcb99536158309ebb2d3bcfbdc7f701f88c9fb0b0910f5947174"
+    },
+    {
+      "path": "docs/verified-architecture-phase2-v3/provisioning/p3/fixture-generate.sh",
+      "bytes": 4171,
+      "sha256": "8a4661d57961c7a86d83d638325022fa81da7ed309e7df78eaeadcdc59167a85"
+    },
+    {
+      "path": "docs/verified-architecture-phase2-v3/provisioning/p3/parse-ovmf-vars.py",
+      "bytes": 4482,
+      "sha256": "d793c46871d0b4c734ddcfb04bfa044944ba09e0a8d4d89fd888a2485d721a82"
+    },
+    {
+      "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/NON_CERTIFYING_REHEARSAL-workflow.yml",
+      "bytes": 8330,
+      "sha256": "df330a5a0dcde00458a9b9658bf16a30e628152eb349e79be087bd1cb2551ffc"
+    },
+    {
+      "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/OVMF_CI_SECURE_BOOT_UKI-CERTIFICATION-workflow.yml",
+      "bytes": 10182,
+      "sha256": "a6f91f9e67ee9a661959186c32fd16450c1b8efe8dcb7e995d599cf824e5340a"
+    },
+    {
+      "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/R3-static-review-candidate.md",
+      "bytes": 21207,
+      "sha256": "0e2d20f58916bdbad635e8bb85fb36c1a8f3e7716ec42f292166cc6583da6821"
+    },
+    {
+      "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/argv-freeze.json",
+      "bytes": 16968,
+      "sha256": "8b6267b818bf1b530f922f7e3bacd7dbf191837fe895eb707e4dff354b1f5ec8"
+    },
+    {
+      "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/build-enroll-app.sh",
+      "bytes": 1329,
+      "sha256": "3737afd39a8d82b6c106079179fc5d74d936324ae884d57a137c0e6de357b708"
+    },
+    {
+      "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/build-esp-variant.sh",
+      "bytes": 3988,
+      "sha256": "2d1a42cfe65a96835919ed87f3f10b11939e5bb556e0e8edc23b9fe9b440847d"
+    },
+    {
+      "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/build-ovmf-debug.sh",
+      "bytes": 8521,
+      "sha256": "73cf82af49bcbd41dd6ecaecd64a6c37d9da86373373ed543e5f197d0422c3d1"
+    },
+    {
+      "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/certification-vs-rehearsal.diff",
+      "bytes": 5769,
+      "sha256": "92f8decf148235f8ce1a35e52902733687d9c2553a974430419a17a4c7b35612"
+    },
+    {
+      "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/config.json",
+      "bytes": 4592,
+      "sha256": "5b5e1b93eee3d55ce4ffef093a38596dd9a14ec320d9f5af4ba356d1dd544202"
+    },
+    {
+      "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/enroll-app.c",
+      "bytes": 4474,
+      "sha256": "859c01bbae9b134aed08a17f550ba9add7d9f3efd8500757a64bd56b8d0fdf47"
+    },
+    {
+      "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/enroll-prep.sh",
+      "bytes": 2523,
+      "sha256": "864f225dfe35e1dc41dc4ed17abc2d84bab161520d8cc46e593a8da0b5b9ba2b"
+    },
+    {
+      "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/evidence/C5-HOSTILE-FIXTURE.cer",
+      "bytes": 799,
+      "sha256": "4428760c1ba2322bd9f9254e45cbbdb5b89c3f8b4e594f0efff337a4d3c4e07a"
+    },
+    {
+      "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/evidence/C5-WRONG-SIGNER-FIXTURE.cer",
+      "bytes": 809,
+      "sha256": "98abb484874dd3c850c6930dd0ba474d1c287b6372292ff6efe44c5a92dda485"
+    },
+    {
+      "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/evidence/F-HOSTILEUKI.efi",
+      "bytes": 21166112,
+      "sha256": "5f6cfe5cf11b5e71158ce3a5736175eae925f33dec2a308370618c3aceec939e"
+    },
+    {
+      "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/evidence/F-WRONGSIG.efi",
+      "bytes": 21166128,
+      "sha256": "44706c4a02bc013a248d4ba228b731471d373a813ea7fd921416c9119071b50a"
+    },
+    {
+      "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/evidence/c5-signing-cert.der",
+      "bytes": 1092,
+      "sha256": "7cda4ddc149849cc61191d4b5b3d218d14770c0401e9e66dd9617b82ba1ae441"
+    },
+    {
+      "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/evidence/successor-signed.efi",
+      "bytes": 21166416,
+      "sha256": "133096976ee70a8c272cbcc8c28d369bfc65d93d994cbff4174b947df00239d1"
+    },
+    {
+      "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/evidence/successor-unsigned.efi",
+      "bytes": 21164544,
+      "sha256": "ed5d9d72be40592af3b14bd1fd9dc91a5976b14f350f9124ea414b975464d536"
+    },
+    {
+      "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/make-disks.sh",
+      "bytes": 611,
+      "sha256": "832a84cf8141ebe9ec9883a706a8c585473d341a459593d9dbe59cbe5e1e1b0e"
+    },
+    {
+      "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/make-shims.sh",
+      "bytes": 2692,
+      "sha256": "cc4ad4e73fce663b8595e9742801f6b2147576ad5388271745b6a6e01a98776f"
+    },
+    {
+      "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/platform-lockgen.py",
+      "bytes": 3862,
+      "sha256": "189d52a3b6170dae83339dd24ba9e6871206822baf5dcabb8bd8624f40170344"
+    },
+    {
+      "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/platform.lock.json",
+      "bytes": 52416,
+      "sha256": "f817f41e9c48235a075e58b44d3d4252b8a6ea8f00063b2deafd594cbc6fd515"
+    },
+    {
+      "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/preflight-check.py",
+      "bytes": 4506,
+      "sha256": "c268b254b547eb95a709bcddb582c81445836185065d5f6f824a8c4abb035b8a"
+    },
+    {
+      "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/rehearsal-enroll.sh",
+      "bytes": 6122,
+      "sha256": "da10e78e19c84d24b52f211f62d7cdca5b2847f6b251394cef950e70a0bdae17"
+    },
+    {
+      "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/rehearsal-harness.py",
+      "bytes": 7298,
+      "sha256": "408412c6ddc54b5f763153954d1b9700d9c42b56402f4104fd48da31a091d600"
+    },
+    {
+      "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/run-ceremony.sh",
+      "bytes": 2907,
+      "sha256": "604879f141ff803d686cf537b66a36837b235e40cfb5836be489faacf25756ad"
+    },
+    {
+      "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/scan-pe-pdb-paths.py",
+      "bytes": 4070,
+      "sha256": "94ada3e6a640d4f11e308f50763361025db8970e1e7ca42b7427cd213e8c060d"
+    },
+    {
+      "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/stage-platform.sh",
+      "bytes": 1688,
+      "sha256": "4b33f8b46c2d71f6f3e82c87deec1b5cd37384bbd4e6e3c7faa0ac9b5aedc1d1"
+    },
+    {
+      "path": "docs/verified-architecture-phase2-v3/provisioning/p3/verify-accepted-uki-static.py",
+      "bytes": 5097,
+      "sha256": "2d7eeb9d6fb5d7499685eb420005ecbd84544ae7e0baccbc5a9f18bc45323533"
+    },
+    {
+      "path": "docs/verified-architecture-phase2-v3/provisioning/p3/verify-esp.py",
+      "bytes": 5345,
+      "sha256": "7bc76872c68d7f985fb70c3382bedd42969c7a561749bdc3fad23fd920fb12bf"
+    }
+  ],
+  "derived_expectations": {
+    "OVMF_CODE.fd": {
+      "sha256": "fc150336fce10eb5508fa440cdf7300622c8c3ac71f2fbe10a0731422b9cef24",
+      "bytes": 3653632,
+      "note": "CI-built at canonical /build; rehearsal must reproduce these bytes (dual build + env2 second runner) or fail"
+    },
+    "OVMF_VARS.fd": {
+      "sha256": "5d2ac383371b408398accee7ec27c8c09ea5b74a0de0ceea6513388b15be5d1e",
+      "bytes": 540672,
+      "note": "pristine template"
+    },
+    "frozen ESP": {
+      "sha256": "2bfa621238890890765c9636f99dabfb46233bfa626afb580ce33e65858019c9",
+      "note": "derived from evidence/successor-signed.efi; workflow asserts this exact hash"
+    }
+  },
+  "ephemeral": "Throwaway PK/KEK and ceremony VARS are generated per run, never published; fixture private keys were plain-deleted after the 2026-09-22 A4 regeneration."
+}

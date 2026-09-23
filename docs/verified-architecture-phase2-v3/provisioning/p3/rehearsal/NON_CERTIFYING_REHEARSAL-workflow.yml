@@ -1,0 +1,152 @@
+# NON_CERTIFYING_REHEARSAL — pre-freeze rehearsal workflow (development evidence only).
+# This workflow NEVER certifies anything. It must never emit OVMF_CI_SECURE_BOOT_UKI_PASS
+# or any certification marker. Every artifact name begins NON_CERTIFYING_REHEARSAL.
+# KVM-only, fail-closed, no TCG. Public standard runner only ($0).
+name: NON_CERTIFYING_REHEARSAL
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'run (full) or preflight-only (static conformance, no VM)'
+        default: 'preflight-only'
+permissions: {}
+env:
+  PREFIX: NON_CERTIFYING_REHEARSAL
+jobs:
+  rehearsal:
+    # ubuntu-22.04 pinned: the canonical-path mechanism (build-ovmf-debug.sh) needs
+    # unprivileged user namespaces for bwrap; ubuntu-24.04 runners restrict them via
+    # AppArmor. 22.04 image supported into 2027; revisit pin before then.
+    runs-on: ubuntu-22.04
+    timeout-minutes: 180
+    steps:
+      - name: NON_CERTIFYING_REHEARSAL kvm fail-closed check
+        run: |
+          set -euo pipefail
+          if [ ! -e /dev/kvm ]; then echo "E_NO_KVM"; exit 90; fi
+          [ "${{ inputs.mode }}" = "preflight-only" ] && echo "preflight-only: KVM presence OK (no VM will run)" || true
+      - uses: actions/checkout@v4
+      - name: NON_CERTIFYING_REHEARSAL userns/bwrap preflight (canonical-path mechanism)
+        run: |
+          set -euo pipefail
+          bwrap --ro-bind /usr /usr --symlink usr/bin /bin --dir /build --bind /tmp /build -- true             || { echo "E_NO_USERNS: bwrap canonical-path mechanism unavailable on this runner"; exit 91; }
+      - name: NON_CERTIFYING_REHEARSAL platform staging (only network phase)
+        run: |
+          set -euo pipefail
+          cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+          ./stage-platform.sh platform.lock /tmp/$PREFIX-stage
+      - name: NON_CERTIFYING_REHEARSAL preflight static conformance
+        run: |
+          set -euo pipefail
+          cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+          python3 preflight-check.py config.json /tmp/$PREFIX-stage
+      - name: NON_CERTIFYING_REHEARSAL reproducible OVMF DEBUG dual build
+        if: inputs.mode == 'run'
+        run: |
+          set -euo pipefail
+          cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+          ./build-ovmf-debug.sh /tmp/$PREFIX-stage /tmp/$PREFIX-ovmf-a /tmp/$PREFIX-ovmf-b
+          cmp /tmp/$PREFIX-ovmf-a/OVMF_CODE.fd /tmp/$PREFIX-ovmf-b/OVMF_CODE.fd
+          cmp /tmp/$PREFIX-ovmf-a/OVMF_VARS.fd /tmp/$PREFIX-ovmf-b/OVMF_VARS.fd
+          echo "dual OVMF build byte-identical (canonical path /build)"
+          # condition 5 verifier over the canonical FD (raw-carve backstop; full-tree
+          # module parse runs in the env2 job whose Build tree is preserved)
+          python3 scan-pe-pdb-paths.py /tmp/$PREFIX-ovmf-a/OVMF_CODE.fd /build/
+          sha256sum /tmp/$PREFIX-ovmf-a/OVMF_CODE.fd /tmp/$PREFIX-ovmf-a/OVMF_VARS.fd             > /tmp/$PREFIX-fw-hashes.txt
+          cat /tmp/$PREFIX-fw-hashes.txt
+      - name: NON_CERTIFYING_REHEARSAL hostile-path drift demonstration (condition 5)
+        if: inputs.mode == 'run'
+        run: |
+          set -euo pipefail
+          cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+          # deliberately NON-canonical host path: the PDB-path verifier MUST reject it
+          CANON_MODE=hostile ./build-ovmf-debug.sh /tmp/$PREFIX-stage /tmp/$PREFIX-hostile-out
+          if python3 scan-pe-pdb-paths.py /tmp/$PREFIX-hostile /build/; then
+            echo "E_HOSTILE_NOT_DETECTED: verifier accepted a host-path build"; exit 92
+          else
+            echo "hostile-path build correctly REJECTED by scan-pe-pdb-paths.py"
+          fi
+          sha256sum /tmp/$PREFIX-hostile-out/OVMF_CODE.fd >> /tmp/$PREFIX-fw-hashes.txt
+      - name: NON_CERTIFYING_REHEARSAL firmware hash upload (env2 comparison input)
+        if: inputs.mode == 'run'
+        uses: actions/upload-artifact@v4
+        with:
+          name: NON_CERTIFYING_REHEARSAL-fw-hashes
+          path: /tmp/NON_CERTIFYING_REHEARSAL-fw-hashes.txt
+          retention-days: 90
+      - name: NON_CERTIFYING_REHEARSAL enrollment app + ESP dual builds
+        if: inputs.mode == 'run'
+        run: |
+          set -euo pipefail
+          cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+          ./build-enroll-app.sh /tmp/$PREFIX-stage /tmp/$PREFIX-app-a /tmp/$PREFIX-app-b
+          cmp /tmp/$PREFIX-app-a/enroll-app.efi /tmp/$PREFIX-app-b/enroll-app.efi
+          ../build-esp-image.sh evidence/successor-signed.efi /tmp/$PREFIX-esp-a
+          ../build-esp-image.sh evidence/successor-signed.efi /tmp/$PREFIX-esp-b
+          [ "$(sha256sum /tmp/$PREFIX-esp-a/c5-root-admitter-uki-v3-esp.raw | cut -d' ' -f1)" = \
+            "2bfa621238890890765c9636f99dabfb46233bfa626afb580ce33e65858019c9" ]
+          cmp /tmp/$PREFIX-esp-a/c5-root-admitter-uki-v3-esp.raw /tmp/$PREFIX-esp-b/c5-root-admitter-uki-v3-esp.raw
+      - name: NON_CERTIFYING_REHEARSAL ceremony (network-enforced-off)
+        if: inputs.mode == 'run'
+        run: |
+          set -euo pipefail
+          cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+          sudo unshare -n ./run-ceremony.sh config.json /tmp/$PREFIX-stage /tmp/$PREFIX-out
+      - name: NON_CERTIFYING_REHEARSAL forbidden-marker guard
+        run: |
+          set -euo pipefail
+          ! grep -rIl "OVMF_CI_SECURE_BOOT_UKI_PASS" /tmp/$PREFIX-out 2>/dev/null
+          ! find /tmp/$PREFIX-out -type f ! -name "NON_CERTIFYING_REHEARSAL*" | grep .
+      - name: NON_CERTIFYING_REHEARSAL evidence upload (ephemeral CI artifact only)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NON_CERTIFYING_REHEARSAL-evidence
+          path: |
+            /tmp/NON_CERTIFYING_REHEARSAL-out/
+            /tmp/NON_CERTIFYING_REHEARSAL-fw-hashes.txt
+          retention-days: 90
+
+  # Reviewer condition 4: reproduce once in a SECOND FRESH ENVIRONMENT (separate runner)
+  # at the same canonical in-container path /build, identical pinned inputs. The FD hash
+  # must equal the first runner's. The Build tree is kept and every module's CodeView PDB
+  # path is parsed: all absolute paths must carry the /build/ prefix.
+  rehearsal-env2:
+    if: inputs.mode == 'run'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 120
+    needs: rehearsal
+    steps:
+      - uses: actions/checkout@v4
+      - name: NON_CERTIFYING_REHEARSAL env2 userns/bwrap preflight
+        run: |
+          set -euo pipefail
+          bwrap --ro-bind /usr /usr --symlink usr/bin /bin --dir /build --bind /tmp /build -- true             || { echo "E_NO_USERNS"; exit 91; }
+      - name: NON_CERTIFYING_REHEARSAL env2 platform staging (only network phase)
+        run: |
+          set -euo pipefail
+          cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+          ./stage-platform.sh platform.lock /tmp/$PREFIX-stage-env2
+      - name: NON_CERTIFYING_REHEARSAL env2 single canonical-path reproduction
+        run: |
+          set -euo pipefail
+          cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+          CANON_REALWORK=/var/tmp/$PREFIX-env2-work CANON_SINGLE=1             ./build-ovmf-debug.sh /tmp/$PREFIX-stage-env2 /tmp/$PREFIX-ovmf-env2
+          # condition 5: parse EVERY module .efi PDB path in the preserved Build tree
+          python3 scan-pe-pdb-paths.py /var/tmp/$PREFIX-env2-work/work /build/
+      - name: NON_CERTIFYING_REHEARSAL env2 hash equality vs first runner
+        run: |
+          set -euo pipefail
+          echo "env2 firmware hashes:"
+          sha256sum /tmp/$PREFIX-ovmf-env2/OVMF_CODE.fd /tmp/$PREFIX-ovmf-env2/OVMF_VARS.fd
+      - uses: actions/download-artifact@v4
+        with:
+          name: NON_CERTIFYING_REHEARSAL-fw-hashes
+          path: /tmp/$PREFIX-fw1
+      - name: NON_CERTIFYING_REHEARSAL env2 cross-runner byte-identity gate
+        run: |
+          set -euo pipefail
+          H1=$(grep "OVMF_CODE.fd" /tmp/$PREFIX-fw1/$PREFIX-fw-hashes.txt | head -1 | cut -d' ' -f1)
+          H2=$(sha256sum /tmp/$PREFIX-ovmf-env2/OVMF_CODE.fd | cut -d' ' -f1)
+          [ "$H1" = "$H2" ] || { echo "E_ENV2_HASH_MISMATCH $H1 $H2"; exit 93; }
+          echo "env2 reproduction byte-identical across runners at canonical /build"
