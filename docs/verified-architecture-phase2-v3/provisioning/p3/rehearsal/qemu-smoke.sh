@@ -8,7 +8,9 @@
 # system"). Inside, it runs the EXACT frozen case argv from argv-freeze.json (with
 # -S inserted; -daemonize kept), proving machine init incl. firmware load from the
 # staged tree only, plus a clean QMP handshake + quit. The CPU never starts (-S):
-# no case is booted. Exit 97 on any failure.
+# no case is booted. Exit 97 on any failure. Relative argv
+# paths resolve against a work root materialized from the pin-verified dual-build
+# products (the same bytes the ceremony copies into the repo tree one step later).
 set -euo pipefail
 PREFIX="${PREFIX:-NON_CERTIFYING_REHEARSAL}"; export PREFIX
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -26,8 +28,11 @@ if [ "${QEMU_SMOKE_NS:-0}" != "1" ]; then
   is_masked() { local e; for e in "${MASKED[@]}"; do [ "$1" = "$e" ] && return 0; done; return 1; }
   under_masked() {  # canonical path $1 lives inside a masked dir (symlink re-import guard)
     local m; for m in "${MASKED[@]}"; do case "$1" in "$m"|"$m"/*) return 0;; esac; done; return 1; }
+  # the dual-build product dirs (created and pin-verified by earlier workflow steps) must be
+  # visible inside: /tmp is tmpfs'd, so bind them explicitly (hard binds: missing = fail loud)
   args=(--unshare-all --die-with-parent --proc /proc --dev /dev --dev-bind /dev/kvm /dev/kvm
         --tmpfs /tmp --ro-bind "$STAGE" "$STAGE" --tmpfs "/tmp/$PREFIX-out"
+        --ro-bind "/tmp/$PREFIX-ovmf-a" "/tmp/$PREFIX-ovmf-a" --ro-bind "/tmp/$PREFIX-esp-a" "/tmp/$PREFIX-esp-a"
         --ro-bind /etc /etc --ro-bind /home /home
         --symlink usr/bin /bin --symlink usr/sbin /sbin --symlink usr/lib /lib --symlink usr/lib64 /lib64)
   bind_children() {  # $1 = host dir already tmpfs-shadowed in the namespace
@@ -52,8 +57,18 @@ fi
 
 CFG="${1:?usage: qemu-smoke.sh CONFIG FREEZE IDX}"; FREEZE="${2:?}"; IDX="${3:?}"
 W="/tmp/$PREFIX-smoke-work"
-rm -rf "$W"; mkdir -p "$W"
-ln -s "$HERE/build-output" "$W/build-output"
+rm -rf "$W"; mkdir -p "$W/build-output/ovmf-debug" "$W/build-output/esp"
+# the frozen argv carries RELATIVE paths (build-output/ovmf-debug/OVMF_CODE.fd,
+# build-output/esp/c5-root-admitter-uki-v3-esp.raw) that the ceremony resolves against the
+# repo tree after its pin-verified copy; at this earlier step the same bytes live only in
+# the dual-build product dirs. Resolve them to exactly those bytes: hash-verify each source
+# against the committed pins (exit 97 on any mismatch), then link it into the work root.
+CODE_SHA=$(python3 -c "import json;print(json.load(open('$CFG'))['firmware_debug_sha256'])")
+ESP_SHA=$(python3 -c "import json;print(json.load(open('$CFG'))['esp_sha256'])")
+[ "$(sha256sum "/tmp/$PREFIX-ovmf-a/OVMF_CODE.fd" | cut -d' ' -f1)" = "$CODE_SHA" ] || { echo "E_QEMU_SMOKE build product OVMF_CODE.fd sha mismatch"; exit 97; }
+[ "$(sha256sum "/tmp/$PREFIX-esp-a/c5-root-admitter-uki-v3-esp.raw" | cut -d' ' -f1)" = "$ESP_SHA" ] || { echo "E_QEMU_SMOKE build product esp sha mismatch"; exit 97; }
+ln -s "/tmp/$PREFIX-ovmf-a/OVMF_CODE.fd" "$W/build-output/ovmf-debug/OVMF_CODE.fd"
+ln -s "/tmp/$PREFIX-esp-a/c5-root-admitter-uki-v3-esp.raw" "$W/build-output/esp/c5-root-admitter-uki-v3-esp.raw"
 "$HERE/make-disks.sh" "$W/disks" >/dev/null
 python3 - "$CFG" "$FREEZE" "$IDX" "$W" <<'PYEOF'
 import json, os, socket, subprocess, sys, time
@@ -82,6 +97,13 @@ for a in argv:
                 os.makedirs(os.path.dirname(p), exist_ok=True)
                 if "unit=1" in a:
                     with open(vars_src,"rb") as s, open(p,"wb") as d: d.write(s.read())
+# every relative file= path in the frozen argv must resolve to a real file under the work
+# root (firmware, ESP, disks) - fail closed naming the exact missing path
+for a in argv:
+    for tok in a.split(","):
+        if (tok.startswith("file=") or tok.startswith("file:")) and not tok[5:].startswith("/"):
+            if not os.path.exists(os.path.join(W,tok[5:])):
+                print("E_QEMU_SMOKE missing relative argv path", tok[5:]); sys.exit(97)
 i=argv.index("-qmp"); sock=argv[i+1].split("unix:",1)[1].split(",",1)[0]
 if os.path.lexists(sock): os.unlink(sock)
 os.makedirs(os.path.dirname(sock), exist_ok=True)
