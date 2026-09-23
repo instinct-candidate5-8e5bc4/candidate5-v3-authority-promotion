@@ -21,7 +21,14 @@ echo "== build-esp-image.sh =="
 echo "epoch=$EPOCH umask=$(umask) LC_ALL=$LC_ALL TZ=$TZ"
 for t in sgdisk mkfs.vfat python3 truncate sha256sum; do
   p=$(command -v "$t") || fail "E_TOOL_MISSING $t"
-  printf 'tool %s %s %s\n' "$t" "$p" "$(sha256sum "$p" | cut -d' ' -f1)"
+  real="$p"
+  # batch1r3 B3: when $t resolves to a make-shims shim, log the UNDERLYING staged
+  # binary's hash (the shim is a fixed-format #!/bin/sh loader wrapper), not the shim's.
+  if grep -q -- '--argv0' "$p" 2>/dev/null; then
+    real=$(sed -n 's/.*--argv0 "[^"]*" "\([^"]*\)".*/\1/p' "$p")
+    [ -n "$real" ] && [ -f "$real" ] || fail "E_SHIM_RESOLVE $t $p"
+  fi
+  printf 'tool %s %s %s\n' "$t" "$real" "$(sha256sum "$real" | cut -d' ' -f1)"
 done
 sgdisk --version 2>&1 | head -1 | sed 's/^/tool-version sgdisk /'
 mkfs.vfat --help 2>&1 | head -1 | sed 's/^/tool-version mkfs.vfat /'

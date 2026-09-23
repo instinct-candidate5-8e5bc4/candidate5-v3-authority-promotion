@@ -4,19 +4,19 @@
  "indices": {
   "noble-main": {
    "sha256": "2a6a199e1031a5c279cb346646d594993f35b1c03dd4a82aaa0323980dd92451",
-   "url": "http://archive.ubuntu.com/ubuntu/dists/noble/main/binary-amd64/Packages.xz"
+   "url": "https://snapshot.ubuntu.com/ubuntu/20260922T000000Z/dists/noble/main/binary-amd64/Packages.xz"
   },
   "noble-universe": {
    "sha256": "ba9057fa1b91438cc8a1d26808d00c85389fe101d0c1496254df97236405599a",
-   "url": "http://archive.ubuntu.com/ubuntu/dists/noble/universe/binary-amd64/Packages.xz"
+   "url": "https://snapshot.ubuntu.com/ubuntu/20260922T000000Z/dists/noble/universe/binary-amd64/Packages.xz"
   },
   "noble-updates-main": {
-   "sha256": "baca02715cd7fe8fc78be2adc83d1b24c292bc31fa2e3c314637c3cccec0c285",
-   "url": "http://archive.ubuntu.com/ubuntu/dists/noble-updates/main/binary-amd64/Packages.xz"
+   "sha256": "c376aea99dffcf26ad5101f56bba95bda24c3fa0e26cf2fffc54ac21ae04fed1",
+   "url": "https://snapshot.ubuntu.com/ubuntu/20260922T000000Z/dists/noble-updates/main/binary-amd64/Packages.xz"
   },
   "noble-updates-universe": {
    "sha256": "c6e4ce37ca6d04963dec1d23a74194a8622bccfd556e74adc4c0584e504578bc",
-   "url": "http://archive.ubuntu.com/ubuntu/dists/noble-updates/universe/binary-amd64/Packages.xz"
+   "url": "https://snapshot.ubuntu.com/ubuntu/20260922T000000Z/dists/noble-updates/universe/binary-amd64/Packages.xz"
   }
  },
  "packages": [
@@ -131,7 +131,7 @@
   {
    "architecture": "amd64",
    "name": "libffi8",
-   "role": "both",
+   "role": "runtime",
    "sha256": "637e6a7744de08cd331a41f4efd0d24e6ea9064843dea9d1c6ca87bdb5f038a2",
    "size": 24718,
    "url": "http://archive.ubuntu.com/ubuntu/pool/main/libf/libffi/libffi8_3.4.6-1build1_amd64.deb",
@@ -527,7 +527,7 @@
   {
    "architecture": "amd64",
    "name": "libssl3t64",
-   "role": "both",
+   "role": "runtime",
    "sha256": "3d0955bc049bbcca0f4c3e78a3a8b994593d96db7d84f4320217224433844534",
    "size": 1944134,
    "url": "http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl3t64_3.0.13-0ubuntu3.15_amd64.deb",
@@ -689,7 +689,7 @@
   {
    "architecture": "amd64",
    "name": "libsqlite3-0",
-   "role": "both",
+   "role": "runtime",
    "sha256": "b1190bb72359f5fcc47406aa46065eaf4f1ca208085c51224a52b04bedc0b4bb",
    "size": 701602,
    "url": "http://archive.ubuntu.com/ubuntu/pool/main/s/sqlite3/libsqlite3-0_3.45.1-1ubuntu2.8_amd64.deb",
@@ -707,7 +707,7 @@
   {
    "architecture": "amd64",
    "name": "libncursesw6",
-   "role": "both",
+   "role": "runtime",
    "sha256": "579c9488755d1ddd70f66480cafd2f68776f68314d15d9cf4b5449d0de0fc968",
    "size": 147816,
    "url": "http://archive.ubuntu.com/ubuntu/pool/main/n/ncurses/libncursesw6_6.4+20240113-1ubuntu2.2_amd64.deb",
@@ -716,7 +716,7 @@
   {
    "architecture": "amd64",
    "name": "libtinfo6",
-   "role": "both",
+   "role": "runtime",
    "sha256": "b67a6df2bdab61d273eabebd208bb6a3fb12618a390a067e1ee305a409ff03d9",
    "size": 108086,
    "url": "http://archive.ubuntu.com/ubuntu/pool/main/n/ncurses/libtinfo6_6.4+20240113-1ubuntu2.2_amd64.deb",
@@ -1342,125 +1342,9 @@
    "size": 34440,
    "url": "http://archive.ubuntu.com/ubuntu/pool/main/g/gdbm/libgdbm6t64_1.23-5.1build1_amd64.deb",
    "version": "1.23-5.1build1"
-  },
-  {
-   "architecture": "amd64",
-   "name": "python3",
-   "role": "build",
-   "sha256": "e691b9cc40841c41bbdc50bd794c876cb1b1801306ea27b06e9a1458180df1e9",
-   "size": 23004,
-   "url": "http://archive.ubuntu.com/ubuntu/pool/main/p/python3-defaults/python3_3.12.3-0ubuntu2.1_amd64.deb",
-   "version": "3.12.3-0ubuntu2.1"
-  },
-  {
-   "architecture": "amd64",
-   "name": "python3-minimal",
-   "role": "build",
-   "sha256": "9ba5dd55cdcf6121c147dc5cb87403169b5933e3a56da0de57774f2ce819cf06",
-   "size": 27442,
-   "url": "http://archive.ubuntu.com/ubuntu/pool/main/p/python3-defaults/python3-minimal_3.12.3-0ubuntu2.1_amd64.deb",
-   "version": "3.12.3-0ubuntu2.1"
-  },
-  {
-   "architecture": "amd64",
-   "name": "python3.12-minimal",
-   "role": "build",
-   "sha256": "d452689b9660845345a4c3e05e4ad82c082d5474e04031b7aa47f1a6d5610a6e",
-   "size": 2334634,
-   "url": "http://archive.ubuntu.com/ubuntu/pool/main/p/python3.12/python3.12-minimal_3.12.3-1ubuntu0.17_amd64.deb",
-   "version": "3.12.3-1ubuntu0.17"
-  },
-  {
-   "architecture": "amd64",
-   "name": "libpython3.12-minimal",
-   "role": "build",
-   "sha256": "d646ad7112b5adec21ba0e1af015f04ae8ca7f5efdc619622547dd6673c4c14b",
-   "size": 838536,
-   "url": "http://archive.ubuntu.com/ubuntu/pool/main/p/python3.12/libpython3.12-minimal_3.12.3-1ubuntu0.17_amd64.deb",
-   "version": "3.12.3-1ubuntu0.17"
-  },
-  {
-   "architecture": "amd64",
-   "name": "libexpat1",
-   "role": "build",
-   "sha256": "9e40c7f613631ffe5c22c3f61daa767d976bc8af5c9e2001a1981eb26f18befd",
-   "size": 95248,
-   "url": "http://archive.ubuntu.com/ubuntu/pool/main/e/expat/libexpat1_2.6.1-2ubuntu0.5_amd64.deb",
-   "version": "2.6.1-2ubuntu0.5"
-  },
-  {
-   "architecture": "amd64",
-   "name": "python3.12",
-   "role": "build",
-   "sha256": "6745c9463432e619d7402b117ad4ac86c31dcd3999ba20daa9e395f6f9909d86",
-   "size": 650732,
-   "url": "http://archive.ubuntu.com/ubuntu/pool/main/p/python3.12/python3.12_3.12.3-1ubuntu0.17_amd64.deb",
-   "version": "3.12.3-1ubuntu0.17"
-  },
-  {
-   "architecture": "amd64",
-   "name": "libpython3.12-stdlib",
-   "role": "build",
-   "sha256": "45d3f530ba1f9d6e879ad46b92046fabab13fe50a82450e4f65557a3bbad1489",
-   "size": 2070530,
-   "url": "http://archive.ubuntu.com/ubuntu/pool/main/p/python3.12/libpython3.12-stdlib_3.12.3-1ubuntu0.17_amd64.deb",
-   "version": "3.12.3-1ubuntu0.17"
-  },
-  {
-   "architecture": "all",
-   "name": "media-types",
-   "role": "build",
-   "sha256": "31bfb7eec55ab6d34a50ba995150e1498d4cb897714085d8025e330d3b529747",
-   "size": 27474,
-   "url": "http://archive.ubuntu.com/ubuntu/pool/main/m/media-types/media-types_10.1.0_all.deb",
-   "version": "10.1.0"
-  },
-  {
-   "architecture": "all",
-   "name": "netbase",
-   "role": "build",
-   "sha256": "8cdbc9c3dca01e660759bf9d840f72e45ac72faf5d19ca1faecacaf6a60c1a87",
-   "size": 13112,
-   "url": "http://archive.ubuntu.com/ubuntu/pool/main/n/netbase/netbase_6.4_all.deb",
-   "version": "6.4"
-  },
-  {
-   "architecture": "all",
-   "name": "tzdata",
-   "role": "build",
-   "sha256": "ef12c9ef81905b5ac558504b2f8c20da9be5f28861020b3fb5e8b15fb3fae2f6",
-   "size": 279816,
-   "url": "http://archive.ubuntu.com/ubuntu/pool/main/t/tzdata/tzdata_2026c-0ubuntu0.24.04.1_all.deb",
-   "version": "2026c-0ubuntu0.24.04.1"
-  },
-  {
-   "architecture": "amd64",
-   "name": "libreadline8t64",
-   "role": "build",
-   "sha256": "563977a16df03b611f5239cc1e9a0426e86479fcc616b5c9e200ea32063119e5",
-   "size": 152856,
-   "url": "http://archive.ubuntu.com/ubuntu/pool/main/r/readline/libreadline8t64_8.2-4build1_amd64.deb",
-   "version": "8.2-4build1"
-  },
-  {
-   "architecture": "all",
-   "name": "readline-common",
-   "role": "build",
-   "sha256": "879bfd7f8a9bc4c0f7cdc777cdd8bc6de5f8c4a2ac80c060322a1b22f13504bb",
-   "size": 56484,
-   "url": "http://archive.ubuntu.com/ubuntu/pool/main/r/readline/readline-common_8.2-4build1_all.deb",
-   "version": "8.2-4build1"
-  },
-  {
-   "architecture": "amd64",
-   "name": "libpython3-stdlib",
-   "role": "build",
-   "sha256": "57ebb378c59d2f9ef479bee0abc933c560878cc10e2c3af8e05d6fdb2ed63da4",
-   "size": 10080,
-   "url": "http://archive.ubuntu.com/ubuntu/pool/main/p/python3-defaults/libpython3-stdlib_3.12.3-0ubuntu2.1_amd64.deb",
-   "version": "3.12.3-0ubuntu2.1"
   }
  ],
  "policy": "runner base image is observational-only; every installed tool comes from this lock; install rejects any missing/extra/substituted deb",
- "schema": "platform.lock/v1"
+ "schema": "platform.lock/v1",
+ "snapshot_ts": "20260922T000000Z"
 }

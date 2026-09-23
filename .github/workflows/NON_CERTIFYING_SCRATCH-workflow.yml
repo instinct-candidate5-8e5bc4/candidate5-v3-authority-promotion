@@ -1,29 +1,20 @@
-# NON_CERTIFYING_REHEARSAL — pre-freeze rehearsal workflow (development evidence only).
-# This workflow NEVER certifies anything. It must never emit OVMF_CI_SECURE_BOOT_UKI_PASS
-# or any certification marker. Every artifact name begins NON_CERTIFYING_REHEARSAL.
-# Trigger: push ONLY, exact branch filter p3-rehearsal-3 / p3-rehearsal-4 (no wildcards, no
-# other events). Per GitHub Actions documentation a push runs the workflow file AT the pushed
-# commit, including on non-default branches, so this file lives ONLY at .github/workflows/
-# on the candidate commit (ONE copy; no default-branch registration, no docs/ copy).
-# The two rehearsals are two separate fresh pushes of the SAME candidate SHA: first
-# p3-rehearsal-3, then p3-rehearsal-4 only after -3 passes. No other commits to these refs.
-# (Ref rotation per reviewer ruling after D2: p3-rehearsal-1 is spent at 02f3eab9 and
-# p3-rehearsal-2 was never created; -1/-2 are removed so a stray push to a spent ref
-# can never run.)
-# Fail-closed: the first step of every job aborts the run unless github.run_attempt == 1 AND
-# github.ref is exactly one of the two filtered refs. No re-run counts; any accidental run
-# is preserved and reported. Every GitHub action is pinned to a full-length commit SHA
-# (reviewer condition 8; SHAs recorded in the deterministic manifest). bwrap is
-# load-bearing for the canonical build path, so it comes ONLY from the hash-verified
-# platform lock as a staged binary (never the host tool). KVM-only, fail-closed, no TCG.
-# Public standard runner only ($0).
-name: NON_CERTIFYING_REHEARSAL
+# NON_CERTIFYING_SCRATCH - pre-freeze KVM scratch lane (r3 ruling 3/H1). NO EVIDENCE WEIGHT.
+# This workflow NEVER certifies anything and its runs carry no section-F evidence weight;
+# findings here only feed the correction batch. It must never emit OVMF_CI_SECURE_BOOT_UKI_PASS
+# or any certification marker (the forbidden-marker guard below is kept). Every artifact name
+# begins NON_CERTIFYING_SCRATCH. It exists ONLY on p3-scratch-* commits in the existing
+# candidate repository (no default-branch registration, never in the candidate tree handed
+# for STATIC REVIEW). KVM-only, fail-closed, no TCG. Public standard runner only ($0).
+# Every run URL and outcome is preserved and reported. Fail-closed: the first step of every
+# job aborts the run unless github.run_attempt == 1 AND github.ref is under refs/heads/p3-scratch-;
+# force-pushes are rejected. Every GitHub action is pinned to a full-length commit SHA.
+name: NON_CERTIFYING_SCRATCH
 on:
   push:
-    branches: [p3-rehearsal-3, p3-rehearsal-4]
+    branches: ['p3-scratch-*']
 permissions: {}
 env:
-  PREFIX: NON_CERTIFYING_REHEARSAL
+  PREFIX: NON_CERTIFYING_SCRATCH
 jobs:
   rehearsal:
     # ubuntu-22.04 pinned: the canonical-path mechanism (build-ovmf-debug.sh) needs
@@ -32,7 +23,7 @@ jobs:
     runs-on: ubuntu-22.04
     timeout-minutes: 360
     steps:
-      - name: NON_CERTIFYING_REHEARSAL ref+attempt fail-closed gate
+      - name: NON_CERTIFYING_SCRATCH ref+attempt fail-closed gate
         env:
           EV_CREATED: ${{ github.event.created }}
           EV_FORCED: ${{ github.event.forced }}
@@ -41,16 +32,14 @@ jobs:
           set -euo pipefail
           [ "${{ github.run_attempt }}" = "1" ] || { echo "E_RERUN_FORBIDDEN run_attempt=${{ github.run_attempt }}"; exit 89; }
           case "${{ github.ref }}" in
-            refs/heads/p3-rehearsal-3|refs/heads/p3-rehearsal-4) : ;;
+            refs/heads/p3-scratch-*) : ;;
             *) echo "E_REF_MISMATCH ref=${{ github.ref }}"; exit 89 ;;
           esac
-          # pushed-once gate (T3 F5): the ref must be created by THIS push, never force-pushed
-          [ "$EV_CREATED" = "true" ] || { echo "E_PUSHED_ONCE created=$EV_CREATED"; exit 89; }
+          # pushed-once gate (scratch form): force-push is forbidden; successive scratch commits are allowed
           [ "$EV_FORCED" = "false" ] || { echo "E_PUSHED_ONCE forced=$EV_FORCED"; exit 89; }
-          [ "$EV_BEFORE" = "0000000000000000000000000000000000000000" ] || { echo "E_PUSHED_ONCE before=$EV_BEFORE"; exit 89; }
           mkdir -p /tmp/$PREFIX-out
-          date +%s >> /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-step-stamps.txt
-      - name: NON_CERTIFYING_REHEARSAL kvm fail-closed check
+          date +%s >> /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-step-stamps.txt
+      - name: NON_CERTIFYING_SCRATCH kvm fail-closed check
         run: |
           set -euo pipefail
           if [ ! -e /dev/kvm ]; then echo "E_NO_KVM"; exit 90; fi
@@ -65,23 +54,23 @@ jobs:
           for f in             platform.lock.json             config.json             stage-platform.sh             make-shims.sh             preflight-check.py             build-ovmf-debug.sh             scan-pe-pdb-paths.py             build-enroll-app.sh             bwrap-argv.sh             enroll-predicate-check.py             rehearsal-enroll.sh             ../build-esp-image.sh             evidence/successor-signed.efi             run-ceremony.sh; do
             [ -e "$f" ] || { echo "E_WORKFLOW_ARG_MISSING $f"; exit 88; }
           done
-      - name: NON_CERTIFYING_REHEARSAL host inputs declared (B3)
+      - name: NON_CERTIFYING_SCRATCH host inputs declared (B3)
         run: |
           set -euo pipefail
           mkdir -p /tmp/$PREFIX-out
-          : > /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-host-inputs.txt
+          : > /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-host-inputs.txt
           for t in gcc make sha256sum; do
             p=$(command -v "$t")
             v=$("$t" --version 2>&1 | head -1 || true)
             h=$(sha256sum "$p" | cut -d' ' -f1)
-            printf 'host-input %s %s %s %s\n' "$t" "$p" "$h" "$v" >> /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-host-inputs.txt
+            printf 'host-input %s %s %s %s\n' "$t" "$p" "$h" "$v" >> /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-host-inputs.txt
           done
           # python declared host input (batch1r3 addendum2 condition 2a): full interpreter identity
           pp=$(command -v python3)
           rp=$(realpath "$pp")
           case "$rp" in /usr/bin/*) ;; *) echo "E_PYTHON_HOST_PATH $rp"; exit 51;; esac
           [ -z "${VIRTUAL_ENV:-}" ] || { echo "E_PYTHON_VENV $VIRTUAL_ENV"; exit 51; }
-          python3 - "$pp" "$rp" >> /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-host-inputs.txt <<'PYEOF'
+          python3 - "$pp" "$rp" >> /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-host-inputs.txt <<'PYEOF'
           import sys, os, hashlib
           pp, rp = sys.argv[1], sys.argv[2]
           print("host-python path=" + pp)
@@ -91,8 +80,8 @@ jobs:
           print("host-python flags=" + repr(sys.flags))
           print("host-python pythonhashseed=" + os.environ.get("PYTHONHASHSEED", "<unset>"))
           PYEOF
-          cat /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-host-inputs.txt
-      - name: NON_CERTIFYING_REHEARSAL platform staging (only network phase)
+          cat /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-host-inputs.txt
+      - name: NON_CERTIFYING_SCRATCH platform staging (only network phase)
         timeout-minutes: 20
         run: |
           set -euo pipefail
@@ -113,7 +102,7 @@ jobs:
               open("/tmp/" + sys.argv[2] + "-lockgen-indices/" + name + ".xz", "wb").write(data)
               print("index", name, len(data), "bytes", got)
           PYEOF
-      - name: NON_CERTIFYING_REHEARSAL userns/bwrap preflight (staged, lock-verified bwrap)
+      - name: NON_CERTIFYING_SCRATCH userns/bwrap preflight (staged, lock-verified bwrap)
         run: |
           set -euo pipefail
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
@@ -131,7 +120,7 @@ jobs:
             echo "E_PREFLIGHT_NS_EXEC: staged bwrap namespace test failed (rc=$rc)"
             exit 91
           fi
-      - name: NON_CERTIFYING_REHEARSAL lockgen byte-for-byte regeneration (addendum2 condition 2)
+      - name: NON_CERTIFYING_SCRATCH lockgen byte-for-byte regeneration (addendum2 condition 2)
         run: |
           set -euo pipefail
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
@@ -141,12 +130,12 @@ jobs:
           (cd /tmp/$PREFIX-lockgen && python3 platform-lockgen.py)
           cmp /tmp/$PREFIX-lockgen/platform.lock.json platform.lock.json || { echo "E_LOCKGEN_NONDET"; exit 52; }
           echo "committed lockgen regenerates the committed lock byte-for-byte"
-      - name: NON_CERTIFYING_REHEARSAL preflight static conformance
+      - name: NON_CERTIFYING_SCRATCH preflight static conformance
         run: |
           set -euo pipefail
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
           python3 preflight-check.py config.json /tmp/$PREFIX-stage
-      - name: NON_CERTIFYING_REHEARSAL reproducible OVMF DEBUG dual build + accepted-firmware pins
+      - name: NON_CERTIFYING_SCRATCH reproducible OVMF DEBUG dual build + accepted-firmware pins
         timeout-minutes: 150
         run: |
           set -euo pipefail
@@ -167,7 +156,7 @@ jobs:
           sha256sum /tmp/$PREFIX-ovmf-a/OVMF_CODE.fd /tmp/$PREFIX-ovmf-a/OVMF_VARS.fd \
             > /tmp/$PREFIX-fw-hashes.txt
           cat /tmp/$PREFIX-fw-hashes.txt
-      - name: NON_CERTIFYING_REHEARSAL hostile-path drift demonstration (condition 5)
+      - name: NON_CERTIFYING_SCRATCH hostile-path drift demonstration (condition 5)
         timeout-minutes: 90
         run: |
           set -euo pipefail
@@ -191,7 +180,7 @@ jobs:
           [ "$HH" != "fc150336fce10eb5508fa440cdf7300622c8c3ac71f2fbe10a0731422b9cef24" ] || { echo "E_HOSTILE_NO_DRIFT: hostile build equals the accepted firmware"; exit 92; }
           echo "hostile-path build REJECTED: all $MODS modules carry the hostile path (exit exactly 43); drift confirmed $HH"
           sha256sum /tmp/$PREFIX-hostile-out/OVMF_CODE.fd >> /tmp/$PREFIX-fw-hashes.txt
-      - name: NON_CERTIFYING_REHEARSAL network-cut canary (must fail)
+      - name: NON_CERTIFYING_SCRATCH network-cut canary (must fail)
         run: |
           set -euo pipefail
           # batch1r3 C3: a fetch inside the cut namespace MUST fail, proving the cut is real
@@ -199,7 +188,7 @@ jobs:
             echo "E_NET_CANARY_LEAK: network reachable inside unshare -n"; exit 96
           fi
           echo "network-cut canary failed as required"
-      - name: NON_CERTIFYING_REHEARSAL enrollment app + ESP dual builds (network-enforced-off)
+      - name: NON_CERTIFYING_SCRATCH enrollment app + ESP dual builds (network-enforced-off)
         timeout-minutes: 60
         run: |
           set -euo pipefail
@@ -215,14 +204,14 @@ jobs:
           [ "$(sha256sum /tmp/$PREFIX-esp-a/c5-root-admitter-uki-v3-esp.raw | cut -d' ' -f1)" = \
             "2bfa621238890890765c9636f99dabfb46233bfa626afb580ce33e65858019c9" ]
           cmp /tmp/$PREFIX-esp-a/c5-root-admitter-uki-v3-esp.raw /tmp/$PREFIX-esp-b/c5-root-admitter-uki-v3-esp.raw
-      - name: NON_CERTIFYING_REHEARSAL firmware hash upload (env2 comparison input)
+      - name: NON_CERTIFYING_SCRATCH firmware hash upload (env2 comparison input)
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
         with:
-          name: NON_CERTIFYING_REHEARSAL-fw-hashes
-          path: /tmp/NON_CERTIFYING_REHEARSAL-fw-hashes.txt
+          name: NON_CERTIFYING_SCRATCH-fw-hashes
+          path: /tmp/NON_CERTIFYING_SCRATCH-fw-hashes.txt
           retention-days: 90
           if-no-files-found: error
-      - name: NON_CERTIFYING_REHEARSAL qemu staged-ROM gates (A3)
+      - name: NON_CERTIFYING_SCRATCH qemu staged-ROM gates (A3)
         run: |
           set -euo pipefail
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
@@ -237,25 +226,25 @@ jobs:
               --tmpfs /usr/share/qemu --tmpfs /usr/share/seabios --tmpfs /usr/share/ipxe \
               --dev-bind /dev/kvm /dev/kvm \
               /tmp/$PREFIX-stage/shims/qemu-system-x86_64 -machine q35,smm=on -accel kvm \
-                -S -display none -qmp stdio > /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-qemu-smoke.log 2>&1 \
-            || { echo "E_QEMU_SMOKE"; cat /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-qemu-smoke.log; exit 97; }
+                -S -display none -qmp stdio > /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-qemu-smoke.log 2>&1 \
+            || { echo "E_QEMU_SMOKE"; cat /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-qemu-smoke.log; exit 97; }
           echo "masked-host qemu startup smoke OK (staged ROMs only, no case booted)"
-      - name: NON_CERTIFYING_REHEARSAL ceremony (network-enforced-off, tee'd log)
+      - name: NON_CERTIFYING_SCRATCH ceremony (network-enforced-off, tee'd log)
         timeout-minutes: 120
         run: |
           set -euo pipefail
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
           mkdir -p /tmp/$PREFIX-out
-          date +%s >> /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-step-stamps.txt
+          date +%s >> /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-step-stamps.txt
           sudo unshare -n ./run-ceremony.sh config.json /tmp/$PREFIX-stage /tmp/$PREFIX-out 2>&1 \
-            | tee /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-ceremony.log
-      - name: NON_CERTIFYING_REHEARSAL ceremony interpreter cross-check (addendum2 condition 2b)
+            | tee /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-ceremony.log
+      - name: NON_CERTIFYING_SCRATCH ceremony interpreter cross-check (addendum2 condition 2b)
         run: |
           set -euo pipefail
-          grep '^host-python ' /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-host-inputs.txt > /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-expected-ceremony-python.txt
-          diff /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-expected-ceremony-python.txt /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-ceremony-python.txt || { echo "E_CEREMONY_PYTHON_DRIFT"; exit 51; }
+          grep '^host-python ' /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-host-inputs.txt > /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-expected-ceremony-python.txt
+          diff /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-expected-ceremony-python.txt /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-ceremony-python.txt || { echo "E_CEREMONY_PYTHON_DRIFT"; exit 51; }
           echo "ceremony interpreter identical to the job record"
-      - name: NON_CERTIFYING_REHEARSAL forbidden-marker guard
+      - name: NON_CERTIFYING_SCRATCH forbidden-marker guard
         run: |
           set -euo pipefail
           # fail-closed form: explicit if, fixed-string binary-inclusive scan (-a -F) of the
@@ -271,17 +260,17 @@ jobs:
           if [ "$GUARD_RC" -ne 1 ]; then
             echo "E_MARKER_GUARD_RC rc=$GUARD_RC (grep rc 1 = pass; anything else = fail)"; exit 94
           fi
-          if [ -n "$(find /tmp/$PREFIX-out -mindepth 1 -maxdepth 1 ! -name 'NON_CERTIFYING_REHEARSAL*' -print -quit)" ]; then
+          if [ -n "$(find /tmp/$PREFIX-out -mindepth 1 -maxdepth 1 ! -name 'NON_CERTIFYING_SCRATCH*' -print -quit)" ]; then
             echo "E_UNPREFIXED_TOPLEVEL_EVIDENCE"; exit 94
           fi
-      - name: NON_CERTIFYING_REHEARSAL evidence upload (ephemeral CI artifact only)
+      - name: NON_CERTIFYING_SCRATCH evidence upload (ephemeral CI artifact only)
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
         with:
-          name: NON_CERTIFYING_REHEARSAL-evidence
+          name: NON_CERTIFYING_SCRATCH-evidence
           path: |
-            /tmp/NON_CERTIFYING_REHEARSAL-out/
-            /tmp/NON_CERTIFYING_REHEARSAL-fw-hashes.txt
+            /tmp/NON_CERTIFYING_SCRATCH-out/
+            /tmp/NON_CERTIFYING_SCRATCH-fw-hashes.txt
           retention-days: 90
           if-no-files-found: error
 
@@ -294,7 +283,7 @@ jobs:
     timeout-minutes: 360
     needs: rehearsal
     steps:
-      - name: NON_CERTIFYING_REHEARSAL ref+attempt fail-closed gate
+      - name: NON_CERTIFYING_SCRATCH ref+attempt fail-closed gate
         env:
           EV_CREATED: ${{ github.event.created }}
           EV_FORCED: ${{ github.event.forced }}
@@ -303,15 +292,13 @@ jobs:
           set -euo pipefail
           [ "${{ github.run_attempt }}" = "1" ] || { echo "E_RERUN_FORBIDDEN run_attempt=${{ github.run_attempt }}"; exit 89; }
           case "${{ github.ref }}" in
-            refs/heads/p3-rehearsal-3|refs/heads/p3-rehearsal-4) : ;;
+            refs/heads/p3-scratch-*) : ;;
             *) echo "E_REF_MISMATCH ref=${{ github.ref }}"; exit 89 ;;
           esac
-          # pushed-once gate (T3 F5): the ref must be created by THIS push, never force-pushed
-          [ "$EV_CREATED" = "true" ] || { echo "E_PUSHED_ONCE created=$EV_CREATED"; exit 89; }
+          # pushed-once gate (scratch form): force-push is forbidden; successive scratch commits are allowed
           [ "$EV_FORCED" = "false" ] || { echo "E_PUSHED_ONCE forced=$EV_FORCED"; exit 89; }
-          [ "$EV_BEFORE" = "0000000000000000000000000000000000000000" ] || { echo "E_PUSHED_ONCE before=$EV_BEFORE"; exit 89; }
           mkdir -p /tmp/$PREFIX-out
-          date +%s >> /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-step-stamps.txt
+          date +%s >> /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-step-stamps.txt
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
         with: {persist-credentials: false}
       - name: workflow-argument existence gate (D2, fail-closed)
@@ -323,23 +310,23 @@ jobs:
           for f in             platform.lock.json             config.json             stage-platform.sh             make-shims.sh             preflight-check.py             build-ovmf-debug.sh             scan-pe-pdb-paths.py             build-enroll-app.sh             bwrap-argv.sh             enroll-predicate-check.py             rehearsal-enroll.sh             ../build-esp-image.sh             evidence/successor-signed.efi             run-ceremony.sh; do
             [ -e "$f" ] || { echo "E_WORKFLOW_ARG_MISSING $f"; exit 88; }
           done
-      - name: NON_CERTIFYING_REHEARSAL env2 host inputs declared (B3)
+      - name: NON_CERTIFYING_SCRATCH env2 host inputs declared (B3)
         run: |
           set -euo pipefail
           mkdir -p /tmp/$PREFIX-env2-evidence
-          : > /tmp/$PREFIX-env2-evidence/NON_CERTIFYING_REHEARSAL-env2-host-inputs.txt
+          : > /tmp/$PREFIX-env2-evidence/NON_CERTIFYING_SCRATCH-env2-host-inputs.txt
           for t in gcc make sha256sum; do
             p=$(command -v "$t")
             v=$("$t" --version 2>&1 | head -1 || true)
             h=$(sha256sum "$p" | cut -d' ' -f1)
-            printf 'host-input %s %s %s %s\n' "$t" "$p" "$h" "$v" >> /tmp/$PREFIX-env2-evidence/NON_CERTIFYING_REHEARSAL-env2-host-inputs.txt
+            printf 'host-input %s %s %s %s\n' "$t" "$p" "$h" "$v" >> /tmp/$PREFIX-env2-evidence/NON_CERTIFYING_SCRATCH-env2-host-inputs.txt
           done
           # python declared host input (batch1r3 addendum2 condition 2a): full interpreter identity
           pp=$(command -v python3)
           rp=$(realpath "$pp")
           case "$rp" in /usr/bin/*) ;; *) echo "E_PYTHON_HOST_PATH $rp"; exit 51;; esac
           [ -z "${VIRTUAL_ENV:-}" ] || { echo "E_PYTHON_VENV $VIRTUAL_ENV"; exit 51; }
-          python3 - "$pp" "$rp" >> /tmp/$PREFIX-env2-evidence/NON_CERTIFYING_REHEARSAL-env2-host-inputs.txt <<'PYEOF'
+          python3 - "$pp" "$rp" >> /tmp/$PREFIX-env2-evidence/NON_CERTIFYING_SCRATCH-env2-host-inputs.txt <<'PYEOF'
           import sys, os, hashlib
           pp, rp = sys.argv[1], sys.argv[2]
           print("host-python path=" + pp)
@@ -349,14 +336,14 @@ jobs:
           print("host-python flags=" + repr(sys.flags))
           print("host-python pythonhashseed=" + os.environ.get("PYTHONHASHSEED", "<unset>"))
           PYEOF
-          cat /tmp/$PREFIX-env2-evidence/NON_CERTIFYING_REHEARSAL-env2-host-inputs.txt
-      - name: NON_CERTIFYING_REHEARSAL env2 platform staging (only network phase)
+          cat /tmp/$PREFIX-env2-evidence/NON_CERTIFYING_SCRATCH-env2-host-inputs.txt
+      - name: NON_CERTIFYING_SCRATCH env2 platform staging (only network phase)
         timeout-minutes: 20
         run: |
           set -euo pipefail
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
           ./stage-platform.sh platform.lock.json /tmp/$PREFIX-stage-env2
-      - name: NON_CERTIFYING_REHEARSAL env2 userns/bwrap preflight (staged, lock-verified bwrap)
+      - name: NON_CERTIFYING_SCRATCH env2 userns/bwrap preflight (staged, lock-verified bwrap)
         run: |
           set -euo pipefail
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
@@ -374,7 +361,7 @@ jobs:
             echo "E_PREFLIGHT_NS_EXEC: staged bwrap namespace test failed (rc=$rc)"
             exit 91
           fi
-      - name: NON_CERTIFYING_REHEARSAL env2 single canonical-path reproduction
+      - name: NON_CERTIFYING_SCRATCH env2 single canonical-path reproduction
         timeout-minutes: 150
         run: |
           set -euo pipefail
@@ -387,8 +374,8 @@ jobs:
           printf '%s\n' "$SCAN_OUT"
           MODS=$(printf '%s\n' "$SCAN_OUT" | sed -n 's/^scanned \([0-9][0-9]*\) PE files.*/\1/p')
           [ "$MODS" = "366" ] || { echo "E_ENV2_SCAN_COUNT modules=$MODS (pinned 366)"; exit 92; }
-          printf '%s\n' "$SCAN_OUT" > /tmp/$PREFIX-env2-evidence/NON_CERTIFYING_REHEARSAL-env2-pdb-scan.txt
-      - name: NON_CERTIFYING_REHEARSAL env2 enroll-app rebuild (C2)
+          printf '%s\n' "$SCAN_OUT" > /tmp/$PREFIX-env2-evidence/NON_CERTIFYING_SCRATCH-env2-pdb-scan.txt
+      - name: NON_CERTIFYING_SCRATCH env2 enroll-app rebuild (C2)
         timeout-minutes: 30
         run: |
           set -euo pipefail
@@ -397,8 +384,8 @@ jobs:
           cmp /tmp/$PREFIX-app-env2-a/enroll-app.efi /tmp/$PREFIX-app-env2-b/enroll-app.efi
           HA=$(sha256sum /tmp/$PREFIX-app-env2-a/enroll-app.efi | cut -d' ' -f1)
           [ "$HA" = "540b4fa3990f998cb803160482bd50e9670a47da3d534acc3ade91364a85f3ee" ] || { echo "E_APP_PIN_MISMATCH $HA"; exit 46; }
-          sha256sum /tmp/$PREFIX-app-env2-a/enroll-app.efi > /tmp/$PREFIX-env2-evidence/NON_CERTIFYING_REHEARSAL-env2-app-hash.txt
-      - name: NON_CERTIFYING_REHEARSAL env2 accepted-firmware pins + runner-1 hash echo
+          sha256sum /tmp/$PREFIX-app-env2-a/enroll-app.efi > /tmp/$PREFIX-env2-evidence/NON_CERTIFYING_SCRATCH-env2-app-hash.txt
+      - name: NON_CERTIFYING_SCRATCH env2 accepted-firmware pins + runner-1 hash echo
         run: |
           set -euo pipefail
           HC=$(sha256sum /tmp/$PREFIX-ovmf-env2/OVMF_CODE.fd | cut -d' ' -f1)
@@ -410,20 +397,20 @@ jobs:
           sha256sum /tmp/$PREFIX-ovmf-env2/OVMF_CODE.fd /tmp/$PREFIX-ovmf-env2/OVMF_VARS.fd
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4.3.0
         with:
-          name: NON_CERTIFYING_REHEARSAL-fw-hashes
-          path: /tmp/NON_CERTIFYING_REHEARSAL-fw1
+          name: NON_CERTIFYING_SCRATCH-fw-hashes
+          path: /tmp/NON_CERTIFYING_SCRATCH-fw1
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4.3.0
         with:
-          name: NON_CERTIFYING_REHEARSAL-evidence
-          path: /tmp/NON_CERTIFYING_REHEARSAL-env1-evidence
-      - name: NON_CERTIFYING_REHEARSAL env2 host-inputs cross-job diff (B3)
+          name: NON_CERTIFYING_SCRATCH-evidence
+          path: /tmp/NON_CERTIFYING_SCRATCH-env1-evidence
+      - name: NON_CERTIFYING_SCRATCH env2 host-inputs cross-job diff (B3)
         run: |
           set -euo pipefail
-          diff /tmp/$PREFIX-env1-evidence/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-host-inputs.txt \
-               /tmp/$PREFIX-env2-evidence/NON_CERTIFYING_REHEARSAL-env2-host-inputs.txt \
+          diff /tmp/$PREFIX-env1-evidence/NON_CERTIFYING_SCRATCH-out/NON_CERTIFYING_SCRATCH-host-inputs.txt \
+               /tmp/$PREFIX-env2-evidence/NON_CERTIFYING_SCRATCH-env2-host-inputs.txt \
             || { echo "E_HOST_INPUTS_DRIFT"; exit 98; }
           echo "host inputs identical across jobs"
-      - name: NON_CERTIFYING_REHEARSAL env2 cross-runner byte-identity gate
+      - name: NON_CERTIFYING_SCRATCH env2 cross-runner byte-identity gate
         run: |
           set -euo pipefail
           H1=$(grep -- "-ovmf-a/OVMF_CODE.fd" /tmp/$PREFIX-fw1/$PREFIX-fw-hashes.txt | cut -d' ' -f1)
@@ -433,11 +420,11 @@ jobs:
           A2=$(sha256sum /tmp/$PREFIX-app-env2-a/enroll-app.efi | cut -d' ' -f1)
           [ "$A1" = "$A2" ] || { echo "E_ENV2_APP_MISMATCH $A1 $A2"; exit 93; }
           echo "env2 reproduction byte-identical across runners at canonical /build (firmware + enroll app)"
-      - name: NON_CERTIFYING_REHEARSAL env2 evidence upload (ephemeral CI artifact only)
+      - name: NON_CERTIFYING_SCRATCH env2 evidence upload (ephemeral CI artifact only)
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
         with:
-          name: NON_CERTIFYING_REHEARSAL-env2-evidence
-          path: /tmp/NON_CERTIFYING_REHEARSAL-env2-evidence/
+          name: NON_CERTIFYING_SCRATCH-env2-evidence
+          path: /tmp/NON_CERTIFYING_SCRATCH-env2-evidence/
           retention-days: 90
           if-no-files-found: error

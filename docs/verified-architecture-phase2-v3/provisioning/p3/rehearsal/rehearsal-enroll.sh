@@ -13,7 +13,8 @@ CPU=$(python3 -c "import json;print(json.load(open('$CFG'))['cpu_model'])")
 FW=$(python3 -c "import json;print(json.load(open('$CFG'))['ovmf_code_debug'])")
 PRISTINE=$(python3 -c "import json;print(json.load(open('$CFG'))['ovmf_vars_pristine'])")
 APP=$(python3 -c "import json;print(json.load(open('$CFG'))['enroll_app'])")
-# enrollment FAT32 image (64 MiB): app as /EFI/BOOT/BOOTX64.EFI + auth blobs in /EFI/BOOT
+# enrollment FAT32 image (64 MiB): app as /EFI/BOOT/BOOTX64.EFI + auth blobs at the VOLUME ROOT
+# (G2/T5 F4: the app opens db.auth/kek.auth/pk.auth on the volume root and writes ENROLL.TXT there)
 IMG="$EVD/enroll-fat.raw"
 truncate -s 67108864 "$IMG"
 mkfs.vfat -F 32 -s 1 -S 512 -f 2 -R 32 -i 45454E52 -n C5ENROLL "$IMG" >/dev/null
@@ -66,9 +67,9 @@ for name83, src in blobs:
 for i in range(nfats):
     d.seek(fat_start + i * fat_secs * bps); d.write(fat)
 d.seek(co(2)); d.write(dent(b"EFI        ", 0x10, EFI_CLUS, 0))
+for b in blob_dents: d.write(b)   # db.auth/kek.auth/pk.auth at the VOLUME ROOT (app opens them there)
 d.seek(co(EFI_CLUS)); d.write(dent(b"BOOT       ", 0x10, BOOT_CLUS, 0))
 d.seek(co(BOOT_CLUS)); d.write(dent(b"BOOTX64 EFI", 0x20, APP_CLUS, len(appdata)))
-for b in blob_dents: d.write(b)
 # FSInfo free-count update
 d.seek(512); fsi = bytearray(d.read(512))
 old_free = struct.unpack_from("<I", fsi, 488)[0]
@@ -91,7 +92,7 @@ cp "$PRISTINE" "$EVD/vars.fd"
 sleep 25
 PID=$(cat "$EVD/qemu.pid")
 kill -TERM "$PID" 2>/dev/null || true; sleep 2; kill -KILL "$PID" 2>/dev/null || true
-# extract ENROLL.TXT from /EFI/BOOT of the FAT32 image
+# extract ENROLL.TXT from the VOLUME ROOT of the FAT32 image (G2/T5 F4: the app writes it there)
 python3 - "$IMG" > "$EVD/ENROLL.TXT" <<'PY'
 import sys, struct
 d = open(sys.argv[1], "rb").read()
@@ -118,14 +119,11 @@ def walk(clus):
         yield e
 def find(name):
     for e in walk(2):
-        if e[11] & 0x10 and e[0:8].rstrip() == b"EFI":
-            for e2 in walk(struct.unpack_from("<H", e, 26)[0]):
-                if e2[11] & 0x10 and e2[0:8].rstrip() == b"BOOT":
-                    for e3 in walk(struct.unpack_from("<H", e2, 26)[0]):
-                        nm = e3[0:8].decode().rstrip() + "." + e3[8:11].decode().rstrip()
-                        if nm == name:
-                            cl = struct.unpack_from("<H", e3, 26)[0]; sz = struct.unpack_from("<I", e3, 28)[0]
-                            return b"".join(d[co(c):co(c) + 512] for c in chain(cl))[:sz]
+        if e[0] == 0xE5 or e[11] == 0x0F or (e[11] & 0x10): continue
+        nm = e[0:8].decode().rstrip() + "." + e[8:11].decode().rstrip()
+        if nm == name:
+            cl = struct.unpack_from("<H", e, 26)[0]; sz = struct.unpack_from("<I", e, 28)[0]
+            return b"".join(d[co(c):co(c) + 512] for c in chain(cl))[:sz]
     raise SystemExit("E_ENROLL_TXT_MISSING")
 sys.stdout.buffer.write(find("ENROLL.TXT"))
 PY

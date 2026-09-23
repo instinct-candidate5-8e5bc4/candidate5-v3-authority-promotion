@@ -5,11 +5,17 @@
 set -euo pipefail
 export LC_ALL=C TZ=UTC; umask 077
 SBS=${1:?}; W=${2:?}; CERT=${3:?}; HOSTILE=${4:-}
-SB=$SBS/usr/bin
+# B1: sbvarsign runs ONLY through the loader-explicit shim (never the absolute staged path,
+# which would bind host glibc/libcrypto); stderr is never discarded.
+STAGE="$(dirname "$SBS")"
+SHIMS="$STAGE/shims"
+[ -x "$SHIMS/sbvarsign" ] || "$(dirname "$0")/make-shims.sh" "$STAGE" "$SHIMS" >/dev/null
+SBV="$SHIMS/sbvarsign"
+[ -x "$SBV" ] || { echo "E_NO_SBVARSIGN_SHIM $SBV" >&2; exit 92; }
 [ -d "$W" ] && { echo "E_WORK_EXISTS" >&2; exit 1; }
 mkdir -p "$W"
-openssl req -new -newkey rsa:2048 -nodes -x509 -days 1 -subj "/CN=C5-THROWAWAY-PK/" -keyout "$W/pk.key" -out "$W/pk.crt" -sha256 2>/dev/null
-openssl req -new -newkey rsa:2048 -nodes -x509 -days 1 -subj "/CN=C5-THROWAWAY-KEK/" -keyout "$W/kek.key" -out "$W/kek.crt" -sha256 2>/dev/null
+openssl req -new -newkey rsa:2048 -nodes -x509 -days 1 -subj "/CN=C5-THROWAWAY-PK/" -keyout "$W/pk.key" -out "$W/pk.crt" -sha256
+openssl req -new -newkey rsa:2048 -nodes -x509 -days 1 -subj "/CN=C5-THROWAWAY-KEK/" -keyout "$W/kek.key" -out "$W/kek.crt" -sha256
 openssl x509 -in "$W/pk.crt" -outform DER -out "$W/pk.cer"
 openssl x509 -in "$W/kek.crt" -outform DER -out "$W/kek.cer"
 python3 - "$CERT" "$W/kek.cer" "$W/pk.cer" "$HOSTILE" "$W" <<'PY'
@@ -40,10 +46,10 @@ esl([kek],f"{W}/kek.esl")
 esl([pk],f"{W}/pk.esl")
 if hostile: esl([cert,hostile],f"{W}/db2.esl")
 PY
-"$SB/sbvarsign" --key "$W/pk.key"  --cert "$W/pk.crt"  --output "$W/pk.auth"  PK  "$W/pk.esl"  >/dev/null 2>&1
-"$SB/sbvarsign" --key "$W/pk.key"  --cert "$W/pk.crt"  --output "$W/kek.auth" KEK "$W/kek.esl" >/dev/null 2>&1
-"$SB/sbvarsign" --key "$W/kek.key" --cert "$W/kek.crt" --output "$W/db.auth"  db  "$W/db.esl"  >/dev/null 2>&1
+"$SBV" --key "$W/pk.key"  --cert "$W/pk.crt"  --output "$W/pk.auth"  PK  "$W/pk.esl"
+"$SBV" --key "$W/pk.key"  --cert "$W/pk.crt"  --output "$W/kek.auth" KEK "$W/kek.esl"
+"$SBV" --key "$W/kek.key" --cert "$W/kek.crt" --output "$W/db.auth"  db  "$W/db.esl"
 if [ -n "$HOSTILE" ]; then
-  "$SB/sbvarsign" --key "$W/kek.key" --cert "$W/kek.crt" --output "$W/db2.auth" db "$W/db2.esl" >/dev/null 2>&1
+  "$SBV" --key "$W/kek.key" --cert "$W/kek.crt" --output "$W/db2.auth" db "$W/db2.esl"
 fi
 echo "enroll-prep complete (keys remain in $W for the enrollment window only)"

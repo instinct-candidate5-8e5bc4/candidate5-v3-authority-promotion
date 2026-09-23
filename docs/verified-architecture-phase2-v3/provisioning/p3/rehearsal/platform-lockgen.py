@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import lzma, json, hashlib, re, sys
 def parse(path, suite):
     out={}
@@ -26,8 +27,10 @@ def cand(name):
     if name in ubase: return ubase[name][0], 'noble-universe'
     if name in base: return base[name][0], 'noble'
     return None, None
+SNAPSHOT_TS='20260922T000000Z'
+SNAP='https://snapshot.ubuntu.com/ubuntu/'+SNAPSHOT_TS
 SEEDS_RUNTIME=['qemu-system-x86','ovmf','sbsigntool','openssl','dosfstools','gdisk','bubblewrap']
-SEEDS_BUILD=['gcc','make','nasm','acpica-tools','uuid-dev','bison','flex','gnu-efi','m4','perl','python3']
+SEEDS_BUILD=['gcc','make','nasm','acpica-tools','uuid-dev','bison','flex','gnu-efi','m4','perl']
 seen={}; order=[]
 def resolve(name, role):
     if name in seen:
@@ -59,10 +62,11 @@ for name in order:
         'size':int(pkg['Size']),'sha256':pkg['SHA256'],'url':'http://archive.ubuntu.com/ubuntu/'+pkg['Filename'],'role':role})
 def h(p): return hashlib.sha256(open(p,'rb').read()).hexdigest()
 lock={'schema':'platform.lock/v1','distro':'ubuntu-24.04-noble','arch':'amd64',
- 'indices':{'noble-main':{'url':'http://archive.ubuntu.com/ubuntu/dists/noble/main/binary-amd64/Packages.xz','sha256':h('noble-main.xz')},
-            'noble-updates-main':{'url':'http://archive.ubuntu.com/ubuntu/dists/noble-updates/main/binary-amd64/Packages.xz','sha256':h('noble-updates-main.xz')},
-            'noble-universe':{'url':'http://archive.ubuntu.com/ubuntu/dists/noble/universe/binary-amd64/Packages.xz','sha256':h('noble-universe.xz')},
-            'noble-updates-universe':{'url':'http://archive.ubuntu.com/ubuntu/dists/noble-updates/universe/binary-amd64/Packages.xz','sha256':h('noble-updates-universe.xz')}},
+ 'indices':{'noble-main':{'url':SNAP+'/dists/noble/main/binary-amd64/Packages.xz','sha256':h('noble-main.xz')},
+            'noble-updates-main':{'url':SNAP+'/dists/noble-updates/main/binary-amd64/Packages.xz','sha256':h('noble-updates-main.xz')},
+            'noble-universe':{'url':SNAP+'/dists/noble/universe/binary-amd64/Packages.xz','sha256':h('noble-universe.xz')},
+            'noble-updates-universe':{'url':SNAP+'/dists/noble-updates/universe/binary-amd64/Packages.xz','sha256':h('noble-updates-universe.xz')}},
+ 'snapshot_ts':SNAPSHOT_TS,
  'policy':'runner base image is observational-only; every installed tool comes from this lock; install rejects any missing/extra/substituted deb',
  'packages':entries}
 open('platform.lock.json','w').write(json.dumps(lock,indent=1,sort_keys=True)+'\n')

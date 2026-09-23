@@ -116,6 +116,132 @@ for c in cfg.get("cases",[]):
 for t in ("usr/bin/qemu-system-x86_64","usr/bin/sbvarsign","usr/bin/openssl","usr/sbin/mkfs.vfat","sbin/sgdisk","usr/bin/nasm","usr/bin/iasl","usr/bin/gcc-13","usr/bin/bwrap"):
     if not os.path.exists(os.path.join(stage,"root",t)): fail("E_STAGED_TOOL_MISSING", t)
 
+# 6b) batch1r3 A1 exec bits: every git-tracked script under provisioning/p3 must be mode
+# 100755 and pass test -x (covers every transitively invoked ./x, ../x, "$HERE/x" form)
+import subprocess as _sp
+p3_root=os.path.normpath(os.path.join(here,".."))
+ls=_sp.run(["git","-C",repo_root,"ls-files","-s","docs/verified-architecture-phase2-v3/provisioning/p3"],
+           capture_output=True,text=True)
+if ls.returncode!=0: fail("E_GIT_LSFILES", ls.stderr[:200])
+else:
+    for line in ls.stdout.splitlines():
+        parts=line.split(None,3)
+        if len(parts)<4: continue
+        mode,path=parts[0],parts[3]
+        if path.endswith((".sh",".py")):
+            if mode!="100755": fail("E_EXEC_BIT", path+" mode="+mode)
+            fp=os.path.join(repo_root,path)
+            if not os.access(fp,os.X_OK): fail("E_EXEC_BIT", path+" not -x")
+
+# 6c) batch1r3 C1: no ceremony state in the committed tree
+for stale in ("build-output","disks","prep"):
+    if os.path.exists(os.path.join(here,stale)): fail("E_STALE_STATE_COMMITTED", stale)
+
+# 6d) batch1r3 B1: no direct staged-root execs outside make-shims.sh (fixture-generate.sh is
+# the allow-listed known offline limitation, B1/R3; bwrap-argv.sh carries $RT only as bwrap
+# bind ARGUMENTS, never as a command word)
+import re as _re2
+EXEC_RE=_re2.compile(r'(?:^|[|;&(]\s*|&&\s*|\|\|\s*)"\$(?:RT|SB|STAGE)/', _re2.M)
+for root,_,files in os.walk(p3_root):
+    for f in files:
+        if not f.endswith(".sh"): continue
+        if f in ("make-shims.sh","fixture-generate.sh"): continue
+        p=os.path.join(root,f)
+        for m in EXEC_RE.finditer(open(p,errors="replace").read()):
+            fail("E_DIRECT_STAGED_EXEC", p)
+
+# 6e) batch1r3 D1: the shared bwrap argv helper is the ONLY bwrap invocation in the build
+# script and preflight, and the preflight executes the exact canonical argv against a
+# temporary realwork dir with `-- true`
+for fn in ("build-ovmf-debug.sh",):
+    text=open(os.path.join(here,fn),errors="replace").read()
+    if "bwrap-argv.sh" not in text: fail("E_BWRAP_HELPER_MISSING", fn)
+    for ln,line in enumerate(text.splitlines(),1):
+        t=line.strip()
+        if "bwrap" not in line or t.startswith("#"): continue
+        if "bwrap-argv.sh" in line or t.startswith("BWRAP=") or "$BWRAP" in line: continue
+        fail("E_BWRAP_DIRECT", fn+":%d"%ln)
+_tmp=None
+try:
+    # the launcher must be the staged-loader SHIM, exactly as build-ovmf-debug.sh invokes it
+    # (the raw staged binary cannot run on the host loader), so the argv is truly identical
+    _sp.run([os.path.join(here,"make-shims.sh"),stage,os.path.join(stage,"shims")],
+            capture_output=True,text=True,check=True)
+    _tmp=_sp.check_output(["mktemp","-d","/tmp/NON_CERTIFYING_REHEARSAL-preflight-realwork.XXXXXX"],text=True).strip()
+    r=_sp.run([os.path.join(here,"bwrap-argv.sh"),"canonical",
+               os.path.join(stage,"shims","bwrap"),_tmp,"--","true"],
+              capture_output=True,text=True)
+    if r.returncode!=0: fail("E_BWRAP_ARGV_MISMATCH",(r.stderr or r.stdout)[:200])
+except Exception as e:
+    fail("E_BWRAP_ARGV_MISMATCH",str(e)[:200])
+finally:
+    if _tmp: _sp.run(["rm","-rf",_tmp])
+
+# 6f) batch1r3 C7: no upload path may be a prefix of the enrollment prep dir
+prep_abs=os.path.join(here,"prep")
+for fn in ("NON_CERTIFYING_REHEARSAL-workflow.yml","OVMF_CI_SECURE_BOOT_UKI-CERTIFICATION-workflow.yml"):
+    wtext=open(os.path.join(wf_dir,fn),errors="replace").read()
+    for m in _re.finditer(r"path:\s*(\S+)", wtext):
+        up=m.group(1).replace("$PREFIX","NON_CERTIFYING_REHEARSAL").replace("${{ env.PREFIX }}","NON_CERTIFYING_REHEARSAL")
+        if up.startswith("/") and (prep_abs.startswith(up) or up.startswith(prep_abs)):
+            fail("E_UPLOAD_PREFIX_PREP", fn+" "+up)
+
+# 6g) batch1r3 D7: platform.lock.json must carry ONE well-formed snapshot_ts, and
+# stage-platform.sh must build snapshot URLs from exactly that field and nothing else
+lock_ts=lock.get("snapshot_ts")
+if not lock_ts or not _re.fullmatch(r"\d{8}T\d{6}Z", lock_ts or ""):
+    fail("E_SNAPSHOT_TS", repr(lock_ts))
+_sp_text=open(os.path.join(here,"stage-platform.sh"),errors="replace").read()
+if "snapshot.ubuntu.com" not in _sp_text:
+    fail("E_SNAPSHOT_TS","stage-platform.sh has no snapshot fallback")
+for m in _re.finditer(r"snapshot\.ubuntu\.com/ubuntu/([^/\s\"\']+)", _sp_text):
+    if m.group(1) not in ("%s","$SNAPSHOT_TS","${SNAPSHOT_TS}"):
+        fail("E_SNAPSHOT_TS","hardcoded snapshot base "+m.group(1))
+if m is not None and m.group(1)=="%s" and "lock.get('snapshot_ts')" not in _sp_text and 'lock.get("snapshot_ts")' not in _sp_text:
+    fail("E_SNAPSHOT_TS","snapshot URL not built from the lock field")
+
+# 6h) batch1r3 addendum2 (2c): python imports are stdlib-only, checked against an explicit
+# allow-list, over every committed .py file AND every python heredoc body in committed .sh
+import re as _re3
+PY_ALLOW={"collections","datetime","glob","hashlib","json","lzma","os","re",
+          "shutil","signal","socket","struct","subprocess","sys","time","urllib"}
+def _py_mods(text):
+    mods=set()
+    for ln in text.splitlines():
+        s=ln.strip()
+        m=_re3.match(r"import\s+([A-Za-z0-9_.,\s]+)",s)
+        if m:
+            for part in m.group(1).split(","):
+                nm=part.strip().split(" as ")[0].strip()
+                if _re3.fullmatch(r"[A-Za-z0-9_.]+",nm or ""): mods.add(nm.split(".")[0])
+            continue
+        m=_re3.match(r"from\s+([A-Za-z0-9_.]+)\s+import\s+",s)
+        if m: mods.add(m.group(1).split(".")[0])
+    return mods
+_py_files=[os.path.join(here,f) for f in sorted(os.listdir(here)) if f.endswith(".py")]
+_py_files+=[os.path.join(p3_root,f) for f in sorted(os.listdir(p3_root)) if f.endswith(".py")]
+for _p in _py_files:
+    _bad=_py_mods(open(_p,errors="replace").read())-PY_ALLOW
+    if _bad: fail("E_PYTHON_IMPORTS",_p+" "+",".join(sorted(_bad)))
+_sh_files=[os.path.join(here,f) for f in sorted(os.listdir(here)) if f.endswith(".sh")]
+_sh_files.append(os.path.join(p3_root,"build-esp-image.sh"))
+for _p in _sh_files:
+    if not os.path.exists(_p): continue
+    _on=False; _body=[]
+    for _ln in open(_p,errors="replace").read().splitlines()+["PY"]:
+        if _re3.search(r"<<\s*['\"]?PY",_ln): _on=True; _body=[]; continue
+        if _on and _ln in ("PY","PYEOF"):
+            _bad=_py_mods("\n".join(_body))-PY_ALLOW
+            if _bad: fail("E_PYTHON_IMPORTS",_p+" heredoc "+",".join(sorted(_bad)))
+            _on=False; continue
+        if _on: _body.append(_ln)
+
+# 6i) batch1r3 addendum2 (2c): no venv/setup-python/pip provisioning in the ceremony workflows
+for fn in ("NON_CERTIFYING_REHEARSAL-workflow.yml","OVMF_CI_SECURE_BOOT_UKI-CERTIFICATION-workflow.yml"):
+    _wt=open(os.path.join(wf_dir,fn),errors="replace").read()
+    for _pat in ("setup-python","pip install","pip3 install","-m venv","virtualenv"):
+        if _pat in _wt: fail("E_PYTHON_FORBIDDEN_PROVISIONING",fn+" "+_pat)
+
 # 7) KVM requirement is declarative here; runtime fail-closed check lives in the workflow
 report={"schema":"NON_CERTIFYING_REHEARSAL-preflight/v1","errors":E,
         "result":"PASS" if not E else "FAIL"}

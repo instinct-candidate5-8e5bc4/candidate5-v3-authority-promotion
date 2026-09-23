@@ -36,8 +36,24 @@ if mode not in ("sole", "widened", "sole-fresh", "db2"):
     fail("E_PRED_MODE", mode)
 
 # --- ENROLL.TXT predicate ---
+# G3/T5 F5: the app writes UTF-16LE (CHAR16, no BOM guaranteed). Decode explicitly,
+# strip a BOM if present, and fail closed (E_ENROLL_DECODE) on any decode error.
+_raw = open(enroll_txt, "rb").read()
+if _raw.startswith(b"\xff\xfe"):
+    _raw = _raw[2:]
+try:
+    _text = _raw.decode("utf-16-le", errors="strict")
+except UnicodeDecodeError as _e:
+    fail("E_ENROLL_DECODE", str(_e))
+    _text = None
 rec = {}
-for line in open(enroll_txt, errors="replace").read().splitlines():
+if _text is None:
+    report = {"schema": "NON_CERTIFYING_REHEARSAL-enroll-predicate/v1", "mode": mode,
+          "enrolled_fd_sha256": sha_f(fd),
+              "widened": widened, "errors": E, "result": "FAIL"}
+    print(json.dumps(report, indent=1, sort_keys=True))
+    sys.exit(92)
+for line in _text.splitlines():
     if "=" in line:
         k, v = line.split("=", 1)
         rec[k] = v

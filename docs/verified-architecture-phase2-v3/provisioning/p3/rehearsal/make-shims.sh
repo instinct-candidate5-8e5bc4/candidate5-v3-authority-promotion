@@ -1,7 +1,7 @@
 #!/bin/bash
 # NON_CERTIFYING_REHEARSAL tool shims: wrapper scripts that run staged binaries through the
-# staged loader, so staged tools work regardless of the host glibc (local jammy sandbox or
-# CI noble runner). usage: make-shims.sh <stage_dir> <shim_dir>
+# staged loader, so staged noble tools run under their own loader/glibc on ANY host
+# (local sandbox or CI ubuntu-22.04 jammy runner alike). usage: make-shims.sh <stage_dir> <shim_dir>
 set -euo pipefail
 STAGE=${1:?}; SHIMS=${2:?}
 RT="$STAGE/root"
@@ -17,13 +17,30 @@ wrap() { # name, relpath, extra-args...
     printf '"$@"\n'; } > "$SHIMS/$name"
   chmod +x "$SHIMS/$name"
 }
-for t in as ar ranlib nm objcopy objdump ld ld.bfd cpp make nasm iasl sbvarsign sbsign sbverify openssl mkfs.vfat mkfs.fat truncate bwrap; do
+for t in as ar ranlib nm objcopy objdump ld ld.bfd cpp make nasm iasl sbsign sbverify mkfs.vfat mkfs.fat truncate bwrap; do
   for d in usr/bin usr/sbin sbin; do
     [ -f "$RT/$d/$t" ] && { wrap "$t" "$d/$t"; break; }
   done
 done
 [ -f "$RT/sbin/sgdisk" ] && wrap sgdisk sbin/sgdisk
-[ -f "$RT/usr/bin/qemu-system-x86_64" ] && wrap qemu-system-x86_64 usr/bin/qemu-system-x86_64
+# B2: openssl and sbvarsign run with the STAGED ssl config + modules (never host /usr/lib/ssl)
+wrap_ssl() { # name, relpath
+  local name=$1 rel=$2
+  [ -f "$RT/$rel" ] || return 0
+  { printf '#!/bin/sh\nexport OPENSSL_CONF="%s/usr/lib/ssl/openssl.cnf"\nexport OPENSSL_MODULES="%s/usr/lib/x86_64-linux-gnu/ossl-modules"\nexec "%s" --library-path "%s" --argv0 "%s" "%s" "$@"\n' \
+      "$RT" "$RT" "$LOADER" "$LIBPATH" "$name" "$RT/$rel"; } > "$SHIMS/$name"
+  chmod +x "$SHIMS/$name"
+}
+wrap_ssl openssl usr/bin/openssl
+wrap_ssl sbvarsign usr/bin/sbvarsign
+# A3: the qemu shim itself carries the staged ROM/module resolution (sudo resets the
+# environment, so this must live inside the shim): QEMU_MODULE_DIR for staged modules and
+# -L for the staged qemu + seabios share dirs (no ipxe deb in the lock; do NOT add -vga none)
+if [ -f "$RT/usr/bin/qemu-system-x86_64" ]; then
+  { printf '#!/bin/sh\nexport QEMU_MODULE_DIR="%s/usr/lib/x86_64-linux-gnu/qemu"\nexec "%s" --library-path "%s" --argv0 qemu-system-x86_64 "%s/usr/bin/qemu-system-x86_64" -L "%s/usr/share/qemu" -L "%s/usr/share/seabios" "$@"\n' \
+      "$RT" "$LOADER" "$LIBPATH" "$RT" "$RT" "$RT"; } > "$SHIMS/qemu-system-x86_64"
+  chmod +x "$SHIMS/qemu-system-x86_64"
+fi
 # cc1/lto-wrapper live in libexec on noble; wrap them so gcc's execvp goes through the loader
 for t in cc1 lto-wrapper; do
   [ -f "$RT/usr/libexec/gcc/x86_64-linux-gnu/13/$t" ] && wrap "$t" "usr/libexec/gcc/x86_64-linux-gnu/13/$t"
@@ -45,4 +62,13 @@ fi
 [ -f "$RT/usr/bin/gcc-13" ] && wrap gcc-13 usr/bin/gcc-13 -B"$SHIMS/" -B"$GCCDIR/"
 ln -sf gcc-13 "$SHIMS/gcc"
 ln -sf gcc-13 "$SHIMS/cc"
+# B5: idempotence assert - regenerate into a scratch tree and require an identical tree
+if [ "${MAKE_SHIMS_VERIFY:-}" != 1 ]; then
+  TMPV=$(mktemp -d)
+  MAKE_SHIMS_VERIFY=1 "$0" "$STAGE" "$TMPV" >/dev/null
+  # shim content embeds the shim dir path (gcc -B); normalize the scratch path before diffing
+  ( cd "$TMPV" && find . -type f -print0 | xargs -0 -r sed -i "s|$TMPV|$SHIMS|g" )
+  diff -r "$SHIMS" "$TMPV" >/dev/null || { echo "E_SHIM_NONIDEMPOTENT" >&2; diff -r "$SHIMS" "$TMPV" >&2; rm -rf "$TMPV"; exit 2; }
+  rm -rf "$TMPV"
+fi
 echo "shims: $(ls "$SHIMS" | tr '\n' ' ')"

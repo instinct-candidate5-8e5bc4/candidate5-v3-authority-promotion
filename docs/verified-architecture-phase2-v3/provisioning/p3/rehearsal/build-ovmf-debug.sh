@@ -8,6 +8,8 @@
 # verifier); CANON_REALWORK=p = real dir bound to /build (default: dirname(OUTA)/ovmf-work-real).
 set -euo pipefail
 STAGE="$1"; OUTA="$2"; OUTB="${3:-}"
+# B4: no compiler/linker environment may leak into BaseTools or the firmware build
+unset LD_LIBRARY_PATH GCC_EXEC_PREFIX COMPILER_PATH CPATH LIBRARY_PATH
 # Reviewer condition 1: the build runs at the canonical in-container path /build, never a
 # host/workspace/user path. Locally the canonical path is provided by a user-namespace bind
 # (bwrap) of a real scratch dir; in CI the runner provides the container path directly.
@@ -23,7 +25,7 @@ if [ "${CANON_MODE:-}" != hostile ] && [ "${IN_CANON_NS:-}" != 1 ]; then
   "$(dirname "$0")/make-shims.sh" "$STAGE" "$STAGE/shims" >/dev/null
   BWRAP="$STAGE/shims/bwrap"
   [ -x "$BWRAP" ] || { echo "E_NO_STAGED_BWRAP $BWRAP"; exit 91; }
-  IN_CANON_NS=1 CANON_REALWORK="$REALWORK"     exec "$BWRAP" --unshare-net --ro-bind /usr /usr --symlink usr/bin /bin --symlink usr/sbin /sbin       --symlink usr/lib /lib --symlink usr/lib64 /lib64 --ro-bind /etc /etc       --bind /tmp /tmp --bind /home /home --bind /var /var --proc /proc --dev /dev       --dir /build --bind "$REALWORK" /build -- "$0" "$@"
+  IN_CANON_NS=1 CANON_REALWORK="$REALWORK"     exec "$(dirname "$0")/bwrap-argv.sh" canonical "$BWRAP" "$REALWORK" -- "$0" "$@"
 fi
 STAGE="$(realpath "$STAGE")"; OUTA="$(realpath "$OUTA")"; [ -z "$OUTB" ] || OUTB="$(realpath "$OUTB")"
 EDK2_COMMIT=edc6681206c1a8791981a2f911d2fb8b3d2f5768   # edk2-stable202402
@@ -64,6 +66,13 @@ build_one() {
   env -u LIBRARY_PATH PATH="$COMPAT/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" \
     CPATH="$COMPAT/include" LIBRARY_PATH="$COMPAT/lib" \
     make -C BaseTools -j"$(nproc)" >/dev/null
+  # B4: no uuid_* member may be pulled from the staged libuuid.a into any host-built
+  # BaseTools binary, and no noble-glibc marker symbol may appear (latent glibc mixing)
+  for bt in "$WORK/edk2/BaseTools/Source/C/bin/"*; do
+    [ -f "$bt" ] || continue
+    nm "$bt" 2>/dev/null | grep -q "uuid_" && { echo "E_UUID_MEMBER_LINKED $bt"; exit 50; }
+    nm -u "$bt" 2>/dev/null | grep -q "__isoc23_" && { echo "E_GLIBC_MIX_SYMBOL $bt"; exit 50; }
+  done
   # PATH must include COMPAT/bin (python) BEFORE edksetup: it probes for python
   export PATH="$SHIMS:$COMPAT/bin:$WORK/edk2/BaseTools/BinWrappers/PosixLike:$PATH"
   # edksetup parses "$@" — clear positional params or it treats our args as its options
@@ -95,6 +104,35 @@ TD
     -D SOURCE_DATE_EPOCH=$SOURCE_DATE_EPOCH > "$WORK/fw-build.log" 2>&1
   tail -5 "$WORK/fw-build.log"
   cp Build/OvmfX64/DEBUG_GCC5/FV/OVMF_CODE.fd Build/OvmfX64/DEBUG_GCC5/FV/OVMF_VARS.fd "$WORK"/
+  # B3: fail-closed dependency provenance scan: every dependency recorded by the build,
+  # absolute or resolved-relative, must live under the work tree or the staged root.
+  # Exception BY DESIGN: BaseTools are HOST tools (documented host-compat split; their host
+  # gcc/make inputs are recorded in the deterministic manifest), so .d files under
+  # edk2/BaseTools/ may additionally reference the declared host toolchain include paths.
+  # Any other host path, anywhere, fails the build.
+  WORK="$WORK" SROOT="$STAGE/root" python3 - <<'PYDEP'
+import os,sys,glob
+work=os.environ["WORK"]; sroot=os.environ["SROOT"]
+HOST_OK=("/usr/include/","/usr/local/include/","/usr/lib/gcc/")
+bad=[]
+for df in glob.glob(work+"/**/*.d",recursive=True):
+    if not os.path.isfile(df): continue
+    host_tool = df.startswith(work+"/edk2/BaseTools/")
+    dd=os.path.dirname(df)
+    txt=open(df,errors="replace").read().replace("\\\n"," ")
+    for tok in txt.split():
+        if tok.endswith(":"): continue
+        r=os.path.realpath(tok if os.path.isabs(tok) else os.path.join(dd,tok))
+        if r==work or r==sroot or r.startswith(work+"/") or r.startswith(sroot+"/"):
+            continue
+        if host_tool and any(r.startswith(p) for p in HOST_OK):
+            continue
+        bad.append(f"{df}: {tok} -> {r}")
+if bad:
+    print("E_DEP_PATH_UNPINNED")
+    print("\n".join(bad[:5]))
+    sys.exit(51)
+PYDEP
   cd /
 }
 # Canonical-path reproducibility (reviewer-accepted): GenFw embeds the absolute DLL path in
@@ -118,7 +156,7 @@ if [ "${CANON_MODE:-}" = hostile ] && [ "${IN_HOSTILE_NS:-}" != 1 ]; then
   "$(dirname "$0")/make-shims.sh" "$STAGE" "$STAGE/shims" >/dev/null
   BWRAP="$STAGE/shims/bwrap"
   [ -x "$BWRAP" ] || { echo "E_NO_STAGED_BWRAP $BWRAP"; exit 91; }
-  IN_HOSTILE_NS=1 CANON_REALWORK="$WORKFIX"     exec "$BWRAP" --unshare-net --ro-bind /usr /usr --symlink usr/bin /bin --symlink usr/sbin /sbin       --symlink usr/lib /lib --symlink usr/lib64 /lib64 --ro-bind /etc /etc       --bind /tmp /tmp --bind /home /home --bind /var /var --proc /proc --dev /dev -- "$0" "$@"
+  IN_HOSTILE_NS=1 CANON_REALWORK="$WORKFIX"     exec "$(dirname "$0")/bwrap-argv.sh" hostile "$BWRAP" - -- "$0" "$@"
 fi
 if [ "${CANON_MODE:-}" = hostile ]; then
   # deliberately different, host-flavored path: drift evidence for scan-pe-pdb-paths.py

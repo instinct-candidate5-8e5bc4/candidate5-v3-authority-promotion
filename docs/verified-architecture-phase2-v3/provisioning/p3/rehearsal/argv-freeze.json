@@ -1,6 +1,6 @@
 {
- "schema": "NON_CERTIFYING_REHEARSAL-argv-freeze/v1",
- "note": "requirement 5c: exact QEMU argv per case, frozen pre-publication. Secure pflash readonly+secure=on, q35 smm=on, -cpu Skylake-Server, -nic none, -display none, KVM accel, QMP unix socket, daemonize. Paths assume the workflow layout (OUT=/tmp/NON_CERTIFYING_REHEARSAL-out; relative ESP/firmware paths resolve from the rehearsal directory). argv_sha256 = sha256 of NUL-joined argv, identical to the harness's own per-case argv_sha256 recording.",
+ "schema": "NON_CERTIFYING_REHEARSAL-argv-freeze/v2",
+ "note": "requirement 5c + batch1r3 D1/G1: exact QEMU argv per case (harness-generated, socket = short per-case /tmp/NON_CERTIFYING_REHEARSAL-q<idx>.sock asserted <=107 bytes), plus the frozen shared bwrap namespace argv (bwrap-argv.sh is the ONLY source; $BWRAP/$REALWORK/$@ are the helper's positional parameters). argv_sha256 = sha256 of NUL-joined argv, identical to the harness per-case recording. The qemu shim adds staged -L/QEMU_MODULE_DIR INSIDE the wrapper (A3; sudo resets the environment), so they are shim-fixed, not argv-level.",
  "qemu": "/tmp/NON_CERTIFYING_REHEARSAL-stage/shims/qemu-system-x86_64",
  "cpu_model": "Skylake-Server",
  "memory_mb": 4096,
@@ -12,9 +12,96 @@
   "v3-reviewed-output",
   "v3-reviewed-evidence"
  ],
+ "qmp_sock_template": "/tmp/NON_CERTIFYING_REHEARSAL-q<case-index>.sock",
+ "qmp_sock_max_bytes": 107,
+ "bwrap_helper": "bwrap-argv.sh",
+ "bwrap_argv": {
+  "canonical": [
+   "$BWRAP",
+   "--unshare-net",
+   "--ro-bind",
+   "/usr",
+   "/usr",
+   "--symlink",
+   "usr/bin",
+   "/bin",
+   "--symlink",
+   "usr/sbin",
+   "/sbin",
+   "--symlink",
+   "usr/lib",
+   "/lib",
+   "--symlink",
+   "usr/lib64",
+   "/lib64",
+   "--ro-bind",
+   "/etc",
+   "/etc",
+   "--bind",
+   "/tmp",
+   "/tmp",
+   "--bind",
+   "/home",
+   "/home",
+   "--bind",
+   "/var",
+   "/var",
+   "--proc",
+   "/proc",
+   "--dev",
+   "/dev",
+   "--dir",
+   "/build",
+   "--bind",
+   "$REALWORK",
+   "/build",
+   "--",
+   "$@"
+  ],
+  "hostile": [
+   "$BWRAP",
+   "--unshare-net",
+   "--ro-bind",
+   "/usr",
+   "/usr",
+   "--symlink",
+   "usr/bin",
+   "/bin",
+   "--symlink",
+   "usr/sbin",
+   "/sbin",
+   "--symlink",
+   "usr/lib",
+   "/lib",
+   "--symlink",
+   "usr/lib64",
+   "/lib64",
+   "--ro-bind",
+   "/etc",
+   "/etc",
+   "--bind",
+   "/tmp",
+   "/tmp",
+   "--bind",
+   "/home",
+   "/home",
+   "--bind",
+   "/var",
+   "/var",
+   "--proc",
+   "/proc",
+   "--dev",
+   "/dev",
+   "--",
+   "$@"
+  ],
+  "canonical_sha256": "1a389f575e79ba75806312638a026d31c0c188670a6cb3538ce4e1c29f50dd47",
+  "hostile_sha256": "17b65d054b94ec7e160cf11ad8d4d2c378ff1c54c03d2c63afac4b3eae47e0aa"
+ },
  "cases": [
   {
    "id": "NON_CERTIFYING_REHEARSAL-R1-positive",
+   "qmp_sock": "/tmp/NON_CERTIFYING_REHEARSAL-q0.sock",
    "argv": [
     "/tmp/NON_CERTIFYING_REHEARSAL-stage/shims/qemu-system-x86_64",
     "-machine",
@@ -71,15 +158,16 @@
     "-device",
     "virtio-blk-pci,drive=d5,serial=v3-reviewed-evidence",
     "-qmp",
-    "unix:/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-cases/NON_CERTIFYING_REHEARSAL-R1-positive/qmp.sock,server,nowait",
+    "unix:/tmp/NON_CERTIFYING_REHEARSAL-q0.sock,server,nowait",
     "-pidfile",
     "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-cases/NON_CERTIFYING_REHEARSAL-R1-positive/qemu.pid",
     "-daemonize"
    ],
-   "argv_sha256": "f638534d69912eb2d613b6644236ff93d5143f2af1539b1c50d233f18587ffe1"
+   "argv_sha256": "cbcd8f053290fbf1e852d2ca5d44f4ea718e42ef6b7229e5c5056687f144595c"
   },
   {
    "id": "NON_CERTIFYING_REHEARSAL-R2-N1-unsigned",
+   "qmp_sock": "/tmp/NON_CERTIFYING_REHEARSAL-q1.sock",
    "argv": [
     "/tmp/NON_CERTIFYING_REHEARSAL-stage/shims/qemu-system-x86_64",
     "-machine",
@@ -136,15 +224,16 @@
     "-device",
     "virtio-blk-pci,drive=d5,serial=v3-reviewed-evidence",
     "-qmp",
-    "unix:/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-cases/NON_CERTIFYING_REHEARSAL-R2-N1-unsigned/qmp.sock,server,nowait",
+    "unix:/tmp/NON_CERTIFYING_REHEARSAL-q1.sock,server,nowait",
     "-pidfile",
     "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-cases/NON_CERTIFYING_REHEARSAL-R2-N1-unsigned/qemu.pid",
     "-daemonize"
    ],
-   "argv_sha256": "ae0e38691057738564b612e8dbe6c9501d0eb1e5fc7880bf03a96f90d7b243df"
+   "argv_sha256": "d8d83880da4f39a7bb16a833f654dca7cc887633067cdacb27daf34446d5b6ac"
   },
   {
    "id": "NON_CERTIFYING_REHEARSAL-R3-N2-wrongsig",
+   "qmp_sock": "/tmp/NON_CERTIFYING_REHEARSAL-q2.sock",
    "argv": [
     "/tmp/NON_CERTIFYING_REHEARSAL-stage/shims/qemu-system-x86_64",
     "-machine",
@@ -201,15 +290,16 @@
     "-device",
     "virtio-blk-pci,drive=d5,serial=v3-reviewed-evidence",
     "-qmp",
-    "unix:/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-cases/NON_CERTIFYING_REHEARSAL-R3-N2-wrongsig/qmp.sock,server,nowait",
+    "unix:/tmp/NON_CERTIFYING_REHEARSAL-q2.sock,server,nowait",
     "-pidfile",
     "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-cases/NON_CERTIFYING_REHEARSAL-R3-N2-wrongsig/qemu.pid",
     "-daemonize"
    ],
-   "argv_sha256": "4a2647900121005833d784b2a532ca66457d5bace04d3b8d368e4bbb488abcc8"
+   "argv_sha256": "7740061c431f5f629b0d6929271c89bae0bbc2533e7a997fdcc3b4304266590c"
   },
   {
    "id": "NON_CERTIFYING_REHEARSAL-R4-N3a-hostile-sole-db",
+   "qmp_sock": "/tmp/NON_CERTIFYING_REHEARSAL-q3.sock",
    "argv": [
     "/tmp/NON_CERTIFYING_REHEARSAL-stage/shims/qemu-system-x86_64",
     "-machine",
@@ -266,15 +356,16 @@
     "-device",
     "virtio-blk-pci,drive=d5,serial=v3-reviewed-evidence",
     "-qmp",
-    "unix:/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-cases/NON_CERTIFYING_REHEARSAL-R4-N3a-hostile-sole-db/qmp.sock,server,nowait",
+    "unix:/tmp/NON_CERTIFYING_REHEARSAL-q3.sock,server,nowait",
     "-pidfile",
     "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-cases/NON_CERTIFYING_REHEARSAL-R4-N3a-hostile-sole-db/qemu.pid",
     "-daemonize"
    ],
-   "argv_sha256": "fddad3133d84026cf42ea5495b6ab7f19351913a193ac83927d2deea86e2cf13"
+   "argv_sha256": "8598a145d072798a84ea93ebdbc3e34109498310f87a56aee1dc7e41e93bae31"
   },
   {
    "id": "NON_CERTIFYING_REHEARSAL-R5-N3b-hostile-widened-db",
+   "qmp_sock": "/tmp/NON_CERTIFYING_REHEARSAL-q4.sock",
    "argv": [
     "/tmp/NON_CERTIFYING_REHEARSAL-stage/shims/qemu-system-x86_64",
     "-machine",
@@ -331,15 +422,16 @@
     "-device",
     "virtio-blk-pci,drive=d5,serial=v3-reviewed-evidence",
     "-qmp",
-    "unix:/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-cases/NON_CERTIFYING_REHEARSAL-R5-N3b-hostile-widened-db/qmp.sock,server,nowait",
+    "unix:/tmp/NON_CERTIFYING_REHEARSAL-q4.sock,server,nowait",
     "-pidfile",
     "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-cases/NON_CERTIFYING_REHEARSAL-R5-N3b-hostile-widened-db/qemu.pid",
     "-daemonize"
    ],
-   "argv_sha256": "4ef06100d6a70605bd9b5086da907be1929bd27b9111191d57653d72387168da"
+   "argv_sha256": "9287c11a11d160a13c198123296d0c8546bd038340b43bb8c2ac6f3f2eec359b"
   },
   {
    "id": "NON_CERTIFYING_REHEARSAL-R6-N3c-hostile-fresh-sole-db",
+   "qmp_sock": "/tmp/NON_CERTIFYING_REHEARSAL-q5.sock",
    "argv": [
     "/tmp/NON_CERTIFYING_REHEARSAL-stage/shims/qemu-system-x86_64",
     "-machine",
@@ -396,15 +488,16 @@
     "-device",
     "virtio-blk-pci,drive=d5,serial=v3-reviewed-evidence",
     "-qmp",
-    "unix:/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-cases/NON_CERTIFYING_REHEARSAL-R6-N3c-hostile-fresh-sole-db/qmp.sock,server,nowait",
+    "unix:/tmp/NON_CERTIFYING_REHEARSAL-q5.sock,server,nowait",
     "-pidfile",
     "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-cases/NON_CERTIFYING_REHEARSAL-R6-N3c-hostile-fresh-sole-db/qemu.pid",
     "-daemonize"
    ],
-   "argv_sha256": "c2691c9a4aa71666a1f56abc9657fa7c3697cb90446d75c9b03c18b255153725"
+   "argv_sha256": "3a057fe9d8ece06e38d490fcb3b3dcd1f3088a83ab947c7dcfe5f73875801699"
   },
   {
    "id": "NON_CERTIFYING_REHEARSAL-R7-release-sibling-behavior-only",
+   "qmp_sock": "/tmp/NON_CERTIFYING_REHEARSAL-q6.sock",
    "argv": [
     "/tmp/NON_CERTIFYING_REHEARSAL-stage/shims/qemu-system-x86_64",
     "-machine",
@@ -461,12 +554,12 @@
     "-device",
     "virtio-blk-pci,drive=d5,serial=v3-reviewed-evidence",
     "-qmp",
-    "unix:/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-cases/NON_CERTIFYING_REHEARSAL-R7-release-sibling-behavior-only/qmp.sock,server,nowait",
+    "unix:/tmp/NON_CERTIFYING_REHEARSAL-q6.sock,server,nowait",
     "-pidfile",
     "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-cases/NON_CERTIFYING_REHEARSAL-R7-release-sibling-behavior-only/qemu.pid",
     "-daemonize"
    ],
-   "argv_sha256": "4634c38eb8c0f39332dfcb4f42094e2ba6183a60b89aab86713328294fc9a6d1"
+   "argv_sha256": "eb4d5bb4593906f65162b2e8a2012c7071454653d293121e2763eebdd73d8d82"
   }
  ]
 }

@@ -38,13 +38,21 @@ jobs:
     # unprivileged user namespaces for bwrap; ubuntu-24.04 runners restrict them via
     # AppArmor.
     runs-on: ubuntu-22.04
-    timeout-minutes: 180
+    timeout-minutes: 360
+    environment: p3-certification
     steps:
       - name: OVMF_CI_SECURE_BOOT_UKI ref+attempt fail-closed gate
+        env:
+          EV_CREATED: ${{ github.event.created }}
+          EV_FORCED: ${{ github.event.forced }}
+          EV_BEFORE: ${{ github.event.before }}
         run: |
           set -euo pipefail
           [ "${{ github.run_attempt }}" = "1" ] || { echo "E_RERUN_FORBIDDEN run_attempt=${{ github.run_attempt }}"; exit 89; }
           [ "${{ github.ref }}" = "refs/heads/p3-certification" ] || { echo "E_REF_MISMATCH ref=${{ github.ref }}"; exit 89; }
+          [ "$EV_CREATED" = "true" ] || { echo "E_PUSHED_ONCE created=$EV_CREATED"; exit 89; }
+          [ "$EV_FORCED" = "false" ] || { echo "E_PUSHED_ONCE forced=$EV_FORCED"; exit 89; }
+          [ "$EV_BEFORE" = "0000000000000000000000000000000000000000" ] || { echo "E_PUSHED_ONCE before=$EV_BEFORE"; exit 89; }
       - name: OVMF_CI_SECURE_BOOT_UKI kvm fail-closed check
         run: |
           set -euo pipefail
@@ -57,22 +65,66 @@ jobs:
           # D2 gate (reviewer ruling): every relative file/script argument used by later
           # steps must exist in the committed tree. Fixed list, fail-closed exit 88.
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
-          for f in             platform.lock.json             config.json             stage-platform.sh             make-shims.sh             preflight-check.py             build-ovmf-debug.sh             scan-pe-pdb-paths.py             build-enroll-app.sh             ../build-esp-image.sh             evidence/successor-signed.efi             run-ceremony.sh; do
+          for f in             platform.lock.json             config.json             stage-platform.sh             make-shims.sh             preflight-check.py             build-ovmf-debug.sh             scan-pe-pdb-paths.py             build-enroll-app.sh             bwrap-argv.sh             enroll-predicate-check.py             rehearsal-enroll.sh             ../build-esp-image.sh             evidence/successor-signed.efi             run-ceremony.sh; do
             [ -e "$f" ] || { echo "E_WORKFLOW_ARG_MISSING $f"; exit 88; }
           done
+      - name: OVMF_CI_SECURE_BOOT_UKI host inputs declared (B3)
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/$PREFIX-out
+          : > /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-host-inputs.txt
+          for t in gcc make sha256sum; do
+            p=$(command -v "$t")
+            v=$("$t" --version 2>&1 | head -1 || true)
+            h=$(sha256sum "$p" | cut -d' ' -f1)
+            printf 'host-input %s %s %s %s\n' "$t" "$p" "$h" "$v" >> /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-host-inputs.txt
+          done
+          # python declared host input (batch1r3 addendum2 condition 2a): full interpreter identity
+          pp=$(command -v python3)
+          rp=$(realpath "$pp")
+          case "$rp" in /usr/bin/*) ;; *) echo "E_PYTHON_HOST_PATH $rp"; exit 51;; esac
+          [ -z "${VIRTUAL_ENV:-}" ] || { echo "E_PYTHON_VENV $VIRTUAL_ENV"; exit 51; }
+          python3 - "$pp" "$rp" >> /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-host-inputs.txt <<'PYEOF'
+          import sys, os, hashlib
+          pp, rp = sys.argv[1], sys.argv[2]
+          print("host-python path=" + pp)
+          print("host-python realpath=" + rp)
+          print("host-python realpath_sha256=" + hashlib.sha256(open(rp, "rb").read()).hexdigest())
+          print("host-python version=" + repr(sys.version))
+          print("host-python flags=" + repr(sys.flags))
+          print("host-python pythonhashseed=" + os.environ.get("PYTHONHASHSEED", "<unset>"))
+          PYEOF
+          cat /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-host-inputs.txt
       - name: OVMF_CI_SECURE_BOOT_UKI platform staging (only network phase)
         timeout-minutes: 20
         run: |
           set -euo pipefail
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
           ./stage-platform.sh platform.lock.json /tmp/$PREFIX-stage
+          # addendum2 condition 2: fetch the four lock-recorded index snapshots for the
+          # byte-for-byte lockgen regeneration gate (inside the only network phase)
+          mkdir -p /tmp/$PREFIX-lockgen-indices
+          python3 - platform.lock.json "$PREFIX" <<'PYEOF'
+          import json, hashlib, urllib.request, sys
+          lock = json.load(open("platform.lock.json"))
+          for name, ent in sorted(lock["indices"].items()):
+              data = urllib.request.urlopen(ent["url"], timeout=60).read()
+              got = hashlib.sha256(data).hexdigest()
+              if got != ent["sha256"]:
+                  print("E_LOCKGEN_INDEX_MISMATCH", name, got)
+                  raise SystemExit(52)
+              open("/tmp/" + sys.argv[2] + "-lockgen-indices/" + name + ".xz", "wb").write(data)
+              print("index", name, len(data), "bytes", got)
+          PYEOF
       - name: OVMF_CI_SECURE_BOOT_UKI userns/bwrap preflight (staged, lock-verified bwrap)
         run: |
           set -euo pipefail
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
           ./make-shims.sh /tmp/$PREFIX-stage /tmp/$PREFIX-stage/shims >/dev/null
+          REALWORK=$(mktemp -d /tmp/$PREFIX-preflight-realwork.XXXXXX)
           rc=0
-          out=$(/tmp/$PREFIX-stage/shims/bwrap --ro-bind /usr /usr --symlink usr/bin /bin --symlink usr/sbin /sbin --symlink usr/lib /lib --symlink usr/lib64 /lib64 --dir /build --bind /tmp /build -- true 2>&1) || rc=$?
+          out=$(./bwrap-argv.sh canonical /tmp/$PREFIX-stage/shims/bwrap "$REALWORK" -- true 2>&1) || rc=$?
+          rm -rf "$REALWORK"
           if [ "$rc" -ne 0 ]; then
             printf '%s\n' "$out"
             if printf '%s\n' "$out" | grep -qiE 'create new namespace|creating new namespace|setting up [ug]id map|user namespace'; then
@@ -82,12 +134,23 @@ jobs:
             echo "E_PREFLIGHT_NS_EXEC: staged bwrap namespace test failed (rc=$rc)"
             exit 91
           fi
+      - name: OVMF_CI_SECURE_BOOT_UKI lockgen byte-for-byte regeneration (addendum2 condition 2)
+        run: |
+          set -euo pipefail
+          cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+          rm -rf /tmp/$PREFIX-lockgen && mkdir -p /tmp/$PREFIX-lockgen
+          cp platform-lockgen.py /tmp/$PREFIX-lockgen/
+          cp /tmp/$PREFIX-lockgen-indices/noble-main.xz /tmp/$PREFIX-lockgen-indices/noble-updates-main.xz /tmp/$PREFIX-lockgen-indices/noble-universe.xz /tmp/$PREFIX-lockgen-indices/noble-updates-universe.xz /tmp/$PREFIX-lockgen/
+          (cd /tmp/$PREFIX-lockgen && python3 platform-lockgen.py)
+          cmp /tmp/$PREFIX-lockgen/platform.lock.json platform.lock.json || { echo "E_LOCKGEN_NONDET"; exit 52; }
+          echo "committed lockgen regenerates the committed lock byte-for-byte"
       - name: OVMF_CI_SECURE_BOOT_UKI preflight static conformance
         run: |
           set -euo pipefail
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
           python3 preflight-check.py config.json /tmp/$PREFIX-stage
       - name: OVMF_CI_SECURE_BOOT_UKI reproducible OVMF DEBUG dual build + accepted-firmware pins
+        timeout-minutes: 150
         run: |
           set -euo pipefail
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
@@ -95,9 +158,8 @@ jobs:
           cmp /tmp/$PREFIX-ovmf-a/OVMF_CODE.fd /tmp/$PREFIX-ovmf-b/OVMF_CODE.fd
           cmp /tmp/$PREFIX-ovmf-a/OVMF_VARS.fd /tmp/$PREFIX-ovmf-b/OVMF_VARS.fd
           echo "dual OVMF build byte-identical (canonical path /build)"
-          # condition 5 verifier over the canonical FD (raw-carve backstop; the full-tree
-          # module parse runs in the env2 job whose Build tree is preserved)
-          python3 scan-pe-pdb-paths.py /tmp/$PREFIX-ovmf-a/OVMF_CODE.fd /build/
+          # batch1r3 C6: the runner-1 FD raw scan is REMOVED (non-evidentiary); the
+          # module-level condition-5 parse runs in env2 over the preserved Build tree.
           # hard gates: the accepted firmware is exactly these bytes (hash AND size)
           HC=$(sha256sum /tmp/$PREFIX-ovmf-a/OVMF_CODE.fd | cut -d' ' -f1)
           [ "$HC" = "fc150336fce10eb5508fa440cdf7300622c8c3ac71f2fbe10a0731422b9cef24" ] || { echo "E_CODE_PIN_MISMATCH $HC"; exit 95; }
@@ -109,6 +171,7 @@ jobs:
             > /tmp/$PREFIX-fw-hashes.txt
           cat /tmp/$PREFIX-fw-hashes.txt
       - name: OVMF_CI_SECURE_BOOT_UKI hostile-path drift demonstration (condition 5)
+        timeout-minutes: 90
         run: |
           set -euo pipefail
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
@@ -131,30 +194,72 @@ jobs:
           [ "$HH" != "fc150336fce10eb5508fa440cdf7300622c8c3ac71f2fbe10a0731422b9cef24" ] || { echo "E_HOSTILE_NO_DRIFT: hostile build equals the accepted firmware"; exit 92; }
           echo "hostile-path build REJECTED: all $MODS modules carry the hostile path (exit exactly 43); drift confirmed $HH"
           sha256sum /tmp/$PREFIX-hostile-out/OVMF_CODE.fd >> /tmp/$PREFIX-fw-hashes.txt
+      - name: OVMF_CI_SECURE_BOOT_UKI network-cut canary (must fail)
+        run: |
+          set -euo pipefail
+          if sudo unshare -n curl -fsS --max-time 10 https://archive.ubuntu.com/ >/dev/null 2>&1; then
+            echo "E_NET_CANARY_LEAK: network reachable inside unshare -n"; exit 96
+          fi
+          echo "network-cut canary failed as required"
+      - name: OVMF_CI_SECURE_BOOT_UKI enrollment app + ESP dual builds (network-enforced-off)
+        timeout-minutes: 60
+        run: |
+          set -euo pipefail
+          cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+          sudo unshare -n ./build-enroll-app.sh /tmp/$PREFIX-stage /tmp/$PREFIX-app-a /tmp/$PREFIX-app-b
+          cmp /tmp/$PREFIX-app-a/enroll-app.efi /tmp/$PREFIX-app-b/enroll-app.efi
+          sha256sum /tmp/$PREFIX-app-a/enroll-app.efi >> /tmp/$PREFIX-fw-hashes.txt
+          # batch1r3 C1: the ESP step runs with the staged-loader shims on PATH
+          export PATH="/tmp/$PREFIX-stage/shims:$PATH"
+          sudo unshare -n env PATH="$PATH" ../build-esp-image.sh evidence/successor-signed.efi /tmp/$PREFIX-esp-a
+          sudo unshare -n env PATH="$PATH" ../build-esp-image.sh evidence/successor-signed.efi /tmp/$PREFIX-esp-b
+          [ "$(sha256sum /tmp/$PREFIX-esp-a/c5-root-admitter-uki-v3-esp.raw | cut -d' ' -f1)" = \
+            "2bfa621238890890765c9636f99dabfb46233bfa626afb580ce33e65858019c9" ]
+          cmp /tmp/$PREFIX-esp-a/c5-root-admitter-uki-v3-esp.raw /tmp/$PREFIX-esp-b/c5-root-admitter-uki-v3-esp.raw
       - name: OVMF_CI_SECURE_BOOT_UKI firmware hash upload (env2 comparison input)
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
         with:
           name: OVMF_CI_SECURE_BOOT_UKI-fw-hashes
           path: /tmp/NON_CERTIFYING_REHEARSAL-fw-hashes.txt
           retention-days: 90
-      - name: OVMF_CI_SECURE_BOOT_UKI enrollment app + ESP dual builds
+          if-no-files-found: error
+      - name: OVMF_CI_SECURE_BOOT_UKI qemu staged-ROM gates (A3)
         run: |
           set -euo pipefail
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
-          ./build-enroll-app.sh /tmp/$PREFIX-stage /tmp/$PREFIX-app-a /tmp/$PREFIX-app-b
-          cmp /tmp/$PREFIX-app-a/enroll-app.efi /tmp/$PREFIX-app-b/enroll-app.efi
-          ../build-esp-image.sh evidence/successor-signed.efi /tmp/$PREFIX-esp-a
-          ../build-esp-image.sh evidence/successor-signed.efi /tmp/$PREFIX-esp-b
-          [ "$(sha256sum /tmp/$PREFIX-esp-a/c5-root-admitter-uki-v3-esp.raw | cut -d' ' -f1)" = \
-            "2bfa621238890890765c9636f99dabfb46233bfa626afb580ce33e65858019c9" ]
-          cmp /tmp/$PREFIX-esp-a/c5-root-admitter-uki-v3-esp.raw /tmp/$PREFIX-esp-b/c5-root-admitter-uki-v3-esp.raw
+          LOUT=$(/tmp/$PREFIX-stage/shims/qemu-system-x86_64 -L help 2>&1)
+          printf '%s\n' "$LOUT"
+          BAD=$(printf '%s\n' "$LOUT" | awk '{print $NF}' | grep -v "^/tmp/$PREFIX-stage/root/" || true)
+          [ -z "$BAD" ] || { echo "E_QEMU_L_HOST $BAD"; exit 97; }
+          printf '{"execute":"qmp_capabilities"}\n{"execute":"quit"}\n' | \
+            /tmp/$PREFIX-stage/shims/bwrap --ro-bind / / \
+              --tmpfs /usr/share/qemu --tmpfs /usr/share/seabios --tmpfs /usr/share/ipxe \
+              --dev-bind /dev/kvm /dev/kvm \
+              /tmp/$PREFIX-stage/shims/qemu-system-x86_64 -machine q35,smm=on -accel kvm \
+                -S -display none -qmp stdio > /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-qemu-smoke.log 2>&1 \
+            || { echo "E_QEMU_SMOKE"; cat /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-qemu-smoke.log; exit 97; }
+          echo "masked-host qemu startup smoke OK (staged ROMs only, no case booted)"
       - name: OVMF_CI_SECURE_BOOT_UKI ceremony (network-enforced-off, tee'd log)
+        timeout-minutes: 120
         run: |
           set -euo pipefail
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
           mkdir -p /tmp/$PREFIX-out
+          date +%s >> /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-step-stamps.txt
           sudo unshare -n ./run-ceremony.sh config.json /tmp/$PREFIX-stage /tmp/$PREFIX-out 2>&1 \
             | tee /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-ceremony.log
+      - name: OVMF_CI_SECURE_BOOT_UKI ceremony interpreter cross-check (addendum2 condition 2b)
+        run: |
+          set -euo pipefail
+          grep '^host-python ' /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-host-inputs.txt > /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-expected-ceremony-python.txt
+          diff /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-expected-ceremony-python.txt /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-ceremony-python.txt || { echo "E_CEREMONY_PYTHON_DRIFT"; exit 51; }
+          echo "ceremony interpreter identical to the job record"
+      - name: OVMF_CI_SECURE_BOOT_UKI top-level evidence prefix guard (D3)
+        run: |
+          set -euo pipefail
+          if [ -n "$(find /tmp/$PREFIX-out -mindepth 1 -maxdepth 1 ! -name 'NON_CERTIFYING_REHEARSAL*' -print -quit)" ]; then
+            echo "E_UNPREFIXED_TOPLEVEL_EVIDENCE"; exit 94
+          fi
       - name: OVMF_CI_SECURE_BOOT_UKI evidence upload (ephemeral CI artifact only)
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
@@ -164,6 +269,7 @@ jobs:
             /tmp/NON_CERTIFYING_REHEARSAL-out/
             /tmp/NON_CERTIFYING_REHEARSAL-fw-hashes.txt
           retention-days: 90
+          if-no-files-found: error
 
   # Reviewer condition 4: reproduce once in a SECOND FRESH ENVIRONMENT (separate runner)
   # at the same canonical in-container path /build with identical pinned inputs. The FD
@@ -171,14 +277,21 @@ jobs:
   # CodeView PDB path is parsed: all absolute paths must carry the /build/ prefix.
   certification-env2:
     runs-on: ubuntu-22.04
-    timeout-minutes: 120
+    timeout-minutes: 360
     needs: certification
     steps:
       - name: OVMF_CI_SECURE_BOOT_UKI ref+attempt fail-closed gate
+        env:
+          EV_CREATED: ${{ github.event.created }}
+          EV_FORCED: ${{ github.event.forced }}
+          EV_BEFORE: ${{ github.event.before }}
         run: |
           set -euo pipefail
           [ "${{ github.run_attempt }}" = "1" ] || { echo "E_RERUN_FORBIDDEN run_attempt=${{ github.run_attempt }}"; exit 89; }
           [ "${{ github.ref }}" = "refs/heads/p3-certification" ] || { echo "E_REF_MISMATCH ref=${{ github.ref }}"; exit 89; }
+          [ "$EV_CREATED" = "true" ] || { echo "E_PUSHED_ONCE created=$EV_CREATED"; exit 89; }
+          [ "$EV_FORCED" = "false" ] || { echo "E_PUSHED_ONCE forced=$EV_FORCED"; exit 89; }
+          [ "$EV_BEFORE" = "0000000000000000000000000000000000000000" ] || { echo "E_PUSHED_ONCE before=$EV_BEFORE"; exit 89; }
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
         with: {persist-credentials: false}
       - name: workflow-argument existence gate (D2, fail-closed)
@@ -187,9 +300,36 @@ jobs:
           # D2 gate (reviewer ruling): every relative file/script argument used by later
           # steps must exist in the committed tree. Fixed list, fail-closed exit 88.
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
-          for f in             platform.lock.json             config.json             stage-platform.sh             make-shims.sh             preflight-check.py             build-ovmf-debug.sh             scan-pe-pdb-paths.py             build-enroll-app.sh             ../build-esp-image.sh             evidence/successor-signed.efi             run-ceremony.sh; do
+          for f in             platform.lock.json             config.json             stage-platform.sh             make-shims.sh             preflight-check.py             build-ovmf-debug.sh             scan-pe-pdb-paths.py             build-enroll-app.sh             bwrap-argv.sh             enroll-predicate-check.py             rehearsal-enroll.sh             ../build-esp-image.sh             evidence/successor-signed.efi             run-ceremony.sh; do
             [ -e "$f" ] || { echo "E_WORKFLOW_ARG_MISSING $f"; exit 88; }
           done
+      - name: OVMF_CI_SECURE_BOOT_UKI env2 host inputs declared (B3)
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/$PREFIX-env2-evidence
+          : > /tmp/$PREFIX-env2-evidence/NON_CERTIFYING_REHEARSAL-env2-host-inputs.txt
+          for t in gcc make sha256sum; do
+            p=$(command -v "$t")
+            v=$("$t" --version 2>&1 | head -1 || true)
+            h=$(sha256sum "$p" | cut -d' ' -f1)
+            printf 'host-input %s %s %s %s\n' "$t" "$p" "$h" "$v" >> /tmp/$PREFIX-env2-evidence/NON_CERTIFYING_REHEARSAL-env2-host-inputs.txt
+          done
+          # python declared host input (batch1r3 addendum2 condition 2a): full interpreter identity
+          pp=$(command -v python3)
+          rp=$(realpath "$pp")
+          case "$rp" in /usr/bin/*) ;; *) echo "E_PYTHON_HOST_PATH $rp"; exit 51;; esac
+          [ -z "${VIRTUAL_ENV:-}" ] || { echo "E_PYTHON_VENV $VIRTUAL_ENV"; exit 51; }
+          python3 - "$pp" "$rp" >> /tmp/$PREFIX-env2-evidence/NON_CERTIFYING_REHEARSAL-env2-host-inputs.txt <<'PYEOF'
+          import sys, os, hashlib
+          pp, rp = sys.argv[1], sys.argv[2]
+          print("host-python path=" + pp)
+          print("host-python realpath=" + rp)
+          print("host-python realpath_sha256=" + hashlib.sha256(open(rp, "rb").read()).hexdigest())
+          print("host-python version=" + repr(sys.version))
+          print("host-python flags=" + repr(sys.flags))
+          print("host-python pythonhashseed=" + os.environ.get("PYTHONHASHSEED", "<unset>"))
+          PYEOF
+          cat /tmp/$PREFIX-env2-evidence/NON_CERTIFYING_REHEARSAL-env2-host-inputs.txt
       - name: OVMF_CI_SECURE_BOOT_UKI env2 platform staging (only network phase)
         timeout-minutes: 20
         run: |
@@ -201,8 +341,10 @@ jobs:
           set -euo pipefail
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
           ./make-shims.sh /tmp/$PREFIX-stage-env2 /tmp/$PREFIX-stage-env2/shims >/dev/null
+          REALWORK=$(mktemp -d /tmp/$PREFIX-env2-preflight-realwork.XXXXXX)
           rc=0
-          out=$(/tmp/$PREFIX-stage-env2/shims/bwrap --ro-bind /usr /usr --symlink usr/bin /bin --symlink usr/sbin /sbin --symlink usr/lib /lib --symlink usr/lib64 /lib64 --dir /build --bind /tmp /build -- true 2>&1) || rc=$?
+          out=$(./bwrap-argv.sh canonical /tmp/$PREFIX-stage-env2/shims/bwrap "$REALWORK" -- true 2>&1) || rc=$?
+          rm -rf "$REALWORK"
           if [ "$rc" -ne 0 ]; then
             printf '%s\n' "$out"
             if printf '%s\n' "$out" | grep -qiE 'create new namespace|creating new namespace|setting up [ug]id map|user namespace'; then
@@ -213,13 +355,29 @@ jobs:
             exit 91
           fi
       - name: OVMF_CI_SECURE_BOOT_UKI env2 single canonical-path reproduction
+        timeout-minutes: 150
         run: |
           set -euo pipefail
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
           CANON_REALWORK=/var/tmp/$PREFIX-env2-work CANON_SINGLE=1 \
             ./build-ovmf-debug.sh /tmp/$PREFIX-stage-env2 /tmp/$PREFIX-ovmf-env2
           # condition 5: parse EVERY module .efi PDB path in the preserved Build tree
-          python3 scan-pe-pdb-paths.py /var/tmp/$PREFIX-env2-work/work /build/
+          # (batch1r3 C6/T3 F10: scan root is exactly work/edk2/Build; module count is pinned)
+          SCAN_OUT=$(python3 scan-pe-pdb-paths.py /var/tmp/$PREFIX-env2-work/work/edk2/Build /build/ 2>&1)
+          printf '%s\n' "$SCAN_OUT"
+          MODS=$(printf '%s\n' "$SCAN_OUT" | sed -n 's/^scanned \([0-9][0-9]*\) PE files.*/\1/p')
+          [ "$MODS" = "366" ] || { echo "E_ENV2_SCAN_COUNT modules=$MODS (pinned 366)"; exit 92; }
+          printf '%s\n' "$SCAN_OUT" > /tmp/$PREFIX-env2-evidence/NON_CERTIFYING_REHEARSAL-env2-pdb-scan.txt
+      - name: OVMF_CI_SECURE_BOOT_UKI env2 enroll-app rebuild (C2)
+        timeout-minutes: 30
+        run: |
+          set -euo pipefail
+          cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+          sudo unshare -n ./build-enroll-app.sh /tmp/$PREFIX-stage-env2 /tmp/$PREFIX-app-env2-a /tmp/$PREFIX-app-env2-b
+          cmp /tmp/$PREFIX-app-env2-a/enroll-app.efi /tmp/$PREFIX-app-env2-b/enroll-app.efi
+          HA=$(sha256sum /tmp/$PREFIX-app-env2-a/enroll-app.efi | cut -d' ' -f1)
+          [ "$HA" = "540b4fa3990f998cb803160482bd50e9670a47da3d534acc3ade91364a85f3ee" ] || { echo "E_APP_PIN_MISMATCH $HA"; exit 46; }
+          sha256sum /tmp/$PREFIX-app-env2-a/enroll-app.efi > /tmp/$PREFIX-env2-evidence/NON_CERTIFYING_REHEARSAL-env2-app-hash.txt
       - name: OVMF_CI_SECURE_BOOT_UKI env2 accepted-firmware pins + runner-1 hash echo
         run: |
           set -euo pipefail
@@ -234,13 +392,35 @@ jobs:
         with:
           name: OVMF_CI_SECURE_BOOT_UKI-fw-hashes
           path: /tmp/NON_CERTIFYING_REHEARSAL-fw1
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4.3.0
+        with:
+          name: OVMF_CI_SECURE_BOOT_UKI-evidence
+          path: /tmp/NON_CERTIFYING_REHEARSAL-env1-evidence
+      - name: OVMF_CI_SECURE_BOOT_UKI env2 host-inputs cross-job diff (B3)
+        run: |
+          set -euo pipefail
+          diff /tmp/$PREFIX-env1-evidence/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-host-inputs.txt \
+               /tmp/$PREFIX-env2-evidence/NON_CERTIFYING_REHEARSAL-env2-host-inputs.txt \
+            || { echo "E_HOST_INPUTS_DRIFT"; exit 98; }
+          echo "host inputs identical across jobs"
       - name: OVMF_CI_SECURE_BOOT_UKI env2 cross-runner byte-identity gate
         run: |
           set -euo pipefail
-          H1=$(grep "OVMF_CODE.fd" /tmp/$PREFIX-fw1/$PREFIX-fw-hashes.txt | head -1 | cut -d' ' -f1)
+          H1=$(grep -- "-ovmf-a/OVMF_CODE.fd" /tmp/$PREFIX-fw1/$PREFIX-fw-hashes.txt | cut -d' ' -f1)
           H2=$(sha256sum /tmp/$PREFIX-ovmf-env2/OVMF_CODE.fd | cut -d' ' -f1)
           [ "$H1" = "$H2" ] || { echo "E_ENV2_HASH_MISMATCH $H1 $H2"; exit 93; }
-          echo "env2 reproduction byte-identical across runners at canonical /build"
+          A1=$(grep -- "-app-a/enroll-app.efi" /tmp/$PREFIX-fw1/$PREFIX-fw-hashes.txt | cut -d' ' -f1)
+          A2=$(sha256sum /tmp/$PREFIX-app-env2-a/enroll-app.efi | cut -d' ' -f1)
+          [ "$A1" = "$A2" ] || { echo "E_ENV2_APP_MISMATCH $A1 $A2"; exit 93; }
+          echo "env2 reproduction byte-identical across runners at canonical /build (firmware + enroll app)"
+      - name: OVMF_CI_SECURE_BOOT_UKI env2 evidence upload (ephemeral CI artifact only)
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: OVMF_CI_SECURE_BOOT_UKI-env2-evidence
+          path: /tmp/NON_CERTIFYING_REHEARSAL-env2-evidence/
+          retention-days: 90
+          if-no-files-found: error
 
   # Marker emission: ONLY reachable when every prior step of both jobs succeeded. The
   # marker is bound to the certified commit SHA, run id and ref on stdout AND in the
@@ -255,15 +435,30 @@ jobs:
     needs: [certification, certification-env2]
     steps:
       - name: OVMF_CI_SECURE_BOOT_UKI ref+attempt fail-closed gate
+        env:
+          EV_CREATED: ${{ github.event.created }}
+          EV_FORCED: ${{ github.event.forced }}
+          EV_BEFORE: ${{ github.event.before }}
         run: |
           set -euo pipefail
           [ "${{ github.run_attempt }}" = "1" ] || { echo "E_RERUN_FORBIDDEN run_attempt=${{ github.run_attempt }}"; exit 89; }
           [ "${{ github.ref }}" = "refs/heads/p3-certification" ] || { echo "E_REF_MISMATCH ref=${{ github.ref }}"; exit 89; }
+          [ "$EV_CREATED" = "true" ] || { echo "E_PUSHED_ONCE created=$EV_CREATED"; exit 89; }
+          [ "$EV_FORCED" = "false" ] || { echo "E_PUSHED_ONCE forced=$EV_FORCED"; exit 89; }
+          [ "$EV_BEFORE" = "0000000000000000000000000000000000000000" ] || { echo "E_PUSHED_ONCE before=$EV_BEFORE"; exit 89; }
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4.3.0
+        with:
+          name: OVMF_CI_SECURE_BOOT_UKI-evidence
+          path: /tmp/NON_CERTIFYING_REHEARSAL-ev1
       - name: OVMF_CI_SECURE_BOOT_UKI marker emission (only reached on full suite success)
         run: |
           set -euo pipefail
           mkdir -p /tmp/$PREFIX-out
-          printf '%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\nSHA=%s\nRUN_ID=%s\nREF=%s\n' \
+          # batch1r3 C8: the marker binds the ceremony evidence-manifest sha256 + workflow path
+          MANIFEST=/tmp/$PREFIX-ev1/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-manifest.json
+          [ -f "$MANIFEST" ] || { echo "E_EVIDENCE_MANIFEST_MISSING"; exit 99; }
+          MANIFEST_SHA=$(sha256sum "$MANIFEST" | cut -d' ' -f1)
+          printf '%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\nSHA=%s\nRUN_ID=%s\nREF=%s\n' \
             'OVMF_CI_SECURE_BOOT_UKI_PASS' \
             'SCOPE: QEMU/KVM + reproducible DEBUG OVMF Secure Boot certification of the accepted signed UKI 133096976ee70a8c272cbcc8c28d369bfc65d93d994cbff4174b947df00239d1 only.' \
             'EXPECTED-PASS: firmware Secure Boot accept + kernel exec + signed-init exit-98 (E_PROVIDER_NAMESPACE/E_PROVIDER_LINK_MISSING on non-Google hardware).' \
@@ -272,8 +467,10 @@ jobs:
             'NO Google firmware, vTPM, GCP-deployment or persistence claims.' \
             'Firmware: accepted canonical DEBUG OVMF (fc150336fce10eb5508fa440cdf7300622c8c3ac71f2fbe10a0731422b9cef24).' \
             'Environment: GitHub-hosted ubuntu-22.04 standard runner, KVM, attempt 1, ref p3-certification.' \
+            'WORKFLOW=.github/workflows/OVMF_CI_SECURE_BOOT_UKI-CERTIFICATION-workflow.yml' \
+            "EVIDENCE_MANIFEST_SHA256=$MANIFEST_SHA" \
             "${{ github.sha }}" "${{ github.run_id }}" "${{ github.ref }}"
-          printf '%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\nSHA=%s\nRUN_ID=%s\nREF=%s\n' \
+          printf '%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\nSHA=%s\nRUN_ID=%s\nREF=%s\n' \
             'OVMF_CI_SECURE_BOOT_UKI_PASS' \
             'SCOPE: QEMU/KVM + reproducible DEBUG OVMF Secure Boot certification of the accepted signed UKI 133096976ee70a8c272cbcc8c28d369bfc65d93d994cbff4174b947df00239d1 only.' \
             'EXPECTED-PASS: firmware Secure Boot accept + kernel exec + signed-init exit-98 (E_PROVIDER_NAMESPACE/E_PROVIDER_LINK_MISSING on non-Google hardware).' \
@@ -282,6 +479,8 @@ jobs:
             'NO Google firmware, vTPM, GCP-deployment or persistence claims.' \
             'Firmware: accepted canonical DEBUG OVMF (fc150336fce10eb5508fa440cdf7300622c8c3ac71f2fbe10a0731422b9cef24).' \
             'Environment: GitHub-hosted ubuntu-22.04 standard runner, KVM, attempt 1, ref p3-certification.' \
+            'WORKFLOW=.github/workflows/OVMF_CI_SECURE_BOOT_UKI-CERTIFICATION-workflow.yml' \
+            "EVIDENCE_MANIFEST_SHA256=$MANIFEST_SHA" \
             "${{ github.sha }}" "${{ github.run_id }}" "${{ github.ref }}" \
             > /tmp/$PREFIX-out/OVMF_CI_SECURE_BOOT_UKI-certification-marker.txt
       - name: OVMF_CI_SECURE_BOOT_UKI marker upload (ephemeral CI artifact only)
@@ -291,3 +490,4 @@ jobs:
           name: OVMF_CI_SECURE_BOOT_UKI-marker
           path: /tmp/NON_CERTIFYING_REHEARSAL-out/OVMF_CI_SECURE_BOOT_UKI-certification-marker.txt
           retention-days: 90
+          if-no-files-found: error

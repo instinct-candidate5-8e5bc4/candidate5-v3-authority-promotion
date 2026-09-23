@@ -2,49 +2,83 @@
 # NON_CERTIFYING_REHEARSAL staging: downloads every deb in platform.lock.json, verifies
 # each SHA-256, rejects any missing/extra/substituted package, extracts into a private tree.
 # This is the ONLY network phase of the rehearsal. Usage: stage-platform.sh LOCK DEST
+# batch1r3 D7: deb download fallback archive->snapshot.ubuntu.com (lock snapshot_ts); wrong bytes
+# from any source fail immediately (E_LOCK_HASH_MISMATCH); per-deb source manifest is recorded.
 set -euo pipefail
 LOCK="$1"; DEST="$2"
 mkdir -p "$DEST/debs" "$DEST/root"
 python3 - "$LOCK" "$DEST" <<'PYEOF'
-import json, sys, urllib.request, hashlib, os
+import json, sys, urllib.request, urllib.error, hashlib, os
 lock=json.load(open(sys.argv[1])); dest=sys.argv[2]
+# batch1r3 D7 (owner-approved snapshot.ubuntu.com fallback, 2026-09-23): ONE fixed
+# snapshot_ts is frozen in the lock; the per-deb sha256/size in the lock remains the ONLY
+# trust chain. Source order per deb: archive first (60s timeout, 3 attempts); the snapshot
+# URL is tried only after the archive returns HTTP 404/410 or a network/timeout failure on
+# all 3 attempts. Wrong bytes or wrong size from ANY source fail IMMEDIATELY
+# (E_LOCK_HASH_MISMATCH exit 38, no retry, no fallback). Both sources unavailable:
+# E_LOCK_DOWNLOAD_FAILED (exit 34). The per-deb source (archive|snapshot|preexisting-cache,
+# final URL, attempts) is recorded in DEST/source-manifest.json; the source column is
+# observational, the per-deb sha256 is deterministic evidence.
+TS=lock.get('snapshot_ts')
+if not TS: print('E_SNAPSHOT_TS missing in lock', file=sys.stderr); sys.exit(37)
 pkgs=lock['packages']
-seen=set()
+seen=set(); sources=[]
+def fetch_from(url, part):
+    try:
+        with urllib.request.urlopen(url, timeout=60) as r, open(part,'wb') as f:
+            while True:
+                chunk=r.read(1<<20)
+                if not chunk: break
+                f.write(chunk)
+        return ('ok',)
+    except urllib.error.HTTPError as ex:
+        if os.path.exists(part): os.unlink(part)
+        return ('http', ex.code)
+    except Exception as ex:
+        if os.path.exists(part): os.unlink(part)
+        return ('net', str(ex))
+def verify_bytes(e, part, url):
+    if os.path.getsize(part)!=e['size']:
+        print('E_LOCK_HASH_MISMATCH %s size %d != %d (%s)'%(e['name'],os.path.getsize(part),e['size'],url), file=sys.stderr); sys.exit(38)
+    d=hashlib.sha256(open(part,'rb').read()).hexdigest()
+    if d!=e['sha256']:
+        print('E_LOCK_HASH_MISMATCH %s sha256 %s != %s (%s)'%(e['name'],d,e['sha256'],url), file=sys.stderr); sys.exit(38)
+    return d
 def fetch(e, fn):
-    # hardened download (D3 ruling): explicit 60s per-request urllib timeout; at most 3
-    # attempts, same lock-listed URL only (no mirror substitution); sha256 re-checked after
-    # EVERY attempt; every attempt logged; final failure is E_LOCK_DOWNLOAD_FAILED exit 34.
     part=fn+'.part'
-    for attempt in (1,2,3):
-        print('download attempt %d/3: %s' % (attempt, e['name']), flush=True)
-        try:
-            with urllib.request.urlopen(e['url'], timeout=60) as r, open(part,'wb') as f:
-                while True:
-                    chunk=r.read(1<<20)
-                    if not chunk: break
-                    f.write(chunk)
-        except Exception as ex:
-            print('attempt %d/3 failed: %s: %s' % (attempt, e['name'], ex), file=sys.stderr, flush=True)
-            if os.path.exists(part): os.unlink(part)
-            continue
-        d=hashlib.sha256(open(part,'rb').read()).hexdigest()
-        if d==e['sha256']:
-            print('verified %s (%d bytes)' % (e['name'], os.path.getsize(part)), flush=True)
-            return
-        print('attempt %d/3 sha256 mismatch: %s: got %s want %s' % (attempt, e['name'], d, e['sha256']), file=sys.stderr, flush=True)
-        os.unlink(part)
+    pool=e['url'].split('/ubuntu/',1)[1]
+    for source,url in (('archive',e['url']),
+                       ('snapshot','https://snapshot.ubuntu.com/ubuntu/%s/%s'%(TS,pool))):
+        last=None
+        for a in (1,2,3):
+            print('download attempt %d/3 [%s]: %s' % (a,source,e['name']), flush=True)
+            res=fetch_from(url,part)
+            if res[0]=='ok':
+                d=verify_bytes(e,part,url)
+                print('verified %s (%d bytes, %s)' % (e['name'],e['size'],source), flush=True)
+                sources.append({'name':e['name'],'source':source,'url':url,'attempts':a,'sha256':d,'size':e['size']})
+                return
+            print('attempt %d/3 [%s] failed: %s: %s' % (a,source,e['name'],res[1]), file=sys.stderr, flush=True)
+            last=res
+        print('source unavailable [%s] for %s: %s' % (source,e['name'],last), file=sys.stderr, flush=True)
     print('E_LOCK_DOWNLOAD_FAILED '+e['name'], file=sys.stderr)
     sys.exit(34)
 for e in pkgs:
     fn=os.path.join(dest,'debs',e['url'].rsplit('/',1)[1])
     if os.path.exists(fn) and hashlib.sha256(open(fn,'rb').read()).hexdigest()==e['sha256']:
-        seen.add(fn); continue
+        seen.add(fn)
+        sources.append({'name':e['name'],'source':'preexisting-cache','url':e['url'],'attempts':0,'sha256':e['sha256'],'size':e['size']})
+        continue
     fetch(e, fn)
     os.rename(fn+'.part', fn); seen.add(fn)
 extra=[f for f in os.listdir(os.path.join(dest,'debs')) if os.path.join(dest,'debs',f) not in seen]
 if extra:
     print('E_LOCK_EXTRA_FILES '+' '.join(extra), file=sys.stderr); sys.exit(32)
-print('staged', len(seen), 'debs, all hashes verified')
+man={'schema':'NON_CERTIFYING_REHEARSAL-source-manifest/v1','snapshot_ts':TS,
+     'note':'per-deb source is observational; the per-deb sha256 is the deterministic trust chain',
+     'packages':sources}
+open(os.path.join(dest,'source-manifest.json'),'w').write(json.dumps(man,indent=1,sort_keys=True)+'\n')
+print('staged', len(seen), 'debs, all hashes verified; source manifest:', len(sources), 'entries')
 PYEOF
 for d in "$DEST"/debs/*.deb; do dpkg-deb -x "$d" "$DEST/root"; done
 # extract the pristine VARS from the ovmf deb and record it

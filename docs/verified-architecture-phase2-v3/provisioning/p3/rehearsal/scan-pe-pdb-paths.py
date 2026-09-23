@@ -77,19 +77,25 @@ def main():
     for f in sorted(files):
         for kind, p in scan_file(f):
             nentries += 1
+            # batch1r3 C6: malformed paths are REJECT, never silently skipped
             try:
-                s = p.decode()
+                s = p.decode("utf-8", "strict")
             except UnicodeDecodeError:
-                continue
+                bad.append((f, kind, "<non-utf-8-path>")); bad_modules.add(f); continue
+            if re.search(r"^[A-Za-z]:[\\/]", s) or "\\" in s:
+                bad.append((f, kind, "windows-style: "+s)); bad_modules.add(f); continue
             if not s.startswith("/"):
-                continue
+                bad.append((f, kind, "relative: "+s)); bad_modules.add(f); continue
             npaths += 1
-            if not s.startswith(CANON) or HOSTILE.search(p):
+            if not s.startswith(CANON) or HOSTILE.search(p) or ".." in s.split("/"):
                 bad.append((f, kind, s))
                 bad_modules.add(f)
     print(f"scanned {len(files)} PE files, {nentries} debug entries/carves, {npaths} absolute paths, canonical prefix {CANON!r}")
     if nentries == 0:
         print("VERDICT: SUSPICIOUS - zero debug entries found; parser or tree wrong")
+        sys.exit(45)
+    if npaths == 0 and not bad:
+        print("VERDICT: SUSPICIOUS - debug entries present but zero absolute paths")
         sys.exit(45)
     if bad:
         for f, k, s in bad[:50]:
