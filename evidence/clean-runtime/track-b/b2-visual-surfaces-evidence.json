@@ -1,0 +1,124 @@
+{
+  "evidenceId": "TRACK-B-B2-VISUAL-SURFACES-LINEAGE",
+  "phase": "B2 physical scene geometry + support surfaces (visual side)",
+  "generatedAt": "2026-09-23T18:11:13.929Z",
+  "branch": "candidate5-track-b-visual-slice",
+  "track": "B (isolated; NO merge to main, NO production connection)",
+  "set": {
+    "status": "LINEAGE_EVIDENCED",
+    "setDigest": "df03ff358879ecd99cd6751596a59376036105b3b4d8d8daa7e9e7b01e225c98",
+    "surfaceCount": 10,
+    "uncoveredPhysicalSurfaces": []
+  },
+  "gateDUnknownsResolved": [
+    "visual-physical lineage: UNKNOWN -> EVIDENCED for 10 room surfaces (floor, 3 walls, door, 5 lockers) via written per-surface lineage records bound to re-verified source bytes"
+  ],
+  "stillUnknown": [
+    "panorama-geometry lineage (panorama stays PIXEL_DIAGNOSTIC_ONLY)",
+    "final visual correctness",
+    "rotated contacts",
+    "articulation/deformation",
+    "friction/load/stability",
+    "Constraint/Entrapment/Accessibility",
+    "real posture contact regions",
+    "dynamic hazard/event contracts"
+  ],
+  "numericContract": {
+    "contractId": "ED-P2-02",
+    "linearUnit": "MICROUNIT",
+    "microunitsPerWorldUnit": 1000000,
+    "rendererConversion": "DOWNSTREAM_ONLY",
+    "rendererFloatsFeedAuthoritativeState": false
+  },
+  "boundary": {
+    "presentationOnly": true,
+    "neverInputToPhysicalRequest": true,
+    "physicalProof": false,
+    "geometryGateBypass": false,
+    "colorsAreVisualOnlyClaims": true,
+    "panorama": {
+      "role": "PIXEL_DIAGNOSTIC_ONLY",
+      "geometryBindingStatus": "UNKNOWN",
+      "promoted": false
+    }
+  },
+  "lineageSummary": [
+    {
+      "visualSurfaceId": "visual:floor",
+      "physicalSurfaceId": "floor",
+      "sourceRange": "base-room",
+      "crossCheck": "FLOOR planeY=0 vs visual top 0; allowed region within visual extent: true"
+    },
+    {
+      "visualSurfaceId": "visual:back-wall",
+      "physicalSurfaceId": "back-wall",
+      "sourceRange": "base-room",
+      "crossCheck": "EXACT_AABB_MATCH"
+    },
+    {
+      "visualSurfaceId": "visual:left-wall",
+      "physicalSurfaceId": "left-wall",
+      "sourceRange": "base-room",
+      "crossCheck": "EXACT_AABB_MATCH"
+    },
+    {
+      "visualSurfaceId": "visual:right-wall",
+      "physicalSurfaceId": "right-wall",
+      "sourceRange": "base-room",
+      "crossCheck": "EXACT_AABB_MATCH"
+    },
+    {
+      "visualSurfaceId": "visual:door",
+      "physicalSurfaceId": "door",
+      "sourceRange": "door",
+      "crossCheck": "EXACT_AABB_MATCH"
+    },
+    {
+      "visualSurfaceId": "visual:locker-0",
+      "physicalSurfaceId": "locker-0",
+      "sourceRange": "school-bag-lockers",
+      "crossCheck": "EXACT_AABB_MATCH"
+    },
+    {
+      "visualSurfaceId": "visual:locker-1",
+      "physicalSurfaceId": "locker-1",
+      "sourceRange": "school-bag-lockers",
+      "crossCheck": "EXACT_AABB_MATCH"
+    },
+    {
+      "visualSurfaceId": "visual:locker-2",
+      "physicalSurfaceId": "locker-2",
+      "sourceRange": "school-bag-lockers",
+      "crossCheck": "EXACT_AABB_MATCH"
+    },
+    {
+      "visualSurfaceId": "visual:locker-3",
+      "physicalSurfaceId": "locker-3",
+      "sourceRange": "school-bag-lockers",
+      "crossCheck": "EXACT_AABB_MATCH"
+    },
+    {
+      "visualSurfaceId": "visual:locker-4",
+      "physicalSurfaceId": "locker-4",
+      "sourceRange": "school-bag-lockers",
+      "crossCheck": "EXACT_AABB_MATCH"
+    }
+  ],
+  "tests": {
+    "suite": "tests/clean-runtime-school-scene-v2/*.test.js",
+    "result": "41/41 PASS via node --test",
+    "note": "host: Linux container, node v22.23.2; not a certified CI platform run"
+  },
+  "barriers": [
+    "no merge to main/default",
+    "no production connection",
+    "visuals never represented as certified physics",
+    "no physical truth from pixels",
+    "no Geometry Gate bypass",
+    "zero mandatory cost"
+  ],
+  "notes": [
+    "All authored meter values scaled exactly to integer microunits (x1,000,000, Math.round verified exact per value).",
+    "Source ranges re-hashed and re-located in the real index.html bytes at build time; any byte drift rejects the set."
+  ]
+}
