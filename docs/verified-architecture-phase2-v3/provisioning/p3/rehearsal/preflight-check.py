@@ -8,7 +8,10 @@ import sys, os, json, hashlib, subprocess
 # prefix resolves to the running lane's /tmp/$PREFIX-. Identity in the rehearsal and
 # certification lanes (PREFIX defaults to NON_CERTIFYING_REHEARSAL); the scratch lane
 # exports PREFIX=NON_CERTIFYING_SCRATCH.
-PREFIX=os.environ.get("PREFIX","NON_CERTIFYING_REHEARSAL")
+PREFIX=os.environ.get("PREFIX","")
+if not PREFIX: print("E_PREFIX_UNSET"); sys.exit(97)
+ALLOWED=os.environ.get("ALLOWED_PREFIX","")
+if PREFIX!=ALLOWED: print("E_PREFIX_MISMATCH prefix=%s allowed=%s"%(PREFIX,ALLOWED)); sys.exit(97)
 CANON_TMP="/tmp/NON_CERTIFYING_REHEARSAL-"; LANE_TMP="/tmp/%s-"%PREFIX
 def pref(x):
     if isinstance(x,str): return x.replace(CANON_TMP,LANE_TMP)
@@ -180,7 +183,7 @@ try:
     # (the raw staged binary cannot run on the host loader), so the argv is truly identical
     _sp.run([os.path.join(here,"make-shims.sh"),stage,os.path.join(stage,"shims")],
             capture_output=True,text=True,check=True)
-    _tmp=_sp.check_output(["mktemp","-d","/tmp/NON_CERTIFYING_REHEARSAL-preflight-realwork.XXXXXX"],text=True).strip()
+    _tmp=_sp.check_output(["mktemp","-d",LANE_TMP+"preflight-realwork.XXXXXX"],text=True).strip()
     r=_sp.run([os.path.join(here,"bwrap-argv.sh"),"canonical",
                os.path.join(stage,"shims","bwrap"),_tmp,"--","true"],
               capture_output=True,text=True)
@@ -219,6 +222,82 @@ if _st.count('exec "$BWRAP"')!=1: fail("E_SMOKE_NS_EXEC","qemu-smoke.sh must hav
 _bh=open(os.path.join(here,"bwrap-argv.sh"),errors="replace").read()
 if "COMMON=(" not in _bh or _bh.count('exec "$BWRAP" "${COMMON[@]}"')!=2:
     fail("E_BWRAP_HELPER_FORM","bwrap-argv.sh lost its pinned canonical form")
+
+# 6e3) peer adjudication (3) of the additive smoke_namespace block: the pre-existing frozen
+# case argv are pinned by INDEPENDENT sha256 constants HERE (outside argv-freeze.json), so
+# the addition provably cannot perturb them; the block must be consumed by qemu-smoke.sh
+# ONLY (never the ceremony); and the freeze file's top-level key set must be exactly the
+# pre-addition keys plus smoke_namespace (additive-only proof).
+CASE_ARGV_PINS=(
+    ("NON_CERTIFYING_REHEARSAL-R1-positive", "cbcd8f053290fbf1e852d2ca5d44f4ea718e42ef6b7229e5c5056687f144595c"),
+    ("NON_CERTIFYING_REHEARSAL-R2-N1-unsigned", "d8d83880da4f39a7bb16a833f654dca7cc887633067cdacb27daf34446d5b6ac"),
+    ("NON_CERTIFYING_REHEARSAL-R3-N2-wrongsig", "7740061c431f5f629b0d6929271c89bae0bbc2533e7a997fdcc3b4304266590c"),
+    ("NON_CERTIFYING_REHEARSAL-R4-N3a-hostile-sole-db", "8598a145d072798a84ea93ebdbc3e34109498310f87a56aee1dc7e41e93bae31"),
+    ("NON_CERTIFYING_REHEARSAL-R5-N3b-hostile-widened-db", "9287c11a11d160a13c198123296d0c8546bd038340b43bb8c2ac6f3f2eec359b"),
+    ("NON_CERTIFYING_REHEARSAL-R6-N3c-hostile-fresh-sole-db", "3a057fe9d8ece06e38d490fcb3b3dcd1f3088a83ab947c7dcfe5f73875801699"),
+    ("NON_CERTIFYING_REHEARSAL-R7-release-sibling-behavior-only", "eb4d5bb4593906f65162b2e8a2012c7071454653d293121e2763eebdd73d8d82"),
+)
+if len(_fz2["cases"])!=len(CASE_ARGV_PINS):
+    fail("E_CASE_ARGV_PIN","case count drifted: %d != %d"%(len(_fz2["cases"]),len(CASE_ARGV_PINS)))
+for _cid,_pin in CASE_ARGV_PINS:
+    _m=[c for c in _fz2["cases"] if c["id"]==_cid]
+    if len(_m)!=1: fail("E_CASE_ARGV_PIN","case id missing or duplicated: "+_cid); continue
+    _h=_hl2.sha256("\0".join(_m[0]["argv"]).encode()).hexdigest()
+    if _h!=_pin: fail("E_CASE_ARGV_PIN",_cid+" argv sha256 drifted: "+_h)
+    # F8 (peer, freeze blocker): ONE convention everywhere - sha256 over the NUL-joined
+    # argv WITHOUT trailing NUL, identical to argv-freeze.json's stored argv_sha256 and
+    # rehearsal-harness.py's det record. Cross-check the stored field so the external
+    # pins and the frozen file's own fields cannot drift apart silently.
+    if _h!=_m[0].get("argv_sha256"): fail("E_CASE_ARGV_PIN_STORED",_cid+" stored argv_sha256 disagrees: "+repr(_m[0].get("argv_sha256")))
+EXPECTED_KEYS={"bwrap_argv","bwrap_helper","cases","cpu_model","memory_mb","note","qemu",
+               "qmp_sock_max_bytes","qmp_sock_template","schema","v3_serials"}
+if set(_fz2.keys())!=EXPECTED_KEYS|{"smoke_namespace"}:
+    fail("E_FREEZE_KEYS","argv-freeze.json top-level keys drifted: "+repr(sorted(_fz2.keys())))
+# 6e6) peer FINAL COUNT RULING: pin the EXACT prefix occurrence counts (grep -o ... | wc -l,
+# not line counts) of BOTH lane workflows, recomputed at the frozen bytes. Any edit to either
+# workflow that adds/removes a literal NON_CERTIFYING_REHEARSAL occurrence fails closed here.
+import subprocess as _sp
+for _wf,_want in (("../../../../../.github/workflows/OVMF_CI_SECURE_BOOT_UKI-CERTIFICATION-workflow.yml",42),
+                  ("../../../../../.github/workflows/NON_CERTIFYING_REHEARSAL-workflow.yml",74)):
+    _n=len(_sp.run(["grep","-o","NON_CERTIFYING_REHEARSAL",os.path.join(here,_wf)],
+                   capture_output=True,text=True,check=True).stdout.splitlines())
+    if _n!=_want:
+        fail("E_PREFIX_COUNT_MISMATCH",_wf+" occurrences="+str(_n)+" pinned="+str(_want))
+
+# 6e5) peer: the ESP-builder chatter acceptance stands ONLY while the image-hash log lines
+# exist - pin their presence fail-closed so they cannot be silently dropped.
+for _f,_pat in (("../build-esp-image.sh",'echo "image $(stat -c %s \"$IMG\") $(sha256sum \"$IMG\"'),
+                ("build-esp-variant.sh",'echo "image $(stat -c %s \"$IMG\") $(sha256sum \"$IMG\"')):
+    if _pat not in open(os.path.join(here,_f),errors="replace").read():
+        fail("E_ESP_HASHLINE_MISSING",_f+" lost its image-hash log line (chatter acceptance void)")
+
+for _fn in sorted(os.listdir(here)):
+    if _fn.endswith((".sh",".py")) and _fn not in ("preflight-check.py","qemu-smoke.sh"):
+        if "smoke_namespace" in open(os.path.join(here,_fn),errors="replace").read():
+            fail("E_SMOKE_NS_CONSUMER","smoke_namespace referenced outside qemu-smoke.sh: "+_fn)
+
+# 6e4) peer adjudication (2): canonical schema identifiers remain only as PINNED constants
+# carrying no verdict/lane-claim words, and every schema report carries an explicit lane
+# field sourced from the allowlisted PREFIX (the producers' exact forms are pinned here).
+SCHEMA_PINS=("NON_CERTIFYING_REHEARSAL-manifest/v1",
+             "NON_CERTIFYING_REHEARSAL-source-manifest/v1",
+             "NON_CERTIFYING_REHEARSAL-enroll-predicate/v1",
+             "NON_CERTIFYING_REHEARSAL-preflight/v1")
+for _s in SCHEMA_PINS:
+    for _w in ("pass","verdict","certification","accepted","verified"):
+        if _w in _s.lower(): fail("E_SCHEMA_PIN","schema id carries a claim word: "+_s)
+_sc=open(os.path.join(here,"run-ceremony.sh"),errors="replace").read()
+if "'NON_CERTIFYING_REHEARSAL-manifest/v1','lane':os.environ['PREFIX']" not in _sc:
+    fail("E_SCHEMA_LANE","run-ceremony.sh manifest lost its pinned schema+lane form")
+_sp2=open(os.path.join(here,"stage-platform.sh"),errors="replace").read()
+if "'NON_CERTIFYING_REHEARSAL-source-manifest/v1','lane':os.environ['PREFIX']" not in _sp2:
+    fail("E_SCHEMA_LANE","stage-platform.sh source-manifest lost its pinned schema+lane form")
+_ep=open(os.path.join(here,"enroll-predicate-check.py"),errors="replace").read()
+if _ep.count('"NON_CERTIFYING_REHEARSAL-enroll-predicate/v1", "lane": PREFIX')!=2:
+    fail("E_SCHEMA_LANE","enroll-predicate-check.py reports lost their pinned schema+lane form")
+_rh=open(os.path.join(here,"rehearsal-harness.py"),errors="replace").read()
+if '"suite":"NON_CERTIFYING_REHEARSAL","lane":PREFIX' not in _rh:
+    fail("E_SCHEMA_LANE","rehearsal-harness.py suite report lost its pinned schema+lane form")
 
 # 6f) batch1r3 C7: no upload path may be a prefix of the enrollment prep dir
 prep_abs=os.path.join(here,"prep")
@@ -286,7 +365,7 @@ for fn in ("NON_CERTIFYING_REHEARSAL-workflow.yml","OVMF_CI_SECURE_BOOT_UKI-CERT
         if _pat in _wt: fail("E_PYTHON_FORBIDDEN_PROVISIONING",fn+" "+_pat)
 
 # 7) KVM requirement is declarative here; runtime fail-closed check lives in the workflow
-report={"schema":"NON_CERTIFYING_REHEARSAL-preflight/v1","errors":E,
+report={"schema":"NON_CERTIFYING_REHEARSAL-preflight/v1","lane":PREFIX,"errors":E,
         "result":"PASS" if not E else "FAIL"}
 print(json.dumps(report,indent=1,sort_keys=True))
 sys.exit(0 if not E else 30)

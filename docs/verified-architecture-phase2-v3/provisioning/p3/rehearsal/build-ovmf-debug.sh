@@ -22,7 +22,7 @@ if [ "${CANON_MODE:-}" != hostile ] && [ "${IN_CANON_NS:-}" != 1 ]; then
   done
   # C6: bwrap is load-bearing for the canonical path. Use ONLY the platform-lock-staged,
   # hash-verified bwrap via the staged-loader shim, never the host binary.
-  "$(dirname "$0")/make-shims.sh" "$STAGE" "$STAGE/shims" >/dev/null
+  "$(dirname "$0")/make-shims.sh" "$STAGE" "$STAGE/shims"
   BWRAP="$STAGE/shims/bwrap"
   [ -x "$BWRAP" ] || { echo "E_NO_STAGED_BWRAP $BWRAP"; exit 91; }
   IN_CANON_NS=1 CANON_REALWORK="$REALWORK"     exec "$(dirname "$0")/bwrap-argv.sh" canonical "$BWRAP" "$REALWORK" -- "$0" "$@"
@@ -32,7 +32,7 @@ EDK2_COMMIT=edc6681206c1a8791981a2f911d2fb8b3d2f5768   # edk2-stable202402
 export SOURCE_DATE_EPOCH=1706745600                    # 2024-02-01T00:00:00Z, frozen
 export PYTHONHASHSEED=0
 SUBMODULES="CryptoPkg/Library/OpensslLib/openssl CryptoPkg/Library/MbedTlsLib/mbedtls BaseTools/Source/C/BrotliCompress/brotli MdeModulePkg/Universal/RegularExpressionDxe/oniguruma MdeModulePkg/Library/BrotliCustomDecompressLib/brotli MdePkg/Library/MipiSysTLib/mipisyst MdePkg/Library/BaseFdtLib/libfdt ArmPkg/Library/ArmSoftFloatLib/berkeley-softfloat-3 RedfishPkg/Library/JsonLib/jansson"
-"$(dirname "$0")/make-shims.sh" "$STAGE" "$STAGE/shims" >/dev/null
+"$(dirname "$0")/make-shims.sh" "$STAGE" "$STAGE/shims"
 SHIMS="$STAGE/shims"
 # two environments: BaseTools are HOST tools (host toolchain, host glibc);
 # the firmware build (GCC5) is freestanding and uses the pinned staged toolchain via shims.
@@ -65,7 +65,9 @@ build_one() {
   mkdir -p "$COMPAT/bin"; ln -sf "$(command -v python3)" "$COMPAT/bin/python"
   env -u LIBRARY_PATH PATH="$COMPAT/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" \
     CPATH="$COMPAT/include" LIBRARY_PATH="$COMPAT/lib" \
-    make -C BaseTools -j"$(nproc)" >/dev/null
+    make -C BaseTools -j"$(nproc)" >"$OUTA/basetools-build.log" 2>&1 || \
+      { _rc=$?; cat "$OUTA/basetools-build.log"; echo "E_BASETOOLS_BUILD make rc=$_rc log=$OUTA/basetools-build.log"; exit 50; }
+  echo "basetools build log: $OUTA/basetools-build.log sha256=$(sha256sum "$OUTA/basetools-build.log" | cut -d' ' -f1)"
   # B4: no uuid_* member may be pulled from the staged libuuid.a into any host-built
   # BaseTools binary, and no noble-glibc marker symbol may appear (latent glibc mixing)
   for bt in "$WORK/edk2/BaseTools/Source/C/bin/"*; do
@@ -153,7 +155,7 @@ if [ "${CANON_MODE:-}" = hostile ] && [ "${IN_HOSTILE_NS:-}" != 1 ]; then
   for p in "$STAGE" "$OUTA" "$WORKFIX"; do
     [ "$(realpath "$p")" = "$p" ] || { echo "E_NONCANONICAL_INPUT_PATH $p"; exit 47; }
   done
-  "$(dirname "$0")/make-shims.sh" "$STAGE" "$STAGE/shims" >/dev/null
+  "$(dirname "$0")/make-shims.sh" "$STAGE" "$STAGE/shims"
   BWRAP="$STAGE/shims/bwrap"
   [ -x "$BWRAP" ] || { echo "E_NO_STAGED_BWRAP $BWRAP"; exit 91; }
   IN_HOSTILE_NS=1 CANON_REALWORK="$WORKFIX"     exec "$(dirname "$0")/bwrap-argv.sh" hostile "$BWRAP" - -- "$0" "$@"

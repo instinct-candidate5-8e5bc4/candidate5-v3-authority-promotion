@@ -46,9 +46,14 @@ try:
 except UnicodeDecodeError as _e:
     fail("E_ENROLL_DECODE", str(_e))
     _text = None
+import os as _os
+PREFIX=_os.environ.get("PREFIX","")
+if not PREFIX: print("E_PREFIX_UNSET"); sys.exit(97)
+ALLOWED=_os.environ.get("ALLOWED_PREFIX","")
+if PREFIX!=ALLOWED: print("E_PREFIX_MISMATCH prefix=%s allowed=%s"%(PREFIX,ALLOWED)); sys.exit(97)
 rec = {}
 if _text is None:
-    report = {"schema": "NON_CERTIFYING_REHEARSAL-enroll-predicate/v1", "mode": mode,
+    report = {"schema": "NON_CERTIFYING_REHEARSAL-enroll-predicate/v1", "lane": PREFIX, "mode": mode,
           "enrolled_fd_sha256": sha_f(fd),
               "widened": widened, "errors": E, "result": "FAIL"}
     print(json.dumps(report, indent=1, sort_keys=True))
@@ -145,7 +150,7 @@ sbe_note = None
 if sbe:
     sbe_note = {"attributes": sbe["attributes"], "data_size": sbe["data_size"],
                 "data_sha256": sbe["data_sha256"]}
-report = {"schema": "NON_CERTIFYING_REHEARSAL-enroll-predicate/v1", "mode": mode,
+report = {"schema": "NON_CERTIFYING_REHEARSAL-enroll-predicate/v1", "lane": PREFIX, "mode": mode,
           "widened": widened, "pk_der_sha256": pk_der, "kek_der_sha256": kek_der,
           "secure_boot_enable_observed": sbe_note, "errors": E,
           "result": "PASS" if not E else "FAIL"}

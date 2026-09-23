@@ -6,6 +6,9 @@
 # from any source fail immediately (E_LOCK_HASH_MISMATCH); per-deb source manifest is recorded.
 set -euo pipefail
 LOCK="$1"; DEST="$2"
+PREFIX="${PREFIX:-}"
+[ -n "$PREFIX" ] || { echo "E_PREFIX_UNSET"; exit 97; }
+[ "$PREFIX" = "${ALLOWED_PREFIX:-}" ] || { echo "E_PREFIX_MISMATCH prefix=$PREFIX allowed=$ALLOWED_PREFIX"; exit 97; }
 mkdir -p "$DEST/debs" "$DEST/root"
 python3 - "$LOCK" "$DEST" <<'PYEOF'
 import json, sys, urllib.request, urllib.error, hashlib, os
@@ -74,7 +77,7 @@ for e in pkgs:
 extra=[f for f in os.listdir(os.path.join(dest,'debs')) if os.path.join(dest,'debs',f) not in seen]
 if extra:
     print('E_LOCK_EXTRA_FILES '+' '.join(extra), file=sys.stderr); sys.exit(32)
-man={'schema':'NON_CERTIFYING_REHEARSAL-source-manifest/v1','snapshot_ts':TS,
+man={'schema':'NON_CERTIFYING_REHEARSAL-source-manifest/v1','lane':os.environ['PREFIX'],'snapshot_ts':TS,
      'note':'per-deb source is observational; the per-deb sha256 is the deterministic trust chain',
      'packages':sources}
 open(os.path.join(dest,'source-manifest.json'),'w').write(json.dumps(man,indent=1,sort_keys=True)+'\n')

@@ -9,7 +9,7 @@ SRC_DIR="$(cd "$(dirname "$0")" && pwd)"
 # (the same mechanism build-ovmf-debug.sh uses); host utilities stay host binaries on a
 # clean host environment - no staged-root PATH prepend, no LD_LIBRARY_PATH.
 SHIMS="$STAGE/shims"
-"$(dirname "$0")/make-shims.sh" "$STAGE" "$SHIMS" >/dev/null
+"$(dirname "$0")/make-shims.sh" "$STAGE" "$SHIMS"
 export PATH="$SHIMS:$PATH"
 # fail-closed toolchain self-check BEFORE building
 [ -z "${LD_LIBRARY_PATH:-}" ] || { echo "E_TOOLCHAIN_NOT_SHIMMED LD_LIBRARY_PATH is set"; exit 45; }

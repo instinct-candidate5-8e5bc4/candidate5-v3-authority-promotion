@@ -8,7 +8,9 @@ CFG=${1:?}; PREP=${2:?}; OUT=${3:?}; EVD=${4:?}; MODE=${5:-sole}
 # Lane prefix resolution (scratch-3 ruling): committed config bytes keep the canonical
 # NON_CERTIFYING_REHEARSAL prefix; the two canonical /tmp paths read below resolve to the
 # running lane's /tmp/$PREFIX-. Identity in the rehearsal and certification lanes.
-PREFIX="${PREFIX:-NON_CERTIFYING_REHEARSAL}"
+PREFIX="${PREFIX:-}"
+[ -n "$PREFIX" ] || { echo "E_PREFIX_UNSET"; exit 97; }
+[ "$PREFIX" = "${ALLOWED_PREFIX:-}" ] || { echo "E_PREFIX_MISMATCH prefix=$PREFIX allowed=$ALLOWED_PREFIX"; exit 97; }
 CANON_TMP=/tmp/NON_CERTIFYING_REHEARSAL-; LANE_TMP=/tmp/$PREFIX-
 [ -e /dev/kvm ] || { echo "E_NO_KVM" >&2; exit 90; }
 [ -e "$EVD" ] && { echo "E_EVD_EXISTS" >&2; exit 1; }
@@ -24,7 +26,9 @@ APP=$(python3 -c "import json;print(json.load(open('$CFG'))['enroll_app'])")
 # (G2/T5 F4: the app opens db.auth/kek.auth/pk.auth on the volume root and writes ENROLL.TXT there)
 IMG="$EVD/enroll-fat.raw"
 truncate -s 67108864 "$IMG"
-mkfs.vfat -F 32 -s 1 -S 512 -f 2 -R 32 -i 45454E52 -n C5ENROLL "$IMG" >/dev/null
+# chatter rule (peer): enroll-fat.raw is not hash-pinned in-log, so the mkfs output is
+# preserved rather than suppressed.
+mkfs.vfat -F 32 -s 1 -S 512 -f 2 -R 32 -i 45454E52 -n C5ENROLL "$IMG"
 python3 - "$IMG" "$APP" "$PREP" "$MODE" <<'PY'
 import sys, struct
 img, app, prep, mode = sys.argv[1:5]
@@ -95,12 +99,32 @@ cp "$PRISTINE" "$EVD/vars.fd"
   -display none -serial none -nic none -no-reboot -m 512 \
   -drive file="$IMG",format=raw,if=none,id=enroll,readonly=off \
   -device virtio-blk-pci,drive=enroll,serial=c5-enroll \
+  -qmp unix:"$EVD/qmp.sock",server,nowait \
   -pidfile "$EVD/qemu.pid" -daemonize
+# peer run-8 ask (1): runtime accelerator PROOF, never a TCG fallback - query-kvm over QMP,
+# fail closed. (-accel kvm already refuses to start without KVM; this proves it in-log.)
+python3 - "$EVD/qmp.sock" <<'PYQ'
+import json, socket, sys
+s=socket.socket(socket.AF_UNIX); s.settimeout(10); s.connect(sys.argv[1])
+f=s.makefile("rw")
+f.readline()
+def cmd(c):
+    f.write(json.dumps({"execute":c})+"\n"); f.flush()
+    while True:
+        r=json.loads(f.readline())
+        if "return" in r or "error" in r: return r
+cmd("qmp_capabilities")
+r=cmd("query-kvm")
+print("KVM PROOF query-kvm:", json.dumps(r.get("return")))
+if r.get("return",{}).get("enabled") is not True:
+    print("E_KVM_NOT_ACTIVE query-kvm enabled=%r (TCG fallback is forbidden)" % (r.get("return",{}).get("enabled"),)); sys.exit(97)
+PYQ
 sleep 25
 PID=$(cat "$EVD/qemu.pid")
 kill -TERM "$PID" 2>/dev/null || true; sleep 2; kill -KILL "$PID" 2>/dev/null || true
 # extract ENROLL.TXT from the VOLUME ROOT of the FAT32 image (G2/T5 F4: the app writes it there)
-python3 - "$IMG" > "$EVD/ENROLL.TXT" <<'PY'
+_rc=0
+python3 - "$IMG" > "$EVD/ENROLL.TXT" <<'PY' || _rc=$?
 import sys, struct
 d = open(sys.argv[1], "rb").read()
 bps = struct.unpack_from("<H", d, 11)[0]
@@ -134,6 +158,16 @@ def find(name):
     raise SystemExit("E_ENROLL_TXT_MISSING")
 sys.stdout.buffer.write(find("ENROLL.TXT"))
 PY
+if [ "$_rc" != 0 ]; then
+  # run-8 defect-2 evidence: the guest produced no ENROLL.TXT in the wait window; the
+  # debugcon log is root-owned and was unreadable to the run-8 upload, so carry a bounded
+  # tail into the tee'd ceremony log (runner-readable) on this failure path.
+  echo "E_ENROLL_TXT_MISSING - no ENROLL.TXT on the enrollment volume after the 25s guest window"
+  echo "----- begin ovmf-debug.log tail (last 200 lines) sha256=$(sha256sum "$EVD/ovmf-debug.log" | cut -d' ' -f1) size=$(stat -c %s "$EVD/ovmf-debug.log") -----"
+  tail -n 200 "$EVD/ovmf-debug.log" || true
+  echo "----- end ovmf-debug.log tail -----"
+  exit 97
+fi
 cp "$EVD/vars.fd" "$OUT"
 # frozen enrollment predicate gate (requirement 5a/5b resolution): any deviation fails the run
 HERE="$(cd "$(dirname "$0")" && pwd)"

@@ -9,7 +9,7 @@ SBS=${1:?}; W=${2:?}; CERT=${3:?}; HOSTILE=${4:-}
 # which would bind host glibc/libcrypto); stderr is never discarded.
 STAGE="$(dirname "$SBS")"
 SHIMS="$STAGE/shims"
-[ -x "$SHIMS/sbvarsign" ] || "$(dirname "$0")/make-shims.sh" "$STAGE" "$SHIMS" >/dev/null
+[ -x "$SHIMS/sbvarsign" ] || "$(dirname "$0")/make-shims.sh" "$STAGE" "$SHIMS"
 SBV="$SHIMS/sbvarsign"
 [ -x "$SBV" ] || { echo "E_NO_SBVARSIGN_SHIM $SBV" >&2; exit 92; }
 [ -d "$W" ] && { echo "E_WORK_EXISTS" >&2; exit 1; }

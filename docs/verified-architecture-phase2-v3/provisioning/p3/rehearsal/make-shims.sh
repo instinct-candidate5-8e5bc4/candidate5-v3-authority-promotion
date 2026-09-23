@@ -6,7 +6,7 @@ set -euo pipefail
 STAGE=${1:?}; SHIMS=${2:?}
 RT="$STAGE/root"
 LOADER="$RT/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2"
-[ -x "$LOADER" ] || { echo "E_LOADER_MISSING $LOADER"; exit 1; }
+[ -x "$LOADER" ] || { echo "E_LOADER_MISSING $LOADER" >&2; exit 1; }
 mkdir -p "$SHIMS"
 LIBPATH="$RT/usr/lib/x86_64-linux-gnu:$RT/lib/x86_64-linux-gnu"
 GCCDIR="$RT/usr/lib/gcc/x86_64-linux-gnu/13"

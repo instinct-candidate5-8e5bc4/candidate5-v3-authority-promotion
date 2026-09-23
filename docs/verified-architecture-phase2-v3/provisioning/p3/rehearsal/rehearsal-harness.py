@@ -10,7 +10,10 @@ import sys, os, json, socket, hashlib, subprocess, time, shutil, signal
 # prefix resolves to the running lane's /tmp/$PREFIX-. Identity in the rehearsal and
 # certification lanes (PREFIX defaults to NON_CERTIFYING_REHEARSAL); the scratch lane
 # exports PREFIX=NON_CERTIFYING_SCRATCH.
-PREFIX=os.environ.get("PREFIX","NON_CERTIFYING_REHEARSAL")
+PREFIX=os.environ.get("PREFIX","")
+if not PREFIX: print("E_PREFIX_UNSET"); sys.exit(97)
+ALLOWED=os.environ.get("ALLOWED_PREFIX","")
+if PREFIX!=ALLOWED: print("E_PREFIX_MISMATCH prefix=%s allowed=%s"%(PREFIX,ALLOWED)); sys.exit(97)
 CANON_TMP="/tmp/NON_CERTIFYING_REHEARSAL-"; LANE_TMP="/tmp/%s-"%PREFIX
 def pref(x):
     if isinstance(x,str): return x.replace(CANON_TMP,LANE_TMP)
@@ -163,7 +166,7 @@ def run_case(cfg, case, idx):
     cid=case["id"]; cdir=os.path.join(cfg["work_root"],cid)
     os.makedirs(cdir, exist_ok=False)
     # G1/T5 F3: short fresh per-case QMP socket path, asserted within the sun_path limit
-    sock=f"/tmp/NON_CERTIFYING_REHEARSAL-q{idx}.sock"   # short, fresh, scratch-prefix compliant
+    sock=pref(f"/tmp/NON_CERTIFYING_REHEARSAL-q{idx}.sock")   # short, fresh; pref()-resolved per lane (scratch-8 grep-audit finding)
     if len(sock)>QMP_SOCK_MAX: fail("E_QMP_PATH_TOO_LONG","%d>%d %s"%(len(sock),QMP_SOCK_MAX,sock))
     if os.path.exists(sock): os.unlink(sock)
     vars_fd=os.path.join(cdir,"vars.fd")
@@ -261,5 +264,5 @@ if __name__=="__main__":
     for idx,case in enumerate(cfg["cases"]):
         results[case["id"]]=run_case(cfg,case,idx)
     ok=all(results.values())
-    print(json.dumps({"suite":"NON_CERTIFYING_REHEARSAL","all_expectations_met":ok,"cases":results},sort_keys=True))
+    print(json.dumps({"suite":"NON_CERTIFYING_REHEARSAL","lane":PREFIX,"all_expectations_met":ok,"cases":results},sort_keys=True))
     sys.exit(0 if ok else 91)

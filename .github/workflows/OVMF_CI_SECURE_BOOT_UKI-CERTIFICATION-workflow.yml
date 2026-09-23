@@ -32,6 +32,8 @@ on:
 permissions: {}
 env:
   PREFIX: NON_CERTIFYING_REHEARSAL
+  # peer adjudication (1): per-workflow singleton allowlist; scripts fail closed on mismatch.
+  ALLOWED_PREFIX: NON_CERTIFYING_REHEARSAL
 jobs:
   certification:
     # ubuntu-22.04 pinned: the canonical-path mechanism (build-ovmf-debug.sh) needs
@@ -50,9 +52,12 @@ jobs:
           set -euo pipefail
           [ "${{ github.run_attempt }}" = "1" ] || { echo "E_RERUN_FORBIDDEN run_attempt=${{ github.run_attempt }}"; exit 89; }
           [ "${{ github.ref }}" = "refs/heads/p3-certification" ] || { echo "E_REF_MISMATCH ref=${{ github.ref }}"; exit 89; }
+          # pushed-once gate (T3 F5): the ref must be created by THIS push, never force-pushed
           [ "$EV_CREATED" = "true" ] || { echo "E_PUSHED_ONCE created=$EV_CREATED"; exit 89; }
           [ "$EV_FORCED" = "false" ] || { echo "E_PUSHED_ONCE forced=$EV_FORCED"; exit 89; }
           [ "$EV_BEFORE" = "0000000000000000000000000000000000000000" ] || { echo "E_PUSHED_ONCE before=$EV_BEFORE"; exit 89; }
+          mkdir -p /tmp/$PREFIX-out
+          date +%s >> /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-step-stamps.txt
       - name: OVMF_CI_SECURE_BOOT_UKI kvm fail-closed check
         run: |
           set -euo pipefail
@@ -120,7 +125,13 @@ jobs:
         run: |
           set -euo pipefail
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
-          ./make-shims.sh /tmp/$PREFIX-stage /tmp/$PREFIX-stage/shims >/dev/null
+          SHIMS_LOG=/tmp/$PREFIX-out/$PREFIX-preflight-make-shims.log
+          mkdir -p /tmp/$PREFIX-out
+          if ./make-shims.sh /tmp/$PREFIX-stage /tmp/$PREFIX-stage/shims >"$SHIMS_LOG" 2>&1; then
+            cat "$SHIMS_LOG"
+          else
+            rc=$?; cat "$SHIMS_LOG"; echo "E_PREFLIGHT_SHIMS make-shims.sh rc=$rc log=$SHIMS_LOG"; exit 97
+          fi
           REALWORK=$(mktemp -d /tmp/$PREFIX-preflight-realwork.XXXXXX)
           rc=0
           out=$(./bwrap-argv.sh canonical /tmp/$PREFIX-stage/shims/bwrap "$REALWORK" -- true 2>&1) || rc=$?
@@ -216,6 +227,10 @@ jobs:
           [ "$(sha256sum /tmp/$PREFIX-esp-a/c5-root-admitter-uki-v3-esp.raw | cut -d' ' -f1)" = \
             "2bfa621238890890765c9636f99dabfb46233bfa626afb580ce33e65858019c9" ]
           cmp /tmp/$PREFIX-esp-a/c5-root-admitter-uki-v3-esp.raw /tmp/$PREFIX-esp-b/c5-root-admitter-uki-v3-esp.raw
+          # peer gap close: the ESP is a frozen output; record it in fw-hashes for the
+          # env2 cross-runner comparison, and log the artifact digest tied to this run.
+          sha256sum /tmp/$PREFIX-esp-a/c5-root-admitter-uki-v3-esp.raw >> /tmp/$PREFIX-fw-hashes.txt
+          echo "ARTIFACT-DIGEST path=/tmp/$PREFIX-fw-hashes.txt sha256=$(sha256sum /tmp/$PREFIX-fw-hashes.txt | cut -d' ' -f1) run_id=$GITHUB_RUN_ID run_attempt=$GITHUB_RUN_ATTEMPT run_number=$GITHUB_RUN_NUMBER workflow=$GITHUB_WORKFLOW commit=$GITHUB_SHA ref=$GITHUB_REF"
       - name: OVMF_CI_SECURE_BOOT_UKI firmware hash upload (env2 comparison input)
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
         with:
@@ -265,8 +280,9 @@ jobs:
           stat -c '%A %a %U:%g %n' qemu-smoke.sh bwrap-argv.sh
           git ls-files -s -- qemu-smoke.sh bwrap-argv.sh
           git config --local --get-regexp '^http\.' || echo "no token in .git/config (persist-credentials: false)"
+          git status --porcelain | grep . && { echo "E_SMOKE_PREP_TREE_DIRTY"; git status --porcelain; exit 97; } || echo "git status --porcelain: EMPTY (before repair)"
           echo "hashed-input SHAs BEFORE repair:"
-          sha256sum qemu-smoke.sh bwrap-argv.sh config.json argv-freeze.json make-disks.sh
+          B4="$(sha256sum qemu-smoke.sh bwrap-argv.sh config.json argv-freeze.json make-disks.sh)"; printf '%s\n' "$B4"
           namei -l "$PWD/qemu-smoke.sh"
           sudo namei -l "$PWD/qemu-smoke.sh"
           for t in "$GITHUB_WORKSPACE" / /tmp /etc /home /usr /usr/share /usr/lib /usr/lib/x86_64-linux-gnu /dev/kvm /tmp/$PREFIX-stage /tmp/$PREFIX-ovmf-a /tmp/$PREFIX-esp-a /tmp/$PREFIX-out; do
@@ -287,10 +303,12 @@ jobs:
           done
           sudo -u nobody test -x "$PWD/qemu-smoke.sh" || { echo "E_SMOKE_PREP other-exec qemu-smoke.sh"; exit 97; }
           sudo -u nobody test -x "$PWD/make-disks.sh" || { echo "E_SMOKE_PREP other-exec make-disks.sh"; exit 97; }
-          echo "hashed-input SHAs AFTER repair (must equal BEFORE):"
-          sha256sum qemu-smoke.sh bwrap-argv.sh config.json argv-freeze.json make-disks.sh
+          echo "hashed-input SHAs AFTER repair (must equal BEFORE, F4 fail-closed):"
+          A4="$(sha256sum qemu-smoke.sh bwrap-argv.sh config.json argv-freeze.json make-disks.sh)"; printf '%s\n' "$A4"
+          [ "$A4" = "$B4" ] || { echo "E_SMOKE_PREP_DRIFT"; exit 97; }
           git ls-files -s -- qemu-smoke.sh bwrap-argv.sh
-          sudo env PREFIX="$PREFIX" ./qemu-smoke.sh config.json argv-freeze.json 0 \
+          git status --porcelain | grep . && { echo "E_SMOKE_PREP_TREE_DIRTY"; git status --porcelain; exit 97; } || echo "git status --porcelain: EMPTY (after repair)"
+          sudo env PREFIX="$PREFIX" ALLOWED_PREFIX="$ALLOWED_PREFIX" ./qemu-smoke.sh config.json argv-freeze.json 0 \
               > /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-qemu-smoke.log 2>&1 \
             || { echo "E_QEMU_SMOKE"; cat /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-qemu-smoke.log; exit 97; }
           echo "masked-host binding smoke OK (exact frozen case argv + -S, four host qemu dirs absent, no case booted)"
@@ -301,8 +319,26 @@ jobs:
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
           mkdir -p /tmp/$PREFIX-out
           date +%s >> /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-step-stamps.txt
-          sudo unshare -n env PREFIX="$PREFIX" ./run-ceremony.sh config.json /tmp/$PREFIX-stage /tmp/$PREFIX-out 2>&1 \
+          sudo unshare -n env PREFIX="$PREFIX" ALLOWED_PREFIX="$ALLOWED_PREFIX" ./run-ceremony.sh config.json /tmp/$PREFIX-stage /tmp/$PREFIX-out 2>&1 \
             | tee /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-ceremony.log
+      - name: OVMF_CI_SECURE_BOOT_UKI evidence readability repair (ephemeral out tree only)
+        if: always()
+        run: |
+          set -euo pipefail
+          # run-8 defect-1: the ceremony and smoke write as root; the runner-side interpreter
+          # check, marker guard, and evidence upload must read everything (run 8 lost the whole
+          # evidence artifact to a zip EACCES on root-owned ovmf-debug.log). Ephemeral CI output
+          # only, never hashed inputs; every change logged; explicit per-type modes.
+          [ -d /tmp/$PREFIX-out ] || { echo "out dir absent (nothing to repair)"; exit 0; }
+          find /tmp/$PREFIX-out -type d ! -perm -005 -print -exec sudo chmod o+rx {} +
+          find /tmp/$PREFIX-out -type f ! -perm -004 -print -exec sudo chmod o+r {} +
+          # peer provenance tie: manifest of everything the evidence artifact will carry,
+          # plus a logged digest line binding it to this exact run.
+          man=$(mktemp)
+          find /tmp/$PREFIX-out -type f -print0 | sort -z | xargs -0 -r sha256sum > "$man"
+          sudo mv "$man" /tmp/$PREFIX-out/$PREFIX-evidence-manifest.txt
+          sudo chown "$(id -u):$(id -g)" /tmp/$PREFIX-out/$PREFIX-evidence-manifest.txt
+          echo "ARTIFACT-DIGEST path=/tmp/$PREFIX-out/ manifest=$PREFIX-evidence-manifest.txt manifest_sha256=$(sha256sum /tmp/$PREFIX-out/$PREFIX-evidence-manifest.txt | cut -d' ' -f1) files=$(grep -c . /tmp/$PREFIX-out/$PREFIX-evidence-manifest.txt) run_id=$GITHUB_RUN_ID run_attempt=$GITHUB_RUN_ATTEMPT run_number=$GITHUB_RUN_NUMBER workflow=$GITHUB_WORKFLOW commit=$GITHUB_SHA ref=$GITHUB_REF"
       - name: OVMF_CI_SECURE_BOOT_UKI ceremony interpreter cross-check (addendum2 condition 2b)
         run: |
           set -euo pipefail
@@ -323,6 +359,9 @@ jobs:
           path: |
             /tmp/NON_CERTIFYING_REHEARSAL-out/
             /tmp/NON_CERTIFYING_REHEARSAL-fw-hashes.txt
+            /tmp/NON_CERTIFYING_REHEARSAL-ovmf-a/basetools-build.log
+            /tmp/NON_CERTIFYING_REHEARSAL-ovmf-b/basetools-build.log
+            /tmp/NON_CERTIFYING_REHEARSAL-hostile-out/basetools-build.log
           retention-days: 90
           if-no-files-found: error
 
@@ -344,9 +383,12 @@ jobs:
           set -euo pipefail
           [ "${{ github.run_attempt }}" = "1" ] || { echo "E_RERUN_FORBIDDEN run_attempt=${{ github.run_attempt }}"; exit 89; }
           [ "${{ github.ref }}" = "refs/heads/p3-certification" ] || { echo "E_REF_MISMATCH ref=${{ github.ref }}"; exit 89; }
+          # pushed-once gate (T3 F5): the ref must be created by THIS push, never force-pushed
           [ "$EV_CREATED" = "true" ] || { echo "E_PUSHED_ONCE created=$EV_CREATED"; exit 89; }
           [ "$EV_FORCED" = "false" ] || { echo "E_PUSHED_ONCE forced=$EV_FORCED"; exit 89; }
           [ "$EV_BEFORE" = "0000000000000000000000000000000000000000" ] || { echo "E_PUSHED_ONCE before=$EV_BEFORE"; exit 89; }
+          mkdir -p /tmp/$PREFIX-out
+          date +%s >> /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-step-stamps.txt
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
         with: {persist-credentials: false}
       - name: workflow-argument existence gate (D2, fail-closed)
@@ -395,7 +437,13 @@ jobs:
         run: |
           set -euo pipefail
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
-          ./make-shims.sh /tmp/$PREFIX-stage-env2 /tmp/$PREFIX-stage-env2/shims >/dev/null
+          SHIMS_LOG=/tmp/$PREFIX-out/$PREFIX-env2-make-shims.log
+          mkdir -p /tmp/$PREFIX-out
+          if ./make-shims.sh /tmp/$PREFIX-stage-env2 /tmp/$PREFIX-stage-env2/shims >"$SHIMS_LOG" 2>&1; then
+            cat "$SHIMS_LOG"
+          else
+            rc=$?; cat "$SHIMS_LOG"; echo "E_ENV2_SHIMS make-shims.sh rc=$rc log=$SHIMS_LOG"; exit 97
+          fi
           REALWORK=$(mktemp -d /tmp/$PREFIX-env2-preflight-realwork.XXXXXX)
           rc=0
           out=$(./bwrap-argv.sh canonical /tmp/$PREFIX-stage-env2/shims/bwrap "$REALWORK" -- true 2>&1) || rc=$?
@@ -433,6 +481,17 @@ jobs:
           HA=$(sha256sum /tmp/$PREFIX-app-env2-a/enroll-app.efi | cut -d' ' -f1)
           [ "$HA" = "540b4fa3990f998cb803160482bd50e9670a47da3d534acc3ade91364a85f3ee" ] || { echo "E_APP_PIN_MISMATCH $HA"; exit 46; }
           sha256sum /tmp/$PREFIX-app-env2-a/enroll-app.efi > /tmp/$PREFIX-env2-evidence/NON_CERTIFYING_REHEARSAL-env2-app-hash.txt
+      - name: OVMF_CI_SECURE_BOOT_UKI env2 ESP image reproduction (peer gap close - ESP is a frozen output)
+        run: |
+          set -euo pipefail
+          cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+          export PATH="/tmp/$PREFIX-stage-env2/shims:$PATH"
+          sudo unshare -n env PATH="$PATH" ../build-esp-image.sh evidence/successor-signed.efi /tmp/$PREFIX-esp-env2-a
+          sudo unshare -n env PATH="$PATH" ../build-esp-image.sh evidence/successor-signed.efi /tmp/$PREFIX-esp-env2-b
+          cmp /tmp/$PREFIX-esp-env2-a/c5-root-admitter-uki-v3-esp.raw /tmp/$PREFIX-esp-env2-b/c5-root-admitter-uki-v3-esp.raw
+          HE=$(sha256sum /tmp/$PREFIX-esp-env2-a/c5-root-admitter-uki-v3-esp.raw | cut -d' ' -f1)
+          [ "$HE" = "2bfa621238890890765c9636f99dabfb46233bfa626afb580ce33e65858019c9" ] || { echo "E_ESP_PIN_MISMATCH $HE"; exit 46; }
+          sha256sum /tmp/$PREFIX-esp-env2-a/c5-root-admitter-uki-v3-esp.raw > /tmp/$PREFIX-env2-evidence/NON_CERTIFYING_REHEARSAL-env2-esp-hash.txt
       - name: OVMF_CI_SECURE_BOOT_UKI env2 accepted-firmware pins + runner-1 hash echo
         run: |
           set -euo pipefail
@@ -467,13 +526,18 @@ jobs:
           A1=$(grep -- "-app-a/enroll-app.efi" /tmp/$PREFIX-fw1/$PREFIX-fw-hashes.txt | cut -d' ' -f1)
           A2=$(sha256sum /tmp/$PREFIX-app-env2-a/enroll-app.efi | cut -d' ' -f1)
           [ "$A1" = "$A2" ] || { echo "E_ENV2_APP_MISMATCH $A1 $A2"; exit 93; }
-          echo "env2 reproduction byte-identical across runners at canonical /build (firmware + enroll app)"
+          E1=$(grep -- "-esp-a/c5-root-admitter-uki-v3-esp.raw" /tmp/$PREFIX-fw1/$PREFIX-fw-hashes.txt | cut -d' ' -f1)
+          E2=$(sha256sum /tmp/$PREFIX-esp-env2-a/c5-root-admitter-uki-v3-esp.raw | cut -d' ' -f1)
+          [ "$E1" = "$E2" ] || { echo "E_ENV2_ESP_MISMATCH $E1 $E2"; exit 93; }
+          echo "env2 reproduction byte-identical across runners at canonical /build (firmware + enroll app + ESP image)"
       - name: OVMF_CI_SECURE_BOOT_UKI env2 evidence upload (ephemeral CI artifact only)
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
         with:
           name: OVMF_CI_SECURE_BOOT_UKI-env2-evidence
-          path: /tmp/NON_CERTIFYING_REHEARSAL-env2-evidence/
+          path: |
+            /tmp/NON_CERTIFYING_REHEARSAL-env2-evidence/
+            /tmp/NON_CERTIFYING_REHEARSAL-ovmf-env2/basetools-build.log
           retention-days: 90
           if-no-files-found: error
 
