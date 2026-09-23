@@ -1,0 +1,93 @@
+{
+  "evidenceId": "TRACK-B-B3-VISUAL-CASUALTY",
+  "phase": "B3 male 3D casualty + posture representation (visual side)",
+  "generatedAt": "2026-09-23T18:12:15.044Z",
+  "branch": "candidate5-track-b-visual-slice",
+  "track": "B (isolated; NO merge to main, NO production connection)",
+  "visual": {
+    "status": "DIMENSIONED_TO_CERTIFIED_ENVELOPE",
+    "visualDigest": "efe6bd00ebbc4aeb13cf219d3aa1a81258b6b2f6ae2f109eb5f4c44850a535d9",
+    "componentCount": 5
+  },
+  "envelopeCheck": {
+    "componentUnionEqualsAggregateBounds": true,
+    "floorContactY0": true,
+    "dimensionsMicrounits": [
+      660000,
+      302000,
+      1946000
+    ]
+  },
+  "physicalPosture": {
+    "semantic": "SUPINE_FLOOR",
+    "source": "CERTIFIED_AUTHORITATIVE_STATE",
+    "visualMayAlter": false
+  },
+  "visualPose": {
+    "kind": "STATIC",
+    "matchesCertifiedPosture": true,
+    "articulation": false,
+    "deformation": false,
+    "reason": "articulation/deformation and rotated contacts are Gate D declared unknowns"
+  },
+  "statusCaveat": {
+    "entityId": "school-casualty-adult-v1",
+    "gate": "GATE B",
+    "gateResult": "PASS_PENDING_LIFECYCLE_REVIEW",
+    "bodyLifecycle": "AUTHORED_NEW_DRAFT/VALIDATED/AWAITING_USER_GATE_REVIEW",
+    "verifiedForSlice": false,
+    "caveat": "Male casualty body is NOT VERIFIED_FOR_SLICE. Visual use is provisional pending lifecycle review."
+  },
+  "boundary": {
+    "presentationOnly": true,
+    "visualPoseFeedsPhysicalPosture": false,
+    "physicalProof": false,
+    "geometryGateBypass": false,
+    "rendererDownstreamOfContract": "ED-P2-02"
+  },
+  "entityRef": {
+    "entityId": "school-casualty-adult-v1",
+    "bodyDigest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3",
+    "profileDigest": "f1d973b4cfbebdfa230fe0257ccfe9c11056a7d07e52c3701d1e6772311bcc41",
+    "postureDigest": "197a806537a3c9d9f629cf2a57d6db4031fa93ebea0618c2e18603f48301745e"
+  },
+  "placement": {
+    "source": "B1 visual scene descriptor (authoritative committed transform)",
+    "transformMicrounits": {
+      "positionMicrounits": [
+        0,
+        0,
+        1000000
+      ],
+      "orientation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scaleMicrounits": [
+        1000000,
+        1000000,
+        1000000
+      ]
+    }
+  },
+  "negativeChecks": [
+    "non-identity orientation REJECTED (rotated contacts declared unknown)",
+    "body digest mismatch REJECTED",
+    "visual pose static: no articulation/deformation (declared unknowns)"
+  ],
+  "tests": {
+    "suite": "tests/clean-runtime-school-scene-v2/*.test.js",
+    "result": "48/48 PASS via node --test",
+    "note": "host: Linux container, node v22.23.2; not a certified CI platform run"
+  },
+  "barriers": [
+    "no merge to main/default",
+    "no production connection",
+    "visuals never represented as certified physics",
+    "visual pose never feeds physical posture",
+    "no Geometry Gate bypass",
+    "zero mandatory cost"
+  ]
+}
