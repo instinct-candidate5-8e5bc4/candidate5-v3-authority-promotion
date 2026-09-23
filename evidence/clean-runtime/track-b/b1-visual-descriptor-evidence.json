@@ -1,0 +1,201 @@
+{
+  "evidenceId": "TRACK-B-B1-VISUAL-SCENE-DESCRIPTOR",
+  "phase": "B1 authoritative runtime integration (read-only scene descriptor)",
+  "generatedAt": "2026-09-23T18:09:53.357Z",
+  "branch": "candidate5-track-b-visual-slice",
+  "baseCommit": "7cd96d36",
+  "track": "B (simulator product development, isolated; NO merge to main, NO production connection)",
+  "descriptor": {
+    "status": "COMMITTED",
+    "descriptorDigest": "5f6829b7b10bbbc91ff0bd7e66bd5de3c69473091d56af92f8decbc8cbecaa18",
+    "descriptorVersion": "1.0.0"
+  },
+  "sourcePackage": {
+    "scenePackageId": "SCHOOL_TREATMENT_ROOM_PHYSICAL_V2",
+    "scenePackageVersion": "2.0.0",
+    "scenePackageDigest": "187cf1a4c0af01ef12087879f44eeb88a355499a860665e29cdb2f5ab0d06aec",
+    "certification": "GATE D SCHOOL PHYSICAL SCENE PACKAGE V2 PASS",
+    "gateEvidenceRef": "evidence/clean-runtime/gate-d/gate-result.json",
+    "packageProvenanceLedger": {
+      "room": "RECOVERED",
+      "surfaceModel": "RECOVERED",
+      "bag": "RECOVERED",
+      "casualty": "AUTHORED_NEW+VERIFIED_FOR_SLICE",
+      "chair": "AUTHORED_NEW+VERIFIED_FOR_SLICE",
+      "seat": "AUTHORED_NEW+VERIFIED_FOR_SLICE",
+      "panoramaGeometryLineage": "UNKNOWN",
+      "visualPhysicalLineage": "UNKNOWN"
+    }
+  },
+  "worldRef": {
+    "worldId": "school-treatment-room-v2",
+    "revision": 1,
+    "stateDigest": "fa1bbaa985a63a8bfa30c2bbd7fbaf14b2c4972d985815a093bdd68f7fe954ea",
+    "replayMatchesCommittedState": true
+  },
+  "numericContract": {
+    "contractId": "ED-P2-02",
+    "linearUnit": "MICROUNIT",
+    "microunitsPerWorldUnit": 1000000,
+    "orientation": "CANONICAL_INTEGER_QUATERNION",
+    "rendererConversion": "DOWNSTREAM_ONLY",
+    "rendererFloatsFeedAuthoritativeState": false,
+    "unitsNotes": [
+      "entities[].transform is integer microunits / canonical integer quaternion per ED-P2-02",
+      "supportRelations[].contactRegionGeometry for school-medical-bag is carried verbatim in AUTHORED METERS from the locked SCHOOL_BAG_BODY geometry (digest f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a, .55x.35x.35m box) - not converted here; the renderer applies each field's declared units",
+      "casualty contact region geometry is integer microunits from the adult-v1 body definition"
+    ]
+  },
+  "boundary": {
+    "kind": "VISUAL_BINDING_PROJECTION",
+    "readOnly": true,
+    "physicalProof": false,
+    "visualsRepresentCertifiedPhysics": false,
+    "physicalTruthFromPixels": false,
+    "geometryGateBypass": false,
+    "rendererDownstreamOfContract": "ED-P2-02",
+    "rendererMayWriteToAuthoritativeState": false
+  },
+  "statusCaveats": {
+    "casualty": {
+      "entityId": "school-casualty-adult-v1",
+      "gate": "GATE B",
+      "gateResult": "PASS_PENDING_LIFECYCLE_REVIEW",
+      "bodyLifecycle": "AUTHORED_NEW_DRAFT/VALIDATED/AWAITING_USER_GATE_REVIEW",
+      "verifiedForSlice": false,
+      "caveat": "Male casualty body is NOT VERIFIED_FOR_SLICE. Visual use is provisional pending lifecycle review."
+    },
+    "chair": {
+      "entityId": "school-treatment-chair",
+      "gate": "GATE C",
+      "gateResult": "PASS_PENDING_USER_REVIEW_FOR_ADMISSION",
+      "verifiedForSlice": false,
+      "caveat": "Treatment chair is PASS_PENDING_USER_REVIEW_FOR_ADMISSION. Visual use is provisional pending user review."
+    }
+  },
+  "declaredUnknowns": [
+    "panorama-geometry lineage",
+    "visual-physical lineage",
+    "final visual correctness",
+    "rotated contacts",
+    "articulation/deformation",
+    "friction/load/stability",
+    "Constraint/Entrapment/Accessibility",
+    "real posture contact regions",
+    "dynamic hazard/event contracts"
+  ],
+  "placementPath": [
+    "WorldMutationAPI",
+    "PhysicalLegalityPort",
+    "SchoolGeometryAdapter",
+    "Phase 2 Geometry Gate (PASS, phase2ByteIdentical)"
+  ],
+  "entities": [
+    {
+      "entityId": "school-casualty-adult-v1",
+      "transform": {
+        "positionMicrounits": [
+          0,
+          0,
+          1000000
+        ],
+        "orientation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scaleMicrounits": [
+          1000000,
+          1000000,
+          1000000
+        ]
+      },
+      "bodyDigest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3",
+      "provenance": "AUTHORED_NEW/AUTHORED_NEW"
+    },
+    {
+      "entityId": "school-medical-bag",
+      "transform": {
+        "positionMicrounits": [
+          -3000000,
+          175000,
+          1000000
+        ],
+        "orientation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scaleMicrounits": [
+          1000000,
+          1000000,
+          1000000
+        ]
+      },
+      "bodyDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+      "provenance": "RECOVERED/RECOVERED"
+    },
+    {
+      "entityId": "school-treatment-chair",
+      "transform": {
+        "positionMicrounits": [
+          -2000000,
+          0,
+          1000000
+        ],
+        "orientation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scaleMicrounits": [
+          1000000,
+          1000000,
+          1000000
+        ]
+      },
+      "bodyDigest": "1e78439ad5977c6c050475b4ac692cee9fce7da034725ea88a7ed4f0b0803247",
+      "provenance": "AUTHORED_NEW/AUTHORED_NEW"
+    }
+  ],
+  "supportRelations": [
+    {
+      "relationId": "school:bag:floor",
+      "supportedEntityId": "school-medical-bag",
+      "surfaceId": "floor",
+      "contactRegionDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a"
+    },
+    {
+      "relationId": "school:casualty:floor",
+      "supportedEntityId": "school-casualty-adult-v1",
+      "surfaceId": "floor",
+      "contactRegionDigest": "a81faa1437446944e978e3d79a3b6dcdaa113415d11db5a1ca6207085b4601de"
+    },
+    {
+      "relationId": "school:chair:floor",
+      "supportedEntityId": "school-treatment-chair",
+      "surfaceId": "floor",
+      "contactRegionDigest": "7bf790b12383cd8161dff560ae3e901aec003dd2a17c86423fd68f3f9b7698d1"
+    }
+  ],
+  "tests": {
+    "suite": "tests/clean-runtime-school-scene-v2 (gate-d, performance, visual-descriptor)",
+    "result": "36/36 PASS via node --test",
+    "emulated": false,
+    "note": "host: Linux container, node v22.23.2; not a certified CI platform run"
+  },
+  "barriers": [
+    "no merge to main/default",
+    "no production connection",
+    "visuals never represented as certified physics",
+    "no physical truth from pixels",
+    "no Geometry Gate bypass (sole placement path)",
+    "zero mandatory cost"
+  ],
+  "knownIssues": [
+    "package.js provenanceLedger labels casualty/chair/seat AUTHORED_NEW+VERIFIED_FOR_SLICE, but owner-facing lifecycle status is stricter (Gate B PASS_PENDING_LIFECYCLE_REVIEW / Gate C PASS_PENDING_USER_REVIEW_FOR_ADMISSION). Descriptor carries the stricter status; the package label discrepancy is reported for review."
+  ]
+}
