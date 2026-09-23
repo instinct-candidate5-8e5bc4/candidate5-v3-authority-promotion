@@ -8,7 +8,7 @@
 # system"). Inside, it runs the EXACT frozen case argv from argv-freeze.json (with
 # -S inserted; -daemonize kept), proving machine init incl. firmware load from the
 # staged tree only, plus a clean QMP handshake + quit. The CPU never starts (-S):
-# no case is booted. Exit 97 on any failure. Relative argv
+# no case is booted. Exit 97 on any failure. Runs as root (KVM device mapping). Relative argv
 # paths resolve against a work root materialized from the pin-verified dual-build
 # products (the same bytes the ceremony copies into the repo tree one step later).
 set -euo pipefail
@@ -16,6 +16,11 @@ PREFIX="${PREFIX:-NON_CERTIFYING_REHEARSAL}"; export PREFIX
 HERE="$(cd "$(dirname "$0")" && pwd)"
 
 if [ "${QEMU_SMOKE_NS:-0}" != "1" ]; then
+  # must run as root (the workflows invoke it via sudo, exactly like the ceremony's sudo
+  # unshare -n): /dev/kvm is root:kvm 0660 on the runner, and inside bwrap's user namespace
+  # an unmapped owner/group fails the open with EACCES (scratch run 5). With euid 0 bwrap
+  # maps ns uid 0 to real uid 0, so the node owner is mapped and owner-rw applies.
+  [ "$(id -u)" = "0" ] || { echo "E_QEMU_SMOKE must run as root (KVM device owner mapping; use sudo as the workflows do)"; exit 97; }
   STAGE="/tmp/$PREFIX-stage"
   BWRAP="$STAGE/shims/bwrap"
   [ -x "$BWRAP" ] || { echo "E_QEMU_SMOKE no staged bwrap at $BWRAP"; exit 97; }
