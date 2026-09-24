@@ -17,6 +17,9 @@ PREFIX="${PREFIX:-}"
 for stale in build-output disks prep; do
   [ -e "$stale" ] && { echo "E_STALE_STATE $stale"; exit 93; }
 done
+# peer run-36009604654 ruling (a): pre-ceremony in-run products (unsigned UKI, c-sign
+# outputs, fixtures) live OUTSIDE the checkout; the ceremony reads them from here.
+INRUN="/tmp/$PREFIX-inrun"
 mkdir -p "$OUT" build-output/esp build-output/esp-variant build-output/ovmf-debug build-output/enroll-app
 # run-8 defect-1 fix: everything the ceremony writes as root under $OUT must be runner-
 # readable for the runner-side evidence upload (run 8's zip died EACCES on the root-owned
@@ -101,10 +104,10 @@ fi
 # (uki-build + c-fixtures steps; runner-ephemeral keys, nothing signed committed). Bind
 # the fixture payload to the c-fixtures FIXTURE-SHASUMS record BEFORE building (fail
 # closed on any drift), mirroring the c-sign SHASUMS binding below.
-[ -f build-output/uki/successor-unsigned.efi ] || { echo "E_UKI_BUILD_MISSING build-output/uki/successor-unsigned.efi"; exit 94; }
-[ -f build-output/c-sign/fixtures/FIXTURE-SHASUMS ] || { echo "E_FIXTURE_RECORD_MISSING build-output/c-sign/fixtures/FIXTURE-SHASUMS"; exit 94; }
-( cd build-output/c-sign/fixtures && sha256sum -c FIXTURE-SHASUMS ) || { echo "E_FIXTURE_PAYLOAD_MISMATCH FIXTURE-SHASUMS"; exit 94; }
-for pair in "build-output/uki/successor-unsigned.efi unsigned" "build-output/c-sign/fixtures/F-WRONGSIG.efi wrongsig" "build-output/c-sign/fixtures/F-HOSTILEUKI.efi hostile"; do
+[ -f "$INRUN/uki/successor-unsigned.efi" ] || { echo "E_UKI_BUILD_MISSING $INRUN/uki/successor-unsigned.efi"; exit 94; }
+[ -f "$INRUN/c-sign/fixtures/FIXTURE-SHASUMS" ] || { echo "E_FIXTURE_RECORD_MISSING $INRUN/c-sign/fixtures/FIXTURE-SHASUMS"; exit 94; }
+( cd "$INRUN/c-sign/fixtures" && sha256sum -c FIXTURE-SHASUMS ) || { echo "E_FIXTURE_PAYLOAD_MISMATCH FIXTURE-SHASUMS"; exit 94; }
+for pair in "$INRUN/uki/successor-unsigned.efi unsigned" "$INRUN/c-sign/fixtures/F-WRONGSIG.efi wrongsig" "$INRUN/c-sign/fixtures/F-HOSTILEUKI.efi hostile"; do
   set -- $pair
   ./build-esp-variant.sh "$1" "$2" "build-output/tmp-$2"
   mv "build-output/tmp-$2/NON_CERTIFYING_REHEARSAL-esp-$2.raw" build-output/esp-variant/
@@ -114,20 +117,21 @@ done
 # outputs (in-run ephemeral key, plain-deleted there); they are NOT committed and NOT
 # config-pinned. Bind them to the c-sign SHASUMS record BEFORE building (fail closed on
 # any drift), then record the runtime ESP hashes into the ceremony evidence tree.
-[ -f build-output/c-sign/SHASUMS ] || { echo "E_CSIGN_RECORD_MISSING build-output/c-sign/SHASUMS"; exit 94; }
-( cd build-output/c-sign && sha256sum -c SHASUMS ) || { echo "E_THROWAWAY_PAYLOAD_MISMATCH c-sign SHASUMS"; exit 94; }
-export C5_THROWAWAY_CERT_SHA256=$(awk '$2=="c5-throwaway-ci-cert.der"{print $1}' build-output/c-sign/SHASUMS)
+[ -f "$INRUN/c-sign/SHASUMS" ] || { echo "E_CSIGN_RECORD_MISSING $INRUN/c-sign/SHASUMS"; exit 94; }
+( cd "$INRUN/c-sign" && sha256sum -c SHASUMS ) || { echo "E_THROWAWAY_PAYLOAD_MISMATCH c-sign SHASUMS"; exit 94; }
+export C5_THROWAWAY_CERT_SHA256=$(awk '$2=="c5-throwaway-ci-cert.der"{print $1}' "$INRUN/c-sign/SHASUMS")
 [ -n "$C5_THROWAWAY_CERT_SHA256" ] || { echo "E_THROWAWAY_CERT_UNSET not in SHASUMS"; exit 94; }
 for pair in "signed-ossl.efi ossl-throwaway" "signed-sbsign.efi sbsign-throwaway"; do
   set -- $pair
-  ./build-esp-variant.sh "build-output/c-sign/$1" "$2" "build-output/tmp-$2"
+  ./build-esp-variant.sh "$INRUN/c-sign/$1" "$2" "build-output/tmp-$2"
   mv "build-output/tmp-$2/NON_CERTIFYING_REHEARSAL-esp-$2.raw" build-output/esp-variant/
   rm -rf "build-output/tmp-$2"
 done
 mkdir -p "$OUT"
 ( cd build-output && sha256sum esp-variant/NON_CERTIFYING_REHEARSAL-esp-ossl-throwaway.raw \
-    esp-variant/NON_CERTIFYING_REHEARSAL-esp-sbsign-throwaway.raw c-sign/signed-ossl.efi \
-    c-sign/signed-sbsign.efi c-sign/c5-throwaway-ci-cert.der ) > "$OUT/$PREFIX-throwaway-runtime.sha256"
+    esp-variant/NON_CERTIFYING_REHEARSAL-esp-sbsign-throwaway.raw ) > "$OUT/$PREFIX-throwaway-runtime.sha256"
+( cd "$INRUN/c-sign" && sha256sum signed-ossl.efi \
+    signed-sbsign.efi c5-throwaway-ci-cert.der ) >> "$OUT/$PREFIX-throwaway-runtime.sha256"
 # batch1r2 C1: the frozen ESP is copied from the dual-built workflow step, never rebuilt here
 # scratch-8 peer ask: a missing/wrong-prefix source must FAIL with a NAMED error BEFORE cp
 # (run 35931520373 died on cp's bare exit 1 with no gate code); print the exact path.

@@ -653,9 +653,11 @@ for _p in _py_files:
         _bad-={"lane_resolve"}
     # peer run-36004747396 ruling (C1''''' items 2+4): NARROW named allowance - exactly
     # the reviewed bash-rule heredoc parser module "heredoc_parse" (this directory,
-    # stdlib-only, no sibling imports), ONLY in the E_HEREDOC_STRUCTURE gate and its two
-    # committed test/extraction consumers. No wildcard, no other file, no other module.
-    if os.path.basename(_p) in ("preflight-check.py","test-k2-sweeps.py","test-heredoc-structure.py"):
+    # stdlib-only, no sibling imports), ONLY in the E_HEREDOC_STRUCTURE and
+    # E_INRUN_WRITES_CHECKOUT gates and their committed test/extraction consumers
+    # (test-inrun-writes.py added by the run-36009604654 ruling (e) - same module,
+    # same shape). No wildcard, no other file, no other module.
+    if os.path.basename(_p) in ("preflight-check.py","test-k2-sweeps.py","test-heredoc-structure.py","test-inrun-writes.py"):
         _bad-={"heredoc_parse"}
     # #18 (same shape): derive-scratch.py's REAL imports are re+sys; the generator embeds
     # the workflow step TEXT it injects, whose fetch-test heredoc carries an
@@ -749,6 +751,40 @@ for _fn in sorted(os.listdir(wf_dir)):
                 except SyntaxError as _se:
                     fail("E_HEREDOC_STRUCTURE","%s:%d python heredoc <<'%s' body fails py_compile: %s"%(_fn,_rec["opener_lineno"],_path,_se))
     if _cov: _heredoc_coverage[_fn]=sorted(_cov)
+
+# 6m) peer run-36009604654 ruling (e): E_INRUN_WRITES_CHECKOUT - no step BEFORE the
+# ceremony step may write under build-output, disks, or prep in the checkout. In-run
+# products live at /tmp/$PREFIX-inrun (ruling (a)); the ceremony's OWN outputs are the
+# only legitimate checkout writes and they happen inside run-ceremony.sh AFTER its
+# E_STALE_STATE loop. Scanned: shell lines of every run block before the ceremony block
+# (top-level and nested shell-heredoc bodies via heredoc_parse.walk; python heredoc
+# bodies and comment lines excluded - the ruling's inspection list is shell shapes:
+# cp/install/mkdir/mv/tee/ln/dd/touch, redirections, -o/-out targets). Committed planted
+# negatives: test-inrun-writes.py.
+import re as _re_iw
+_inrun_wf="NON_CERTIFYING_REHEARSAL-workflow.yml"
+_wt=open(os.path.join(wf_dir,_inrun_wf),errors="replace").read()
+_blocks=list(_hp.iter_run_blocks(_wt))
+_cer=None
+for _i,(_rk,_blk) in enumerate(_blocks):
+    if any("run-ceremony.sh" in _l for _,_l in _blk):
+        _cer=_i; break
+if _cer is None:
+    fail("E_INRUN_WRITES_CHECKOUT",_inrun_wf+" ceremony step (run-ceremony.sh) not found")
+else:
+    _WRITE_RE=_re_iw.compile(r"\b(?:mkdir|cp|install|mv|tee|ln|dd|touch)\b|\b-o\b|\b-out\b|>>?")
+    _TGT_RE=_re_iw.compile(r"(?:build-output|disks|prep)(?:/|[\s\"'\)]|$)")
+    for _rk,_blk in _blocks[:_cer]:
+        _pylines=set()
+        for _kind,_path,_rec in _hp.walk(_blk):
+            if _kind=="heredoc" and _hp.is_python(_rec):
+                _pylines.update(_ln for _ln,_ in _rec["body"])
+        for _ln,_l in _blk:
+            if _ln in _pylines: continue
+            _ls=_l.strip()
+            if not _ls or _ls.startswith("#"): continue
+            if _WRITE_RE.search(_l) and _TGT_RE.search(_l):
+                fail("E_INRUN_WRITES_CHECKOUT","%s:%d pre-ceremony step writes under build-output/disks/prep: %s"%(_inrun_wf,_ln,_ls[:100]))
 
 # 7) KVM requirement is declarative here; runtime fail-closed check lives in the workflow
 report={"schema":"NON_CERTIFYING_REHEARSAL-preflight/v1","lane":PREFIX,"errors":E,

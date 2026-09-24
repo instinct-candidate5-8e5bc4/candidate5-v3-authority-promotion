@@ -1852,3 +1852,30 @@ Fix per ruling: (a) heredoc_parse.walk recurses - every closed non-python heredo
 Mishap disclosed: my first local replant attempt was paren-balanced (paren moved, not removed) and taught nothing; the real unclosed-paren plant fires as required. C1''''' itself shipped a gate whose own coverage claim was unproven for nested bodies - the recursion the extraction already had is now shared by enforcement, so gate and tests cannot diverge on depth again.
 
 Signed-slot deferred items 16d(a)-(e) still stand - NOT part of this head.
+
+## 21. C1''''''' revision (run-36009604654 failure): in-run products leave the checkout - design contradiction removed
+
+Run 36009604654 (head dac532c39166e63c11a7f11ec2e4efef213d617c, attempt 1) FAILED at step 22 "qemu staged-ROM gates (A3)": E_SMOKE_PREP_TREE_DIRTY exit 97 - git status showed exactly ?? rehearsal/build-output/ (untracked in-run products from steps 18/19) and the boot never started. Steps 11 (static), 18 (c-sign), 19 (c-fixtures) and 33 (H5) were GREEN; steps 31/32 (F6/H3) cascaded on the missing sole vars; step 30 (F3), step 42 (immutability) and the marker scan passed. C1''''''' SUPERSEDES C1'''''' (dac532c39166e63c11a7f11ec2e4efef213d617c), C1''''' (d53219d2..), C1'''' (c839727e..), C1''' (27bfd5c3..), C1'' (fe147879..), C1' (0d66fc2b..), C1 (b2eaef1d..); all remain in history as reviewed-and-revised heads. F6/H3 consequential failures are re-judged only on the new run - no workarounds.
+
+Root cause: a design contradiction, not flakiness. In-run products (UKI build, c-sign outputs, fixtures) were written into rehearsal/build-output inside the checkout while three cleanliness mechanisms demanded an empty git status: the A3 gates (step 22, workflow lines 624/651), the run-ceremony.sh E_STALE_STATE loop (lines 17-19) and static preflight 6c. The first A3 gate after the first in-run write had to fire. The reviewer REJECTED the allowlist/.gitignore shapes (they weaken the gates); the ruling moves the products OUT of the checkout.
+
+Fix per ruling (parts 3-4/4):
+(a) UKI build, c-sign and fixtures now write OUTSIDE the checkout to /tmp/$PREFIX-inrun/{uki,c-sign,c-sign/fixtures} (runner-owned). The key dir stays /tmp/$PREFIX-csign-key; fixture keys stay in mktemp.
+(b) run-ceremony.sh and every later consumer read from /tmp/$PREFIX-inrun; the SHASUMS/FIXTURE-SHASUMS sha256sum -c bindings and the unsigned-UKI drift check (4cda9c3e285b5b639364234400bf0b121178f12447cc88d896cd2623e07d18e1) are KEPT at consumption.
+(c) No gate weakened: the A3 git-status gates, the E_STALE_STATE loop, static 6c and the three H5 mid-ceremony re-preflights stay exactly as strict (PREFLIGHT_MID_CEREMONY=1 only on the three H5 invocations).
+(d) The K2 sweeps (PYK2C, PYK2F) and all three zero-private-key upload gates now cover /tmp/$PREFIX-inrun AS WELL AS the checkout build-output tree (both legs, when present); the fixture root sweep (PYK2) needed no path change - $F was and stays a mktemp outside the checkout. Anything uploaded from inrun names only the public files. test-k2-sweeps.py re-pointed at the dual-leg bodies: 22/22 (clean, clean-both-legs, unreadable inrun, unreadable checkout leg, empty, planted key-name in inrun, planted key-name in checkout leg; fixture and zero-key suites unchanged).
+(e) NEW static preflight gate E_INRUN_WRITES_CHECKOUT (section 6m): no run block BEFORE the ceremony step may write under build-output/disks/prep in the checkout (shell-line scan over heredoc_parse.walk at every depth; python heredoc bodies and comment lines excluded - the ruling's inspection list is shell shapes: mkdir/cp/install/mv/tee/ln/dd/touch, redirections, -o/-out targets; boundary = the first run block containing run-ceremony.sh; missing boundary fails too). Committed planted negatives test-inrun-writes.py exec the EXACT 6m block: 11/11 (real workflow clean; mkdir/cp/redirect/install/tee/nested-shell-heredoc writes each fire; comment mention, post-ceremony write, python-body write do not fire; ceremony step missing fires).
+(f) Ruling table - every step writing inside the checkout, in step order, and every checkout-cleanliness gate:
+
+| step (in order) | role re checkout |
+|---|---|
+| step 11 static preflight | CLEANLINESS GATE: 6c E_RUNTIME_ARTIFACT_COMMITTED (no committed build-output/disks/prep) + NEW 6m E_INRUN_WRITES_CHECKOUT |
+| step 22 qemu staged-ROM gates (A3) | CLEANLINESS GATE x2 (workflow lines 624/651): git status --porcelain must be EMPTY (E_SMOKE_PREP_TREE_DIRTY exit 97) |
+| smoke-prep / ceremony step | CLEANLINESS GATE then WRITER: run-ceremony.sh E_STALE_STATE loop (exit 93) refuses a dirty checkout, then creates its OWN build-output/{esp,esp-variant,ovmf-debug,enroll-app} (ceremony outputs - legitimate) |
+| steps 31-42 consumers | WRITERS of evidence files under build-output/pins, esp, ovmf-debug, enroll-app; READERS of /tmp/$PREFIX-inrun products |
+| H5 mid-ceremony re-preflights x3 (step 33) | CLEANLINESS GATE: tracked-file cleanliness only (PREFLIGHT_MID_CEREMONY=1 - the tracked-mode check, unchanged) |
+
+(g) Certification lane: its A3 gates (workflow lines 358/385) were checked - no cert step before them writes into the checkout (structured pass in the delivery report).
+
+Signed-slot deferred items 16d(a)-(e) still stand - NOT part of this head.
+

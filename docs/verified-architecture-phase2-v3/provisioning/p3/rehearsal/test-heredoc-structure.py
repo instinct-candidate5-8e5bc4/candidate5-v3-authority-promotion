@@ -14,7 +14,7 @@ import heredoc_parse as hp
 
 PF = open(os.path.join(HERE, "preflight-check.py")).read()
 i = PF.index("# 6l) peer run-36004747396 ruling")
-j = PF.index("# 7) KVM requirement", i)
+j = PF.index("# 6m) peer run-36009604654 ruling", i)
 GATE = PF[i:j]
 
 def run_gate(wf_dir):

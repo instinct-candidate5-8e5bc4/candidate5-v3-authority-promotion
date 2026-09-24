@@ -32,14 +32,34 @@ SWEEPS = {
     "PYK-zerokkey": extract("PYK"),
 }
 
-def run(name, code, argv, cwd):
+def run(name, code, argv, cwd, env=None):
     with tempfile.NamedTemporaryFile("w", suffix=".py", delete=False) as f:
         f.write(code); path = f.name
     try:
-        r = subprocess.run([sys.executable, path] + argv, cwd=cwd, capture_output=True, text=True)
+        r = subprocess.run([sys.executable, path] + argv, cwd=cwd, capture_output=True, text=True, env=env)
         return r.returncode, (r.stdout + r.stderr)
     finally:
         os.unlink(path)
+
+# run-36009604654 ruling (d): the c-sign/post-copy sweep bodies walk /tmp/<PREFIX>-inrun
+# (from os.environ["PREFIX"]) plus the checkout build-output tree when present. Tests use
+# a throwaway prefix so the body's /tmp path never collides with the lane's real tree.
+TPREFIX = "K2SWEEPTEST"
+TINRUN = "/tmp/%s-inrun" % TPREFIX
+
+def run_env(name, code, argv, cwd):
+    return run(name, code, argv, cwd, env=dict(os.environ, PREFIX=TPREFIX))
+
+def inrun(build):
+    shutil.rmtree(TINRUN, ignore_errors=True)
+    os.makedirs(TINRUN)
+    build()
+
+def inrun_locked():
+    open(os.path.join(TINRUN, "x.efi"), "wb").write(b"public")
+    os.makedirs(os.path.join(TINRUN, "locked"))
+    open(os.path.join(TINRUN, "locked", "z.bin"), "wb").write(b"x")
+    os.chmod(os.path.join(TINRUN, "locked"), 0)
 
 def mktree(build):
     d = tempfile.mkdtemp()
@@ -76,24 +96,50 @@ rc, out = run("fixture-incomplete", SWEEPS["PYK2-fixture"], [d], d)
 expect("fixture-incomplete", rc, out, 94, "E_FIXTURE_PAYLOAD_INCOMPLETE")
 shutil.rmtree(d)
 
-# 4/5) c-sign + post-copy sweeps: clean / unreadable / empty / planted key-name
+# 4/5) c-sign + post-copy sweeps: inrun leg AND checkout-leg coverage (ruling (d))
 for tag, sub in (("PYK2C-csign", "build-output"), ("PYK2F-postcopy", os.path.join("rehearsal", "build-output"))):
-    d = mktree(lambda d: (os.makedirs(os.path.join(d, sub)), open(os.path.join(d, sub, "x.efi"), "wb").write(b"public")))
-    rc, out = run(tag + "-clean", SWEEPS[tag], [], d)
+    # clean: inrun has content, no checkout tree -> pass
+    inrun(lambda: open(os.path.join(TINRUN, "x.efi"), "wb").write(b"public"))
+    d = mktree(lambda d: None)
+    rc, out = run_env(tag + "-clean", SWEEPS[tag], [], d)
     expect(tag + "-clean", rc, out, 0, "sweep clean")
-    shutil.rmtree(d)
-    d = mktree(lambda d: (os.makedirs(os.path.join(d, sub)), open(os.path.join(d, sub, "x.efi"), "wb").write(b"public"), unreadable(d, os.path.join(sub, "locked"))))
-    rc, out = run(tag + "-unreadable", SWEEPS[tag], [], d)
+    shutil.rmtree(d); shutil.rmtree(TINRUN, ignore_errors=True)
+    # clean with BOTH legs present -> pass
+    inrun(lambda: open(os.path.join(TINRUN, "x.efi"), "wb").write(b"public"))
+    d = mktree(lambda d: (os.makedirs(os.path.join(d, sub)), open(os.path.join(d, sub, "y.efi"), "wb").write(b"public")))
+    rc, out = run_env(tag + "-clean-both-legs", SWEEPS[tag], [], d)
+    expect(tag + "-clean-both-legs", rc, out, 0, "sweep clean")
+    shutil.rmtree(d); shutil.rmtree(TINRUN, ignore_errors=True)
+    # unreadable inside inrun -> E_K2_SWEEP_UNREADABLE, never "clean"
+    inrun(inrun_locked)
+    d = mktree(lambda d: None)
+    rc, out = run_env(tag + "-unreadable", SWEEPS[tag], [], d)
     expect(tag + "-unreadable", rc, out, 95, "E_K2_SWEEP_UNREADABLE")
-    os.chmod(os.path.join(d, sub, "locked"), 0o700); shutil.rmtree(d)
-    d = mktree(lambda d: os.makedirs(os.path.join(d, sub)))
-    rc, out = run(tag + "-empty", SWEEPS[tag], [], d)
+    os.chmod(os.path.join(TINRUN, "locked"), 0o700); shutil.rmtree(d); shutil.rmtree(TINRUN, ignore_errors=True)
+    # empty inrun, no checkout tree -> E_K2_SWEEP_EMPTY
+    inrun(lambda: None)
+    d = mktree(lambda d: None)
+    rc, out = run_env(tag + "-empty", SWEEPS[tag], [], d)
     expect(tag + "-empty", rc, out, 95, "E_K2_SWEEP_EMPTY")
-    shutil.rmtree(d)
-    d = mktree(lambda d: (os.makedirs(os.path.join(d, sub)), open(os.path.join(d, sub, "throwaway-key.pem"), "wb").write(b"k")))
-    rc, out = run(tag + "-planted-keyname", SWEEPS[tag], [], d)
+    shutil.rmtree(d); shutil.rmtree(TINRUN, ignore_errors=True)
+    # planted key-named file in inrun -> E_PRIVATE_KEY_IN_BUILD_TREE
+    inrun(lambda: open(os.path.join(TINRUN, "throwaway-key.pem"), "wb").write(b"k"))
+    d = mktree(lambda d: None)
+    rc, out = run_env(tag + "-planted-keyname", SWEEPS[tag], [], d)
     expect(tag + "-planted-keyname", rc, out, 95, "E_PRIVATE_KEY_IN_BUILD_TREE")
-    shutil.rmtree(d)
+    shutil.rmtree(d); shutil.rmtree(TINRUN, ignore_errors=True)
+    # planted key-named file in the CHECKOUT leg (as-well-as coverage) -> caught
+    inrun(lambda: open(os.path.join(TINRUN, "x.efi"), "wb").write(b"public"))
+    d = mktree(lambda d: (os.makedirs(os.path.join(d, sub)), open(os.path.join(d, sub, "sneaky.key"), "wb").write(b"k")))
+    rc, out = run_env(tag + "-planted-keyname-checkout-leg", SWEEPS[tag], [], d)
+    expect(tag + "-planted-keyname-checkout-leg", rc, out, 95, "E_PRIVATE_KEY_IN_BUILD_TREE")
+    shutil.rmtree(d); shutil.rmtree(TINRUN, ignore_errors=True)
+    # UNREADABLE checkout leg (inrun clean) -> E_K2_SWEEP_UNREADABLE, never skipped
+    inrun(lambda: open(os.path.join(TINRUN, "x.efi"), "wb").write(b"public"))
+    d = mktree(lambda d: (os.makedirs(os.path.join(d, sub)), open(os.path.join(d, sub, "x.efi"), "wb").write(b"public"), unreadable(d, os.path.join(sub, "locked"))))
+    rc, out = run_env(tag + "-unreadable-checkout-leg", SWEEPS[tag], [], d)
+    expect(tag + "-unreadable-checkout-leg", rc, out, 95, "E_K2_SWEEP_UNREADABLE")
+    os.chmod(os.path.join(d, sub, "locked"), 0o700); shutil.rmtree(d); shutil.rmtree(TINRUN, ignore_errors=True)
 
 # 6) zero-private-key gate sweep: clean / unreadable / empty / planted pem
 def pyk_args(d):

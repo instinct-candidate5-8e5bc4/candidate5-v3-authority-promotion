@@ -80,7 +80,7 @@ jobs:
           # D2 gate (reviewer ruling): every relative file/script argument used by later
           # steps must exist in the committed tree. Fixed list, fail-closed exit 88.
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
-          for f in             platform.lock.json             config.json             stage-platform.sh             make-shims.sh             test-c-sign-confinement.py             test-enroll-predicate-env.py             test-cert-positive-guard.py             test-k2-sweeps.py             test-stale-state-committed.py             test-heredoc-structure.py             test-h5-planted-errset.py             preflight-check.py             build-ovmf-debug.sh             scan-pe-pdb-paths.py             build-enroll-app.sh             bwrap-argv.sh             enroll-predicate-check.py             rehearsal-enroll.sh             ../build-esp-image.sh             evidence/successor-signed.efi             run-ceremony.sh             qemu-smoke.sh; do
+          for f in             platform.lock.json             config.json             stage-platform.sh             make-shims.sh             test-c-sign-confinement.py             test-enroll-predicate-env.py             test-cert-positive-guard.py             test-k2-sweeps.py             test-inrun-writes.py             test-stale-state-committed.py             test-heredoc-structure.py             test-h5-planted-errset.py             preflight-check.py             build-ovmf-debug.sh             scan-pe-pdb-paths.py             build-enroll-app.sh             bwrap-argv.sh             enroll-predicate-check.py             rehearsal-enroll.sh             ../build-esp-image.sh             evidence/successor-signed.efi             run-ceremony.sh             qemu-smoke.sh; do
             [ -e "$f" ] || { echo "E_WORKFLOW_ARG_MISSING $f"; exit 88; }
           done
       - name: NON_CERTIFYING_REHEARSAL host inputs declared (B3)
@@ -196,6 +196,7 @@ jobs:
           python3 test-stale-state-committed.py 2>&1 | tee /tmp/$PREFIX-out/$PREFIX-stale-state-negtests.log
           python3 test-heredoc-structure.py 2>&1 | tee /tmp/$PREFIX-out/$PREFIX-heredoc-structure-negtests.log
           python3 test-h5-planted-errset.py 2>&1 | tee /tmp/$PREFIX-out/$PREFIX-h5-planted-errset-tests.log
+          python3 test-inrun-writes.py 2>&1 | tee /tmp/$PREFIX-out/$PREFIX-inrun-writes-negtests.log
 
       - name: NON_CERTIFYING_REHEARSAL reproducible OVMF DEBUG dual build + accepted-firmware pins
         timeout-minutes: 150
@@ -290,8 +291,8 @@ jobs:
           [ "$got" = "4cda9c3e285b5b639364234400bf0b121178f12447cc88d896cd2623e07d18e1" ] || { echo "E_UNSIGNED_UKI_DRIFT got=$got"; exit 91; }
           echo "unsigned UKI in-run build == 4cda9c3e (E_UNSIGNED_UKI_DRIFT gate clean)"
           UKIB
-          mkdir -p provisioning/p3/rehearsal/build-output/uki
-          cp "/tmp/$PREFIX-uki/successor-unsigned.efi" provisioning/p3/rehearsal/build-output/uki/successor-unsigned.efi
+          mkdir -p "/tmp/$PREFIX-inrun/uki"
+          cp "/tmp/$PREFIX-uki/successor-unsigned.efi" "/tmp/$PREFIX-inrun/uki/successor-unsigned.efi"
       - name: NON_CERTIFYING_REHEARSAL criterion-C throwaway signing (c-sign, ephemeral in-run key)
         if: ${{ !cancelled() }}
         timeout-minutes: 20
@@ -303,7 +304,7 @@ jobs:
           [ -x "/tmp/$PREFIX-stage/shims/osslsigncode" ] || { echo "E_TOOL_MISSING osslsigncode shim"; exit 92; }
           [ -x "/tmp/$PREFIX-stage/shims/sbsign" ] || { echo "E_TOOL_MISSING sbsign shim"; exit 92; }
           [ -x "/tmp/$PREFIX-stage/shims/openssl" ] || { echo "E_TOOL_MISSING openssl shim"; exit 92; }
-          C=build-output/c-sign
+          C=/tmp/$PREFIX-inrun/c-sign
           rm -rf "$C"; mkdir -p "$C"
           # network-enforced-off like every other post-staging build step (batch1r3 C3);
           # the inner body runs as root solely for the namespace, then ownership is repaired.
@@ -320,7 +321,7 @@ jobs:
           K=/tmp/$PREFIX-csign-key
           mkdir -p "$K"; chmod 0700 "$K"
           trap 'shred -u "$K/throwaway-key.pem" 2>/dev/null || true; rmdir "$K" 2>/dev/null || true' EXIT
-          U=build-output/uki/successor-unsigned.efi
+          U=/tmp/$PREFIX-inrun/uki/successor-unsigned.efi
           got=$(sha256sum "$U" | cut -d' ' -f1)
           [ "$got" = "4cda9c3e285b5b639364234400bf0b121178f12447cc88d896cd2623e07d18e1" ] || { echo "E_UNSIGNED_UKI_DRIFT got=$got"; exit 91; }
           openssl req -x509 -newkey rsa:2048 -keyout "$K/throwaway-key.pem" -out "$C/c5-throwaway-ci-cert.pem" -days 1 -nodes -subj "/CN=C5-THROWAWAY-CI-SIGNER/" -sha256
@@ -361,29 +362,34 @@ jobs:
           shred -u "$K/throwaway-key.pem"
           [ ! -e "$K/throwaway-key.pem" ] || { echo "E_KEY_RESIDUE $K/throwaway-key.pem"; exit 95; }
           rmdir "$K"
-          # K2 over the checkout build-output tree (peer 2026-09-24 BLOCKING 2): no
-          # key-named file and no PEM/DER private-key content anywhere under build-output.
+          # K2 over the in-run product tree AND the checkout build-output tree
+          # (peer run-36009604654 ruling (d)): no key-named file and no PEM/DER
+          # private-key content under /tmp/$PREFIX-inrun or (if present) build-output.
           python3 - <<'PYK2C'
           import os, sys
           def _raise(e):
               print("E_K2_SWEEP_UNREADABLE %s" % e); sys.exit(95)
+          roots = ["/tmp/%s-inrun" % os.environ["PREFIX"]]
+          if os.path.isdir("build-output"):
+              roots.append("build-output")
           bad = []; scanned = 0
-          for root, dirs, files in os.walk("build-output", onerror=_raise):
-              for f in files:
-                  scanned += 1
-                  fp = os.path.join(root, f)
-                  if "key" in f.lower():
-                      bad.append(fp + " (key-named)")
-                      continue
-                  with open(fp, "rb") as h:
-                      d = h.read()
-                  if b"PRIVATE KEY-----" in d:
-                      bad.append(fp + " (private-key content)")
+          for path in roots:
+              for root, dirs, files in os.walk(path, onerror=_raise):
+                  for f in files:
+                      scanned += 1
+                      fp = os.path.join(root, f)
+                      if "key" in f.lower():
+                          bad.append(fp + " (key-named)")
+                          continue
+                      with open(fp, "rb") as h:
+                          d = h.read()
+                      if b"PRIVATE KEY-----" in d:
+                          bad.append(fp + " (private-key content)")
           if bad:
               print("E_PRIVATE_KEY_IN_BUILD_TREE", bad); sys.exit(95)
           if scanned == 0:
-              print("E_K2_SWEEP_EMPTY build-output"); sys.exit(95)
-          print("K2 build-output sweep clean (scanned=%d)" % scanned)
+              print("E_K2_SWEEP_EMPTY %s" % roots); sys.exit(95)
+          print("K2 c-sign/inrun sweep clean (scanned=%d roots=%s)" % (scanned, roots))
           PYK2C
           echo "c-sign complete: two arms gated, key shredded outside the checkout, SHASUMS recorded"
           CSIGN
@@ -399,19 +405,19 @@ jobs:
           export PATH="/tmp/$PREFIX-stage/shims:$PATH"
           [ -x "/tmp/$PREFIX-stage/root/usr/bin/sbsign" ] || { echo "E_TOOL_MISSING staged sbsign"; exit 92; }
           [ -x "/tmp/$PREFIX-stage/root/usr/bin/sbverify" ] || { echo "E_TOOL_MISSING staged sbverify"; exit 92; }
-          [ -f rehearsal/build-output/c-sign/SHASUMS ] || { echo "E_CSIGN_RECORD_MISSING build-output/c-sign/SHASUMS"; exit 94; }
+          [ -f "/tmp/$PREFIX-inrun/c-sign/SHASUMS" ] || { echo "E_CSIGN_RECORD_MISSING /tmp/$PREFIX-inrun/c-sign/SHASUMS"; exit 94; }
           # peer 2026-09-24 route-(ii) key lifecycle: fixtures are generated network-off
           # under /tmp/$PREFIX-*; private keys exist only inside fixture-generate.sh's own
           # mktemp workdir and are shred -u'd by its EXIT trap and explicit cleanup;
           # nothing key-bearing is ever written under an upload path.
           F=/tmp/$PREFIX-fixtures
           RUNNER_UID=$(id -u); RUNNER_GID=$(id -g)
-          mkdir -p rehearsal/build-output/c-sign/fixtures
+          mkdir -p "/tmp/$PREFIX-inrun/c-sign/fixtures"
           sudo unshare -n env PATH="$PATH" PREFIX="$PREFIX" F="$F" RUNNER_UID="$RUNNER_UID" RUNNER_GID="$RUNNER_GID" bash -se <<'CFIX'
           set -eEuo pipefail
           trap '_rc=$?; echo "E_BASH_ERRTRAP c-fixtures-inner line $LINENO rc=$_rc cmd: $BASH_COMMAND" >&2; exit 97' ERR
           rm -rf "$F"; mkdir -p "$F"
-          bash fixture-generate.sh rehearsal/build-output/uki/successor-unsigned.efi "/tmp/$PREFIX-stage/root" "$F/gen"
+          bash fixture-generate.sh "/tmp/$PREFIX-inrun/uki/successor-unsigned.efi" "/tmp/$PREFIX-stage/root" "$F/gen"
           # run-35999960747 D4: the K2 sweep runs HERE, as root, over the WHOLE $F tree.
           # The old runner-user sweep was VACUOUS (umask 077 root-owned gen + os.walk's
           # silent onerror=None skip): it scanned nothing and printed clean. os.walk now
@@ -446,19 +452,20 @@ jobs:
           PYK2
           # copy ONLY the four public artifacts out, runner-owned from birth via install
           # (NEVER chown; the key workdir stays 0700 root and is shredded by the script).
-          install -m 0644 -o "$RUNNER_UID" -g "$RUNNER_GID" "$F/gen/F-WRONGSIG.efi" "$F/gen/F-HOSTILEUKI.efi" "$F/gen/C5-WRONG-SIGNER-FIXTURE.cer" "$F/gen/C5-HOSTILE-FIXTURE.cer" rehearsal/build-output/c-sign/fixtures/
+          install -m 0644 -o "$RUNNER_UID" -g "$RUNNER_GID" "$F/gen/F-WRONGSIG.efi" "$F/gen/F-HOSTILEUKI.efi" "$F/gen/C5-WRONG-SIGNER-FIXTURE.cer" "$F/gen/C5-HOSTILE-FIXTURE.cer" "/tmp/$PREFIX-inrun/c-sign/fixtures/"
           rm -rf "$F"
           CFIX
           python3 - <<'PREC'
-          import json, hashlib, subprocess, sys
+          import json, hashlib, os, subprocess, sys
           def sha(p):
               return hashlib.sha256(open(p, "rb").read()).hexdigest()
-          fx = "rehearsal/build-output/c-sign/fixtures"
+          inrun = "/tmp/%s-inrun" % os.environ["PREFIX"]
+          fx = inrun + "/c-sign/fixtures"
           OWNER = "7cda4ddc149849cc61191d4b5b3d218d14770c0401e9e66dd9617b82ba1ae441"
           H = sha(fx + "/C5-HOSTILE-FIXTURE.cer")
           W = sha(fx + "/C5-WRONG-SIGNER-FIXTURE.cer")
           T = None
-          for line in open("rehearsal/build-output/c-sign/SHASUMS"):
+          for line in open(inrun + "/c-sign/SHASUMS"):
               parts = line.split()
               if len(parts) == 2 and parts[1] == "c5-throwaway-ci-cert.der":
                   T = parts[0]
@@ -469,7 +476,7 @@ jobs:
               if v in seen:
                   print("E_FIXTURE_CERT_DISTINCT %s DER sha256 collides with %s (%s)" % (label, seen[v], v)); sys.exit(91)
               seen[v] = label
-          U = sha("rehearsal/build-output/uki/successor-unsigned.efi")
+          U = sha(inrun + "/uki/successor-unsigned.efi")
           if U != "4cda9c3e285b5b639364234400bf0b121178f12447cc88d896cd2623e07d18e1":
               print("E_UNSIGNED_UKI_DRIFT got=" + U); sys.exit(91)
           def ver(cmd):
@@ -494,30 +501,34 @@ jobs:
           open(fx + "/FIXTURE-SHASUMS", "w").write(shas)
           print("GENERATION-RECORD.json + FIXTURE-SHASUMS written; H/W/T/owner all distinct")
           PREC
-          # K2 over the checkout build-output tree after fixture copy-out (peer
-          # 2026-09-24 BLOCKING 2): fixtures are public-only; no key-named file,
-          # no private-key content may exist anywhere under build-output.
+          # K2 after fixture copy-out (peer run-36009604654 ruling (d)): fixtures are
+          # public-only; no key-named file and no private-key content under
+          # /tmp/$PREFIX-inrun or (if present) the checkout rehearsal/build-output.
           python3 - <<'PYK2F'
           import os, sys
           def _raise(e):
               print("E_K2_SWEEP_UNREADABLE %s" % e); sys.exit(95)
+          roots = ["/tmp/%s-inrun" % os.environ["PREFIX"]]
+          if os.path.isdir("rehearsal/build-output"):
+              roots.append("rehearsal/build-output")
           bad = []; scanned = 0
-          for root, dirs, files in os.walk("rehearsal/build-output", onerror=_raise):
-              for f in files:
-                  scanned += 1
-                  fp = os.path.join(root, f)
-                  if "key" in f.lower():
-                      bad.append(fp + " (key-named)")
-                      continue
-                  with open(fp, "rb") as h:
-                      d = h.read()
-                  if b"PRIVATE KEY-----" in d:
-                      bad.append(fp + " (private-key content)")
+          for path in roots:
+              for root, dirs, files in os.walk(path, onerror=_raise):
+                  for f in files:
+                      scanned += 1
+                      fp = os.path.join(root, f)
+                      if "key" in f.lower():
+                          bad.append(fp + " (key-named)")
+                          continue
+                      with open(fp, "rb") as h:
+                          d = h.read()
+                      if b"PRIVATE KEY-----" in d:
+                          bad.append(fp + " (private-key content)")
           if bad:
               print("E_PRIVATE_KEY_IN_BUILD_TREE", bad); sys.exit(95)
           if scanned == 0:
-              print("E_K2_SWEEP_EMPTY rehearsal/build-output"); sys.exit(95)
-          print("K2 build-output sweep clean (post fixture copy-out, scanned=%d)" % scanned)
+              print("E_K2_SWEEP_EMPTY %s" % roots); sys.exit(95)
+          print("K2 inrun sweep clean (post fixture copy-out, scanned=%d roots=%s)" % (scanned, roots))
           PYK2F
       - name: zero-private-key evidence gate K2 before firmware-hash upload (peer run-12 K4)
         id: k2gate-fw
@@ -529,7 +540,7 @@ jobs:
           # K2 (peer run-12 K4 containment): fail closed if any private-key material stands
           # under ANY evidence upload path - by NAME (*.key/*.pem/*.p12/*.pfx) or CONTENT
           # (PEM "PRIVATE KEY" markers, PKCS#8/RSA DER key headers). Upload only if this passed.
-          printf '%s\n' "$SCAN_PATHS" > /tmp/$PREFIX-k2-paths.txt
+          printf '%s\n' "$SCAN_PATHS" "/tmp/$PREFIX-inrun" > /tmp/$PREFIX-k2-paths.txt
           python3 - /tmp/$PREFIX-k2-paths.txt <<'PYK'
           import sys, os, re
           paths = [l.strip() for l in open(sys.argv[1]) if l.strip()]
@@ -774,7 +785,7 @@ jobs:
           # K2 (peer run-12 K4 containment): fail closed if any private-key material stands
           # under ANY evidence upload path - by NAME (*.key/*.pem/*.p12/*.pfx) or CONTENT
           # (PEM "PRIVATE KEY" markers, PKCS#8/RSA DER key headers). Upload only if this passed.
-          printf '%s\n' "$SCAN_PATHS" > /tmp/$PREFIX-k2-paths.txt
+          printf '%s\n' "$SCAN_PATHS" "/tmp/$PREFIX-inrun" > /tmp/$PREFIX-k2-paths.txt
           python3 - /tmp/$PREFIX-k2-paths.txt <<'PYK'
           import sys, os, re
           paths = [l.strip() for l in open(sys.argv[1]) if l.strip()]
@@ -1037,7 +1048,7 @@ jobs:
           # K2 (peer run-12 K4 containment): fail closed if any private-key material stands
           # under ANY evidence upload path - by NAME (*.key/*.pem/*.p12/*.pfx) or CONTENT
           # (PEM "PRIVATE KEY" markers, PKCS#8/RSA DER key headers). Upload only if this passed.
-          printf '%s\n' "$SCAN_PATHS" > /tmp/$PREFIX-k2-paths.txt
+          printf '%s\n' "$SCAN_PATHS" "/tmp/$PREFIX-inrun" > /tmp/$PREFIX-k2-paths.txt
           python3 - /tmp/$PREFIX-k2-paths.txt <<'PYK'
           import sys, os, re
           paths = [l.strip() for l in open(sys.argv[1]) if l.strip()]
