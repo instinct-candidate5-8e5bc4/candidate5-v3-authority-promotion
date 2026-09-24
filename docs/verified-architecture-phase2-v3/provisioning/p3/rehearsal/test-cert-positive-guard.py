@@ -3,7 +3,7 @@
 # 2026-09-24 C1''' ruling). The test EXTRACTS the exact guard block from
 # preflight-check.py and execs it against the REAL config.json plus synthetic case
 # mutations - the current config + planted slot MUST fire (the C1'' reviewer's repro).
-import json, os, re, sys, textwrap
+import json, os, re, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = open(os.path.join(HERE, "preflight-check.py")).read()
@@ -12,7 +12,9 @@ CFG = json.load(open(os.path.join(HERE, "config.json")))
 m = re.search(r'    if os\.path\.exists\(os\.path\.join\(here,"evidence","successor-to-certify\.efi"\)\):.*?repr\(_pos\)\)\)', SRC, re.S)
 if not m:
     print("E_TEST_EXTRACTION guard block not found in preflight-check.py"); sys.exit(97)
-BLOCK = textwrap.dedent(m.group(0))
+_ls = m.group(0).splitlines()
+_ind = min(len(l) - len(l.lstrip()) for l in _ls if l.strip())
+BLOCK = "\n".join(l[_ind:] for l in _ls)
 
 def run_guard(cfg, slot_exists):
     fails = []

@@ -643,6 +643,8 @@ BLOCK_NEG_TESTS = r'''      - name: NON_CERTIFYING_SCRATCH verify-auth negative 
 A_USERNS   = "      - name: NON_CERTIFYING_SCRATCH userns/bwrap preflight (staged, lock-verified bwrap)\n"
 A_CEREMONY = "      - name: NON_CERTIFYING_SCRATCH ceremony (network-enforced-off, tee'd log)\n"
 BLOCK_BYTECODE_GUARD_NEG = r'''      - name: NON_CERTIFYING_SCRATCH planted-fault H5 bytecode-guard must-show (peer run-35963407323 redesign)
+        # run-35999960747 D3: the three re-preflights below run mid-ceremony (build-output legitimately
+        # exists by then); PREFLIGHT_MID_CEREMONY=1 switches E_STALE_STATE_COMMITTED to tracked-path semantics.
         if: ${{ !cancelled() }}
         run: |
           set -eEuo pipefail
@@ -655,7 +657,7 @@ BLOCK_BYTECODE_GUARD_NEG = r'''      - name: NON_CERTIFYING_SCRATCH planted-faul
           # captured into the evidence tree - a must-show step NAMES every non-zero exit
           # (the run-19' phase-2 clean re-run died silent exit 30 into /dev/null).
           _rc=0
-          python3 preflight-check.py config.json /tmp/$PREFIX-stage > "$OUT/$PREFIX-h5-baseline.json" 2>&1 || _rc=$?
+          PREFLIGHT_MID_CEREMONY=1 python3 preflight-check.py config.json /tmp/$PREFIX-stage > "$OUT/$PREFIX-h5-baseline.json" 2>&1 || _rc=$?
           if [ "$_rc" -ne 0 ]; then
             echo "E_H5_BASELINE_PREFLIGHT_FAIL rc=$_rc"; cat "$OUT/$PREFIX-h5-baseline.json"; exit 90
           fi
@@ -665,7 +667,7 @@ BLOCK_BYTECODE_GUARD_NEG = r'''      - name: NON_CERTIFYING_SCRATCH planted-faul
           trap 'rm -f "$REH_ABS/zz_bytecode_probe.py"' EXIT
           printf 'from lane_resolve import resolve_config_value\n' > "$REH_ABS/zz_bytecode_probe.py"
           _rc=0
-          python3 preflight-check.py config.json /tmp/$PREFIX-stage > "$OUT/$PREFIX-h5-planted.json" 2>&1 || _rc=$?
+          PREFLIGHT_MID_CEREMONY=1 python3 preflight-check.py config.json /tmp/$PREFIX-stage > "$OUT/$PREFIX-h5-planted.json" 2>&1 || _rc=$?
           rm -f "$REH_ABS/zz_bytecode_probe.py"
           trap - EXIT
           if [ "$_rc" -ne 30 ]; then
@@ -690,7 +692,7 @@ BLOCK_BYTECODE_GUARD_NEG = r'''      - name: NON_CERTIFYING_SCRATCH planted-faul
           PYT
           # (c) probe removed; the post-clean run must pass clean, else NAMED with JSON printed.
           _rc=0
-          python3 preflight-check.py config.json /tmp/$PREFIX-stage > "$OUT/$PREFIX-h5-post.json" 2>&1 || _rc=$?
+          PREFLIGHT_MID_CEREMONY=1 python3 preflight-check.py config.json /tmp/$PREFIX-stage > "$OUT/$PREFIX-h5-post.json" 2>&1 || _rc=$?
           if [ "$_rc" -ne 0 ]; then
             echo "E_H5_POST_PREFLIGHT_FAIL rc=$_rc"; cat "$OUT/$PREFIX-h5-post.json"; exit 90
           fi

@@ -69,7 +69,7 @@ jobs:
           # D2 gate (reviewer ruling): every relative file/script argument used by later
           # steps must exist in the committed tree. Fixed list, fail-closed exit 88.
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
-          for f in             platform.lock.json             config.json             stage-platform.sh             make-shims.sh             test-c-sign-confinement.py             test-enroll-predicate-env.py             test-cert-positive-guard.py             preflight-check.py             build-ovmf-debug.sh             scan-pe-pdb-paths.py             build-enroll-app.sh             bwrap-argv.sh             enroll-predicate-check.py             rehearsal-enroll.sh             ../build-esp-image.sh             evidence/successor-signed.efi             run-ceremony.sh             qemu-smoke.sh; do
+          for f in             platform.lock.json             config.json             stage-platform.sh             make-shims.sh             test-c-sign-confinement.py             test-enroll-predicate-env.py             test-cert-positive-guard.py             test-k2-sweeps.py             test-stale-state-committed.py             preflight-check.py             build-ovmf-debug.sh             scan-pe-pdb-paths.py             build-enroll-app.sh             bwrap-argv.sh             enroll-predicate-check.py             rehearsal-enroll.sh             ../build-esp-image.sh             evidence/successor-signed.efi             run-ceremony.sh             qemu-smoke.sh; do
             [ -e "$f" ] || { echo "E_WORKFLOW_ARG_MISSING $f"; exit 88; }
           done
       - name: NON_CERTIFYING_SCRATCH host inputs declared (B3)
@@ -242,6 +242,8 @@ jobs:
           python3 test-c-sign-confinement.py 2>&1 | tee /tmp/$PREFIX-out/$PREFIX-csign-negtests.log
           python3 test-enroll-predicate-env.py 2>&1 | tee /tmp/$PREFIX-out/$PREFIX-predicate-env-negtests.log
           python3 test-cert-positive-guard.py 2>&1 | tee /tmp/$PREFIX-out/$PREFIX-certpos-guard-negtests.log
+          python3 test-k2-sweeps.py 2>&1 | tee /tmp/$PREFIX-out/$PREFIX-k2-sweeps-negtests.log
+          python3 test-stale-state-committed.py 2>&1 | tee /tmp/$PREFIX-out/$PREFIX-stale-state-negtests.log
 
       - name: NON_CERTIFYING_SCRATCH reproducible OVMF DEBUG dual build + accepted-firmware pins
         timeout-minutes: 150
@@ -411,9 +413,12 @@ jobs:
           # key-named file and no PEM/DER private-key content anywhere under build-output.
           python3 - <<'PYK2C'
           import os, sys
-          bad = []
-          for root, dirs, files in os.walk("build-output"):
+          def _raise(e):
+              print("E_K2_SWEEP_UNREADABLE %s" % e); sys.exit(95)
+          bad = []; scanned = 0
+          for root, dirs, files in os.walk("build-output", onerror=_raise):
               for f in files:
+                  scanned += 1
                   fp = os.path.join(root, f)
                   if "key" in f.lower():
                       bad.append(fp + " (key-named)")
@@ -424,7 +429,9 @@ jobs:
                       bad.append(fp + " (private-key content)")
           if bad:
               print("E_PRIVATE_KEY_IN_BUILD_TREE", bad); sys.exit(95)
-          print("K2 build-output sweep clean")
+          if scanned == 0:
+              print("E_K2_SWEEP_EMPTY build-output"); sys.exit(95)
+          print("K2 build-output sweep clean (scanned=%d)" % scanned)
           PYK2C
           echo "c-sign complete: two arms gated, key shredded outside the checkout, SHASUMS recorded"
           CSIGN
@@ -443,26 +450,33 @@ jobs:
           [ -f rehearsal/build-output/c-sign/SHASUMS ] || { echo "E_CSIGN_RECORD_MISSING build-output/c-sign/SHASUMS"; exit 94; }
           # peer 2026-09-24 route-(ii) key lifecycle: fixtures are generated network-off
           # under /tmp/$PREFIX-*; private keys exist only inside fixture-generate.sh's own
-          # mktemp workdir and are plain-deleted by its EXIT trap (proven A4 hygiene);
+          # mktemp workdir and are shred -u'd by its EXIT trap and explicit cleanup;
           # nothing key-bearing is ever written under an upload path.
           F=/tmp/$PREFIX-fixtures
-          sudo unshare -n env PATH="$PATH" PREFIX="$PREFIX" F="$F" bash -se <<'CFIX'
+          RUNNER_UID=$(id -u); RUNNER_GID=$(id -g)
+          mkdir -p rehearsal/build-output/c-sign/fixtures
+          sudo unshare -n env PATH="$PATH" PREFIX="$PREFIX" F="$F" RUNNER_UID="$RUNNER_UID" RUNNER_GID="$RUNNER_GID" bash -se <<'CFIX'
           set -eEuo pipefail
           trap '_rc=$?; echo "E_BASH_ERRTRAP c-fixtures-inner line $LINENO rc=$_rc cmd: $BASH_COMMAND" >&2; exit 97' ERR
           rm -rf "$F"; mkdir -p "$F"
           bash fixture-generate.sh rehearsal/build-output/uki/successor-unsigned.efi "/tmp/$PREFIX-stage/root" "$F/gen"
-          CFIX
-          # K2-style sweep of the generation tree BEFORE any copy-out: no key file names,
-          # no PEM/DER private-key content, no symlinks.
+          # run-35999960747 D4: the K2 sweep runs HERE, as root, over the WHOLE $F tree.
+          # The old runner-user sweep was VACUOUS (umask 077 root-owned gen + os.walk's
+          # silent onerror=None skip): it scanned nothing and printed clean. os.walk now
+          # gets an onerror that RAISES, the scanned-file count and the four named public
+          # outputs are asserted, and only then are the artifacts installed out.
           python3 - "$F" <<'PYK2'
           import sys, os, re
           root = sys.argv[1]
+          def _raise(e):
+              print("E_FIXTURE_TREE_UNREADABLE %s" % e); sys.exit(94)
           pem = b"PRIVATE KEY"
           der_rsa = re.compile(rb"\x30\x82..\x02\x01\x00\x02\x82", re.S)
           der_p8 = re.compile(rb"\x30\x82..\x02\x01\x00\x30", re.S)
-          hits = []
-          for base, dirs, files in os.walk(root):
+          hits = []; scanned = 0
+          for base, dirs, files in os.walk(root, onerror=_raise):
               for fn in files:
+                  scanned += 1
                   p = os.path.join(base, fn)
                   if os.path.islink(p): hits.append(("symlink", p)); continue
                   if re.search(r"\.(key|pem|p12|pfx)$", fn, re.I): hits.append(("name", p)); continue
@@ -470,12 +484,19 @@ jobs:
                   if pem in b or der_rsa.search(b) or der_p8.search(b): hits.append(("content", p))
           if hits:
               print("E_PRIVATE_KEY_IN_FIXTURE_TREE %r" % hits[:3]); sys.exit(94)
-          print("fixture generation tree clean (no key material)")
+          want = ["F-WRONGSIG.efi", "F-HOSTILEUKI.efi", "C5-WRONG-SIGNER-FIXTURE.cer", "C5-HOSTILE-FIXTURE.cer"]
+          gdir = os.path.join(root, "gen")
+          have = os.listdir(gdir) if os.path.isdir(gdir) else []
+          missing = [w for w in want if w not in have]
+          if missing or scanned < len(want):
+              print("E_FIXTURE_PAYLOAD_INCOMPLETE missing=%r scanned=%d" % (missing, scanned)); sys.exit(94)
+          print("fixture generation tree clean (no key material); scanned=%d; four public outputs present" % scanned)
           PYK2
-          # copy ONLY the public artifacts out; build the generation record + payload binding.
-          mkdir -p rehearsal/build-output/c-sign/fixtures
-          cp "$F/gen/F-WRONGSIG.efi" "$F/gen/F-HOSTILEUKI.efi" "$F/gen/C5-WRONG-SIGNER-FIXTURE.cer" "$F/gen/C5-HOSTILE-FIXTURE.cer" rehearsal/build-output/c-sign/fixtures/
+          # copy ONLY the four public artifacts out, runner-owned from birth via install
+          # (NEVER chown; the key workdir stays 0700 root and is shredded by the script).
+          install -m 0644 -o "$RUNNER_UID" -g "$RUNNER_GID" "$F/gen/F-WRONGSIG.efi" "$F/gen/F-HOSTILEUKI.efi" "$F/gen/C5-WRONG-SIGNER-FIXTURE.cer" "$F/gen/C5-HOSTILE-FIXTURE.cer" rehearsal/build-output/c-sign/fixtures/
           rm -rf "$F"
+          CFIX
           python3 - <<'PREC'
           import json, hashlib, subprocess, sys
           def sha(p):
@@ -525,9 +546,12 @@ jobs:
           # no private-key content may exist anywhere under build-output.
           python3 - <<'PYK2F'
           import os, sys
-          bad = []
-          for root, dirs, files in os.walk("rehearsal/build-output"):
+          def _raise(e):
+              print("E_K2_SWEEP_UNREADABLE %s" % e); sys.exit(95)
+          bad = []; scanned = 0
+          for root, dirs, files in os.walk("rehearsal/build-output", onerror=_raise):
               for f in files:
+                  scanned += 1
                   fp = os.path.join(root, f)
                   if "key" in f.lower():
                       bad.append(fp + " (key-named)")
@@ -538,7 +562,9 @@ jobs:
                       bad.append(fp + " (private-key content)")
           if bad:
               print("E_PRIVATE_KEY_IN_BUILD_TREE", bad); sys.exit(95)
-          print("K2 build-output sweep clean (post fixture copy-out)")
+          if scanned == 0:
+              print("E_K2_SWEEP_EMPTY rehearsal/build-output"); sys.exit(95)
+          print("K2 build-output sweep clean (post fixture copy-out, scanned=%d)" % scanned)
           PYK2F
           PREC
       - name: zero-private-key evidence gate K2 before firmware-hash upload (peer run-12 K4)
@@ -559,7 +585,11 @@ jobs:
           pem = b"PRIVATE KEY"
           der_rsa = re.compile(rb"\x30\x82..\x02\x01\x00\x02\x82", re.S)
           der_p8 = re.compile(rb"\x30\x82..\x02\x01\x00\x30", re.S)
+          scanned = [0]
+          def _k2raise(e):
+              print("E_K2_SWEEP_UNREADABLE %s" % e); sys.exit(94)
           def scan_file(p):
+              scanned[0] += 1
               if re.search(r"\.(key|pem|p12|pfx)$", os.path.basename(p), re.I):
                   namehit.append(p); return
               b = open(p, "rb").read()
@@ -571,7 +601,7 @@ jobs:
               if os.path.isfile(p):
                   scan_file(p)
               elif os.path.isdir(p):
-                  for base, dirs, files in os.walk(p):
+                  for base, dirs, files in os.walk(p, onerror=_k2raise):
                       for dn in dirs:
                           if os.path.islink(os.path.join(base, dn)):
                               linkhit.append(os.path.join(base, dn))
@@ -586,7 +616,9 @@ jobs:
           if namehit or conthit:
               print("E_PRIVATE_KEY_IN_EVIDENCE names=%r content=%r" % (namehit[:3], conthit[:3]))
               sys.exit(94)
-          print("zero-private-key gate: clean across %d upload paths" % len(paths))
+          if scanned[0] == 0:
+              print("E_K2_SWEEP_EMPTY no files scanned across %d upload paths" % len(paths)); sys.exit(94)
+          print("zero-private-key gate: clean across %d upload paths (scanned=%d)" % (len(paths), scanned[0]))
           PYK
       - name: NON_CERTIFYING_SCRATCH firmware hash upload (env2 comparison input)
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
@@ -1086,6 +1118,8 @@ jobs:
           ! grep -F "EXPECTATIONS_VIOLATED" "$T/h3.log" || { echo "E_H3_NEG_GENERIC death must be the named gate, never EXPECTATIONS_VIOLATED"; cat "$T/h3.log"; exit 97; }
           echo "H3_BOOT_TARGET_MUST_SHOW_OK planted bootindex-removed case died named (E_CASE_BOOT_TARGET rc=90, no EXPECTATIONS_VIOLATED)"
       - name: NON_CERTIFYING_SCRATCH planted-fault H5 bytecode-guard must-show (peer run-35963407323 redesign)
+        # run-35999960747 D3: the three re-preflights below run mid-ceremony (build-output legitimately
+        # exists by then); PREFLIGHT_MID_CEREMONY=1 switches E_STALE_STATE_COMMITTED to tracked-path semantics.
         if: ${{ !cancelled() }}
         run: |
           set -eEuo pipefail
@@ -1098,7 +1132,7 @@ jobs:
           # captured into the evidence tree - a must-show step NAMES every non-zero exit
           # (the run-19' phase-2 clean re-run died silent exit 30 into /dev/null).
           _rc=0
-          python3 preflight-check.py config.json /tmp/$PREFIX-stage > "$OUT/$PREFIX-h5-baseline.json" 2>&1 || _rc=$?
+          PREFLIGHT_MID_CEREMONY=1 python3 preflight-check.py config.json /tmp/$PREFIX-stage > "$OUT/$PREFIX-h5-baseline.json" 2>&1 || _rc=$?
           if [ "$_rc" -ne 0 ]; then
             echo "E_H5_BASELINE_PREFLIGHT_FAIL rc=$_rc"; cat "$OUT/$PREFIX-h5-baseline.json"; exit 90
           fi
@@ -1108,7 +1142,7 @@ jobs:
           trap 'rm -f "$REH_ABS/zz_bytecode_probe.py"' EXIT
           printf 'from lane_resolve import resolve_config_value\n' > "$REH_ABS/zz_bytecode_probe.py"
           _rc=0
-          python3 preflight-check.py config.json /tmp/$PREFIX-stage > "$OUT/$PREFIX-h5-planted.json" 2>&1 || _rc=$?
+          PREFLIGHT_MID_CEREMONY=1 python3 preflight-check.py config.json /tmp/$PREFIX-stage > "$OUT/$PREFIX-h5-planted.json" 2>&1 || _rc=$?
           rm -f "$REH_ABS/zz_bytecode_probe.py"
           trap - EXIT
           if [ "$_rc" -ne 30 ]; then
@@ -1133,7 +1167,7 @@ jobs:
           PYT
           # (c) probe removed; the post-clean run must pass clean, else NAMED with JSON printed.
           _rc=0
-          python3 preflight-check.py config.json /tmp/$PREFIX-stage > "$OUT/$PREFIX-h5-post.json" 2>&1 || _rc=$?
+          PREFLIGHT_MID_CEREMONY=1 python3 preflight-check.py config.json /tmp/$PREFIX-stage > "$OUT/$PREFIX-h5-post.json" 2>&1 || _rc=$?
           if [ "$_rc" -ne 0 ]; then
             echo "E_H5_POST_PREFLIGHT_FAIL rc=$_rc"; cat "$OUT/$PREFIX-h5-post.json"; exit 90
           fi
@@ -1252,7 +1286,11 @@ jobs:
           pem = b"PRIVATE KEY"
           der_rsa = re.compile(rb"\x30\x82..\x02\x01\x00\x02\x82", re.S)
           der_p8 = re.compile(rb"\x30\x82..\x02\x01\x00\x30", re.S)
+          scanned = [0]
+          def _k2raise(e):
+              print("E_K2_SWEEP_UNREADABLE %s" % e); sys.exit(94)
           def scan_file(p):
+              scanned[0] += 1
               if re.search(r"\.(key|pem|p12|pfx)$", os.path.basename(p), re.I):
                   namehit.append(p); return
               b = open(p, "rb").read()
@@ -1264,7 +1302,7 @@ jobs:
               if os.path.isfile(p):
                   scan_file(p)
               elif os.path.isdir(p):
-                  for base, dirs, files in os.walk(p):
+                  for base, dirs, files in os.walk(p, onerror=_k2raise):
                       for dn in dirs:
                           if os.path.islink(os.path.join(base, dn)):
                               linkhit.append(os.path.join(base, dn))
@@ -1279,7 +1317,9 @@ jobs:
           if namehit or conthit:
               print("E_PRIVATE_KEY_IN_EVIDENCE names=%r content=%r" % (namehit[:3], conthit[:3]))
               sys.exit(94)
-          print("zero-private-key gate: clean across %d upload paths" % len(paths))
+          if scanned[0] == 0:
+              print("E_K2_SWEEP_EMPTY no files scanned across %d upload paths" % len(paths)); sys.exit(94)
+          print("zero-private-key gate: clean across %d upload paths (scanned=%d)" % (len(paths), scanned[0]))
           PYK
       - name: NON_CERTIFYING_SCRATCH evidence upload (ephemeral CI artifact only)
         if: always() && steps.k2gate-evidence.outcome == 'success'
@@ -1624,7 +1664,11 @@ jobs:
           pem = b"PRIVATE KEY"
           der_rsa = re.compile(rb"\x30\x82..\x02\x01\x00\x02\x82", re.S)
           der_p8 = re.compile(rb"\x30\x82..\x02\x01\x00\x30", re.S)
+          scanned = [0]
+          def _k2raise(e):
+              print("E_K2_SWEEP_UNREADABLE %s" % e); sys.exit(94)
           def scan_file(p):
+              scanned[0] += 1
               if re.search(r"\.(key|pem|p12|pfx)$", os.path.basename(p), re.I):
                   namehit.append(p); return
               b = open(p, "rb").read()
@@ -1636,7 +1680,7 @@ jobs:
               if os.path.isfile(p):
                   scan_file(p)
               elif os.path.isdir(p):
-                  for base, dirs, files in os.walk(p):
+                  for base, dirs, files in os.walk(p, onerror=_k2raise):
                       for dn in dirs:
                           if os.path.islink(os.path.join(base, dn)):
                               linkhit.append(os.path.join(base, dn))
@@ -1651,7 +1695,9 @@ jobs:
           if namehit or conthit:
               print("E_PRIVATE_KEY_IN_EVIDENCE names=%r content=%r" % (namehit[:3], conthit[:3]))
               sys.exit(94)
-          print("zero-private-key gate: clean across %d upload paths" % len(paths))
+          if scanned[0] == 0:
+              print("E_K2_SWEEP_EMPTY no files scanned across %d upload paths" % len(paths)); sys.exit(94)
+          print("zero-private-key gate: clean across %d upload paths (scanned=%d)" % (len(paths), scanned[0]))
           PYK
       - name: NON_CERTIFYING_SCRATCH env2 evidence upload (ephemeral CI artifact only)
         if: always() && steps.k2gate-env2.outcome == 'success'

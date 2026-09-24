@@ -283,9 +283,22 @@ else:
     _hits=[f for f in _bc.stdout.splitlines() if "__pycache__" in f or f.endswith(".pyc")]
     if _hits: fail("E_BYTECODE_COMMITTED","tracked bytecode in tree: %s"%repr(_hits[:10]))
 
-# 6c) batch1r3 C1: no ceremony state in the committed tree
-for stale in ("build-output","disks","prep"):
-    if os.path.exists(os.path.join(here,stale)): fail("E_STALE_STATE_COMMITTED", stale)
+# 6c) batch1r3 C1: no ceremony state in the committed tree. The static (step-11) run
+# happens BEFORE any build: filesystem absence is the check and is NOT weakened. Mid-ceremony
+# re-preflights (H5 baseline/planted/post) run AFTER the in-run builds legitimately create
+# rehearsal/build-output (unsigned UKI, c-sign, fixtures): there "committed" means TRACKED
+# (git ls-files), via PREFLIGHT_MID_CEREMONY=1 (run-35999960747 D3).
+if os.environ.get("PREFLIGHT_MID_CEREMONY","")=="1":
+    _tr=_sp.run(["git","-C",repo_root,"ls-files"],capture_output=True,text=True)
+    if _tr.returncode!=0: fail("E_GIT_LSFILES", _tr.stderr[:200])
+    else:
+        for stale in ("build-output","disks","prep"):
+            _sp3="docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/%s/"%stale
+            _sh=[f for f in _tr.stdout.splitlines() if f.startswith(_sp3)]
+            if _sh: fail("E_STALE_STATE_COMMITTED", stale+" tracked: %s"%repr(_sh[:5]))
+else:
+    for stale in ("build-output","disks","prep"):
+        if os.path.exists(os.path.join(here,stale)): fail("E_STALE_STATE_COMMITTED", stale)
 
 # 6d) batch1r3 B1: no direct staged-root execs outside make-shims.sh (fixture-generate.sh is
 # the allow-listed known offline limitation, B1/R3; bwrap-argv.sh carries $RT only as bwrap
@@ -400,8 +413,11 @@ import subprocess as _sp
 # rehearsal 74->77 (N8 log path x2 + env2-manifest step-name literal); rehearsal 77->78
 # (peer run-12 C4-addendum E_XCHECK_SKIPPED strictness step name, one literal);
 # rehearsal 78->79 (criterion-C c-sign step name, one literal).
+# rehearsal 79->83 (C1'''' run-35999960747 D1, deliberate): four C1' literals missed by the
+# 78->79 move - confinement-tests step name, unsigned-build step name, fixture-generation
+# step name, c-fixture-generation/v1 schema literal. Per-occurrence justification in R3 sec 18.
 for _wf,_want in (("../../../../../.github/workflows/OVMF_CI_SECURE_BOOT_UKI-CERTIFICATION-workflow.yml",44),
-                  ("../../../../../.github/workflows/NON_CERTIFYING_REHEARSAL-workflow.yml",79)):
+                  ("../../../../../.github/workflows/NON_CERTIFYING_REHEARSAL-workflow.yml",83)):
     _n=len(_sp.run(["grep","-o","NON_CERTIFYING_REHEARSAL",os.path.join(here,_wf)],
                    capture_output=True,text=True,check=True).stdout.splitlines())
     if _n!=_want:
