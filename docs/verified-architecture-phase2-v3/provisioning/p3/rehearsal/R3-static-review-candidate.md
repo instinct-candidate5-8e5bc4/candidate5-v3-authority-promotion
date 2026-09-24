@@ -1895,3 +1895,29 @@ Mishap disclosed: C1''''''' shipped eight stale reads. The 6m gate covers WRITES
 
 Signed-slot deferred items 16d(a)-(e) still stand - NOT part of this head.
 
+## 23. C1''''''''' revision (run-36014385477 ruling): PEM intermediates out of $INRUN, aligned K2 legs, exact-set allowlist
+
+Run 36014385477 (head a7bca25ef66098d05b4e51632569839639991988, attempt 1) FAILED at steps 20/38 (zero-private-key K2 gates): E_PRIVATE_KEY_IN_EVIDENCE names=[signer-ossl.pem, c5-throwaway-ci-cert.pem, signer-sbsign.pem] content=[] - filename-only hits on three public-cert PEM intermediates the c-sign step left in /tmp/$PREFIX-inrun/c-sign. Steps 1-19 GREEN (incl. the relocated c-sign/fixtures and their sweeps), F3/H5/immutability GREEN; the A3 smoke-prep path (step 22) never ran. C1''''''''' SUPERSEDES C1'''''''' (a7bca25e..), C1''''''' (3508536e..), C1'''''' (dac532c3..), C1''''' (d53219d2..), C1'''' (c839727e..), C1''' (27bfd5c3..), C1'' (fe147879..), C1' (0d66fc2b..), C1 (b2eaef1d..); all remain in history as reviewed-and-revised heads. The K2 name policy is UNCHANGED: *.key|*.pem|*.p12|*.pfx fails by NAME whatever the content - "public by description" is exactly the judgment the name rule exists to avoid. F6/H3 consequential, re-judged on the next run.
+
+Fix per the ruling:
+(a) PEM intermediates NEVER land in $INRUN: c5-throwaway-ci-cert.pem and signer-$v.pem now live in the sibling 0700 transient dir /tmp/$PREFIX-csign-pem, consumed there by the DER conversions and both signing arms, shred -u'd in the SAME EXIT trap AND the explicit cleanup as the throwaway key, with per-file residue checks (E_PEM_RESIDUE, exit 95) plus an outer dir-level E_PEM_RESIDUE backstop. $INRUN holds certs as .der ONLY, as SHASUMS already expects.
+(b) PYK2C and PYK2F aligned with the zero-private-key gates: name set = .key/.pem/.p12/.pfx extension PLUS the 'key' substring; content = PEM "PRIVATE KEY" + PKCS#8/RSA DER key-header regexes (the PYK2 fixture sweep already used this set). This class now fails INSIDE c-sign/fixtures, not three steps later at the upload gate.
+(c) NEW positive allowlist E_INRUN_UNEXPECTED_FILE (exit 97) at the END of the fixture step - /tmp/$PREFIX-inrun must contain EXACTLY these 21 files:
+    uki/successor-unsigned.efi
+    c-sign/signed-ossl.efi, c-sign/signed-sbsign.efi
+    c-sign/c5-throwaway-ci-cert.der, c-sign/signer-ossl.der, c-sign/signer-sbsign.der
+    c-sign/pkcs7-ossl.der, c-sign/pkcs7-sbsign.der
+    c-sign/gate4b-ossl.json, c-sign/gate4b-sbsign.json
+    c-sign/delta-ossl.json, c-sign/delta-sbsign.json
+    c-sign/auth-ossl.json, c-sign/auth-sbsign.json
+    c-sign/SHASUMS
+    c-sign/fixtures/F-WRONGSIG.efi, c-sign/fixtures/F-HOSTILEUKI.efi
+    c-sign/fixtures/C5-WRONG-SIGNER-FIXTURE.cer, c-sign/fixtures/C5-HOSTILE-FIXTURE.cer
+    c-sign/fixtures/GENERATION-RECORD.json, c-sign/fixtures/FIXTURE-SHASUMS
+  Any extra OR missing file fails. (Identical list in the workflow's PYALLOW block.)
+(d) Committed tests: test-k2-sweeps.py gained aligned-leg cases - a PUBLIC .pem (cert-only bytes) in inrun fails at PYK2C AND PYK2F by name, and DER PKCS#8 key bytes fail by content: 26/26. NEW test-inrun-allowlist.py execs the EXACT PYALLOW body (synthetic exact tree built from the want-list parsed out of the extracted body - single source): exact set passes, extra public .pem fails, missing SHASUMS fails, empty tree fails: 4/4. Existing suites unchanged and green.
+
+Mishap disclosed: C1'''''''' relocated the c-sign PRODUCTS but left the public-cert PEM INTERMEDIATES in $INRUN; my own run-36014385477 analysis proposed plain rm inside $INRUN and the ruling's shape (never land them there + transient dir + shred + exact-set) is strictly stronger. The exact-set allowlist now makes ANY unplanned inrun content a named failure at the producing step.
+
+Signed-slot deferred items 16d(a)-(e) still stand - NOT part of this head.
+

@@ -655,9 +655,10 @@ for _p in _py_files:
     # the reviewed bash-rule heredoc parser module "heredoc_parse" (this directory,
     # stdlib-only, no sibling imports), ONLY in the E_HEREDOC_STRUCTURE and
     # E_INRUN_WRITES_CHECKOUT gates and their committed test/extraction consumers
-    # (test-inrun-writes.py added by the run-36009604654 ruling (e) - same module,
+    # (test-inrun-writes.py added by the run-36009604654 ruling (e); test-inrun-stale-path.py
+    # and test-inrun-allowlist.py added by the run-36014385477 ruling - same module,
     # same shape). No wildcard, no other file, no other module.
-    if os.path.basename(_p) in ("preflight-check.py","test-k2-sweeps.py","test-heredoc-structure.py","test-inrun-writes.py"):
+    if os.path.basename(_p) in ("preflight-check.py","test-k2-sweeps.py","test-heredoc-structure.py","test-inrun-writes.py","test-inrun-stale-path.py","test-inrun-allowlist.py"):
         _bad-={"heredoc_parse"}
     # #18 (same shape): derive-scratch.py's REAL imports are re+sys; the generator embeds
     # the workflow step TEXT it injects, whose fetch-test heredoc carries an

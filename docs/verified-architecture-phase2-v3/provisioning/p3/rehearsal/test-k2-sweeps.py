@@ -141,6 +141,21 @@ for tag, sub in (("PYK2C-csign", "build-output"), ("PYK2F-postcopy", os.path.joi
     expect(tag + "-unreadable-checkout-leg", rc, out, 95, "E_K2_SWEEP_UNREADABLE")
     os.chmod(os.path.join(d, sub, "locked"), 0o700); shutil.rmtree(d); shutil.rmtree(TINRUN, ignore_errors=True)
 
+# 5b) run-36014385477 ruling (b)+(d): the ALIGNED name/content legs - a PUBLIC .pem in
+# inrun fails at PYK2C/PYK2F by NAME (not only at the step-20 upload gate), and DER
+# PKCS#8 key bytes in any file fail by CONTENT.
+for tag in ("PYK2C-csign", "PYK2F-postcopy"):
+    inrun(lambda: open(os.path.join(TINRUN, "public-cert.pem"), "wb").write(b"-----BEGIN CERTIFICATE-----\nMIIB\n-----END CERTIFICATE-----\n"))
+    d = mktree(lambda d: None)
+    rc, out = run_env(tag + "-planted-public-pem", SWEEPS[tag], [], d)
+    expect(tag + "-planted-public-pem", rc, out, 95, "E_PRIVATE_KEY_IN_BUILD_TREE")
+    shutil.rmtree(d); shutil.rmtree(TINRUN, ignore_errors=True)
+    inrun(lambda: (open(os.path.join(TINRUN, "x.efi"), "wb").write(b"public"), open(os.path.join(TINRUN, "payload.bin"), "wb").write(b"\x30\x82\x01\x00\x02\x01\x00\x30\x0c\x06\x08")))
+    d = mktree(lambda d: None)
+    rc, out = run_env(tag + "-planted-der-pkcs8", SWEEPS[tag], [], d)
+    expect(tag + "-planted-der-pkcs8", rc, out, 95, "E_PRIVATE_KEY_IN_BUILD_TREE")
+    shutil.rmtree(d); shutil.rmtree(TINRUN, ignore_errors=True)
+
 # 6) zero-private-key gate sweep: clean / unreadable / empty / planted pem
 def pyk_args(d):
     pf = os.path.join(d, "paths.txt"); open(pf, "w").write(d + "/scan\n")

@@ -80,7 +80,7 @@ jobs:
           # D2 gate (reviewer ruling): every relative file/script argument used by later
           # steps must exist in the committed tree. Fixed list, fail-closed exit 88.
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
-          for f in             platform.lock.json             config.json             stage-platform.sh             make-shims.sh             test-c-sign-confinement.py             test-enroll-predicate-env.py             test-cert-positive-guard.py             test-k2-sweeps.py             test-inrun-writes.py             test-inrun-stale-path.py             test-stale-state-committed.py             test-heredoc-structure.py             test-h5-planted-errset.py             preflight-check.py             build-ovmf-debug.sh             scan-pe-pdb-paths.py             build-enroll-app.sh             bwrap-argv.sh             enroll-predicate-check.py             rehearsal-enroll.sh             ../build-esp-image.sh             evidence/successor-signed.efi             run-ceremony.sh             qemu-smoke.sh; do
+          for f in             platform.lock.json             config.json             stage-platform.sh             make-shims.sh             test-c-sign-confinement.py             test-enroll-predicate-env.py             test-cert-positive-guard.py             test-k2-sweeps.py             test-inrun-writes.py             test-inrun-stale-path.py             test-inrun-allowlist.py             test-stale-state-committed.py             test-heredoc-structure.py             test-h5-planted-errset.py             preflight-check.py             build-ovmf-debug.sh             scan-pe-pdb-paths.py             build-enroll-app.sh             bwrap-argv.sh             enroll-predicate-check.py             rehearsal-enroll.sh             ../build-esp-image.sh             evidence/successor-signed.efi             run-ceremony.sh             qemu-smoke.sh; do
             [ -e "$f" ] || { echo "E_WORKFLOW_ARG_MISSING $f"; exit 88; }
           done
       - name: NON_CERTIFYING_REHEARSAL host inputs declared (B3)
@@ -198,6 +198,7 @@ jobs:
           python3 test-h5-planted-errset.py 2>&1 | tee /tmp/$PREFIX-out/$PREFIX-h5-planted-errset-tests.log
           python3 test-inrun-writes.py 2>&1 | tee /tmp/$PREFIX-out/$PREFIX-inrun-writes-negtests.log
           python3 test-inrun-stale-path.py 2>&1 | tee /tmp/$PREFIX-out/$PREFIX-inrun-stale-path-negtests.log
+          python3 test-inrun-allowlist.py 2>&1 | tee /tmp/$PREFIX-out/$PREFIX-inrun-allowlist-negtests.log
 
       - name: NON_CERTIFYING_REHEARSAL reproducible OVMF DEBUG dual build + accepted-firmware pins
         timeout-minutes: 150
@@ -321,15 +322,20 @@ jobs:
           # never printed.
           K=/tmp/$PREFIX-csign-key
           mkdir -p "$K"; chmod 0700 "$K"
-          trap 'shred -u "$K/throwaway-key.pem" 2>/dev/null || true; rmdir "$K" 2>/dev/null || true' EXIT
+          # run-36014385477 ruling (a): public-cert PEM intermediates NEVER land in $INRUN -
+          # they live in this sibling 0700 transient dir and are shred -u'd by the same EXIT
+          # trap and explicit cleanup as the key, with residue checks. $INRUN holds .der ONLY.
+          P=/tmp/$PREFIX-csign-pem
+          mkdir -p "$P"; chmod 0700 "$P"
+          trap 'shred -u "$K/throwaway-key.pem" "$P/c5-throwaway-ci-cert.pem" "$P/signer-ossl.pem" "$P/signer-sbsign.pem" 2>/dev/null || true; rmdir "$K" "$P" 2>/dev/null || true' EXIT
           U=/tmp/$PREFIX-inrun/uki/successor-unsigned.efi
           got=$(sha256sum "$U" | cut -d' ' -f1)
           [ "$got" = "4cda9c3e285b5b639364234400bf0b121178f12447cc88d896cd2623e07d18e1" ] || { echo "E_UNSIGNED_UKI_DRIFT got=$got"; exit 91; }
-          openssl req -x509 -newkey rsa:2048 -keyout "$K/throwaway-key.pem" -out "$C/c5-throwaway-ci-cert.pem" -days 1 -nodes -subj "/CN=C5-THROWAWAY-CI-SIGNER/" -sha256
-          openssl x509 -in "$C/c5-throwaway-ci-cert.pem" -outform DER -out "$C/c5-throwaway-ci-cert.der"
+          openssl req -x509 -newkey rsa:2048 -keyout "$K/throwaway-key.pem" -out "$P/c5-throwaway-ci-cert.pem" -days 1 -nodes -subj "/CN=C5-THROWAWAY-CI-SIGNER/" -sha256
+          openssl x509 -in "$P/c5-throwaway-ci-cert.pem" -outform DER -out "$C/c5-throwaway-ci-cert.der"
           # arm 1: osslsigncode (PE Authenticode attach); arm 2: sbsign
-          osslsigncode sign -certs "$C/c5-throwaway-ci-cert.pem" -key "$K/throwaway-key.pem" -h sha256 -in "$U" -out "$C/signed-ossl.efi"
-          sbsign --key "$K/throwaway-key.pem" --cert "$C/c5-throwaway-ci-cert.pem" --out "$C/signed-sbsign.efi" "$U"
+          osslsigncode sign -certs "$P/c5-throwaway-ci-cert.pem" -key "$K/throwaway-key.pem" -h sha256 -in "$U" -out "$C/signed-ossl.efi"
+          sbsign --key "$K/throwaway-key.pem" --cert "$P/c5-throwaway-ci-cert.pem" --out "$C/signed-sbsign.efi" "$U"
           # per-arm in-job gates: (a) embedded digest == recomputed section-wise ==
           # b2f655b0 == the pinned unsigned artifact's dual-equal digest; (b) signed
           # delta == ONLY the security directory + CheckSum under the refined tail rule;
@@ -354,37 +360,48 @@ jobs:
           open(sys.argv[2], "wb").write(b[va+8:va+sz])
           PYX
             python3 ../verify-uki-authenticode.py "$C/pkcs7-$v.der" | tee "$C/auth-$v.json"
-            openssl pkcs7 -inform DER -in "$C/pkcs7-$v.der" -print_certs -out "$C/signer-$v.pem"
-            openssl x509 -in "$C/signer-$v.pem" -outform DER -out "$C/signer-$v.der"
+            openssl pkcs7 -inform DER -in "$C/pkcs7-$v.der" -print_certs -out "$P/signer-$v.pem"
+            openssl x509 -in "$P/signer-$v.pem" -outform DER -out "$C/signer-$v.der"
             cmp "$C/signer-$v.der" "$C/c5-throwaway-ci-cert.der" || { echo "E_SIGNER_CERT_MISMATCH $v"; exit 91; }
           done
           ( cd "$C" && sha256sum signed-ossl.efi signed-sbsign.efi c5-throwaway-ci-cert.der > SHASUMS )
           cat "$C/SHASUMS"
-          shred -u "$K/throwaway-key.pem"
+          shred -u "$K/throwaway-key.pem" "$P/c5-throwaway-ci-cert.pem" "$P/signer-ossl.pem" "$P/signer-sbsign.pem"
           [ ! -e "$K/throwaway-key.pem" ] || { echo "E_KEY_RESIDUE $K/throwaway-key.pem"; exit 95; }
+          for pem in "$P/c5-throwaway-ci-cert.pem" "$P/signer-ossl.pem" "$P/signer-sbsign.pem"; do
+            [ ! -e "$pem" ] || { echo "E_PEM_RESIDUE $pem"; exit 95; }
+          done
           rmdir "$K"
+          rmdir "$P"
           # K2 over the in-run product tree AND the checkout build-output tree
           # (peer run-36009604654 ruling (d)): no key-named file and no PEM/DER
           # private-key content under /tmp/$PREFIX-inrun or (if present) build-output.
           python3 - <<'PYK2C'
-          import os, sys
+          import os, sys, re
           def _raise(e):
               print("E_K2_SWEEP_UNREADABLE %s" % e); sys.exit(95)
           roots = ["/tmp/%s-inrun" % os.environ["PREFIX"]]
           if os.path.isdir("build-output"):
               roots.append("build-output")
+          # run-36014385477 ruling (b): SAME name set as the zero-private-key gates
+          # (.key/.pem/.p12/.pfx extension PLUS the 'key' substring) and SAME content
+          # patterns (PEM "PRIVATE KEY" + PKCS#8/RSA DER key headers) - this class fails
+          # HERE inside c-sign, not three steps later at the upload gate.
+          name_re = re.compile(r"\.(key|pem|p12|pfx)$", re.I)
+          der_rsa = re.compile(rb"\x30\x82..\x02\x01\x00\x02\x82", re.S)
+          der_p8 = re.compile(rb"\x30\x82..\x02\x01\x00\x30", re.S)
           bad = []; scanned = 0
           for path in roots:
               for root, dirs, files in os.walk(path, onerror=_raise):
                   for f in files:
                       scanned += 1
                       fp = os.path.join(root, f)
-                      if "key" in f.lower():
-                          bad.append(fp + " (key-named)")
+                      if name_re.search(f) or "key" in f.lower():
+                          bad.append(fp + " (key-suspect name)")
                           continue
                       with open(fp, "rb") as h:
                           d = h.read()
-                      if b"PRIVATE KEY-----" in d:
+                      if b"PRIVATE KEY" in d or der_rsa.search(d) or der_p8.search(d):
                           bad.append(fp + " (private-key content)")
           if bad:
               print("E_PRIVATE_KEY_IN_BUILD_TREE", bad); sys.exit(95)
@@ -396,6 +413,7 @@ jobs:
           CSIGN
           sudo chown -R "$(id -u):$(id -g)" "$C"
           [ ! -d "/tmp/$PREFIX-csign-key" ] || { echo "E_KEY_RESIDUE /tmp/$PREFIX-csign-key"; exit 95; }
+          [ ! -d "/tmp/$PREFIX-csign-pem" ] || { echo "E_PEM_RESIDUE /tmp/$PREFIX-csign-pem"; exit 95; }
       - name: NON_CERTIFYING_REHEARSAL criterion-C fixture generation (in-run ephemeral keys)
         if: ${{ !cancelled() }}
         timeout-minutes: 20
@@ -506,24 +524,30 @@ jobs:
           # public-only; no key-named file and no private-key content under
           # /tmp/$PREFIX-inrun or (if present) the checkout rehearsal/build-output.
           python3 - <<'PYK2F'
-          import os, sys
+          import os, sys, re
           def _raise(e):
               print("E_K2_SWEEP_UNREADABLE %s" % e); sys.exit(95)
           roots = ["/tmp/%s-inrun" % os.environ["PREFIX"]]
           if os.path.isdir("rehearsal/build-output"):
               roots.append("rehearsal/build-output")
+          # run-36014385477 ruling (b): SAME name set as the zero-private-key gates
+          # (.key/.pem/.p12/.pfx extension PLUS the 'key' substring) and SAME content
+          # patterns (PEM "PRIVATE KEY" + PKCS#8/RSA DER key headers).
+          name_re = re.compile(r"\.(key|pem|p12|pfx)$", re.I)
+          der_rsa = re.compile(rb"\x30\x82..\x02\x01\x00\x02\x82", re.S)
+          der_p8 = re.compile(rb"\x30\x82..\x02\x01\x00\x30", re.S)
           bad = []; scanned = 0
           for path in roots:
               for root, dirs, files in os.walk(path, onerror=_raise):
                   for f in files:
                       scanned += 1
                       fp = os.path.join(root, f)
-                      if "key" in f.lower():
-                          bad.append(fp + " (key-named)")
+                      if name_re.search(f) or "key" in f.lower():
+                          bad.append(fp + " (key-suspect name)")
                           continue
                       with open(fp, "rb") as h:
                           d = h.read()
-                      if b"PRIVATE KEY-----" in d:
+                      if b"PRIVATE KEY" in d or der_rsa.search(d) or der_p8.search(d):
                           bad.append(fp + " (private-key content)")
           if bad:
               print("E_PRIVATE_KEY_IN_BUILD_TREE", bad); sys.exit(95)
@@ -531,6 +555,34 @@ jobs:
               print("E_K2_SWEEP_EMPTY %s" % roots); sys.exit(95)
           print("K2 inrun sweep clean (post fixture copy-out, scanned=%d roots=%s)" % (scanned, roots))
           PYK2F
+          # run-36014385477 ruling (c): positive allowlist - at the END of the fixture step
+          # /tmp/$PREFIX-inrun must contain EXACTLY this file set (listed identically in
+          # R3 section 23); any extra OR missing file fails E_INRUN_UNEXPECTED_FILE.
+          python3 - <<'PYALLOW'
+          import os, sys
+          base = "/tmp/%s-inrun" % os.environ["PREFIX"]
+          want = {
+              "uki/successor-unsigned.efi",
+              "c-sign/signed-ossl.efi", "c-sign/signed-sbsign.efi",
+              "c-sign/c5-throwaway-ci-cert.der", "c-sign/signer-ossl.der", "c-sign/signer-sbsign.der",
+              "c-sign/pkcs7-ossl.der", "c-sign/pkcs7-sbsign.der",
+              "c-sign/gate4b-ossl.json", "c-sign/gate4b-sbsign.json",
+              "c-sign/delta-ossl.json", "c-sign/delta-sbsign.json",
+              "c-sign/auth-ossl.json", "c-sign/auth-sbsign.json",
+              "c-sign/SHASUMS",
+              "c-sign/fixtures/F-WRONGSIG.efi", "c-sign/fixtures/F-HOSTILEUKI.efi",
+              "c-sign/fixtures/C5-WRONG-SIGNER-FIXTURE.cer", "c-sign/fixtures/C5-HOSTILE-FIXTURE.cer",
+              "c-sign/fixtures/GENERATION-RECORD.json", "c-sign/fixtures/FIXTURE-SHASUMS",
+          }
+          got = set()
+          for root, dirs, files in os.walk(base):
+              for f in files:
+                  got.add(os.path.relpath(os.path.join(root, f), base))
+          extra = sorted(got - want); missing = sorted(want - got)
+          if extra or missing:
+              print("E_INRUN_UNEXPECTED_FILE extra=%r missing=%r" % (extra, missing)); sys.exit(97)
+          print("inrun exact-set OK (%d files)" % len(want))
+          PYALLOW
       - name: zero-private-key evidence gate K2 before firmware-hash upload (peer run-12 K4)
         id: k2gate-fw
         if: '!cancelled()'
