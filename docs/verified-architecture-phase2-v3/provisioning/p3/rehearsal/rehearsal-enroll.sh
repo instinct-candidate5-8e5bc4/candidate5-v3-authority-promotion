@@ -636,6 +636,12 @@ cp "$EVD/vars.fd" "$OUT"
 # that same line before PIPESTATUS is ever read (peer reproduced: rc 92 -> E_BASH_ERRTRAP
 # on tee). The || form exempts the command from the trap; verified reaching the named
 # branch with rc=92. The json lands via redirect + cat, same durable evidence as tee.
+# peer run-36017957182 ruling (a): bind the fixture certs at THIS single consumer point,
+# immediately before the predicate call - the helper computes the ACTUAL sha256 of the two
+# fixture .cer files, requires equality with GENERATION-RECORD.json, then exports
+# C5_HOSTILE_CERT_SHA256 / C5_WRONG_SIGNER_CERT_SHA256 / C5_THROWAWAY_CERT_SHA256.
+# NEVER bound in callers (run-ceremony.sh) or anywhere else.
+. "$HERE/bind-fixture-certs.sh" "/tmp/$PREFIX-inrun"
 _pred_rc=0
 python3 "$HERE/enroll-predicate-check.py" "$MODE" "$EVD/ENROLL.TXT" "$PREP" "$OUT" "$HERE/../parse-ovmf-vars.py" > "$EVD/enroll-predicate.json" || _pred_rc=$?
 cat "$EVD/enroll-predicate.json"

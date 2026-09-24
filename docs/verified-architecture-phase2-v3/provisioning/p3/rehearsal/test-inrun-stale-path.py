@@ -12,7 +12,7 @@ WF_REAL = os.path.normpath(os.path.join(HERE, "..", "..", "..", "..", "..", ".gi
 
 PF = open(os.path.join(HERE, "preflight-check.py")).read()
 i = PF.index("# 6n) peer C1''''''' verdict (b)")
-j = PF.index("# 7) KVM requirement", i)
+j = PF.index("# 6o) peer run-36017957182 ruling (c)", i)
 GATE = PF[i:j]
 
 def run_gate(wf_dir, here, p3_root):

@@ -20,6 +20,10 @@ if PREFIX!=ALLOWED: print("E_PREFIX_MISMATCH prefix=%s allowed=%s"%(PREFIX,ALLOW
 # lane_resolve .pyc tripped E_CHECKOUT_MUTATED at the end-of-job gate).
 sys.dont_write_bytecode = True
 from lane_resolve import LaneError, resolve_config_value, resolve_path, allowed_vars_templates
+# peer run-36017957182 ruling (Q2): the top-level schema is single-sourced - imported
+# from config_schema.py, the SAME module preflight-check.py validates with, so the two
+# consumers can never drift apart again (run 36017957182's F6 E_CONFIG_SCHEMA).
+from config_schema import ConfigSchemaError, check_top
 
 # C7 runtime-emission provenance: the signed cmdline (ro root=/dev/mapper/v3-root-admitter
 # rootfstype=ext4 v3.root_admitter_verity=533d6d61..) carries NO console= parameter, so the
@@ -48,12 +52,9 @@ ADAPTER_STRINGS = [s.encode() for s in ("E_PROVIDER_NAMESPACE","E_PROVIDER_LINK_
 # run-ceremony.sh pre-guest gate (F3) uses. Populated in __main__ from argv[3].
 ALLOWED_VARS_TEMPLATES = set()
 
-# C4 strict closed schema (T4 F6): unknown or missing keys fail.
-TOP_KEYS = {"cases","cpu_model","disk_dir","enroll_app","enroll_app_sha256","esp_sha256",
-            "firmware_debug_sha256","firmware_release","firmware_release_sha256",
-            "memory_mb","note","ovmf_code_debug","ovmf_vars_pristine","qemu","schema",
-            "v3_serials","vars_parser"}
-TOP_REQUIRED = TOP_KEYS - {"note"}
+# C4 strict closed schema (T4 F6): unknown or missing keys fail. The TOP-LEVEL sets and
+# the enrollments validator are single-sourced in config_schema.py (peer run-36017957182
+# ruling); the case/expect-level sets below stay local (only the harness uses them).
 CASE_KEYS = {"esp","expect","firmware","id","lanes","settle_seconds","vars_template"}
 EXPECT_KEYS = {"kernel_exec","exit_98","exit_97","reject_strings","no_reject_strings"}
 EXPECT_REQUIRED = {"kernel_exec","exit_98","exit_97","reject_strings"}
@@ -70,8 +71,8 @@ def fail(code, msg):
     print(json.dumps({"result":"FAIL","code":code,"detail":msg}, sort_keys=True)); sys.exit(90)
 
 def check_schema(cfg):
-    extra=set(cfg)-TOP_KEYS; missing=TOP_REQUIRED-set(cfg)
-    if extra or missing: fail("E_CONFIG_SCHEMA", "top extra=%s missing=%s"%(sorted(extra),sorted(missing)))
+    try: check_top(cfg)
+    except ConfigSchemaError as e: fail("E_CONFIG_SCHEMA", e.msg)
     if not isinstance(cfg.get("cases"),list) or not cfg["cases"]: fail("E_CONFIG_SCHEMA","cases")
     for case in cfg["cases"]:
         extra=set(case)-CASE_KEYS; missing=CASE_KEYS-set(case)

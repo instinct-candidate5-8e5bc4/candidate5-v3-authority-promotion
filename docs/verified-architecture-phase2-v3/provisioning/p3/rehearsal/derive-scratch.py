@@ -121,6 +121,7 @@ BLOCK_PF = r'''
         if: "!cancelled() && steps.pf-prereq.outputs.ok == 'true'"
         run: |
           set -euo pipefail
+          trap '_rc=$?; echo "E_BASH_ERRTRAP pf1 line $LINENO rc=$_rc cmd: $BASH_COMMAND" >&2; exit 97' ERR
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
           REH="$PWD"
           # peer run-12 shape (chosen option): NO PF-only knobs to the shared code/config.
@@ -172,6 +173,7 @@ BLOCK_PF = r'''
         if: "!cancelled() && steps.pf-prereq.outputs.ok == 'true'"
         run: |
           set -euo pipefail
+          trap '_rc=$?; echo "E_BASH_ERRTRAP pf2 line $LINENO rc=$_rc cmd: $BASH_COMMAND" >&2; exit 97' ERR
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
           REH="$PWD"
           # peer run-12 shape (chosen option): NO PF-only knobs to the shared code/config.
@@ -225,6 +227,7 @@ BLOCK_PF = r'''
         if: "!cancelled() && steps.pf-prereq.outputs.ok == 'true'"
         run: |
           set -euo pipefail
+          trap '_rc=$?; echo "E_BASH_ERRTRAP pf4 line $LINENO rc=$_rc cmd: $BASH_COMMAND" >&2; exit 97' ERR
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
           REH="$PWD"
           # peer run-12 shape (chosen option): NO PF-only knobs to the shared code/config.
@@ -304,6 +307,7 @@ BLOCK_PF = r'''
         if: "!cancelled() && steps.pf-prereq.outputs.ok == 'true'"
         run: |
           set -euo pipefail
+          trap '_rc=$?; echo "E_BASH_ERRTRAP pf5 line $LINENO rc=$_rc cmd: $BASH_COMMAND" >&2; exit 97' ERR
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
           REH="$PWD"
           # peer run-12 shape (chosen option): NO PF-only knobs to the shared code/config.
@@ -362,6 +366,7 @@ BLOCK_PF6 = r'''      - name: NON_CERTIFYING_SCRATCH planted-fault PF-6 badpred 
         if: "!cancelled() && steps.pf-prereq.outputs.ok == 'true'"
         run: |
           set -euo pipefail
+          trap '_rc=$?; echo "E_BASH_ERRTRAP pf6 line $LINENO rc=$_rc cmd: $BASH_COMMAND" >&2; exit 97' ERR
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
           REH="$PWD"
           # peer run-12 shape (chosen option): NO PF-only knobs to the shared code/config.
@@ -411,6 +416,10 @@ BLOCK_PF6 = r'''      - name: NON_CERTIFYING_SCRATCH planted-fault PF-6 badpred 
             || { echo "E_PF_GATE_NOT_FIRED expected exit 97, got $_rc" | tee -a "$PFD/pf6.log"; exit 97; }
           grep -F "E_ENROLL_PREDICATE_FAIL" "$PFD/pf6.log" \
             || { echo "E_PF_GATE_WRONG_CODE predicate failure must be named" | tee -a "$PFD/pf6.log"; exit 97; }
+          # peer run-36017957182 ruling: PF-6's asserted diagnostic must be its PLANTED
+          # predicate fault, never the HOSTILE_UNSET side effect - the wiring must be live.
+          ! grep -F "E_HOSTILE_CERT_UNSET" "$PFD/pf6.log" \
+            || { echo "E_PF6_STALE_CODE E_HOSTILE_CERT_UNSET must not appear" | tee -a "$PFD/pf6.log"; exit 97; }
           ! grep -F "E_BASH_ERRTRAP" "$PFD/pf6.log" \
             || { echo "E_PF_TRAP_MASKED E_BASH_ERRTRAP present - D13-1 regression" | tee -a "$PFD/pf6.log"; exit 97; }
           echo "PF_6_MUST_SHOW_OK predicate-failing evidence died with E_ENROLL_PREDICATE_FAIL exit 97, no E_BASH_ERRTRAP" | tee -a "$PFD/pf6.log"
@@ -421,6 +430,7 @@ BLOCK_TIE_NEGS = r'''      - name: NON_CERTIFYING_SCRATCH planted-fault F3 out-o
         if: ${{ !cancelled() }}
         run: |
           set -euo pipefail
+          trap '_rc=$?; echo "E_BASH_ERRTRAP f3negs line $LINENO rc=$_rc cmd: $BASH_COMMAND" >&2; exit 97' ERR
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
           [ -f config.json ] || { echo "E_F3_NEG_INPUT committed config.json absent"; exit 97; }
           [ -f lane_resolve.py ] || { echo "E_F3_NEG_INPUT committed lane_resolve.py absent"; exit 97; }
@@ -445,6 +455,7 @@ BLOCK_TIE_NEGS = r'''      - name: NON_CERTIFYING_SCRATCH planted-fault F3 out-o
         if: ${{ !cancelled() }}
         run: |
           set -euo pipefail
+          trap '_rc=$?; echo "E_BASH_ERRTRAP f6 line $LINENO rc=$_rc cmd: $BASH_COMMAND" >&2; exit 97' ERR
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
           SRC=/tmp/$PREFIX-out/$PREFIX-enroll-sole
           [ -f "$SRC/vars-enrolled.fd" ] || { echo "E_F6_NEG_INPUT sole vars-enrolled.fd absent"; exit 97; }
@@ -481,6 +492,7 @@ BLOCK_BOOT_TARGET_NEG = r'''      - name: NON_CERTIFYING_SCRATCH planted-fault H
         if: ${{ !cancelled() }}
         run: |
           set -euo pipefail
+          trap '_rc=$?; echo "E_BASH_ERRTRAP h3 line $LINENO rc=$_rc cmd: $BASH_COMMAND" >&2; exit 97' ERR
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
           SRC=/tmp/$PREFIX-out/$PREFIX-enroll-sole
           [ -f "$SRC/vars-enrolled.fd" ] || { echo "E_H3_NEG_INPUT sole vars-enrolled.fd absent"; exit 97; }
@@ -511,6 +523,7 @@ BLOCK_BOOT_TARGET_NEG = r'''      - name: NON_CERTIFYING_SCRATCH planted-fault H
           # environmental death would be E_QEMU_START, also rc 90 - indistinguishable
           # without this proof): the case argv.txt exists AND a NONEMPTY ovmf-debug.log
           # carries a "[Bds]Booting " line.
+          [ -d "$T/cases" ] || { echo "E_H3_CASES_MISSING harness produced no cases dir (early death - see h3.log)"; cat "$T/h3.log"; exit 97; }
           _cdir=$(find "$T/cases" -mindepth 1 -maxdepth 1 -type d | head -1)
           [ -n "$_cdir" ] && [ -s "$_cdir/argv.txt" ] || { echo "E_H3_QEMU_NOT_STARTED case argv.txt missing (environmental)"; cat "$T/h3.log"; exit 97; }
           [ -s "$_cdir/ovmf-debug.log" ] && grep -q '^\[Bds\]Booting ' "$_cdir/ovmf-debug.log" || { echo "E_H3_QEMU_NOT_STARTED no nonempty debug log with a Booting line (environmental)"; cat "$T/h3.log"; exit 97; }
@@ -648,6 +661,7 @@ BLOCK_BYTECODE_GUARD_NEG = r'''      - name: NON_CERTIFYING_SCRATCH planted-faul
         if: ${{ !cancelled() }}
         run: |
           set -eEuo pipefail
+          trap '_rc=$?; echo "E_BASH_ERRTRAP h5 line $LINENO rc=$_rc cmd: $BASH_COMMAND" >&2; exit 97' ERR
           REH=docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
           OUT=/tmp/$PREFIX-out
           mkdir -p "$OUT"

@@ -18,6 +18,9 @@ LANE_TMP="/tmp/%s-"%PREFIX
 # lane_resolve .pyc tripped E_CHECKOUT_MUTATED at the end-of-job gate).
 sys.dont_write_bytecode = True
 from lane_resolve import LaneError, resolve_config_value
+# peer run-36017957182 ruling (Q2): single-sourced top-level schema - the SAME module the
+# harness validates with. The two-copy drift is how the F6 E_CONFIG_SCHEMA happened.
+from config_schema import ConfigSchemaError, check_top
 
 FORBIDDEN = "OVMF_CI_SECURE_BOOT_UKI_PASS"
 E = []
@@ -198,6 +201,11 @@ def scan_wildcards(o, path=""):
     elif isinstance(o, str):
         if "*" in o or "?" in o or "TBD" in o or "FILL" in o: fail("E_CONFIG_WILDCARD", path+"="+o)
 scan_wildcards(cfg)
+# peer run-36017957182 ruling (DEFECT 2): preflight runs the harness's OWN top-level schema
+# validation (single-sourced in config_schema.py) so a schema/config drift dies HERE, in the
+# preflight, never at a deep must-show step. 'enrollments' is REQUIRED (Q1).
+try: check_top(cfg)
+except ConfigSchemaError as e: fail("E_CONFIG_SCHEMA", e.msg)
 for req in ("qemu","cpu_model","memory_mb","v3_serials","disk_dir","vars_parser","ovmf_code_debug","ovmf_vars_pristine","enroll_app","cases"):
     if req not in cfg: fail("E_CONFIG_MISSING_FIELD", req)
 LANES_ALL={"scratch","rehearsal","certification"}
@@ -651,6 +659,12 @@ for _p in _py_files:
     # ONLY in its two committed consumers. No wildcard, no other file, no other module.
     if os.path.basename(_p) in ("rehearsal-harness.py","preflight-check.py"):
         _bad-={"lane_resolve"}
+    # peer run-36017957182 ruling (Q2): NARROW named allowance - exactly the reviewed
+    # single-source schema module "config_schema" (this directory, exec-bit pinned,
+    # stdlib-only, no sibling imports), ONLY in its two committed consumers plus its
+    # committed test. No wildcard, no other file, no other module.
+    if os.path.basename(_p) in ("rehearsal-harness.py","preflight-check.py","test-config-schema.py"):
+        _bad-={"config_schema"}
     # peer run-36004747396 ruling (C1''''' items 2+4): NARROW named allowance - exactly
     # the reviewed bash-rule heredoc parser module "heredoc_parse" (this directory,
     # stdlib-only, no sibling imports), ONLY in the E_HEREDOC_STRUCTURE and
@@ -807,6 +821,39 @@ for _p in _stale_files:
         if _l.strip().startswith("#"): continue
         if _STALE_RE.search(_l):
             fail("E_INRUN_STALE_PATH","%s:%d pre-relocation inrun path reference: %s"%(_p,_ln,_l.strip()[:100]))
+
+# 6o) peer run-36017957182 ruling (c): E_ENV_CONTRACT_UNWIRED - every C5_* env READ in a
+# committed rehearsal .py must have a matching committed PRODUCER (export/assignment in a
+# rehearsal or p3 .sh, or an env key / shell line in the ceremony workflows). Run
+# 36017957182 died at step 28 on exactly this shape: enroll-predicate-check.py reads
+# C5_HOSTILE_CERT_SHA256 / C5_WRONG_SIGNER_CERT_SHA256 and nothing exported them.
+# preflight-check.py (this file - it carries the scan regex) and test-env-contract.py
+# (planted fixtures) are excluded. Writes (os.environ["C5_X"] = ...) are not reads.
+import re as _re_ec
+_ec_get=_re_ec.compile(r"""os\.environ\.get\(\s*["'](C5_[A-Z0-9_]+)["']""")
+_ec_sub=_re_ec.compile(r"""os\.environ\[\s*["'](C5_[A-Z0-9_]+)["']\s*\](?!\s*=[^=])""")
+_ec_shp=_re_ec.compile(r"\bexport\s+(C5_[A-Z0-9_]+)\b|\b(C5_[A-Z0-9_]+)\s*=")
+_ec_ykey=_re_ec.compile(r"^\s*(C5_[A-Z0-9_]+)\s*:")
+_ec_prod=set()
+for _d in (here, p3_root):
+    for _f in sorted(os.listdir(_d)):
+        if _f.endswith(".sh"):
+            for _ln in open(os.path.join(_d,_f),errors="replace"):
+                for _m in _ec_shp.finditer(_ln): _ec_prod.add(_m.group(1) or _m.group(2))
+for _f in sorted(os.listdir(wf_dir)):
+    if _f.endswith((".yml",".yaml")):
+        for _ln in open(os.path.join(wf_dir,_f),errors="replace"):
+            _mk=_ec_ykey.match(_ln)
+            if _mk: _ec_prod.add(_mk.group(1))
+            for _m in _ec_shp.finditer(_ln): _ec_prod.add(_m.group(1) or _m.group(2))
+for _f in sorted(os.listdir(here)):
+    if not _f.endswith(".py"): continue
+    if _f in ("preflight-check.py","test-env-contract.py"): continue
+    for _i,_ln in enumerate(open(os.path.join(here,_f),errors="replace"),1):
+        for _v in _ec_get.findall(_ln)+_ec_sub.findall(_ln):
+            if _v not in _ec_prod:
+                fail("E_ENV_CONTRACT_UNWIRED",
+                     "%s:%d reads %s with no committed export/assignment in rehearsal/p3 .sh or workflow"%(_f,_i,_v))
 
 # 7) KVM requirement is declarative here; runtime fail-closed check lives in the workflow
 report={"schema":"NON_CERTIFYING_REHEARSAL-preflight/v1","lane":PREFIX,"errors":E,
