@@ -5,12 +5,15 @@
 # preflight-check.py used to carry).
 #
 # Rule (exactly as ruled): component-wise mapping, ONLY for canonical absolute /tmp lane
-# paths. Every path component that IS the canonical token NON_CERTIFYING_REHEARSAL or starts
-# with it plus '-' maps to the running lane's prefix; a canonical token anywhere else in a
-# component fails closed (NO substring rewrites anywhere); a component naming a different
-# NON_CERTIFYING_ lane fails closed; components already in the running lane pass through
-# (idempotent); anything that is not an absolute /tmp lane path at all fails closed in the
-# strict entry point. Config VALUES that are not absolute /tmp paths (relative paths, case
+# paths. Components equal to '', '.' or '..' fail closed (G1: paths must be lexically
+# normal - traversal and dot/empty components are rejected, never normalized, and no
+# filesystem realpath is ever performed, so nonexistent expected paths are never
+# dereferenced). Every path component that IS the canonical token NON_CERTIFYING_REHEARSAL
+# or starts with it plus '-' maps to the running lane's prefix; a canonical token anywhere
+# else in a component fails closed (NO substring rewrites anywhere); a component naming a
+# different NON_CERTIFYING_ lane fails closed; components already in the running lane pass
+# through (idempotent); anything that is not an absolute /tmp lane path at all fails closed
+# in the strict entry point. Config VALUES that are not absolute /tmp paths (relative paths, case
 # IDs, schema strings, names) are never touched by the resolver's config traversal - they
 # pass through byte-identical (ruled exemptions).
 #
@@ -19,6 +22,7 @@
 #   E_LANE_PATH              bad lane prefix, or resolved path escapes the lane
 #   E_LANE_PATH_NOT_CANON    not an absolute /tmp lane path (no canonical/lane component)
 #   E_LANE_PATH_COMPONENT    canonical token inside a component but not at its start
+#   E_LANE_PATH_DOTSEG       component is '', '.' or '..' (non-normal path; G1)
 #   E_LANE_PATH_FOREIGN      component names a different NON_CERTIFYING_ lane
 #   E_PREFIX_UNSET / E_PREFIX_MISMATCH  (gate mode, same convention as the other scripts)
 #   E_VARS_TEMPLATE_GATE     gate mode: a case vars_template resolved outside the
@@ -52,6 +56,9 @@ def resolve_path(p, prefix):
     saw_canon = False
     saw_lane = False
     for c in comps[2:]:
+        if c in ("", ".", ".."):
+            raise LaneError("E_LANE_PATH_DOTSEG",
+                            "non-normal component %r in %s (dot/empty/traversal components rejected; paths must be lexically normal)" % (c, p))
         if c == CANON or c.startswith(CANON + "-"):
             out.append(prefix + c[len(CANON):])
             saw_canon = True
@@ -73,8 +80,10 @@ def resolve_path(p, prefix):
     return resolved
 
 def resolve_config_value(x, prefix):
-    """Config traversal: only absolute /tmp path strings are resolved; every other value
-    (relative paths, IDs, schema strings, names, non-strings) passes through untouched."""
+    """Config traversal: only absolute /tmp path strings are resolved (via resolve_path, so
+    the G1 dot/empty/traversal component rejection applies to them identically); every other
+    value (relative paths, IDs, schema strings, names, non-strings) passes through
+    untouched."""
     if isinstance(x, str):
         return resolve_path(x, prefix) if x.startswith("/tmp/") else x
     if isinstance(x, list):

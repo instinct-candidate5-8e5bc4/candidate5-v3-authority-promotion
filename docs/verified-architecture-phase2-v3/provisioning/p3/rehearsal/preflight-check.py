@@ -340,14 +340,19 @@ finally:
 # 6e13) #18 F1 conformance: resolve-lane-path.sh (the bash caller) and lane_resolve.py (the
 # single definition) must agree on rc AND stdout over a corpus covering: nested canonical,
 # leading-only canonical, already-lane idempotence, the run-17 mixed lane/canonical shape,
-# foreign-lane, non-leading-token, and token-free /tmp (the last three must fail both).
+# foreign-lane, non-leading-token, token-free /tmp, and the G1 dotseg probes (traversal,
+# dot component, empty component - the peer #18 G1 reviewer inputs; the last six must fail
+# both).
 _CONFORM=("/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-enroll-sole/vars-enrolled.fd",
           "/tmp/NON_CERTIFYING_REHEARSAL-stage/root/usr/share/OVMF/OVMF_VARS_4M.fd",
           "/tmp/%s-out/%s-enroll-sole/vars-enrolled.fd"%(PREFIX,PREFIX),
           "/tmp/%s-out/NON_CERTIFYING_REHEARSAL-enroll-sole/vars-enrolled.fd"%PREFIX,
           "/tmp/NON_CERTIFYING_FOREIGN-x",
           "/tmp/x-NON_CERTIFYING_REHEARSAL-y",
-          "/tmp/token-free")
+          "/tmp/token-free",
+          "/tmp/NON_CERTIFYING_REHEARSAL-out/../../etc/passwd",
+          "/tmp/NON_CERTIFYING_REHEARSAL-out/./x",
+          "/tmp/NON_CERTIFYING_REHEARSAL-out//x")
 for _i,_cp in enumerate(_CONFORM):
     _b=_sp.run([os.path.join(here,"resolve-lane-path.sh"),_cp,PREFIX],capture_output=True,text=True)
     _y=_sp.run([sys.executable,os.path.join(here,"lane_resolve.py"),"resolve",_cp,PREFIX],capture_output=True,text=True)
