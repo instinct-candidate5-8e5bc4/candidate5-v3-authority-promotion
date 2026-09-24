@@ -72,5 +72,33 @@ expect("python-syntax-error", any(c == "E_HEREDOC_STRUCTURE" and "py_compile" in
        "fails=%r" % (f,))
 shutil.rmtree(d)
 
+# 6) C1 ruling (d): syntax error in a python body NESTED inside a bash heredoc ->
+#    fires with the nested path (the peer's exact repro shape, CSIGN>PYK2C)
+d = synth(["bash -se <<'OUTER'", "echo hi", "python3 - <<'INNER'", "def broken(:",
+           "INNER", "OUTER"])
+f = run_gate(d)
+expect("nested-python-syntax-error",
+       any(c == "E_HEREDOC_STRUCTURE" and "OUTER>INNER" in m and "py_compile" in m for c, m in f),
+       "fails=%r" % (f,))
+shutil.rmtree(d)
+
+# 7) C1 ruling (d): misplaced terminator INSIDE a nested body (nested step-19
+#    shape: INNER's body swallows the INNER2 opener before INNER closes) -> fires
+d = synth(["bash -se <<'OUTER'", "python3 - <<'INNER'", 'print("x")',
+           "python3 - <<'INNER2'", 'print("y")', "INNER2", "INNER", "OUTER"])
+f = run_gate(d)
+expect("nested-misplaced-terminator",
+       any(c == "E_HEREDOC_STRUCTURE" and "OUTER>INNER" in m for c, m in f),
+       "fails=%r" % (f,))
+shutil.rmtree(d)
+
+# 8) C1 ruling (b)/(d): unquoted opener <<PYT -> fails closed with its own code
+d = synth(["python3 - <<PYT", 'print("unquoted")', "PYT"])
+f = run_gate(d)
+expect("unquoted-opener",
+       any(c == "E_HEREDOC_UNQUOTED_OPENER" for c, _ in f),
+       "fails=%r" % (f,))
+shutil.rmtree(d)
+
 print("HEREDOC_STRUCTURE_NEGTESTS %d/%d pass" % (sum(results), len(results)))
 sys.exit(0 if all(results) else 1)

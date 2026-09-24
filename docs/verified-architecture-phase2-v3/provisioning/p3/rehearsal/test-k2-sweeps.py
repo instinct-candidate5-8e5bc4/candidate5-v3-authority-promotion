@@ -14,30 +14,15 @@ SRC = open(WF).read()
 # search (marker search extracted the swallowed PYK2F block and could not see the step-19
 # defect). sys.dont_write_bytecode BEFORE the sibling import (preflight check 6j).
 sys.dont_write_bytecode = True
-from heredoc_parse import iter_run_blocks, parse_heredocs, is_python
-
-def _find(tag, block, top):
-    closed, unclosed = parse_heredocs(block)
-    if top and unclosed:
-        raise SystemExit("unclosed heredoc in workflow (E_HEREDOC_STRUCTURE territory): %r" % (unclosed,))
-    for h in closed:
-        if h["tag"] == tag:
-            return "\n".join(l for _, l in h["body"]) + "\n"
-    # nested-generation heredocs: a shell body (e.g. the sudo/unshare CFIX/CSIGN scripts)
-    # is itself a bash script whose own heredocs bash parses at runtime - descend. Python
-    # bodies are data (and the 6l gate guarantees they contain no opener lines).
-    for h in closed:
-        if not is_python(h):
-            r = _find(tag, h["body"], False)
-            if r is not None:
-                return r
-    return None
+from heredoc_parse import iter_run_blocks, walk
 
 def extract(tag):
     for _rk, blk in iter_run_blocks(SRC):
-        r = _find(tag, blk, True)
-        if r is not None:
-            return r
+        for kind, path, rec in walk(blk):
+            if kind == "unclosed":
+                raise SystemExit("unclosed heredoc in workflow (E_HEREDOC_STRUCTURE territory): %r" % (rec,))
+            if kind == "heredoc" and rec["tag"] == tag:
+                return "\n".join(l for _, l in rec["body"]) + "\n"
     raise KeyError(tag)
 
 SWEEPS = {

@@ -19,6 +19,10 @@ _OP = r"(?<!<)<<(?!<)-?\s*(?:'([A-Za-z_][A-Za-z0-9_]*)'|\"([A-Za-z_][A-Za-z0-9_]
 OPENER_RE = re.compile(_OP)
 BODY_OPENER_RE = OPENER_RE  # a python-body line matching this is itself a heredoc opener
 PY_OPENER_RE = re.compile(r"python[0-9.]*\s+-[^<\n]*" + _OP)
+# peer run-36004747396 C1-prime6 ruling (b): UNQUOTED openers (<<TAG, <<-TAG) fail closed.
+# The parser recognises only quoted delimiters; an unquoted match is a violation record,
+# never queued as a parseable heredoc.
+UNQUOTED_RE = re.compile(r"(?<!<)<<(?!<)-?\s*(?!['\"])([A-Za-z_][A-Za-z0-9_]*)")
 
 
 def iter_run_blocks(text):
@@ -46,10 +50,11 @@ def iter_run_blocks(text):
 
 
 def parse_heredocs(block):
-    """Bash-rule parse of one de-indented run block. Returns (closed, unclosed):
+    """Bash-rule parse of one de-indented run block. Returns (closed, unclosed, unquoted):
     closed   = [{tag, opener_lineno, opener_line, body=[(lineno, line)], closed_lineno}]
-    unclosed = [{tag, opener_lineno, opener_line, body=[...]}] (pending at end of step)."""
-    pending, closed = [], []
+    unclosed = [{tag, opener_lineno, opener_line, body=[...]}] (pending at end of step)
+    unquoted = [{tag, lineno, line}] (unquoted openers - violations, never queued)."""
+    pending, closed, unquoted = [], [], []
     for lineno, line in block:
         if pending:
             cur = pending[0]
@@ -63,7 +68,28 @@ def parse_heredocs(block):
         for m in OPENER_RE.finditer(line):
             pending.append({"tag": m.group(1) or m.group(2), "opener_lineno": lineno,
                             "opener_line": line, "body": []})
-    return closed, pending
+        for m in UNQUOTED_RE.finditer(line):
+            unquoted.append({"tag": m.group(1), "lineno": lineno, "line": line})
+    return closed, pending, unquoted
+
+
+def walk(block, prefix=""):
+    """Recursive bash-rule walk (peer run-36004747396 C1-prime6 ruling (a)): yields
+    ("heredoc", path, rec) for every closed heredoc at EVERY depth, descending into
+    non-python bodies (shell-stdin scripts such as sudo unshare ... bash -se <<'CSIGN'
+    whose own heredocs bash parses at runtime; python bodies are data and are not
+    descended into), plus ("unclosed", path, rec) and ("unquoted", path, rec) at any
+    depth. path is the >-joined tag chain, e.g. CSIGN>PYK2C, CFIX>PYK2."""
+    closed, unclosed, unquoted = parse_heredocs(block)
+    for h in closed:
+        path = prefix + h["tag"]
+        yield ("heredoc", path, h)
+        if not is_python(h):
+            yield from walk(h["body"], path + ">")
+    for u in unclosed:
+        yield ("unclosed", prefix + u["tag"], u)
+    for q in unquoted:
+        yield ("unquoted", prefix + q["tag"], q)
 
 
 def is_python(h):

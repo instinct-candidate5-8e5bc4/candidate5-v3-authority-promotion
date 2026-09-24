@@ -717,32 +717,42 @@ for _c in cfg.get("cases",[]):
     if _c["firmware"]!="build-output/ovmf-debug/OVMF_CODE.fd" and _c["expect"].get("kernel_exec") is not True:
         fail("E_CASE_BOOT_TARGET_UNPROVABLE",_c["id"]+" non-debug firmware without expect.kernel_exec=true")
 
-# 6l) peer run-36004747396 ruling (C1''''' item 2): E_HEREDOC_STRUCTURE over EVERY
-# workflow (including certification). Bash-rule heredoc parse of every run block via
-# heredoc_parse.py (the single source of truth shared with the test suites): every opener
-# must close inside the same step; every python heredoc body must py_compile; no python
-# body line may itself open a heredoc (the run-36004747396 step-19 shape: PREC swallowing
-# the python3 - <<'PYK2F' line). Committed planted negatives: test-heredoc-structure.py.
+# 6l) peer run-36004747396 ruling (C1''''' item 2, recursion per the C1'''''' verdict):
+# E_HEREDOC_STRUCTURE over EVERY workflow (including certification), at EVERY nesting
+# depth. Bash-rule parse via heredoc_parse.walk (the single source of truth shared with
+# the test suites): every opener must close inside its step at its own depth; every
+# python heredoc body (including nested ones such as CSIGN>PYK2C and CFIX>PYK2) must
+# py_compile; no python body line may itself open a heredoc. Unquoted openers
+# (<<TAG, <<-TAG) fail closed as E_HEREDOC_UNQUOTED_OPENER (none exist today; the parser
+# only recognises quoted delimiters). The per-workflow list of compiled python heredoc
+# paths is recorded in the report as heredoc_coverage so coverage is visible in evidence.
+# Committed planted negatives: test-heredoc-structure.py.
 import heredoc_parse as _hp
+_heredoc_coverage={}
 for _fn in sorted(os.listdir(wf_dir)):
     if not _fn.endswith((".yml",".yaml")): continue
     _wt=open(os.path.join(wf_dir,_fn),errors="replace").read()
+    _cov=[]
     for _rk,_blk in _hp.iter_run_blocks(_wt):
-        _closed,_unclosed=_hp.parse_heredocs(_blk)
-        for _u in _unclosed:
-            fail("E_HEREDOC_STRUCTURE","%s:%d heredoc <<'%s' never closes inside its step"%(_fn,_u["opener_lineno"],_u["tag"]))
-        for _h in _closed:
-            if not _hp.is_python(_h): continue
-            for _ln,_l in _h["body"]:
-                if _hp.BODY_OPENER_RE.search(_l):
-                    fail("E_HEREDOC_STRUCTURE","%s:%d python heredoc <<'%s' body line itself opens a heredoc: %s"%(_fn,_ln,_h["tag"],_l.strip()[:80]))
-            try:
-                compile(_hp.body_text(_h),"%s:<<'%s'>"%(_fn,_h["tag"]),"exec")
-            except SyntaxError as _se:
-                fail("E_HEREDOC_STRUCTURE","%s:%d python heredoc <<'%s' body fails py_compile: %s"%(_fn,_h["opener_lineno"],_h["tag"],_se))
+        for _kind,_path,_rec in _hp.walk(_blk):
+            if _kind=="unclosed":
+                fail("E_HEREDOC_STRUCTURE","%s:%d heredoc <<'%s' never closes inside its step (path %s)"%(_fn,_rec["opener_lineno"],_rec["tag"],_path))
+            elif _kind=="unquoted":
+                fail("E_HEREDOC_UNQUOTED_OPENER","%s:%d unquoted heredoc opener <<%s (path %s) - quote the delimiter"%(_fn,_rec["lineno"],_rec["tag"],_path))
+            elif _hp.is_python(_rec):
+                _cov.append(_path)
+                for _ln,_l in _rec["body"]:
+                    if _hp.BODY_OPENER_RE.search(_l):
+                        fail("E_HEREDOC_STRUCTURE","%s:%d python heredoc <<'%s' body line itself opens a heredoc: %s"%(_fn,_ln,_path,_l.strip()[:80]))
+                try:
+                    compile(_hp.body_text(_rec),"%s:<<'%s'>"%(_fn,_path),"exec")
+                except SyntaxError as _se:
+                    fail("E_HEREDOC_STRUCTURE","%s:%d python heredoc <<'%s' body fails py_compile: %s"%(_fn,_rec["opener_lineno"],_path,_se))
+    if _cov: _heredoc_coverage[_fn]=sorted(_cov)
 
 # 7) KVM requirement is declarative here; runtime fail-closed check lives in the workflow
 report={"schema":"NON_CERTIFYING_REHEARSAL-preflight/v1","lane":PREFIX,"errors":E,
+        "heredoc_coverage":_heredoc_coverage,
         "result":"PASS" if not E else "FAIL"}
 print(json.dumps(report,indent=1,sort_keys=True))
 sys.exit(0 if not E else 30)
