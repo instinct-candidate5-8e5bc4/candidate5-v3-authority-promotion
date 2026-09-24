@@ -1,7 +1,9 @@
 #!/bin/bash
 # NON_CERTIFYING_REHEARSAL enroll-app dual build from the rehearsal tree source.
 # Usage: build-enroll-app.sh STAGE OUTDIR_A OUTDIR_B
-set -euo pipefail
+set -eEuo pipefail
+# peer run-11: every otherwise-bare bash failure is NAMED (script/line/rc/command), exit 97.
+trap '_rc=$?; echo "E_BASH_ERRTRAP build-enroll-app.sh line $LINENO rc=$_rc cmd: $BASH_COMMAND" >&2; exit 97' ERR
 STAGE="$1"; OUTA="$2"; OUTB="$3"
 RT="$STAGE/root"
 SRC_DIR="$(cd "$(dirname "$0")" && pwd)"

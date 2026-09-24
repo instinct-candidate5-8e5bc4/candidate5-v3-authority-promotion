@@ -32,9 +32,13 @@ env:
   EVIDENCE_UPLOAD_PATHS: &evidence_upload_paths |
     /tmp/NON_CERTIFYING_REHEARSAL-out/
     /tmp/NON_CERTIFYING_REHEARSAL-fw-hashes.txt
-    /tmp/NON_CERTIFYING_REHEARSAL-ovmf-a/basetools-build.log
-    /tmp/NON_CERTIFYING_REHEARSAL-ovmf-b/basetools-build.log
+    /tmp/NON_CERTIFYING_REHEARSAL-ovmf-a/basetools-build-pass1.log
+    /tmp/NON_CERTIFYING_REHEARSAL-ovmf-a/basetools-build-pass2.log
     /tmp/NON_CERTIFYING_REHEARSAL-hostile-out/basetools-build.log
+  # peer run-11: the env2 job gets the same single-list treatment (same drift shape).
+  ENV2_EVIDENCE_UPLOAD_PATHS: &env2_evidence_upload_paths |
+    /tmp/NON_CERTIFYING_REHEARSAL-env2-evidence/
+    /tmp/NON_CERTIFYING_REHEARSAL-ovmf-env2/basetools-build-pass1.log
 jobs:
   rehearsal:
     # ubuntu-22.04 pinned: the canonical-path mechanism (build-ovmf-debug.sh) needs
@@ -589,26 +593,30 @@ jobs:
       - name: NON_CERTIFYING_REHEARSAL env2 evidence manifest + digest (peer N9)
         run: |
           set -euo pipefail
-          # every uploaded env2 path - the env2-evidence tree plus the ovmf-env2 basetools
-          # log - hashed into one manifest, with absent members noted explicitly.
+          # peer N9 + run-11 single-list: env2 manifest members come from the ONE shared
+          # ENV2_EVIDENCE_UPLOAD_PATHS list (workflow env anchor; upload aliases it below).
           if [ -n "$(sudo find /tmp/$PREFIX-env2-evidence ! -type f ! -type d -print -quit)" ]; then
             echo "E_EVIDENCE_NONREGULAR non-regular file in env2 evidence tree:"; sudo find /tmp/$PREFIX-env2-evidence ! -type f ! -type d -print; exit 94
           fi
           man=$(mktemp)
-          { sudo find /tmp/$PREFIX-env2-evidence -type f -print0
-            [ -f /tmp/$PREFIX-ovmf-env2/basetools-build.log ] && printf '%s\0' /tmp/$PREFIX-ovmf-env2/basetools-build.log
+          { while IFS= read -r p; do
+              if [ -z "$p" ]; then continue; fi
+              if [ -d "$p" ]; then sudo find "$p" -type f -print0
+              elif [ -f "$p" ]; then printf '%s\0' "$p"; fi
+            done <<< "$ENV2_EVIDENCE_UPLOAD_PATHS"
           } | sort -z | sudo xargs -0 -r sha256sum > "$man"
-          [ -f /tmp/$PREFIX-ovmf-env2/basetools-build.log ] || echo "ARTIFACT-DIGEST note: /tmp/$PREFIX-ovmf-env2/basetools-build.log ABSENT this run (not in manifest)"
+          while IFS= read -r p; do
+            if [ -z "$p" ]; then continue; fi
+            [ -d "$p" ] || [ -f "$p" ] || echo "ARTIFACT-DIGEST note: $p ABSENT this run (not in manifest)"
+          done <<< "$ENV2_EVIDENCE_UPLOAD_PATHS"
           sudo mv "$man" /tmp/$PREFIX-env2-evidence/$PREFIX-env2-evidence-manifest.txt
           sudo chown "$(id -u):$(id -g)" /tmp/$PREFIX-env2-evidence/$PREFIX-env2-evidence-manifest.txt
-          echo "ARTIFACT-DIGEST path=/tmp/$PREFIX-env2-evidence/ +ovmf-env2-basetools-log manifest=$PREFIX-env2-evidence-manifest.txt manifest_sha256=$(sha256sum /tmp/$PREFIX-env2-evidence/$PREFIX-env2-evidence-manifest.txt | cut -d' ' -f1) files=$(grep -c . /tmp/$PREFIX-env2-evidence/$PREFIX-env2-evidence-manifest.txt) run_id=$GITHUB_RUN_ID run_attempt=$GITHUB_RUN_ATTEMPT run_number=$GITHUB_RUN_NUMBER workflow=$GITHUB_WORKFLOW commit=$GITHUB_SHA ref=$GITHUB_REF"
+          echo "ARTIFACT-DIGEST paths=ENV2_EVIDENCE_UPLOAD_PATHS(shared-list) manifest=$PREFIX-env2-evidence-manifest.txt manifest_sha256=$(sha256sum /tmp/$PREFIX-env2-evidence/$PREFIX-env2-evidence-manifest.txt | cut -d' ' -f1) files=$(grep -c . /tmp/$PREFIX-env2-evidence/$PREFIX-env2-evidence-manifest.txt) run_id=$GITHUB_RUN_ID run_attempt=$GITHUB_RUN_ATTEMPT run_number=$GITHUB_RUN_NUMBER workflow=$GITHUB_WORKFLOW commit=$GITHUB_SHA ref=$GITHUB_REF"
       - name: NON_CERTIFYING_REHEARSAL env2 evidence upload (ephemeral CI artifact only)
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
         with:
           name: NON_CERTIFYING_REHEARSAL-env2-evidence
-          path: |
-            /tmp/NON_CERTIFYING_REHEARSAL-env2-evidence/
-            /tmp/NON_CERTIFYING_REHEARSAL-ovmf-env2/basetools-build.log
+          path: *env2_evidence_upload_paths
           retention-days: 90
           if-no-files-found: error

@@ -6,7 +6,9 @@
 # Modes (env): CANON_SINGLE=1 = one build only (env2 reproduction); CANON_MODE=hostile =
 # one build at a deliberately NON-canonical host path (drift demonstration for the PDB
 # verifier); CANON_REALWORK=p = real dir bound to /build (default: dirname(OUTA)/ovmf-work-real).
-set -euo pipefail
+set -eEuo pipefail
+# peer run-11: every otherwise-bare bash failure is NAMED (script/line/rc/command), exit 97.
+trap '_rc=$?; echo "E_BASH_ERRTRAP build-ovmf-debug.sh line $LINENO rc=$_rc cmd: $BASH_COMMAND" >&2; exit 97' ERR
 STAGE="$1"; OUTA="$2"; OUTB="${3:-}"
 # B4: no compiler/linker environment may leak into BaseTools or the firmware build
 unset LD_LIBRARY_PATH GCC_EXEC_PREFIX COMPILER_PATH CPATH LIBRARY_PATH
@@ -39,6 +41,10 @@ SHIMS="$STAGE/shims"
 export NASM_PREFIX="$SHIMS/"
 export IASL_PREFIX="$SHIMS/"
 build_one() {
+  # peer run-11 ruling (per-pass logs DECIDED): each build pass writes its OWN named
+  # BaseTools log (default keeps the hostile-mode name); both pass logs land in the
+  # shared evidence upload and each log's sha256 is printed in the main log above.
+  local BTLOG="${2:-$OUTA/basetools-build.log}"
   local WORK="$1"
   rm -rf "$WORK"; mkdir -p "$WORK"
   cd "$WORK"
@@ -65,9 +71,9 @@ build_one() {
   mkdir -p "$COMPAT/bin"; ln -sf "$(command -v python3)" "$COMPAT/bin/python"
   env -u LIBRARY_PATH PATH="$COMPAT/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" \
     CPATH="$COMPAT/include" LIBRARY_PATH="$COMPAT/lib" \
-    make -C BaseTools -j"$(nproc)" >"$OUTA/basetools-build.log" 2>&1 || \
-      { _rc=$?; cat "$OUTA/basetools-build.log"; echo "E_BASETOOLS_BUILD make rc=$_rc log=$OUTA/basetools-build.log"; exit 50; }
-  echo "basetools build log: $OUTA/basetools-build.log sha256=$(sha256sum "$OUTA/basetools-build.log" | cut -d' ' -f1)"
+    make -C BaseTools -j"$(nproc)" >"$BTLOG" 2>&1 || \
+      { _rc=$?; cat "$BTLOG"; echo "E_BASETOOLS_BUILD make rc=$_rc log=$BTLOG"; exit 50; }
+  echo "basetools build log: $BTLOG sha256=$(sha256sum "$BTLOG" | cut -d' ' -f1)"
   # B4: no uuid_* member may be pulled from the staged libuuid.a into any host-built
   # BaseTools binary, and no noble-glibc marker symbol may appear (latent glibc mixing)
   for bt in "$WORK/edk2/BaseTools/Source/C/bin/"*; do
@@ -176,7 +182,7 @@ WORKFIX=/build/work
 find /build -type l -print -quit | grep -q . && { echo "E_SYMLINK_IN_CANON_TREE"; exit 49; } || true
 # condition 3: two clean sequential builds at the canonical path; build_one rm -rf's the
 # whole tree and restores only pinned inputs (pinned edk2 commit + staged toolchain).
-build_one "$WORKFIX"
+build_one "$WORKFIX" "$OUTA/basetools-build-pass1.log"
 cp "$WORKFIX/OVMF_CODE.fd" "$WORKFIX/OVMF_VARS.fd" "$OUTA"/
 if [ "${CANON_SINGLE:-}" = 1 ]; then
   # tree intentionally KEPT: scan-pe-pdb-paths.py must parse every module .efi (condition 5)
@@ -184,7 +190,7 @@ if [ "${CANON_SINGLE:-}" = 1 ]; then
   echo "single canonical-path build complete (tree kept at real path $CANON_REALWORK/work)"
   exit 0
 fi
-build_one "$WORKFIX"
+build_one "$WORKFIX" "$OUTA/basetools-build-pass2.log"
 cp "$WORKFIX/OVMF_CODE.fd" "$WORKFIX/OVMF_VARS.fd" "$OUTB"/
 rm -rf "$WORKFIX"
 cmp "$OUTA/OVMF_CODE.fd" "$OUTB/OVMF_CODE.fd" || { echo "E_OVMF_DUAL_BUILD_MISMATCH CODE"; exit 42; }

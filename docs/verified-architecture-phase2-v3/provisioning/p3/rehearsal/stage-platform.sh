@@ -4,7 +4,9 @@
 # This is the ONLY network phase of the rehearsal. Usage: stage-platform.sh LOCK DEST
 # batch1r3 D7: deb download fallback archive->snapshot.ubuntu.com (lock snapshot_ts); wrong bytes
 # from any source fail immediately (E_LOCK_HASH_MISMATCH); per-deb source manifest is recorded.
-set -euo pipefail
+set -eEuo pipefail
+# peer run-11: every otherwise-bare bash failure is NAMED (script/line/rc/command), exit 97.
+trap '_rc=$?; echo "E_BASH_ERRTRAP stage-platform.sh line $LINENO rc=$_rc cmd: $BASH_COMMAND" >&2; exit 97' ERR
 LOCK="$1"; DEST="$2"
 PREFIX="${PREFIX:-}"
 [ -n "$PREFIX" ] || { echo "E_PREFIX_UNSET"; exit 97; }

@@ -2,7 +2,9 @@
 # build-esp-image.sh - deterministic construction of the ESP boot disk image for P3.
 # Offline, no mounting, no root. Exactly one boot path: /EFI/BOOT/BOOTX64.EFI = signed UKI.
 # usage: build-esp-image.sh <signed_uki.efi> <fresh_work_dir>
-set -euo pipefail
+set -eEuo pipefail
+# peer run-11: every otherwise-bare bash failure is NAMED (script/line/rc/command), exit 97.
+trap '_rc=$?; echo "E_BASH_ERRTRAP build-esp-image.sh line $LINENO rc=$_rc cmd: $BASH_COMMAND" >&2; exit 97' ERR
 export LC_ALL=C TZ=UTC
 umask 022
 readonly EPOCH=1789923381

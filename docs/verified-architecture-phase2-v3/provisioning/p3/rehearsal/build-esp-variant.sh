@@ -2,7 +2,9 @@
 # NON_CERTIFYING_REHEARSAL ESP variant builder: same deterministic layout recipe as the
 # frozen ESP, but parameterized payload and variant-derived identities. Never collides
 # with the frozen ESP GUIDs/name. usage: build-esp-variant.sh <payload.efi> <label> <fresh_work_dir>
-set -euo pipefail
+set -eEuo pipefail
+# peer run-11: every otherwise-bare bash failure is NAMED (script/line/rc/command), exit 97.
+trap '_rc=$?; echo "E_BASH_ERRTRAP build-esp-variant.sh line $LINENO rc=$_rc cmd: $BASH_COMMAND" >&2; exit 97' ERR
 export LC_ALL=C TZ=UTC
 umask 022
 readonly EPOCH=1789923381

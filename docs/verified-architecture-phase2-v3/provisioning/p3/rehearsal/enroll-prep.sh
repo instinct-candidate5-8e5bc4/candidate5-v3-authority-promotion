@@ -2,7 +2,9 @@
 # NON_CERTIFYING_REHEARSAL enrollment preparation: throwaway PK/KEK, ESLs, .auth blobs.
 # Public inputs only; keys 0600 in a private dir, plain-deleted by the caller after use.
 # usage: enroll-prep.sh <sbs_extract_dir> <work_dir> <production_cert.der> [hostile_cert.der]
-set -euo pipefail
+set -eEuo pipefail
+# peer run-11: every otherwise-bare bash failure is NAMED (script/line/rc/command), exit 97.
+trap '_rc=$?; echo "E_BASH_ERRTRAP enroll-prep.sh line $LINENO rc=$_rc cmd: $BASH_COMMAND" >&2; exit 97' ERR
 export LC_ALL=C TZ=UTC; umask 077
 SBS=${1:?}; W=${2:?}; CERT=${3:?}; HOSTILE=${4:-}
 # B1: sbvarsign runs ONLY through the loader-explicit shim (never the absolute staged path,

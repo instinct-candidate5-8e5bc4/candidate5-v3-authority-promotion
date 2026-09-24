@@ -767,10 +767,10 @@ candidate):
   alive). Fixed in the peer-requested capture+poll shape: the PID is captured PROMPTLY
   after daemonize (bounded 5s pidfile wait; E_ENROLL_PID_MISSING exit 97 if it never
   appears), then THAT PID is polled with kill -0 through the bounded 25s budget and the
-  actual exit mode is logged - self-exit at t=N, or E_ENROLL_QEMU_DEADLINE_TERM with
-  TERM/KILL at the deadline (a named code logged for the event; the final disposition
-  stays with the E_ENROLL_TXT_MISSING 97 extraction gate, which preserves the run-9
-  shell-drop success shape). The pidfile itself is never the lifecycle signal; a
+  actual exit mode is logged - self-exit at t=N, or W_ENROLL_QEMU_DEADLINE_TERM with
+  TERM/KILL at the deadline (peer rename: a W_ event line, NOT an E_ error - the final
+  disposition stays with the E_ENROLL_TXT_MISSING 97 extraction gate, which preserves
+  the run-9 shell-drop success shape). The pidfile itself is never the lifecycle signal; a
   ResetSystem2 line is logged as SUPPORTING evidence of guest intent, not the mechanism.
   Post-guest image sha256+size and extracted ENROLL.TXT sha256+size are logged. All
   three modes locally tested on the exact extracted production block (self-exit, deadline
@@ -786,32 +786,44 @@ build-ovmf-debug.sh: build_one() writes the BaseTools log to OUTA only -
 and ovmf-b receives only the final FDs, byte-identity enforced -
   line 188: cp "$WORKFIX/OVMF_CODE.fd" "$WORKFIX/OVMF_VARS.fd" "$OUTB"/
   line 190: cmp "$OUTA/OVMF_CODE.fd" "$OUTB/OVMF_CODE.fd" || { echo "E_OVMF_DUAL_BUILD_MISMATCH CODE"; exit 42; }
-CAVEAT (open reviewer decision): build_one() runs for BOTH dual-build passes and BOTH
-write "$OUTA/basetools-build.log" - the second pass OVERWRITES the first, so the FIRST
-pass's own BaseTools diagnostics are NOT retained anywhere. If the reviewer wants
-per-pass logs retained (e.g. basetools-build-pass1.log / -pass2.log), that is a
-build-ovmf-debug.sh change - surfaced here as a decision, not implemented unasked.
-ovmf-b's FDs remain byte-identical to ovmf-a's under cmp, so the absent log carries no
-firmware-integrity signal; run-9's upload silently skipped it and the N9 absent-note made
-it visible - the gate working as intended.
+CAVEAT RESOLVED (peer #11 design review item 1 - DECIDED): per-pass logs are now
+retained. build_one() takes an explicit log path; the dual-build driver calls it as
+  pass 1: build_one "$WORKFIX" "$OUTA/basetools-build-pass1.log"
+  pass 2: build_one "$WORKFIX" "$OUTA/basetools-build-pass2.log"
+each pass's log sha256 is printed in the main log by the line above, the failure path
+echoes the failing pass's own log (E_BASETOOLS_BUILD log=$BTLOG), and BOTH pass logs are
+members of the shared evidence upload list (replacing the old ovmf-a/ovmf-b entries; the
+ovmf-b absent-note is superseded - ovmf-b never had a log by design). Hostile and
+CANON_SINGLE (env2) modes keep the default/single naming; env2's shared list references
+basetools-build-pass1.log. CODE/VARS pin reproduction is unchanged: the cmp byte-identity
+gate (E_OVMF_DUAL_BUILD_MISMATCH) and the frozen FD pins are untouched, and the next run
+must still reproduce them.
 Run-10 remaining owes: db2/sole-fresh ENROLL.TXT (ceremony stopped after sole), PF-1/PF-2
 CI execution, env2 compare.
 
 Run-11 hardening (peer #11 shape requests, this candidate):
-- Named ERR traps: rehearsal-enroll.sh, run-ceremony.sh, qemu-smoke.sh and make-shims.sh
-  now run set -eE with an ERR trap printing E_BASH_ERRTRAP <script> line/rc/command, exit
-  97 - no failure can ever again die bare the way run 10's pidfile cat did. The EXIT
-  evidence trap in run-ceremony.sh is preserved (the ERR trap is disabled inside
-  _repair_out so an incidental repair failure can never mask the original named exit
-  code, peer N3). Negative/positive tested: an unguarded cp failure -> E_BASH_ERRTRAP
-  rc=97; a guarded named gate -> its own E_ code, trap silent.
+- Named ERR traps (extended per peer #11 review item 3): ALL twelve ceremony-path bash
+  scripts now run set -eE with an ERR trap printing E_BASH_ERRTRAP <script>
+  line/rc/command, exit 97 - rehearsal-enroll.sh, run-ceremony.sh, qemu-smoke.sh,
+  make-shims.sh, build-ovmf-debug.sh, build-enroll-app.sh, enroll-prep.sh,
+  build-esp-variant.sh, build-esp-image.sh, make-disks.sh, stage-platform.sh and
+  bwrap-argv.sh. No exceptions needed: every script already ran under set -e, so the trap
+  only NAMES failures that would already abort. The EXIT evidence trap in
+  run-ceremony.sh is preserved (the ERR trap is disabled inside _repair_out so an
+  incidental repair failure can never mask the original named exit code, peer N3).
+  Negative/positive tested: an unguarded cp failure -> E_BASH_ERRTRAP rc=97; a guarded
+  named gate -> its own E_ code, trap silent.
 - Post-guest fsck -n is run OBSERVATIONALLY (logged to enroll-fat-fsck-postguest.log and
   teed into the run log, never a gate) to record the guest-induced on-disk state.
-- ONE SHARED LIST: EVIDENCE_UPLOAD_PATHS (YAML anchor at the workflow env block) is the
-  single source for BOTH the upload-artifact path (YAML alias) and the manifest member
-  enumeration - upload/manifest drift is impossible by construction. Directories expand
-  to their files at manifest time; absent members are noted explicitly. Locally simulated
-  with a mixed dir/file/absent list. 6e6 occurrence pins unchanged (cert 44, rehearsal 77).
+- ONE SHARED LIST (extended per peer #11 review item 4 / D-e): EVIDENCE_UPLOAD_PATHS
+  (YAML anchor at each workflow's env block) is the single source for BOTH the
+  upload-artifact path (YAML alias) and the manifest member enumeration in ALL THREE
+  workflows - rehearsal, scratch (via derivation) and CERTIFICATION, which previously
+  enumerated upload and manifest separately and could drift. The env2 jobs got the same
+  treatment (ENV2_EVIDENCE_UPLOAD_PATHS) in all three workflows. Directories expand to
+  their files at manifest time; absent members are noted explicitly. Locally simulated
+  with a mixed dir/file/absent list. 6e6 occurrence pins unchanged (cert 44, rehearsal
+  77 - the anchors' literal lines exactly replace the removed upload-block lines).
 - PF-1/PF-2 now live in INDEPENDENT per-PF directories under the evidence out dir
   (prep/log/vars/evidence each), so their logs ride the shared upload+manifest list via
   the out-dir expansion; both still sit BEFORE the ceremony step (run-10 ordering fix).
@@ -823,6 +835,72 @@ Run-11 hardening (peer #11 shape requests, this candidate):
 - E_ENROLL_PID_MISSING is the defensive net for "qemu never started"; most launch
   failures (e.g. a missing readonly firmware drive) fail the daemonize command itself and
   surface as E_BASH_ERRTRAP - both are NAMED 97s, which is what PF-4 asserts.
+
+Run-11 verdict (scratch run 35941253435, #11 candidate) - FAILED at PF-1, and the
+failure itself proved the run-11 hardening: the planted fault never got planted because
+the embedded FAT writer crashed on the RELATIVE config path build-output/enroll-app/
+enroll-app.efi (writer python line 57) - and the NEW ERR trap named it exactly
+(E_BASH_ERRTRAP rehearsal-enroll.sh line 39 rc=1 cmd shown) instead of run-10's silent
+bare exit 1. Mechanism: the run-10 ordering fix moved the PF steps BEFORE the ceremony,
+but config.json carries TWO build-output-relative paths (enroll_app, ovmf_code_debug)
+that only resolve in the post-ceremony context (the ceremony builds them into
+build-output/); pre-ceremony they do not exist. Fixes (this candidate):
+- SUPERSEDED before delivery (peer run-12 source check at 05ef8031): the first fix
+  absolutized both paths in a throwaway config COPY - the peer ruled NO PF-only
+  argument/env/config knobs to the shared rehearsal-enroll or config, and offered two
+  acceptable shapes. CHOSEN: each PF wrapper recreates the ceremony's SAME relative cwd
+  layout in its own work dir ($PFD/work/build-output/enroll-app/enroll-app.efi copied
+  from the pinned /tmp/$PREFIX-app-a product, sha 540b4fa3... asserted after copy;
+  build-output/ovmf-debug/OVMF_CODE.fd from the pinned /tmp/$PREFIX-ovmf-a product, sha
+  fc150336... asserted; the committed config.json copied byte-UNTOUCHED) and runs the
+  UNCHANGED shared code from that cwd. The alternative (a shared anchor resolution in
+  rehearsal-enroll.sh) was not chosen: a script-dir anchor still misses build-output in
+  the pre-ceremony PF context, and anchoring at the pinned /tmp product would change
+  what ceremony-context callers read. The config-copy approach never left the workspace.
+- cwd AUDIT (peer run-12 requirement) - every relative read in the shared scripts and
+  each caller's base dir:
+  * rehearsal-enroll.sh: config.json path = caller arg; config VALUES enroll_app and
+    ovmf_code_debug are build-output-relative and resolve against the PROCESS CWD;
+    qemu and ovmf_vars_pristine are /tmp-absolute (CANON_TMP->LANE_TMP substituted);
+    enroll-predicate-check.py + parse-ovmf-vars.py resolve via $HERE (script dir,
+    absolute); fsck/mkfs resolve via the staged PATH; all evidence paths are $EVD-
+    absolute. Callers' base dirs: ceremony/post-ceremony enrollment steps = the
+    rehearsal dir (build-output present, ceremony-built); PF wrappers = $PFD/work
+    (layout recreated); smoke = its own materialized work root.
+  * enroll-prep.sh: the two evidence fixtures are caller-arg-relative (PF wrappers now
+    pass them ABSOLUTE - "absolute paths already accepted by existing arguments are
+    fine"); all other reads are arg-absolute.
+  * run-ceremony.sh: cd "$HERE" then builds its own build-output - self-sufficient.
+- CORRECTION logged by the peer against our run-11 report: E_PF_GATE_WRONG_CODE and the
+  injection marker were in the STEP CONSOLE, not the durable PF evidence log (the log's
+  only E_ was E_BASH_ERRTRAP). Fixed: every PF wrapper verdict - PLANTED FAULT ACTIVE,
+  the injection confirmation, and the final E_PF_* / PF_n_MUST_SHOW_OK - is tee'd INTO
+  the durable pf evidence log; a log lacking the wrapper verdict fails the must-show
+  (E_PF_LOG_VERDICT_MISSING).
+- MUST-SHOW STRICTNESS (peer run-12): PF-1/PF-2 first require BOTH "PLANTED FAULT
+  ACTIVE: <mode>" AND a before/after image-sha injection confirmation (new in the shared
+  injector block, scratch-gated, with E_PF_INJECTION_NOOP if the injector changes
+  nothing) - else E_PF_NOT_INJECTED 97; then exact exit 97 + expected named gate +
+  diagnostic; and any E_BASH_ERRTRAP in the log REJECTS the must-show even at exit 97
+  (E_PF_TRAP_MASKED - the named gate must be the failure, not the trap). PF-4 expects
+  the ERR-trap/E_ENROLL_PID_MISSING line as before. Locally simulated all wrapper paths:
+  ok -> PF_1_MUST_SHOW_OK in log rc=0; trap -> E_PF_TRAP_MASKED 97; noinj ->
+  E_PF_NOT_INJECTED 97.
+- PF must-shows are now INDEPENDENT (peer run-12): each PF step carries if: always() &&
+  steps.pf-prereq.outputs.ok == 'true' (a dedicated id: pf-prereq step records that every
+  build prerequisite passed; one PF's failure never skips another, a prerequisite failure
+  skips them all), each has its own id and dirs, and the ceremony runs ONLY when ALL PFs
+  pass (if: always() && pf-prereq ok && steps.pf1/pf2/pf4.outcome all == 'success'). All
+  PF logs live in per-PF dirs under the evidence out dir, riding the shared list.
+- DISCLOSED near-miss from run 11: without the layout fix, PF-4 would ALSO have died at
+  the writer crash - still a NAMED 97 via E_BASH_ERRTRAP, technically satisfying its grep
+  assertion for the WRONG reason. With the layout fix, PF-4 reaches the intended
+  missing-pristine-file failure at cp "$PRISTINE".
+GREEN to hold from run 11: steps 1-16 all success; EVIDENCE_UPLOAD_PATHS shared anchor
+live (env echoed every step; manifest_sha256=ec06c362... files=26); fw-hashes
+ARTIFACT-DIGEST with correct run fields; evidence upload succeeded; hostile 50 lines;
+marker scan 0 (publisher's independent scan, 138,288 B log). Ceremony (3 modes) never
+ran this run - still owed with PF-1/2/4 execution.
 
 Peer pushed-byte review of #10 (2026-09-24; run-10 watch items separate) - resolutions:
 1. CERT VERIFIER identity non-keying: the exactly-one-run verifier (peer N5 section) keys

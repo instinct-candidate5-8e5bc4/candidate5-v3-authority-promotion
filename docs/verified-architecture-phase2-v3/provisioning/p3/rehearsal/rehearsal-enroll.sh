@@ -137,6 +137,9 @@ if [ -n "$ENROLL_PLANTED_FAULT" ]; then
     || { echo "E_PLANTED_FAULT_LANE faults are scratch-lane only (PREFIX=$PREFIX ALLOWED_PREFIX=$ALLOWED_PREFIX)"; exit 97; }
   case "$ENROLL_PLANTED_FAULT" in freemark|missingblob) ;; *) echo "E_PLANTED_FAULT_UNKNOWN $ENROLL_PLANTED_FAULT"; exit 97;; esac
   echo "PLANTED FAULT ACTIVE: $ENROLL_PLANTED_FAULT (scratch-lane gate must-show; this run certifies nothing)"
+  # peer run-12 strictness: the injection must be PROVABLE - bound the injector with
+  # before/after image hashes and fail closed if it changed nothing.
+  _pf_before=$(sha256sum "$IMG" | cut -d' ' -f1)
   python3 - "$IMG" "$ENROLL_PLANTED_FAULT" <<'PYF'
 import sys, struct
 img, fault = sys.argv[1:3]
@@ -166,6 +169,9 @@ elif fault == "missingblob":
 f.seek(0); f.write(allb); f.close()
 print("planted fault applied:", fault)
 PYF
+  _pf_after=$(sha256sum "$IMG" | cut -d' ' -f1)
+  echo "planted fault injection confirmation: image sha256 before=$_pf_before after=$_pf_after"
+  [ "$_pf_before" != "$_pf_after" ] || { echo "E_PF_INJECTION_NOOP injector left the image unchanged"; exit 97; }
 fi
 # run-9 per-run image identity (peer: unpinned by design, logged every run)
 echo "enroll-fat image sha256=$(sha256sum "$IMG" | cut -d' ' -f1) size=$(stat -c %s "$IMG") (unpinned by design; per-run logged)"
@@ -336,7 +342,7 @@ if ! kill -0 "$PID" 2>/dev/null; then
   fi
 else
   kill -TERM "$PID" 2>/dev/null || true; sleep 2; kill -KILL "$PID" 2>/dev/null || true
-  echo "E_ENROLL_QEMU_DEADLINE_TERM qemu pid $PID still alive at the 25s deadline - TERM/KILL issued (no self-shutdown proof; the ENROLL.TXT extraction gate decides the final disposition)"
+  echo "W_ENROLL_QEMU_DEADLINE_TERM qemu pid $PID still alive at the 25s deadline - TERM/KILL issued (no self-shutdown proof; the ENROLL.TXT extraction gate decides the final disposition)"
 fi
 # post-guest image identity (run-10 provenance: guest writes land in the image; the
 # pre/post sha difference IS the guest-wrote evidence - run 10: f48a5700... -> 41740f00...)

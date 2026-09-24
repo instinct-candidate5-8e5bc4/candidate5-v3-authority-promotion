@@ -5,7 +5,9 @@
 #   canonical: merged-/usr set + --unshare-net + --dir /build --bind REALWORK /build
 #   hostile:   same merged-/usr set + --unshare-net, NO /build (pass REALWORK as -)
 #   preflight: canonical against a temporary realwork, with `-- true`
-set -euo pipefail
+set -eEuo pipefail
+# peer run-11: every otherwise-bare bash failure is NAMED (script/line/rc/command), exit 97.
+trap '_rc=$?; echo "E_BASH_ERRTRAP bwrap-argv.sh line $LINENO rc=$_rc cmd: $BASH_COMMAND" >&2; exit 97' ERR
 MODE=${1:?}; BWRAP=${2:?}; RW=${3:?}; shift 3
 [ "${1:-}" = "--" ] && shift
 COMMON=(--unshare-net --ro-bind /usr /usr --symlink usr/bin /bin --symlink usr/sbin /sbin
