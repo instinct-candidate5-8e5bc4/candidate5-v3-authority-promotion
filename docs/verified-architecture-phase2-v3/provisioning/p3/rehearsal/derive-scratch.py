@@ -509,16 +509,23 @@ BLOCK_BOOT_TARGET_NEG = r'''      - name: NON_CERTIFYING_SCRATCH planted-fault H
           [ "$(grep -c -F ',bootindex=0' "$T/rehearsal-harness.py")" = "1" ] || { echo "E_H3_NEG_INJECTION ESP-device bootindex count != 1 in harness source"; exit 97; }
           sed -i 's/,bootindex=0//' "$T/rehearsal-harness.py"
           [ "$(grep -c -F ',bootindex=0' "$T/rehearsal-harness.py")" = "0" ] || { echo "E_H3_NEG_INJECTION bootindex removal failed"; exit 97; }
-          # peer run-36037280674 ruling (14): the freeze gate stays LIVE and PASSING on the
-          # injected copy - never disabled, never bypassed. Plant a ONE-ENTRY argv-freeze.json:
-          # the frozen R1 argv with EXACTLY ONE ',bootindex=0' removal (the injection itself)
-          # and the $T work_root substituted in CANONICALIZED form (canonize_element maps the
-          # executed $T paths to the canonical -pf/h3boot/cases root in BOTH lanes), then pin
-          # THAT file's sha256 into the copy's ARGV_FREEZE_SHA256. Exact-count injection
-          # assertions on BOTH mutations, same discipline as the bootindex check. The canonical
-          # token is sourced from the copied lane_resolve.CANON - never a workflow literal
-          # (E_DERIVED_CANON_LITERAL: the derived scratch workflow must carry zero).
-          [ "$(grep -c -F ',bootindex=0' "$T/argv-freeze.json")" -ge "2" ] || { echo "E_H3_NEG_INJECTION planted-freeze precondition: committed freeze carries <2 bootindex flags"; exit 97; }
+          # peer run-36037280674 ruling (14) + run-36042868066 ruling (20): the freeze gate
+          # stays LIVE and PASSING on the injected copy - never disabled, never bypassed.
+          # Plant a ONE-ENTRY argv-freeze.json: the frozen R1 argv with EXACTLY ONE ESP
+          # bootindex flag removal (the injection itself) and the $T work_root substituted
+          # in CANONICALIZED form (canonize_element maps the executed $T paths to the
+          # canonical -pf/h3boot/cases root in BOTH lanes), then pin THAT file's sha256 into
+          # the copy's ARGV_FREEZE_SHA256. Every count assertion reads the PARSED argv
+          # (JSON), never a grep over the file - prose can never intersect a count. The
+          # canonical token is sourced from the copied lane_resolve.CANON - never a
+          # workflow literal (E_DERIVED_CANON_LITERAL).
+          # (Extracted with the death-code segment by test-h3-precheck.py.)
+          python3 - "$T/argv-freeze.json" <<'PYT' || { echo "E_H3_NEG_INJECTION planted-freeze precondition: committed freeze per-case bootindex counts wrong"; exit 97; }
+          import json, sys
+          fz = json.load(open(sys.argv[1]))
+          counts = [sum(el.count(",bootindex=0") for el in c["argv"]) for c in fz["cases"]]
+          assert counts and all(n == 1 for n in counts), "per-case bootindex counts != 1: %r" % counts
+          PYT
           python3 - "$T" <<'PYT' || { echo "E_H3_NEG_INJECTION planted-freeze generation failed"; exit 97; }
           import json, sys, hashlib
           T = sys.argv[1]
@@ -543,13 +550,18 @@ BLOCK_BOOT_TARGET_NEG = r'''      - name: NON_CERTIFYING_SCRATCH planted-fault H
           e["argv_sha256"] = hashlib.sha256("\0".join(argv).encode()).hexdigest()
           assert e["argv_sha256"] == hashlib.sha256("\0".join(e["argv"]).encode()).hexdigest()
           out = dict(fz); out["cases"] = [e]
-          out["note"] = "H3 planted freeze (peer run-36037280674 ruling 14): single R1 entry - the frozen argv minus exactly one ',bootindex=0' with the canonicalized $T work_root substituted; sha256 pinned into the injected harness copy's ARGV_FREEZE_SHA256."
+          out["note"] = "H3 planted freeze (peer run-36037280674 ruling 14): single R1 entry - the frozen argv minus exactly one ESP bootindex flag, with the canonicalized $T work_root substituted; sha256 pinned into the injected harness copy's ARGV_FREEZE_SHA256."
           json.dump(out, open(T + "/argv-freeze.json", "w"), indent=1, sort_keys=True)
           PYT
-          [ "$(python3 -c "import json,sys;print(len(json.load(open(sys.argv[1]))['cases']))" "$T/argv-freeze.json")" = "1" ] || { echo "E_H3_NEG_INJECTION planted freeze case count != 1"; exit 97; }
-          [ "$(grep -c -F ',bootindex=0' "$T/argv-freeze.json")" = "0" ] || { echo "E_H3_NEG_INJECTION planted freeze still carries a bootindex flag"; exit 97; }
+          python3 - "$T/argv-freeze.json" <<'PYT' || { echo "E_H3_NEG_INJECTION planted freeze argv still carries a bootindex flag (or case count != 1)"; exit 97; }
+          import json, sys
+          fz = json.load(open(sys.argv[1]))
+          assert len(fz["cases"]) == 1, "planted freeze case count %d != 1" % len(fz["cases"])
+          n = sum(el.count(",bootindex=0") for el in fz["cases"][0]["argv"])
+          assert n == 0, "planted argv still carries %d bootindex flags" % n
+          PYT
           _PF_SHA=$(sha256sum "$T/argv-freeze.json" | awk '{print $1}')
-          [ "$(grep -c 'ARGV_FREEZE_SHA256="e9a38cec9a63986b6898203ffc39de3ba706607646b66a9610c1a87b74713f94"' "$T/rehearsal-harness.py")" = "1" ] || { echo "E_H3_NEG_INJECTION ARGV_FREEZE_SHA256 constant count != 1 in harness copy"; exit 97; }
+          [ "$(grep -c 'ARGV_FREEZE_SHA256="[0-9a-f]\{64\}"' "$T/rehearsal-harness.py")" = "1" ] || { echo "E_H3_NEG_INJECTION ARGV_FREEZE_SHA256 constant count != 1 in harness copy"; exit 97; }
           sed -i "s/ARGV_FREEZE_SHA256=\"[0-9a-f]\{64\}\"/ARGV_FREEZE_SHA256=\"$_PF_SHA\"/" "$T/rehearsal-harness.py"
           [ "$(grep -c "ARGV_FREEZE_SHA256=\"$_PF_SHA\"" "$T/rehearsal-harness.py")" = "1" ] || { echo "E_H3_NEG_INJECTION freeze pin planting failed"; exit 97; }
           python3 - config.json "$T" <<'PYT'
@@ -568,17 +580,34 @@ BLOCK_BOOT_TARGET_NEG = r'''      - name: NON_CERTIFYING_SCRATCH planted-fault H
           # OWNERSHIP of $T only (chown to runner) before any runner-side read - NO
           # world-readable chmod, nothing outside $T. Fail closed if the repair fails.
           sudo chown -R "$(id -u):$(id -g)" "$T" || { echo "E_H3_PERM_REPAIR_FAILED chown rc=$? on $T"; exit 97; }
-          # peer run-36037280674 ruling (15): the death code is checked FIRST, BEFORE any
-          # debug-log checks - h3.log must carry EXACTLY the named boot-target death and NO
-          # freeze-gate code; any other harness death dies E_H3_WRONG_DEATH naming it.
+          # peer run-36037280674 ruling (15) + run-36042868066 ruling (21): the death code is
+          # checked FIRST, BEFORE any debug-log checks. fail() records one JSON object
+          # ({"result":"FAIL","code":...}); parse it - the set of observed harness death
+          # codes must be EXACTLY {E_CASE_BOOT_TARGET}. A freeze-gate code, the UNPROVEN
+          # variant, a second code alongside, or no code at all dies E_H3_WRONG_DEATH
+          # naming the observed set.
           # (Extracted with the taxonomy below by test-h3-precheck.py.)
-          _codes=$(grep -o 'E_[A-Z0-9_]*' "$T/h3.log" | sort -u || true)
-          if printf '%s\n' "$_codes" | grep -q 'E_CASE_ARGV_FROZEN_'; then
-            echo "E_H3_WRONG_DEATH $(printf '%s\n' "$_codes" | grep 'E_CASE_ARGV_FROZEN_' | head -1) (freeze gate fired on the planted copy - expected exactly E_CASE_BOOT_TARGET)"; cat "$T/h3.log"; exit 97
-          fi
-          if ! printf '%s\n' "$_codes" | grep -qx 'E_CASE_BOOT_TARGET'; then
-            echo "E_H3_WRONG_DEATH $(printf '%s\n' "$_codes" | grep '^E_' | head -1) (expected exactly E_CASE_BOOT_TARGET)"; cat "$T/h3.log"; exit 97
-          fi
+          _codes=$(python3 - "$T/h3.log" <<'PYT'
+          import json, sys
+          codes = set()
+          try:
+              fh = open(sys.argv[1])
+          except OSError:
+              fh = []
+          for line in fh:
+              line = line.strip()
+              if not line.startswith("{"):
+                  continue
+              try:
+                  d = json.loads(line)
+              except Exception:
+                  continue
+              if isinstance(d, dict) and d.get("result") == "FAIL" and isinstance(d.get("code"), str):
+                  codes.add(d["code"])
+          print(" ".join(sorted(codes)))
+          PYT
+          )
+          [ "$_codes" = "E_CASE_BOOT_TARGET" ] || { echo "E_H3_WRONG_DEATH ${_codes:-none} (expected exactly E_CASE_BOOT_TARGET)"; cat "$T/h3.log"; exit 97; }
           [ "$_rc" = "90" ] || { echo "E_H3_GATE_NOT_FIRED rc=$_rc expected 90 (E_CASE_BOOT_TARGET)"; cat "$T/h3.log"; exit 97; }
           # before accepting the named target death, ASSERT qemu really started (an
           # environmental death would be E_QEMU_START, also rc 90 - indistinguishable

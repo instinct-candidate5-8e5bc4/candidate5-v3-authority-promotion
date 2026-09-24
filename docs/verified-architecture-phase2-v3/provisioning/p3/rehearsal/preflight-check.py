@@ -391,10 +391,13 @@ CASE_ARGV_PINS=(
     ("NON_CERTIFYING_REHEARSAL-R5-N3b-hostile-widened-db", "4a780d858f457e078c4a982d007cbfafd9f5f66e797c83b00ff523456c0df156"),
     ("NON_CERTIFYING_REHEARSAL-R6-N3c-hostile-fresh-sole-db", "6f2fc5a541aebbd23c4dc875d405519a2d834ea3b8376d71c6a3e9a8313bac10"),
     ("NON_CERTIFYING_REHEARSAL-R7-release-sibling-behavior-only", "2d450e95e778d9f1d1c9d165993c31023fb00c9b12c585bd068be89749774b05"),
-    ("NON_CERTIFYING_REHEARSAL-C-ossl-throwaway-debug", "ddc0e5c285dd08847b17477f332255f65f4885b358e9a4111a21be483f73b1ec"),
-    ("NON_CERTIFYING_REHEARSAL-C-ossl-throwaway-release", "efe08f207a651493c5145e1afce230c502ab2be054483c799fe939b7c98548da"),
-    ("NON_CERTIFYING_REHEARSAL-C-sbsign-throwaway-debug", "db4a6507297b386c664ce85602a38bfb86f7aa1efe8bb6c300ae94ec8cf043b0"),
-    ("NON_CERTIFYING_REHEARSAL-C-sbsign-throwaway-release", "0765626bfa54dacd00fdd02d13adb5e32d9b86f3b6010f44a74344352dc1c89e"),
+    # peer run-36042868066 ruling (17)+(18): the four C pins changed EXACTLY ONCE - the
+    # enumeration-leftover sockets (q0/q6) became the stable full-config indexes q7-q10;
+    # the R1-R7 pins above are byte-identical, proven against this independent table.
+    ("NON_CERTIFYING_REHEARSAL-C-ossl-throwaway-debug", "28336d0b080c9425d41f17be7bef464d5a1ec396229061a32e1711f4f9d9608c"),
+    ("NON_CERTIFYING_REHEARSAL-C-ossl-throwaway-release", "55eab601878f4eb2d036a5ab87d5c382df5168bd5ba13fc8ad886bb8f428621c"),
+    ("NON_CERTIFYING_REHEARSAL-C-sbsign-throwaway-debug", "d26b5e269982039d569f0099964a8b1bb79b9ed3770b44083ff3660484c1ba90"),
+    ("NON_CERTIFYING_REHEARSAL-C-sbsign-throwaway-release", "a42e506e652cf34d0d4d35b9c2c3d6a7e3a95650400172cb604e1a96dc0d6bd2"),
 )
 if len(_fz2["cases"])!=len(CASE_ARGV_PINS):
     fail("E_CASE_ARGV_PIN","case count drifted: %d != %d"%(len(_fz2["cases"]),len(CASE_ARGV_PINS)))
@@ -430,6 +433,19 @@ _mpin=_re_af.search(r'ARGV_FREEZE_SHA256="([0-9a-f]{64})"',_hsrc)
 if not _mpin: fail("E_ARGV_FREEZE_PIN_DRIFT","ARGV_FREEZE_SHA256 constant absent from rehearsal-harness.py")
 elif _mpin.group(1)!=hashlib.sha256(open(os.path.join(here,"argv-freeze.json"),"rb").read()).hexdigest():
     fail("E_ARGV_FREEZE_PIN_DRIFT","harness pin "+_mpin.group(1)+" != committed argv-freeze.json sha256")
+# 6e3d) peer run-36042868066 ruling (18): every freeze entry must carry a NON-NULL
+# qmp_sock equal to its argv's -qmp element, and the socket indexes must be unique -
+# a null/missing or mismatched qmp_sock, or two cases sharing one socket, dies named.
+# Planted negatives: test-argv-freeze.py.
+_qmp_seen={}
+for _c in _fz2["cases"]:
+    _qs=_c.get("qmp_sock")
+    if not _qs: fail("E_ARGV_FREEZE_QMP_SOCK",_c["id"]+" qmp_sock missing or null")
+    _el=_c["argv"][_c["argv"].index("-qmp")+1]
+    if _el!="unix:%s,server,nowait"%_qs:
+        fail("E_ARGV_FREEZE_QMP_SOCK",_c["id"]+" qmp_sock "+_qs+" != argv -qmp element "+_el)
+    if _qs in _qmp_seen: fail("E_ARGV_FREEZE_QMP_SOCK",_c["id"]+" shares qmp_sock "+_qs+" with "+_qmp_seen[_qs])
+    _qmp_seen[_qs]=_c["id"]
 # 6e6) peer FINAL COUNT RULING: pin the EXACT prefix occurrence counts (grep -o ... | wc -l,
 # not line counts) of BOTH lane workflows, recomputed at the frozen bytes. Any edit to either
 # workflow that adds/removes a literal NON_CERTIFYING_REHEARSAL occurrence fails closed here.
@@ -675,8 +691,10 @@ for _p in _py_files:
     # resolver module "lane_resolve" (this directory, exec-bit pinned, stdlib-only itself),
     # ONLY in its committed consumers: the two gates plus test-argv-freeze.py (peer
     # run-36037280674 ruling 12/13 - the comparison-block test drives the REAL lane
-    # mapping, never a synthetic rewrite). No wildcard, no other file, no other module.
-    if os.path.basename(_p) in ("rehearsal-harness.py","preflight-check.py","test-argv-freeze.py"):
+    # mapping, never a synthetic rewrite) plus test-h3-precheck.py (peer run-36042868066
+    # ruling 20 - the planting-block test drives the REAL lane mapping for the executed
+    # freeze-gate comparison). No wildcard, no other file, no other module.
+    if os.path.basename(_p) in ("rehearsal-harness.py","preflight-check.py","test-argv-freeze.py","test-h3-precheck.py"):
         _bad-={"lane_resolve"}
     # peer run-36017957182 ruling (Q2): NARROW named allowance - exactly the reviewed
     # single-source schema module "config_schema" (this directory, exec-bit pinned,

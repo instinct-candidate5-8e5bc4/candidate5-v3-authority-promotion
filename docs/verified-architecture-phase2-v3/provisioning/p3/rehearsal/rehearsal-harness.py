@@ -46,7 +46,7 @@ ALL_REJECT_STRINGS = [STR_UNSIGNED_REJECT, STR_SIGNED_REJECT, STR_DBX_REJECT, ST
 # peer run-36031372949 ruling (9): sha256 of the committed argv-freeze.json - the harness
 # refuses any other bytes, so a workdir copy cannot drift from the committed file.
 # preflight 6e3c pins this constant to the committed file (E_ARGV_FREEZE_PIN_DRIFT).
-ARGV_FREEZE_SHA256="e9a38cec9a63986b6898203ffc39de3ba706607646b66a9610c1a87b74713f94"
+ARGV_FREEZE_SHA256="ceeac181022d14868788b30cc41a0f3d3e1d991dfbef01e53c93946759156945"
 ADAPTER_STRINGS = [s.encode() for s in ("E_PROVIDER_NAMESPACE","E_PROVIDER_LINK_MISSING")]  # the signed adapter's own fail() reasons (cloud-boot-adapter.sh). OBSERVATIONAL ONLY: these strings are at-rest bytes inside the accepted signed UKI's uncompressed newc initrd, and the firmware loads the UKI image into guest RAM for hash verification even on REJECT paths, so their presence/absence in a post-run RAM dump is non-evidentiary. Execution provenance is the frozen runtime-formatted panic records (section 6 markers).
 
 # Frozen per-case VARS template binding (reviewer ruling): each case must draw its VARS from
@@ -394,6 +394,7 @@ if __name__=="__main__":
     try: cfg=resolve_config_value(json.load(open(sys.argv[1])),PREFIX)
     except LaneError as e: print("%s %s"%(e.code,e.detail)); sys.exit(97)
     check_schema(cfg)
+    _case_idx={c["id"]:k for k,c in enumerate(cfg["cases"])}  # full-config order, captured BEFORE lane selection (ruling 17)
     # peer 2026-09-24 B3: the certification lane runs ONLY the frozen six-case set
     # (no criterion-C, no historical reject-control); anything else fails closed.
     if os.environ.get("CERTIFICATION_TARGET","")=="1":
@@ -431,8 +432,12 @@ if __name__=="__main__":
     ALLOWED_VARS_TEMPLATES.update(allowed_vars_templates(sys.argv[3],PREFIX))
     os.makedirs(cfg["work_root"],exist_ok=True)
     results={}
-    for idx,case in enumerate(cfg["cases"]):
-        results[case["id"]]=run_case(cfg,case,idx)
+    for case in cfg["cases"]:
+        # peer run-36042868066 ruling (17): the per-case QMP socket index is a STABLE
+        # per-case key - the case's index in the FULL committed config order - never its
+        # position among the lane-selected cases, so the executed argv is lane-independent
+        # and one freeze contract serves every lane.
+        results[case["id"]]=run_case(cfg,case,_case_idx[case["id"]])
     ok=all(results.values())
     print(json.dumps({"suite":"NON_CERTIFYING_REHEARSAL","lane":PREFIX,"all_expectations_met":ok,"cases":results},sort_keys=True))
     sys.exit(0 if ok else 91)

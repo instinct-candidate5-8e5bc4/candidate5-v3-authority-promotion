@@ -19,8 +19,20 @@
 #   D. preflight 6e3b: real config/freeze id sets pass; a renamed freeze id dies
 #      E_CASE_ARGV_FREEZE_SET naming the drift.
 #   E. preflight 6e3c: the real tree passes; a drifted harness pin constant dies
-#      E_ARGV_FREEZE_PIN_DRIFT.
-import hashlib, json, os, shutil, sys, tempfile
+#      E_ARGV_FREEZE_PIN_DRIFT. 6e3d (run-36042868066 ruling 18): the real freeze passes;
+#      a null qmp_sock, a qmp_sock != its argv -qmp element, and two cases sharing one
+#      socket each die E_ARGV_FREEZE_QMP_SOCK.
+#   G. full-lane dry-run (run-36042868066 ruling 19): per lane, select exactly as the
+#      harness does (lanes lists; certification = the frozen six), build with the REAL
+#      extracted build_argv over the REAL lane work_root with the full-config socket
+#      index, canonize_element, and require the freeze entry's sha - certification proves
+#      R2-R7 build to q1-q6.
+#   F6-F8. run-36042868066 fixture (ruling 19): the COMMITTED exact argv.txt bytes the
+#      scratch ceremony executed on C-ossl-throwaway-debug under the OLD per-lane socket
+#      rule (fixtures/run-36042868066-C-ossl-debug-argv.txt, sha256 pinned below) - a
+#      PRE-FIX negative: it canonicalizes to the run's executed digest d17bcc7d.. and
+#      must NOT match the new q7-form pin.
+import hashlib, json, os, re, shutil, sys, tempfile
 
 sys.dont_write_bytecode = True
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -33,6 +45,7 @@ FZ = json.load(open(os.path.join(HERE, "argv-freeze.json")))
 CANON = "NON_CERTIFYING_REHEARSAL"
 SCRATCH = "NON_CERTIFYING_SCRATCH"
 FAILS = 0
+TOTAL = 0
 
 
 class GateFail(Exception):
@@ -46,7 +59,8 @@ def fail(c, m):
 
 
 def report(name, ok, got=None):
-    global FAILS
+    global FAILS, TOTAL
+    TOTAL += 1
     print(("PASS" if ok else "FAIL") + " " + name + ("" if ok else " got=%r" % (got,)))
     if not ok:
         FAILS += 1
@@ -170,7 +184,7 @@ expect_fail("D2 renamed freeze id dies E_CASE_ARGV_FREEZE_SET",
 
 # --- E. preflight 6e3c (harness pin == committed freeze sha256) ---
 i = PF.index("# 6e3c)")
-j = PF.index("# 6e6)", i)
+j = PF.index("# 6e3d)", i)
 BLOCK = PF[i:j]
 
 
@@ -183,8 +197,10 @@ report("E1 real tree pin matches the committed freeze", run_6e3c(HERE) is None)
 tmp = tempfile.mkdtemp(prefix="c5-aftest-")
 try:
     shutil.copy(os.path.join(HERE, "argv-freeze.json"), os.path.join(tmp, "argv-freeze.json"))
-    drift = HSRC.replace('ARGV_FREEZE_SHA256="e9a38cec', 'ARGV_FREEZE_SHA256="00000000', 1)
-    if drift == HSRC:
+    drift, _n = re.subn(r'ARGV_FREEZE_SHA256="[0-9a-f]{64}',
+                        'ARGV_FREEZE_SHA256="0000000000000000000000000000000000000000000000000000000000000000"',
+                        HSRC, count=1)
+    if _n != 1:
         report("E2 drifted harness pin dies E_ARGV_FREEZE_PIN_DRIFT", False, "could not plant")
     else:
         open(os.path.join(tmp, "rehearsal-harness.py"), "w").write(drift)
@@ -193,6 +209,82 @@ try:
 finally:
     shutil.rmtree(tmp, ignore_errors=True)
 
+# --- E3-E6. preflight 6e3d (qmp_sock consistency, run-36042868066 ruling 18) ---
+i = PF.index("# 6e3d)")
+j = PF.index("# 6e6)", i)
+BLOCK = PF[i:j]
+
+
+def run_6e3d(fz):
+    gg = {"_fz2": fz, "fail": fail}
+    exec(compile(BLOCK, "block6e3d", "exec"), gg)
+
+
+report("E3 real freeze passes 6e3d", run_6e3d(FZ) is None)
+nullq = json.loads(json.dumps(FZ))
+nullq["cases"][0]["qmp_sock"] = None
+expect_fail("E4 null qmp_sock dies E_ARGV_FREEZE_QMP_SOCK",
+            lambda: run_6e3d(nullq), "E_ARGV_FREEZE_QMP_SOCK", "missing or null")
+misq = json.loads(json.dumps(FZ))
+misq["cases"][0]["qmp_sock"] = "/tmp/NON_CERTIFYING_REHEARSAL-q9.sock"
+expect_fail("E5 qmp_sock != argv -qmp element dies E_ARGV_FREEZE_QMP_SOCK",
+            lambda: run_6e3d(misq), "E_ARGV_FREEZE_QMP_SOCK", "!= argv -qmp element")
+dupq = json.loads(json.dumps(FZ))
+dupq["cases"][1]["qmp_sock"] = dupq["cases"][0]["qmp_sock"]
+dupq["cases"][1]["argv"][dupq["cases"][1]["argv"].index("-qmp") + 1] = \
+    "unix:%s,server,nowait" % dupq["cases"][0]["qmp_sock"]
+expect_fail("E6 shared qmp_sock dies E_ARGV_FREEZE_QMP_SOCK",
+            lambda: run_6e3d(dupq), "E_ARGV_FREEZE_QMP_SOCK", "shares qmp_sock")
+
+# --- G. full-lane dry-run (run-36042868066 ruling 19) ---
+def lane_cases(lane):
+    return [c for c in CFG["cases"] if lane in c.get("lanes", [])]
+
+
+fullidx = {c["id"]: k for k, c in enumerate(CFG["cases"])}
+
+
+def dry_run(lane, prefix):
+    cfgL = resolve_config_value(json.loads(json.dumps(CFG)), prefix)
+    root = "/tmp/%s-out/%s-cases" % (prefix, prefix)
+    for caseC in lane_cases(lane):
+        cid = caseC["id"]
+        cS = cfgL["cases"][fullidx[cid]]
+        cd = os.path.join(root, cid)
+        sock = resolve_path("/tmp/%s-q%d.sock" % (CANON, fullidx[cid]), prefix)
+        argv = build_argv(cfgL, cd, os.path.join(cd, "vars.fd"), cS["esp"], cS["firmware"], sock)
+        sha = hashlib.sha256("\0".join(canonize_element(t, prefix) for t in argv).encode()).hexdigest()
+        fz = next(c for c in FZ["cases"] if c["id"] == cid)
+        if sha != fz["argv_sha256"]:
+            return (cid, sha, fz["argv_sha256"])
+    return None
+
+
+report("G1 rehearsal-lane dry-run (11 cases, q0-q10) matches the freeze",
+       dry_run("rehearsal", CANON) is None, dry_run("rehearsal", CANON))
+report("G2 scratch-lane dry-run (10 cases) matches the freeze",
+       dry_run("scratch", SCRATCH) is None, dry_run("scratch", SCRATCH))
+report("G3 certification selection is exactly R2-R7 (full-config indexes 1-6)",
+       [fullidx[c["id"]] for c in lane_cases("certification")] == [1, 2, 3, 4, 5, 6],
+       [fullidx[c["id"]] for c in lane_cases("certification")])
+report("G4 certification-lane dry-run builds R2-R7 at q1-q6 matching the freeze",
+       dry_run("certification", CANON) is None, dry_run("certification", CANON))
+
+# --- F6-F8. run-36042868066 fixture: the exact argv.txt the scratch ceremony executed on
+# C-ossl-throwaway-debug under the OLD per-lane socket rule - a PRE-FIX negative ---
+FIX2 = os.path.join(HERE, "fixtures", "run-36042868066-C-ossl-debug-argv.txt")
+fix2_raw = open(FIX2, "rb").read()
+report("F6 second fixture bytes match the run-verified sha256",
+       hashlib.sha256(fix2_raw).hexdigest() ==
+       "788fae665031bfeb8cd683236e7d72f8fb639cbf20fe6302648f7569e1b2a135")
+fix2_argv = fix2_raw.decode().split("\0")
+fix2_sha = hashlib.sha256("\0".join(canonize_element(t, SCRATCH) for t in fix2_argv).encode()).hexdigest()
+report("F7 second fixture canonicalizes to the run's executed digest d17bcc7d.. (pre-fix rule)",
+       fix2_sha == "d17bcc7dadfd880f294a96d5df2d1fed65102cd356694bbb621a9caef4bfd304", fix2_sha)
+newpin = next(c for c in FZ["cases"] if "C-ossl-throwaway-debug" in c["id"])["argv_sha256"]
+report("F8 pre-fix fixture does NOT match the new pin (socket rule changed q6->q7)",
+       fix2_sha != newpin, (fix2_sha, newpin))
+
 if FAILS:
     sys.exit(1)
-print("test-argv-freeze: all 16 checks pass")
+print("test-argv-freeze: all %d checks pass" % TOTAL)
