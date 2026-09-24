@@ -641,7 +641,7 @@ cp "$EVD/vars.fd" "$OUT"
 # fixture .cer files, requires equality with GENERATION-RECORD.json, then exports
 # C5_HOSTILE_CERT_SHA256 / C5_WRONG_SIGNER_CERT_SHA256 / C5_THROWAWAY_CERT_SHA256.
 # NEVER bound in callers (run-ceremony.sh) or anywhere else.
-. "$HERE/bind-fixture-certs.sh" "/tmp/$PREFIX-inrun"
+. "$HERE/bind-fixture-certs.sh" "/tmp/$PREFIX-inrun" "$MODE"
 _pred_rc=0
 python3 "$HERE/enroll-predicate-check.py" "$MODE" "$EVD/ENROLL.TXT" "$PREP" "$OUT" "$HERE/../parse-ovmf-vars.py" > "$EVD/enroll-predicate.json" || _pred_rc=$?
 cat "$EVD/enroll-predicate.json"

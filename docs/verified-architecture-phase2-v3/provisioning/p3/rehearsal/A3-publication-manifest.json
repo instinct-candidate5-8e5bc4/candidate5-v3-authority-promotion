@@ -42,9 +42,9 @@
    "sha256": "540e7d789944020127e089372fa0de76dc3bc8a57ba959127a975f38e14e3e04"
   },
   {
-   "bytes": 185739,
+   "bytes": 189452,
    "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/R3-static-review-candidate.md",
-   "sha256": "24283de8ff9ed6694da6f4d458c120c2b8725a1116c513d6ce1740923ee26604"
+   "sha256": "6d198944b40e472c85827a5cc9d2e14d9cc6426f0131cdb1371e9cc49f43c68e"
   },
   {
    "bytes": 10606,
@@ -62,9 +62,9 @@
    "sha256": "e9a38cec9a63986b6898203ffc39de3ba706607646b66a9610c1a87b74713f94"
   },
   {
-   "bytes": 3249,
+   "bytes": 3531,
    "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/bind-fixture-certs.sh",
-   "sha256": "f8d7cbb18cbbf225466e282f232c628a4744e792eb8d7948be4c127865fddbc3"
+   "sha256": "93d7cb7e344d34896fb6aff35b5dbc8fa1a98531fef0b07e554894fd2cb63ccd"
   },
   {
    "bytes": 2396,
@@ -162,9 +162,9 @@
    "sha256": "e2462c2ea892127a607a1d0a3edccb0ff680b3715ec550046a891f6995ed23a8"
   },
   {
-   "bytes": 35799,
+   "bytes": 35807,
    "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/rehearsal-enroll.sh",
-   "sha256": "81a69a5a268a1051ebf8b3f9d92017a6b84649c2262eba2ce57fef0c7116bae3"
+   "sha256": "3e00a81e7521f7d2b684dacad5200d1a59be95c8f2e35a722a70f7756fad5fa5"
   },
   {
    "bytes": 20436,
@@ -197,9 +197,9 @@
    "sha256": "b67de183517796cd581ae3c9f1a4b198cc0def313b20bf70838b1dd1c651622e"
   },
   {
-   "bytes": 2698,
+   "bytes": 2816,
    "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/test-config-schema.py",
-   "sha256": "6c909fe5049e3f293d1964dfaa357f29a95eae2dcc746499075c6c9b0ffd9a04"
+   "sha256": "4531b8087c260ad4e970c95529633baef96a304d0fbbff1b4f24b2111f4de8a0"
   },
   {
    "bytes": 2565,
@@ -212,9 +212,9 @@
    "sha256": "49443eb7be0047b19ee79406973bcba258b0b1d56d75d94e30003351b878f187"
   },
   {
-   "bytes": 3453,
+   "bytes": 5000,
    "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/test-fixture-cert-binding.py",
-   "sha256": "01cd847b25855a4a1c87eee46b93f09237a0f40fa4949f8dfb2f7e06c8e83865"
+   "sha256": "3151aa911d43061590f5ab5ebd7146723ea4a6483a78f83ed6ec1db5e53bf9d7"
   },
   {
    "bytes": 3125,
@@ -326,7 +326,7 @@
  "enrollment_predicates": "Requirement 5a/5b resolved pre-run as frozen predicates checked in-ceremony by enroll-predicate-check.py (E_ENROLL_*/E_TRUST_*, exit 92): SetupMode==0 && SecureBoot==1, EFI_SUCCESS, BS|RT attributes only; PK/KEK exactly one X509 ESL entry each (owner c501e570-0de0-0001-0000-000000000000, run throwaway DER); sole db exactly the production cert; widened db exactly production+hostile fixture; dbx/dbt/*Default absent; stored data byte-equals the enrolled ESL payloads; per-case VARS byte-equal the run's post-enrollment template (harness allowlist + byte-identity). Post-run VARS image hashes are observational evidence, not pre-frozen expectations. C1' route (ii): the hostile and wrong-signer DER hashes are supplied in-run via C5_HOSTILE_CERT_SHA256 / C5_WRONG_SIGNER_CERT_SHA256 from the per-run GENERATION-RECORD.json (R3 section 15e); the HOSTILE_CERT constant is deleted from enroll-predicate-check.py.",
  "ephemeral": "Throwaway PK/KEK private keys are generated per run inside the prep dir and plain-deleted by run-ceremony.sh (trap EXIT) the moment the enrollment window closes; they are never logged, uploaded or published. The enrolled VARS templates and the enroll FAT images are uploaded as ephemeral public CI artifacts (batch1r3 C7 correction: they are public run data, not secrets). Negative-control fixture keys are generated IN-RUN per ceremony (route (ii), R3 section 15), network-off under /tmp/$PREFIX-*, shredded end-of-step; the historical 2026-09-22 A4 fixture keys were plain-deleted after that regeneration, and the historical fixture BYTES were deleted from the tree in C1' after the 2026-09-24 C2 byte-loss event (R3 section 15d).",
  "manifest": "NON_CERTIFYING_REHEARSAL A3 publication manifest",
- "manifest_self_declaration": "This manifest is one of the 48 paths in the C1'''''''''' candidate commit's name-status vs 5f71b13478c5e8c317950703922dcfe3f33ebc7a (25 added, 18 modified, 5 deleted; C1'''''''''' itself is a 14-path delta on its parent 48b251adff1d3b5274353b3e5a55d7784b4e3a80). It is deliberately EXCLUDED from the assets list above (57 review-relevant files: the 42 other present in-lineage paths plus 15 unchanged continuity pins) because its own hash cannot be recorded inside itself; verify it via the commit tree (git ls-tree) instead.",
+ "manifest_self_declaration": "This manifest is one of the 48 paths in the C1''''''''''' candidate commit's name-status vs 5f71b13478c5e8c317950703922dcfe3f33ebc7a (25 added, 18 modified, 5 deleted; C1''''''''''' itself is a 6-path delta on its parent 2403781e9b74f3a7150471430f1b570aebcd9e08). It is deliberately EXCLUDED from the assets list above (57 review-relevant files: the 42 other present in-lineage paths plus 15 unchanged continuity pins) because its own hash cannot be recorded inside itself; verify it via the commit tree (git ls-tree) instead.",
  "uki_source_commit": "92741cbdefaa78adc33bc3c74935a45f9558b88c",
  "version": "10+C1prime",
  "workflow_placement": "Both workflows live exactly once at .github/workflows/ on this commit (push-triggered; exact ref filters p3-rehearsal-3 / p3-rehearsal-4 for the rehearsal, p3-certification for the certification workflow; no wildcards, no other events). No docs/ copies; no default-branch write; no workflow_dispatch. p3-certification must not exist before STATIC ACCEPT; the certification run pushes the already-accepted SHA once."

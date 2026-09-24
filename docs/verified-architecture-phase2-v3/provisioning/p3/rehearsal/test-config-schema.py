@@ -8,12 +8,17 @@
 #   4. bad enrollments value shapes fail (non-dict, empty, wrong inner keys, empty list,
 #      bad hex, bad IN-RUN)
 #   5. IN-RUN:<name> entries pass
-import sys, os, json, copy
+import sys, os, json
 
 sys.dont_write_bytecode = True
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from config_schema import ConfigSchemaError, check_top
+
+
+def deepcopy(o):  # json round-trip: 'copy' is not on PY_ALLOW (peer verdict BLOCKER 1 on the 10-prime head)
+    return json.loads(json.dumps(o))
+
 
 FAILS = 0
 
@@ -31,21 +36,21 @@ def check(name, fn, expect_ok):
 
 
 cfg = json.load(open(os.path.join(HERE, "config.json")))
-check("shipped config.json passes", lambda: check_top(copy.deepcopy(cfg)), True)
+check("shipped config.json passes", lambda: check_top(deepcopy(cfg)), True)
 
-bad = copy.deepcopy(cfg)
+bad = deepcopy(cfg)
 bad["planted_extra"] = 1
 check("planted extra top key fails", lambda: check_top(bad), False)
 
-bad = copy.deepcopy(cfg)
+bad = deepcopy(cfg)
 del bad["enrollments"]
 check("missing enrollments fails (REQUIRED per Q1)", lambda: check_top(bad), False)
 
 name = sorted(cfg["enrollments"])[0]
-good_entry = copy.deepcopy(cfg["enrollments"][name])
+good_entry = deepcopy(cfg["enrollments"][name])
 
 def with_enr(val):
-    c = copy.deepcopy(cfg)
+    c = deepcopy(cfg)
     c["enrollments"] = val
     return c
 
