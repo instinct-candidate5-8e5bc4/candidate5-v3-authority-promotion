@@ -227,10 +227,11 @@ manifests, suite exit 91 on any violated expectation.
 Requirement 5c (frozen pre-publication): the exact QEMU argv per case is frozen in
 argv-freeze.json (schema NON_CERTIFYING_REHEARSAL-argv-freeze/v1): q35 smm=on, KVM, -cpu
 Skylake-Server, pflash unit0 readonly + cfi.pflash01 secure=on, pflash unit1 VARS, -nic none,
--display none, -serial none, debugcon isa-debugcon 0x402, QMP unix socket, 4096 MB, ESP +
-six v3-serial virtio-blk drives, -daemonize. argv_sha256 per case (NUL-joined, identical to
-the harness's own recording): R1 f638534d69912eb2.., R2 ae0e386910577385.., R3 4a26479001210058..,
-R4 fddad3133d84026c.., R5 4ef06100d6a70605.., R6 c2691c9a4aa71666.., R7 4634c38eb8c0f393..
+-display none, -serial none, debugcon isa-debugcon 0x402, QMP unix socket, 4096 MB, ESP
+(bootindex=0 since #19, H1) + six v3-serial virtio-blk drives, -daemonize. argv_sha256 per
+case (NUL-joined, identical to the harness's own recording): R1 c581e7dda5d855f2.., R2
+f382e94075d87cd0.., R3 46d5c1c485cec634.., R4 daa8eee9131d7d2c.., R5 4a780d858f457e07.., R6
+6f2fc5a541aebbd2.., R7 2d450e95e778d9f1..
 (full 64-hex values and complete argv vectors in argv-freeze.json). Per-case work dirs live
 under OUT/NON_CERTIFYING_REHEARSAL-cases/ so every top-level evidence path carries the
 rehearsal prefix (workflow guard E_UNPREFIXED_TOPLEVEL_EVIDENCE).
@@ -1591,3 +1592,129 @@ A3 manifest untouched (X4: regenerated at the frozen r3 SHA). The #18 scratch ru
 show: every #17 checklist item, all 7 cases with ALL checks true (tie included
 this time), steps 27/28 green with a real comparison, both new must-shows OK,
 K2/guard/final gate green, and env2 with its cross-runner compare.
+
+## 14. Run-35959397469 follow-up (#19): ESP bootindex promotion, named boot-target gate, harness rc passthrough, bytecode guard
+
+Run 35959397469 (#18', 60a03a9b, attempt 1) reached case launch for the first time and
+failed: all 7 cases EXPECTATIONS_VIOLATED. Evidence showed NO Secure Boot verdict in
+either direction: every case guest fell through to the EFI Internal Shell without
+attempting the case ESP. Mechanics (peer-confirmed against the kept template's NV-store
+history): the kept enrolled template's BootOrder is 0000(UiApp),0001(non-block enrollment
+FAT at Pci(0x2,0x0)),0002(Shell); in the case guest Pci(0x2) is the ESP virtio-BLK, the
+stale non-block Boot0001 is invalid and BDS refresh deletes it, then re-adds the block
+devices AFTER the Shell; with no bootindex in the case argv there is no fw_cfg bootorder,
+so OVMF never reorders and the Shell boots first. Two rejected fix directions (peer):
+host-side template edits (synthetic VARS, breaks producer-truth and the F6 tie) and
+enrollment-app NVRAM mutation (widens the recorder; BDS re-writes boot options anyway).
+
+H1 - rehearsal-harness.py build_argv adds ",bootindex=0" to the ESP virtio-blk-pci device
+ONLY (data disks unchanged); QEMU publishes fw_cfg "bootorder" and the frozen OVMF's
+QemuBootOrderLib promotes the ESP boot option ahead of the Shell. Shared by all lanes.
+QemuBootOrderLib presence CONFIRMED in the frozen edk2 edc6681206c1a8791981a2f911d2fb8b3d2f5768:
+SetBootOrderFromQemu at OvmfPkg/Library/QemuBootOrderLib/QemuBootOrderLib.c:2172, library
+wired in OvmfPkgX64.dsc:418. argv-freeze.json vectors + argv_sha256 regenerated surgically
+(14-line delta: 7 device strings + 7 hashes); preflight CASE_ARGV_PINS updated to the new
+hashes; this document's quoted prefixes updated above.
+
+H2 - check_boot_target() (module-level in rehearsal-harness.py): the FIRST "[Bds]Booting "
+line in the case ovmf-debug.log must be the case ESP option, proven by its "[Bds] Expand "
+line resolving to the ESP's PCI slot DERIVED from argv device order (q35 assigns -device
+slots 0x2,0x3,... in argv order; the ESP is the first virtio-blk device by construction).
+Anything else - Internal Shell, UiApp, wrong slot, no boot line - dies E_CASE_BOOT_TARGET
+(rc 90) BEFORE expectation checks. The deterministic manifest records first_booting,
+expand, esp_slot_derived_from_argv and the observed SetBootOrderFromQemu line when OVMF
+logs one. Executed (function driver against the committed harness): the REAL run-18' R1
+ovmf-debug.log dies rc 90 with detail naming '[Bds]Booting EFI Internal Shell'; synthetic
+UiApp-first and wrong-slot (0x3) logs die rc 90; ESP-first at 0x2 passes; an argv with the
+ESP second derives slot 0x3 and passes (derivation is not hand-typed).
+
+H3 - planted must-show (scratch-only, generator BLOCK_BOOT_TARGET_NEG inserted before the
+evidence-repair anchor): ONE case copy with bootindex REMOVED (harness copy; provable
+injection: grep -c -F ',bootindex=0' is 1 before and 0 after the sed) must die
+E_CASE_BOOT_TARGET rc 90, never a generic EXPECTATIONS_VIOLATED. Local simulation
+(KVM-less host): injection counts 1->0 verified, the harness copy runs, the F3/F6 pre-guest
+gates pass against the real run-18' sole evidence, the run dies E_NO_KVM before the guest
+(expected off-CI), and the written argv.txt carries zero bootindex occurrences.
+
+H4 - run-ceremony.sh passes the harness's NAMED exit code up unchanged (the L6 pattern from
+the F3 gate and enrollment wrappers); E_BASH_ERRTRAP is reserved for signal/trap deaths
+(rc>=128). Executed against the verbatim extracted block: stub rc 91 -> run-ceremony exits
+91 with the passthrough line; stub rc 90 -> 90; stub rc 139 -> E_BASH_ERRTRAP exit 97.
+
+Validation: generator re-derives the committed scratch workflow with EXACTLY the 29-line H3
+block added (previous scratch sha f9c2892cff9500d746d01b3ed8871adb7b9a04d08dd08e2ce2829ce8d7b76363,
+new sha 0622068eef665a84a01cd147b78c26a2bd96e4925cf2b23f627cc2108d377baf); E_SCRATCH_DERIVE_DRIFT
+clean; preflight PASS rc=0 BOTH lanes; yaml parse clean on all three workflows; extracted H3
+step bash -n clean. Rehearsal and certification workflow YAMLs untouched.
+
+Mishaps (all caught before delivery): (a) first argv-freeze.json regen reserialized the whole
+file (618-line noise) - reverted and redone surgically; (b) the first H1 comment carried the
+literal string "bootindex=0", which would have broken the H3 injection count - caught by the
+local simulation, comment reworded and block greps tightened to the exact ',bootindex=0'
+device pattern; (c) the first generator patch left an unterminated r-string - caught by the
+ast check, redone via file assembly; (d) the first H4 test extraction truncated at the wrong
+'fi' (test-harness artifact only) - redone against the complete block.
+
+H5 - the run's second failure class (end-of-job E_CHECKOUT_MUTATED on
+__pycache__/lane_resolve.cpython-310.pyc), root-caused by the reviewer from the raw job log:
+#18 introduced the FIRST sibling-module imports in this directory (from lane_resolve import
+... in rehearsal-harness.py and preflight-check.py). Scripts run as __main__ never write
+their own bytecode; only imports do. preflight runs as the runner user WITH
+PYTHONDONTWRITEBYTECODE=1; the harness runs from run-ceremony.sh under
+`sudo unshare -n env PREFIX=... ./run-ceremony.sh`, and sudo's env_reset strips
+PYTHONDONTWRITEBYTECODE, so root wrote the .pyc. Fix, without weakening the gate and with no
+.gitignore:
+H5a - both sibling-importing files set sys.dont_write_bytecode = True BEFORE the lane_resolve
+import (verified these are the only sibling importers here: enroll-predicate-check.py,
+fetch_locked.py, platform-lockgen.py, scan-pe-pdb-paths.py, lane_resolve.py, derive-scratch.py
+import none).
+H5b - export PYTHONDONTWRITEBYTECODE=1 near the top of run-ceremony.sh and rehearsal-enroll.sh,
+covering any future python3 child regardless of the workflow's sudo env list.
+H5c - preflight check 6j E_BYTECODE_GUARD: any rehearsal .py whose first sibling import is not
+preceded by the guard fails by name; scratch-only planted negative (probe file without the
+guard, EXIT-trap cleanup, clean re-run must PASS, marker H5_BYTECODE_GUARD_MUST_SHOW_OK).
+H5d - checkout-gate.sh and its __pycache__ gate test UNCHANGED.
+H5 executed validation (verbatim extracted step, full fidelity against the real preflight):
+the planted probe died rc=30 with E_BYTECODE_GUARD naming zz_bytecode_probe.py:1 and sibling
+lane_resolve (the pre-existing E_PYTHON_IMPORTS import gate fired on the probe too - two
+independent detectors); the probe was removed; the clean re-run PASSED. Local note: the first
+simulation attempt's clean re-run failed only because this workspace lacks
+/tmp/NON_CERTIFYING_SCRATCH-stage (E_LOCK_MISSING_DEB/E_STAGED_TOOL_MISSING on the missing
+stage); symlinked to the p15 stage for the faithful re-run. The case-row booleans that looked
+inverted are Shell-boot artifacts; no harness inversion is inferred until an ESP-first boot
+tests it.
+
+J1/J2 - peer review of 7e2dc964 came back NOT CLEARED with two blockers, fixed in this head:
+J1 - the H2 debug-log gate would have killed R7 unconditionally: R7 boots the RELEASE
+firmware (distro OVMF_CODE_4M.secboot.fd, sha256 1dbb7f9b7e7285b950929bbbc1494c186bfb061cde60cf531ff9756ef87dab7a),
+which emits no debugcon output - its run-18' ovmf-debug.log is 0 bytes (R1-R6: 130,377 B
+each, verified on the evidence). Reviewer amendment: (a) the debug-log gate applies ONLY to
+cases whose RUN-TIME firmware sha256 == firmware_debug_sha256
+(fc150336fce10eb5508fa440cdf7300622c8c3ac71f2fbe10a0731422b9cef24), hashed from the exact
+pflash file fed to qemu; (b) a release-firmware case proves its boot target BEHAVIORALLY -
+the kernel_exec + exit_98 RAM-scan markers are present only if the case ESP booted (only
+the ESP carries the UKI); absent markers die E_CASE_BOOT_TARGET_UNPROVEN (rc 90) BEFORE
+expectation checks, recording boot_target = {observable:false, reason:"RELEASE firmware, no
+debugcon", proof:"kernel_exec+exit98 markers"}; (c) preflight check 6k
+E_CASE_BOOT_TARGET_UNPROVABLE: any case on non-debug firmware must carry
+expect.kernel_exec=true (R7 does); (d) R7 keeps bootindex=0 like every other case.
+Executed: T1 release+markers -> PASS with the exact observable:false record; T2 release
+markers absent -> rc 90 E_CASE_BOOT_TARGET_UNPROVEN; T3 REAL run-18' R1 Shell log -> rc 90
+E_CASE_BOOT_TARGET (debug path unchanged); T4 debug ESP-first -> PASS observable:true; 6k
+positive both lanes, planted config negative (R7 kernel_exec flipped) -> rc 30
+E_CASE_BOOT_TARGET_UNPROVABLE naming the case.
+J2 - the H3 must-show ran the planted guest as the runner user, but qemu needs /dev/kvm
+(root:kvm 0660): the guest would never start, the harness would die E_QEMU_START (also rc
+90), and the must-show would fail for an environmental reason. Fix: the planted harness
+copy runs under the SAME authorized root/KVM context as the ceremony (sudo unshare -n env
+PREFIX=... ALLOWED_PREFIX=... PYTHONDONTWRITEBYTECODE=1 python3 ... - byte-identical to the
+ceremony's proven invocation plus the bytecode export), all writes under /tmp ($T work
+root), NO root write into the checkout, harness copy H5a-protected. Before accepting the
+named death the step ASSERTS qemu really started: the case argv.txt exists AND a nonempty
+ovmf-debug.log carries a "[Bds]Booting " line (E_H3_QEMU_NOT_STARTED names the
+environmental case); the observed first Booting line is appended to h3.log as must-show
+evidence. Executed: injection 1->0 and one-case config derivation green; assertion branches
+simulated - branch A (no debug log) dies E_H3_QEMU_NOT_STARTED, branch B (started + named
+death) reaches H3_BOOT_TARGET_MUST_SHOW_OK with the observed-line evidence. Local limit:
+this sandbox has neither passwordless sudo nor /dev/kvm, so the full planted-guest path is
+CI-only; the harness copy itself runs green as the runner up to the E_NO_KVM wall.

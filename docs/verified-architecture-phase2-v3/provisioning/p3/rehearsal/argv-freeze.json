@@ -115,7 +115,7 @@
         "-drive",
         "file=build-output/esp/c5-root-admitter-uki-v3-esp.raw,format=raw,if=none,id=esp,readonly=on",
         "-device",
-        "virtio-blk-pci,drive=esp,serial=c5-esp",
+        "virtio-blk-pci,drive=esp,serial=c5-esp,bootindex=0",
         "-drive",
         "file=disks/disk0.raw,format=raw,if=none,id=d0,readonly=on",
         "-device",
@@ -146,7 +146,7 @@
         "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-cases/NON_CERTIFYING_REHEARSAL-R1-positive/qemu.pid",
         "-daemonize"
       ],
-      "argv_sha256": "cbcd8f053290fbf1e852d2ca5d44f4ea718e42ef6b7229e5c5056687f144595c",
+      "argv_sha256": "c581e7dda5d855f2dc4be9fc587765305220107cc8225a87a27ce06b1bbee0b0",
       "id": "NON_CERTIFYING_REHEARSAL-R1-positive",
       "qmp_sock": "/tmp/NON_CERTIFYING_REHEARSAL-q0.sock"
     },
@@ -181,7 +181,7 @@
         "-drive",
         "file=build-output/esp-variant/NON_CERTIFYING_REHEARSAL-esp-unsigned.raw,format=raw,if=none,id=esp,readonly=on",
         "-device",
-        "virtio-blk-pci,drive=esp,serial=c5-esp",
+        "virtio-blk-pci,drive=esp,serial=c5-esp,bootindex=0",
         "-drive",
         "file=disks/disk0.raw,format=raw,if=none,id=d0,readonly=on",
         "-device",
@@ -212,7 +212,7 @@
         "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-cases/NON_CERTIFYING_REHEARSAL-R2-N1-unsigned/qemu.pid",
         "-daemonize"
       ],
-      "argv_sha256": "d8d83880da4f39a7bb16a833f654dca7cc887633067cdacb27daf34446d5b6ac",
+      "argv_sha256": "f382e94075d87cd0cb00df84b1f393f59ff7ee0e5de138f668713309ab2b1edc",
       "id": "NON_CERTIFYING_REHEARSAL-R2-N1-unsigned",
       "qmp_sock": "/tmp/NON_CERTIFYING_REHEARSAL-q1.sock"
     },
@@ -247,7 +247,7 @@
         "-drive",
         "file=build-output/esp-variant/NON_CERTIFYING_REHEARSAL-esp-wrongsig.raw,format=raw,if=none,id=esp,readonly=on",
         "-device",
-        "virtio-blk-pci,drive=esp,serial=c5-esp",
+        "virtio-blk-pci,drive=esp,serial=c5-esp,bootindex=0",
         "-drive",
         "file=disks/disk0.raw,format=raw,if=none,id=d0,readonly=on",
         "-device",
@@ -278,7 +278,7 @@
         "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-cases/NON_CERTIFYING_REHEARSAL-R3-N2-wrongsig/qemu.pid",
         "-daemonize"
       ],
-      "argv_sha256": "7740061c431f5f629b0d6929271c89bae0bbc2533e7a997fdcc3b4304266590c",
+      "argv_sha256": "46d5c1c485cec634c3e0546e03395184b089d11ded01ffef0ca4db588bce6072",
       "id": "NON_CERTIFYING_REHEARSAL-R3-N2-wrongsig",
       "qmp_sock": "/tmp/NON_CERTIFYING_REHEARSAL-q2.sock"
     },
@@ -313,7 +313,7 @@
         "-drive",
         "file=build-output/esp-variant/NON_CERTIFYING_REHEARSAL-esp-hostile.raw,format=raw,if=none,id=esp,readonly=on",
         "-device",
-        "virtio-blk-pci,drive=esp,serial=c5-esp",
+        "virtio-blk-pci,drive=esp,serial=c5-esp,bootindex=0",
         "-drive",
         "file=disks/disk0.raw,format=raw,if=none,id=d0,readonly=on",
         "-device",
@@ -344,7 +344,7 @@
         "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-cases/NON_CERTIFYING_REHEARSAL-R4-N3a-hostile-sole-db/qemu.pid",
         "-daemonize"
       ],
-      "argv_sha256": "8598a145d072798a84ea93ebdbc3e34109498310f87a56aee1dc7e41e93bae31",
+      "argv_sha256": "daa8eee9131d7d2cc5ad48ceb8e1f6b164327dbf489412d8761aa83289c04215",
       "id": "NON_CERTIFYING_REHEARSAL-R4-N3a-hostile-sole-db",
       "qmp_sock": "/tmp/NON_CERTIFYING_REHEARSAL-q3.sock"
     },
@@ -379,7 +379,7 @@
         "-drive",
         "file=build-output/esp-variant/NON_CERTIFYING_REHEARSAL-esp-hostile.raw,format=raw,if=none,id=esp,readonly=on",
         "-device",
-        "virtio-blk-pci,drive=esp,serial=c5-esp",
+        "virtio-blk-pci,drive=esp,serial=c5-esp,bootindex=0",
         "-drive",
         "file=disks/disk0.raw,format=raw,if=none,id=d0,readonly=on",
         "-device",
@@ -410,7 +410,7 @@
         "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-cases/NON_CERTIFYING_REHEARSAL-R5-N3b-hostile-widened-db/qemu.pid",
         "-daemonize"
       ],
-      "argv_sha256": "9287c11a11d160a13c198123296d0c8546bd038340b43bb8c2ac6f3f2eec359b",
+      "argv_sha256": "4a780d858f457e078c4a982d007cbfafd9f5f66e797c83b00ff523456c0df156",
       "id": "NON_CERTIFYING_REHEARSAL-R5-N3b-hostile-widened-db",
       "qmp_sock": "/tmp/NON_CERTIFYING_REHEARSAL-q4.sock"
     },
@@ -445,7 +445,7 @@
         "-drive",
         "file=build-output/esp-variant/NON_CERTIFYING_REHEARSAL-esp-hostile.raw,format=raw,if=none,id=esp,readonly=on",
         "-device",
-        "virtio-blk-pci,drive=esp,serial=c5-esp",
+        "virtio-blk-pci,drive=esp,serial=c5-esp,bootindex=0",
         "-drive",
         "file=disks/disk0.raw,format=raw,if=none,id=d0,readonly=on",
         "-device",
@@ -476,7 +476,7 @@
         "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-cases/NON_CERTIFYING_REHEARSAL-R6-N3c-hostile-fresh-sole-db/qemu.pid",
         "-daemonize"
       ],
-      "argv_sha256": "3a057fe9d8ece06e38d490fcb3b3dcd1f3088a83ab947c7dcfe5f73875801699",
+      "argv_sha256": "6f2fc5a541aebbd23c4dc875d405519a2d834ea3b8376d71c6a3e9a8313bac10",
       "id": "NON_CERTIFYING_REHEARSAL-R6-N3c-hostile-fresh-sole-db",
       "qmp_sock": "/tmp/NON_CERTIFYING_REHEARSAL-q5.sock"
     },
@@ -511,7 +511,7 @@
         "-drive",
         "file=build-output/esp/c5-root-admitter-uki-v3-esp.raw,format=raw,if=none,id=esp,readonly=on",
         "-device",
-        "virtio-blk-pci,drive=esp,serial=c5-esp",
+        "virtio-blk-pci,drive=esp,serial=c5-esp,bootindex=0",
         "-drive",
         "file=disks/disk0.raw,format=raw,if=none,id=d0,readonly=on",
         "-device",
@@ -542,7 +542,7 @@
         "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-cases/NON_CERTIFYING_REHEARSAL-R7-release-sibling-behavior-only/qemu.pid",
         "-daemonize"
       ],
-      "argv_sha256": "eb4d5bb4593906f65162b2e8a2012c7071454653d293121e2763eebdd73d8d82",
+      "argv_sha256": "2d450e95e778d9f1d1c9d165993c31023fb00c9b12c585bd068be89749774b05",
       "id": "NON_CERTIFYING_REHEARSAL-R7-release-sibling-behavior-only",
       "qmp_sock": "/tmp/NON_CERTIFYING_REHEARSAL-q6.sock"
     }

@@ -15,6 +15,10 @@ PREFIX=os.environ.get("PREFIX","")
 if not PREFIX: print("E_PREFIX_UNSET"); sys.exit(97)
 ALLOWED=os.environ.get("ALLOWED_PREFIX","")
 if PREFIX!=ALLOWED: print("E_PREFIX_MISMATCH prefix=%s allowed=%s"%(PREFIX,ALLOWED)); sys.exit(97)
+# peer run-35959397469 ruling H5a: never write bytecode for sibling imports even when the
+# caller's env drops PYTHONDONTWRITEBYTECODE (sudo env_reset on run-ceremony.sh did, and the
+# lane_resolve .pyc tripped E_CHECKOUT_MUTATED at the end-of-job gate).
+sys.dont_write_bytecode = True
 from lane_resolve import LaneError, resolve_config_value, resolve_path, allowed_vars_templates
 
 # C7 runtime-emission provenance: the signed cmdline (ro root=/dev/mapper/v3-root-admitter
@@ -144,7 +148,10 @@ def build_argv(cfg, case_dir, vars_fd, esp, firmware, sock):
        "-display","none","-serial","none","-nic","none","-no-reboot",
        "-m",str(cfg["memory_mb"]),
        "-drive",f"file={esp},format=raw,if=none,id=esp,readonly=on",
-       "-device","virtio-blk-pci,drive=esp,serial=c5-esp"]
+       # H1 (peer run-35959397469 ruling): the bootindex flag on the ESP device ONLY - QEMU
+       # publishes fw_cfg "bootorder" and the frozen OVMF's QemuBootOrderLib promotes the
+       # ESP boot option ahead of the Internal Shell. NO bootindex on the data disks.
+       "-device","virtio-blk-pci,drive=esp,serial=c5-esp,bootindex=0"]
     for i,role in enumerate(cfg["v3_serials"]):
         a+=["-drive",f"file={cfg['disk_dir']}/disk{i}.raw,format=raw,if=none,id=d{i},readonly=on",
             "-device",f"virtio-blk-pci,drive=d{i},serial={role}"]
@@ -162,6 +169,45 @@ def parse_vars(cfg, vars_fd, code):
     for k in ("variables","summary"):
         if k not in v: fail("E_VARS_PARSE_SCHEMA", code+" producer output missing key "+k)
     return v
+
+def check_boot_target(cid, argv, dbg, fw_sha, debug_fw_sha, kexec, e98):
+    """H2 (peer run-35959397469 ruling) + J1 review amendment: named per-case boot-target
+    gate, scoped by the run-time sha256 of the exact pflash CODE file fed to qemu.
+    DEBUG firmware (sha == firmware_debug_sha256): the FIRST "[Bds]Booting " line in
+    ovmf-debug.log must be the case ESP option, proven by its "[Bds] Expand " line
+    resolving to the ESP's PCI slot - DERIVED from argv device order, never hand-typed
+    (QEMU q35 assigns -device slots 0x2,0x3,... in argv order on this frozen machine; no
+    PCI device precedes the virtio-blk set). Anything else, including the Internal Shell,
+    dies E_CASE_BOOT_TARGET. RELEASE firmware emits no debugcon output (run 35959397469:
+    the R7 log is 0 bytes), so a non-debug case proves its boot target BEHAVIORALLY: the
+    kernel_exec + exit_98 RAM-scan markers are present only if the case ESP booted (only
+    the ESP carries the UKI); absent markers die E_CASE_BOOT_TARGET_UNPROVEN. Both paths
+    run BEFORE expectation checks and return the boot-target evidence record for the
+    deterministic manifest."""
+    if fw_sha!=debug_fw_sha:
+        if not (kexec and e98):
+            fail("E_CASE_BOOT_TARGET_UNPROVEN",
+                 cid+" release-firmware boot target unproven: kernel_exec=%r exit_98=%r firmware=%s"%(kexec,e98,fw_sha))
+        return {"observable":False,"reason":"RELEASE firmware, no debugcon",
+                "proof":"kernel_exec+exit98 markers","firmware_sha256":fw_sha}
+    _pci=[x for x in argv if x.startswith("virtio-blk-pci,")]
+    _esp_idx=[i for i,x in enumerate(_pci) if "drive=esp," in x]
+    if len(_esp_idx)!=1: fail("E_CASE_BOOT_TARGET", cid+" argv carries %d ESP devices"%len(_esp_idx))
+    esp_slot=0x2+_esp_idx[0]
+    _lines=dbg.splitlines()
+    _bi=next((i for i,l in enumerate(_lines) if l.startswith("[Bds]Booting ")),None)
+    _expand=None
+    if _bi is not None:
+        _expand=next((l for l in _lines[_bi+1:] if l.startswith("[Bds] Expand ")),None)
+    _want="PciRoot(0x0)/Pci(0x%x,0x0)"%esp_slot
+    if _bi is None or _expand is None or _want not in _expand:
+        fail("E_CASE_BOOT_TARGET",
+             cid+" first boot target is not the case ESP (slot 0x%x derived from argv device order): booting=%r expand=%r"
+             %(esp_slot,_lines[_bi] if _bi is not None else None,_expand))
+    return {"observable":True,"firmware_sha256":fw_sha,
+            "first_booting":_lines[_bi],"expand":_expand,
+            "esp_slot_derived_from_argv":esp_slot,
+            "qemu_bootorder_evidence":next((l for l in _lines if "SetBootOrderFromQemu" in l),None)}
 
 def run_case(cfg, case, idx):
     cid=case["id"]; cdir=os.path.join(cfg["work_root"],cid)
@@ -211,6 +257,7 @@ def run_case(cfg, case, idx):
     kexec=found[MARKER_KERNEL_EXEC]; e98=found[MARKER_EXIT_98]; e97=found[MARKER_EXIT_97]
     adapters_present=[n.decode() for n in ADAPTER_STRINGS if found[n]]
     dbg=open(os.path.join(cdir,"ovmf-debug.log"),errors="replace").read()
+    boot_ev=check_boot_target(cid, argv, dbg, sha(case["firmware"]), cfg["firmware_debug_sha256"], kexec, e98)   # H2+J1: named gate, BEFORE expectation checks
     def match_template(t):
         parts=t.split("%s"); pos=0
         for p in parts:
@@ -232,7 +279,8 @@ def run_case(cfg, case, idx):
     checks["vars_template_enroll_tie"]= True   # proven pre-guest by the F6 fatal gate above
     checks["pre_parse_trust_predicate"]= trust_ok
     if exp.get("no_reject_strings"): checks["no_reject_strings"]=(len(rejects_found)==0)
-    det={"case":cid,"argv_sha256":hashlib.sha256("\0".join(argv).encode()).hexdigest(),
+    det={"case":cid,"boot_target":boot_ev,
+         "argv_sha256":hashlib.sha256("\0".join(argv).encode()).hexdigest(),
          "vars_template":case["vars_template"],
          "esp_sha256":sha(case["esp"]),
          "firmware_sha256":sha(case["firmware"]),

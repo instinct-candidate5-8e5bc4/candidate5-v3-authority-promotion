@@ -4,6 +4,9 @@
 set -eEuo pipefail
 # peer run-11: every otherwise-bare bash failure is NAMED (script/line/rc/command), exit 97.
 trap '_rc=$?; echo "E_BASH_ERRTRAP run-ceremony.sh line $LINENO rc=$_rc cmd: $BASH_COMMAND" >&2; exit 97' ERR
+# peer run-35959397469 ruling H5b: python children must never write bytecode inside the
+# checkout; sudo env_reset strips the workflow-level PYTHONDONTWRITEBYTECODE, so set it here.
+export PYTHONDONTWRITEBYTECODE=1
 CONFIG="$1"; STAGE="$2"; OUT="$3"
 HERE="$(cd "$(dirname "$0")" && pwd)"; cd "$HERE"
 PREFIX="${PREFIX:-}"
@@ -166,7 +169,19 @@ done
 # enroll-predicate.json evidence. (trap EXIT above also covers failure paths.)
 rm -rf prep
 # case suite (harness CLI: config + work_root + out_dir for the F4 allow-set construction)
-python3 ./rehearsal-harness.py "$CONFIG" "$OUT/$PREFIX-cases" "$OUT"
+# H4 (peer run-35959397469 ruling): the harness's NAMED exit code passes up unchanged
+# (the L6 pattern from the F3 gate and enrollment wrappers); E_BASH_ERRTRAP is reserved
+# for signal/trap deaths (rc>=128), never for a named harness failure (run 35959397469:
+# harness rc 91 surfaced as E_BASH_ERRTRAP at this line).
+_harness_rc=0
+python3 ./rehearsal-harness.py "$CONFIG" "$OUT/$PREFIX-cases" "$OUT" || _harness_rc=$?
+if [ "$_harness_rc" -ge 128 ]; then
+  echo "E_BASH_ERRTRAP harness died on signal/trap rc=$_harness_rc"; exit 97
+fi
+if [ "$_harness_rc" -ne 0 ]; then
+  echo "harness failed rc=$_harness_rc (named gate code in its output above) - passing the failure up unchanged"
+  exit "$_harness_rc"
+fi
 # canonical ceremony manifest (streamed reads: never loads a full dump into memory)
 python3 - "$OUT" <<'PYEOF'
 import json, hashlib, os, sys

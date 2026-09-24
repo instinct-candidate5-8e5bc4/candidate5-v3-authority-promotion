@@ -801,6 +801,71 @@ jobs:
           [ "$_rc" = "90" ] || { echo "E_F6_TIE_NOT_FIRED rc=$_rc expected 90"; cat "$T/f6.log"; exit 97; }
           grep -F "E_VARS_TEMPLATE_ENROLL_TIE" "$T/f6.log" || { echo "E_F6_NEG_CODE_ABSENT named tie code missing"; cat "$T/f6.log"; exit 97; }
           echo "F6_TIE_MUST_SHOW_OK planted byte-flipped template died named (E_VARS_TEMPLATE_ENROLL_TIE rc=90)"
+      - name: NON_CERTIFYING_SCRATCH planted-fault H3 boot-target gate must-show (peer run-35959397469 H3)
+        run: |
+          set -euo pipefail
+          cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+          SRC=/tmp/$PREFIX-out/$PREFIX-enroll-sole
+          [ -f "$SRC/vars-enrolled.fd" ] || { echo "E_H3_NEG_INPUT sole vars-enrolled.fd absent"; exit 97; }
+          [ -f "$SRC/evidence/enroll-predicate.json" ] || { echo "E_H3_NEG_INPUT sole enroll-predicate.json absent"; exit 97; }
+          T=/tmp/$PREFIX-pf/h3boot; rm -rf "$T"; mkdir -p "$T"
+          # ONE case copy with bootindex REMOVED: the harness copy drops ",bootindex=0"
+          # from the ESP device (provable injection: exactly one removal). The case guest
+          # then falls to the Internal Shell (run 35959397469 mechanics) and the H2 gate
+          # MUST kill it named E_CASE_BOOT_TARGET - never a generic EXPECTATIONS_VIOLATED.
+          cp rehearsal-harness.py "$T/rehearsal-harness.py"
+          cp lane_resolve.py "$T/lane_resolve.py"
+          [ "$(grep -c -F ',bootindex=0' "$T/rehearsal-harness.py")" = "1" ] || { echo "E_H3_NEG_INJECTION ESP-device bootindex count != 1 in harness source"; exit 97; }
+          sed -i 's/,bootindex=0//' "$T/rehearsal-harness.py"
+          [ "$(grep -c -F ',bootindex=0' "$T/rehearsal-harness.py")" = "0" ] || { echo "E_H3_NEG_INJECTION bootindex removal failed"; exit 97; }
+          python3 - config.json "$T" <<'PYT'
+          import json, sys
+          c = json.load(open(sys.argv[1]))
+          c["cases"] = [c["cases"][0]]
+          json.dump(c, open(sys.argv[2] + "/config.json", "w"), indent=1, sort_keys=True)
+          PYT
+          # J2 (peer run-35959397469 review): the planted guest runs under the SAME
+          # authorized root/KVM context as the ceremony (qemu needs /dev/kvm, root:kvm
+          # 0660); all writes stay under /tmp ($T, one-case work root) - NO root write
+          # into the checkout. The harness copy carries the H5a bytecode guard.
+          _rc=0
+          sudo unshare -n env PREFIX="$PREFIX" ALLOWED_PREFIX="$ALLOWED_PREFIX" PYTHONDONTWRITEBYTECODE=1 python3 "$T/rehearsal-harness.py" "$T/config.json" "$T/cases" /tmp/$PREFIX-out > "$T/h3.log" 2>&1 || _rc=$?
+          # before accepting the named target death, ASSERT qemu really started (an
+          # environmental death would be E_QEMU_START, also rc 90 - indistinguishable
+          # without this proof): the case argv.txt exists AND a NONEMPTY ovmf-debug.log
+          # carries a "[Bds]Booting " line.
+          _cdir=$(find "$T/cases" -mindepth 1 -maxdepth 1 -type d | head -1)
+          [ -n "$_cdir" ] && [ -s "$_cdir/argv.txt" ] || { echo "E_H3_QEMU_NOT_STARTED case argv.txt missing (environmental)"; cat "$T/h3.log"; exit 97; }
+          [ -s "$_cdir/ovmf-debug.log" ] && grep -q '^\[Bds\]Booting ' "$_cdir/ovmf-debug.log" || { echo "E_H3_QEMU_NOT_STARTED no nonempty debug log with a Booting line (environmental)"; cat "$T/h3.log"; exit 97; }
+          grep -m1 '^\[Bds\]Booting ' "$_cdir/ovmf-debug.log" | sed 's/^/H3 observed first Booting line: /' >> "$T/h3.log"
+          [ "$_rc" = "90" ] || { echo "E_H3_GATE_NOT_FIRED rc=$_rc expected 90 (E_CASE_BOOT_TARGET)"; cat "$T/h3.log"; exit 97; }
+          grep -F "E_CASE_BOOT_TARGET" "$T/h3.log" || { echo "E_H3_NEG_CODE_ABSENT named boot-target code missing"; cat "$T/h3.log"; exit 97; }
+          ! grep -F "EXPECTATIONS_VIOLATED" "$T/h3.log" || { echo "E_H3_NEG_GENERIC death must be the named gate, never EXPECTATIONS_VIOLATED"; cat "$T/h3.log"; exit 97; }
+          echo "H3_BOOT_TARGET_MUST_SHOW_OK planted bootindex-removed case died named (E_CASE_BOOT_TARGET rc=90, no EXPECTATIONS_VIOLATED)"
+      - name: NON_CERTIFYING_SCRATCH planted-fault H5 bytecode-guard must-show (peer run-35959397469 H5c)
+        if: ${{ always() }}
+        run: |
+          set -eEuo pipefail
+          REH=docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+          # planted sibling importer WITHOUT sys.dont_write_bytecode, scanned by the REAL
+          # preflight E_BYTECODE_GUARD check. The EXIT trap guarantees the probe never
+          # survives the step: the end-of-job checkout gate must see a clean tree.
+          trap 'rm -f "$REH/zz_bytecode_probe.py"' EXIT
+          printf 'from lane_resolve import resolve_config_value\n' > "$REH/zz_bytecode_probe.py"
+          cd "$REH"
+          _rc=0
+          python3 preflight-check.py config.json /tmp/$PREFIX-stage > /tmp/$PREFIX-h5-preflight.json 2>&1 || _rc=$?
+          if [ "$_rc" -ne 30 ]; then
+            echo "E_BYTECODE_GUARD_MUST_SHOW rc=$_rc (want 30)"; cat /tmp/$PREFIX-h5-preflight.json; exit 90
+          fi
+          grep -q '"E_BYTECODE_GUARD"' /tmp/$PREFIX-h5-preflight.json \
+            || { echo "E_BYTECODE_GUARD_MUST_SHOW named code missing"; cat /tmp/$PREFIX-h5-preflight.json; exit 90; }
+          grep -q 'zz_bytecode_probe.py' /tmp/$PREFIX-h5-preflight.json \
+            || { echo "E_BYTECODE_GUARD_MUST_SHOW probe file not named"; cat /tmp/$PREFIX-h5-preflight.json; exit 90; }
+          rm -f zz_bytecode_probe.py
+          trap - EXIT
+          python3 preflight-check.py config.json /tmp/$PREFIX-stage > /dev/null
+          echo "H5_BYTECODE_GUARD_MUST_SHOW_OK"
       - name: NON_CERTIFYING_SCRATCH evidence readability repair (ephemeral out tree only)
         if: always()
         run: |

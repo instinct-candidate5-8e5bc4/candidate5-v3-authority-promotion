@@ -7,6 +7,9 @@ set -eEuo pipefail
 # peer run-11: every otherwise-bare bash failure is NAMED (script/line/rc/command) and
 # exits 97 - never another silent set -e death (run 10's pidfile cat died bare).
 trap '_rc=$?; echo "E_BASH_ERRTRAP rehearsal-enroll.sh line $LINENO rc=$_rc cmd: $BASH_COMMAND" >&2; exit 97' ERR
+# peer run-35959397469 ruling H5b: python children must never write bytecode inside the
+# checkout; sudo env_reset strips the workflow-level PYTHONDONTWRITEBYTECODE, so set it here.
+export PYTHONDONTWRITEBYTECODE=1
 CFG=${1:?}; PREP=${2:?}; OUT=${3:?}; EVD=${4:?}; MODE=${5:-sole}
 HERE="$(cd "$(dirname "$0")" && pwd)"
 # peer N1: the enrollment QMP socket path is PINNED (argv-freeze.json enroll_qmp_sock_basename)

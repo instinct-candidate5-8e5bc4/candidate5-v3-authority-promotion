@@ -13,6 +13,10 @@ if not PREFIX: print("E_PREFIX_UNSET"); sys.exit(97)
 ALLOWED=os.environ.get("ALLOWED_PREFIX","")
 if PREFIX!=ALLOWED: print("E_PREFIX_MISMATCH prefix=%s allowed=%s"%(PREFIX,ALLOWED)); sys.exit(97)
 LANE_TMP="/tmp/%s-"%PREFIX
+# peer run-35959397469 ruling H5a: never write bytecode for sibling imports even when the
+# caller's env drops PYTHONDONTWRITEBYTECODE (sudo env_reset on run-ceremony.sh under sudo did, and the
+# lane_resolve .pyc tripped E_CHECKOUT_MUTATED at the end-of-job gate).
+sys.dont_write_bytecode = True
 from lane_resolve import LaneError, resolve_config_value
 
 FORBIDDEN = "OVMF_CI_SECURE_BOOT_UKI_PASS"
@@ -227,13 +231,13 @@ if "COMMON=(" not in _bh or _bh.count('exec "$BWRAP" "${COMMON[@]}"')!=2:
 # ONLY (never the ceremony); and the freeze file's top-level key set must be exactly the
 # pre-addition keys plus smoke_namespace (additive-only proof).
 CASE_ARGV_PINS=(
-    ("NON_CERTIFYING_REHEARSAL-R1-positive", "cbcd8f053290fbf1e852d2ca5d44f4ea718e42ef6b7229e5c5056687f144595c"),
-    ("NON_CERTIFYING_REHEARSAL-R2-N1-unsigned", "d8d83880da4f39a7bb16a833f654dca7cc887633067cdacb27daf34446d5b6ac"),
-    ("NON_CERTIFYING_REHEARSAL-R3-N2-wrongsig", "7740061c431f5f629b0d6929271c89bae0bbc2533e7a997fdcc3b4304266590c"),
-    ("NON_CERTIFYING_REHEARSAL-R4-N3a-hostile-sole-db", "8598a145d072798a84ea93ebdbc3e34109498310f87a56aee1dc7e41e93bae31"),
-    ("NON_CERTIFYING_REHEARSAL-R5-N3b-hostile-widened-db", "9287c11a11d160a13c198123296d0c8546bd038340b43bb8c2ac6f3f2eec359b"),
-    ("NON_CERTIFYING_REHEARSAL-R6-N3c-hostile-fresh-sole-db", "3a057fe9d8ece06e38d490fcb3b3dcd1f3088a83ab947c7dcfe5f73875801699"),
-    ("NON_CERTIFYING_REHEARSAL-R7-release-sibling-behavior-only", "eb4d5bb4593906f65162b2e8a2012c7071454653d293121e2763eebdd73d8d82"),
+    ("NON_CERTIFYING_REHEARSAL-R1-positive", "c581e7dda5d855f2dc4be9fc587765305220107cc8225a87a27ce06b1bbee0b0"),
+    ("NON_CERTIFYING_REHEARSAL-R2-N1-unsigned", "f382e94075d87cd0cb00df84b1f393f59ff7ee0e5de138f668713309ab2b1edc"),
+    ("NON_CERTIFYING_REHEARSAL-R3-N2-wrongsig", "46d5c1c485cec634c3e0546e03395184b089d11ded01ffef0ca4db588bce6072"),
+    ("NON_CERTIFYING_REHEARSAL-R4-N3a-hostile-sole-db", "daa8eee9131d7d2cc5ad48ceb8e1f6b164327dbf489412d8761aa83289c04215"),
+    ("NON_CERTIFYING_REHEARSAL-R5-N3b-hostile-widened-db", "4a780d858f457e078c4a982d007cbfafd9f5f66e797c83b00ff523456c0df156"),
+    ("NON_CERTIFYING_REHEARSAL-R6-N3c-hostile-fresh-sole-db", "6f2fc5a541aebbd23c4dc875d405519a2d834ea3b8376d71c6a3e9a8313bac10"),
+    ("NON_CERTIFYING_REHEARSAL-R7-release-sibling-behavior-only", "2d450e95e778d9f1d1c9d165993c31023fb00c9b12c585bd068be89749774b05"),
 )
 if len(_fz2["cases"])!=len(CASE_ARGV_PINS):
     fail("E_CASE_ARGV_PIN","case count drifted: %d != %d"%(len(_fz2["cases"]),len(CASE_ARGV_PINS)))
@@ -506,6 +510,31 @@ for fn in ("NON_CERTIFYING_REHEARSAL-workflow.yml","OVMF_CI_SECURE_BOOT_UKI-CERT
     _wt=open(os.path.join(wf_dir,fn),errors="replace").read()
     for _pat in ("setup-python","pip install","pip3 install","-m venv","virtualenv"):
         if _pat in _wt: fail("E_PYTHON_FORBIDDEN_PROVISIONING",fn+" "+_pat)
+
+# 6j) peer run-35959397469 ruling H5c: any rehearsal .py that imports a sibling module must
+# set sys.dont_write_bytecode = True BEFORE that import - self-protection against callers whose
+# env drops PYTHONDONTWRITEBYTECODE. Planted negative lives in the scratch lane and must fail
+# by this name.
+import re as _re_bg
+for _f in sorted(os.listdir(here)):
+    if not _f.endswith(".py"): continue
+    _lines=open(os.path.join(here,_f),errors="replace").read().splitlines()
+    _guard_at=None; _first_sib=None
+    for _i,_ln in enumerate(_lines):
+        if _guard_at is None and _re_bg.search(r"sys\.dont_write_bytecode\s*=\s*True",_ln): _guard_at=_i
+        _m=_re_bg.match(r"\s*(?:from|import)\s+([A-Za-z_][A-Za-z0-9_]*)",_ln)
+        if _m and os.path.isfile(os.path.join(here,_m.group(1)+".py")) and _first_sib is None:
+            _first_sib=(_i,_m.group(1))
+    if _first_sib is not None and (_guard_at is None or _guard_at>_first_sib[0]):
+        fail("E_BYTECODE_GUARD","%s:%d imports sibling %s without sys.dont_write_bytecode=True before it"%(_f,_first_sib[0]+1,_first_sib[1]))
+
+# 6k) peer run-35959397469 review J1(c): any case on non-debug firmware MUST carry
+# expect.kernel_exec=true, else its boot target is statically unprovable - release firmware
+# emits no debugcon output (R7's run-18' log is 0 bytes), so the behavioral proof needs the
+# kernel-exec RAM marker. The debug firmware path is the config's own build-output literal.
+for _c in cfg.get("cases",[]):
+    if _c["firmware"]!="build-output/ovmf-debug/OVMF_CODE.fd" and _c["expect"].get("kernel_exec") is not True:
+        fail("E_CASE_BOOT_TARGET_UNPROVABLE",_c["id"]+" non-debug firmware without expect.kernel_exec=true")
 
 # 7) KVM requirement is declarative here; runtime fail-closed check lives in the workflow
 report={"schema":"NON_CERTIFYING_REHEARSAL-preflight/v1","lane":PREFIX,"errors":E,
