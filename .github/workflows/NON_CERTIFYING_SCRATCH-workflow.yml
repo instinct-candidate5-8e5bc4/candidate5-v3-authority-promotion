@@ -229,6 +229,42 @@ jobs:
           # env2 cross-runner comparison, and log the artifact digest tied to this run.
           sha256sum /tmp/$PREFIX-esp-a/c5-root-admitter-uki-v3-esp.raw >> /tmp/$PREFIX-fw-hashes.txt
           echo "ARTIFACT-DIGEST path=/tmp/$PREFIX-fw-hashes.txt sha256=$(sha256sum /tmp/$PREFIX-fw-hashes.txt | cut -d' ' -f1) run_id=$GITHUB_RUN_ID run_attempt=$GITHUB_RUN_ATTEMPT run_number=$GITHUB_RUN_NUMBER workflow=$GITHUB_WORKFLOW commit=$GITHUB_SHA ref=$GITHUB_REF"
+      - name: zero-private-key evidence gate K2 before firmware-hash upload (peer run-12 K4)
+        id: k2gate-fw
+        if: '!cancelled()'
+        env:
+          SCAN_PATHS: ${{ env.EVIDENCE_UPLOAD_PATHS }}
+        run: |
+          set -euo pipefail
+          # K2 (peer run-12 K4 containment): fail closed if any private-key material stands
+          # under ANY evidence upload path - by NAME (*.key/*.pem/*.p12/*.pfx) or CONTENT
+          # (PEM "PRIVATE KEY" markers, PKCS#8/RSA DER key headers). Upload only if this passed.
+          printf '%s\n' "$SCAN_PATHS" > /tmp/$PREFIX-k2-paths.txt
+          python3 - /tmp/$PREFIX-k2-paths.txt <<'PYK'
+          import sys, os, re
+          paths = [l.strip() for l in open(sys.argv[1]) if l.strip()]
+          namehit, conthit = [], []
+          pem = b"PRIVATE KEY"
+          der_rsa = re.compile(rb"\x30\x82..\x02\x01\x00\x02\x82", re.S)
+          der_p8 = re.compile(rb"\x30\x82..\x02\x01\x00\x30", re.S)
+          def scan_file(p):
+              if re.search(r"\.(key|pem|p12|pfx)$", os.path.basename(p), re.I):
+                  namehit.append(p); return
+              b = open(p, "rb").read()
+              if pem in b or der_rsa.search(b) or der_p8.search(b):
+                  conthit.append(p)
+          for p in paths:
+              if os.path.isfile(p):
+                  scan_file(p)
+              elif os.path.isdir(p):
+                  for base, _d, files in os.walk(p):
+                      for fn in files:
+                          scan_file(os.path.join(base, fn))
+          if namehit or conthit:
+              print("E_PRIVATE_KEY_IN_EVIDENCE names=%r content=%r" % (namehit[:3], conthit[:3]))
+              sys.exit(94)
+          print("zero-private-key gate: clean across %d upload paths" % len(paths))
+          PYK
       - name: NON_CERTIFYING_SCRATCH firmware hash upload (env2 comparison input)
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
         with:
@@ -323,7 +359,7 @@ jobs:
         run: echo "ok=true" >> "$GITHUB_OUTPUT"
       - name: NON_CERTIFYING_SCRATCH planted-fault PF-1 freemark gate must-show (peer condition 4)
         id: pf1
-        if: always() && steps.pf-prereq.outputs.ok == 'true'
+        if: "!cancelled() && steps.pf-prereq.outputs.ok == 'true'"
         run: |
           set -euo pipefail
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
@@ -334,30 +370,47 @@ jobs:
           mkdir -p /tmp/$PREFIX-out
           export PATH="/tmp/$PREFIX-stage/shims:$PATH"
           PFD=/tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-pf1-dir
+          PREPP=/tmp/$PREFIX-pfprep-1
+          # K1 (peer run-12 K4): PF prep (which contains the throwaway private keys) lives
+          # OUTSIDE the upload tree and is removed by this step's own EXIT trap. Absolute
+          # rule: no *.key under any EVIDENCE_UPLOAD_PATHS entry.
+          trap 'rm -rf "$PREPP"' EXIT
           PFWORK="$PFD/work"
           mkdir -p "$PFWORK/build-output/enroll-app" "$PFWORK/build-output/ovmf-debug"
           cp /tmp/$PREFIX-app-a/enroll-app.efi "$PFWORK/build-output/enroll-app/enroll-app.efi"
-          [ "$(sha256sum "$PFWORK/build-output/enroll-app/enroll-app.efi" | cut -d' ' -f1)" = "540b4fa3990f998cb803160482bd50e9670a47da3d534acc3ade91364a85f3ee" ]             || { echo "E_PF_SETUP enroll-app sha mismatch after copy" | tee -a "$PFD/prep.log"; exit 97; }
+          [ "$(sha256sum "$PFWORK/build-output/enroll-app/enroll-app.efi" | cut -d' ' -f1)" = "540b4fa3990f998cb803160482bd50e9670a47da3d534acc3ade91364a85f3ee" ] \
+            || { echo "E_PF_SETUP enroll-app sha mismatch after copy" | tee -a "$PFD/prep.log"; exit 97; }
           cp /tmp/$PREFIX-ovmf-a/OVMF_CODE.fd "$PFWORK/build-output/ovmf-debug/OVMF_CODE.fd"
-          [ "$(sha256sum "$PFWORK/build-output/ovmf-debug/OVMF_CODE.fd" | cut -d' ' -f1)" = "fc150336fce10eb5508fa440cdf7300622c8c3ac71f2fbe10a0731422b9cef24" ]             || { echo "E_PF_SETUP OVMF_CODE sha mismatch after copy" | tee -a "$PFD/prep.log"; exit 97; }
+          [ "$(sha256sum "$PFWORK/build-output/ovmf-debug/OVMF_CODE.fd" | cut -d' ' -f1)" = "fc150336fce10eb5508fa440cdf7300622c8c3ac71f2fbe10a0731422b9cef24" ] \
+            || { echo "E_PF_SETUP OVMF_CODE sha mismatch after copy" | tee -a "$PFD/prep.log"; exit 97; }
           cp config.json "$PFWORK/config.json"
-          "$REH/enroll-prep.sh" /tmp/$PREFIX-stage/root "$PFD/prep" "$REH/evidence/c5-signing-cert.der" "$REH/evidence/C5-HOSTILE-FIXTURE.cer"             > "$PFD/prep.log" 2>&1             || { echo "E_PF_PREP rc=$?" | tee -a "$PFD/prep.log"; cat "$PFD/prep.log"; exit 97; }
+          "$REH/enroll-prep.sh" /tmp/$PREFIX-stage/root "$PREPP" "$REH/evidence/c5-signing-cert.der" "$REH/evidence/C5-HOSTILE-FIXTURE.cer" \
+            > "$PFD/prep.log" 2>&1 \
+            || { echo "E_PF_PREP rc=$?" | tee -a "$PFD/prep.log"; cat "$PFD/prep.log"; exit 97; }
           _rc=0
-          ( cd "$PFWORK" && sudo env PREFIX="$PREFIX" ALLOWED_PREFIX="$ALLOWED_PREFIX" PATH="$PATH" ENROLL_PLANTED_FAULT=freemark             "$REH/rehearsal-enroll.sh" config.json "$PFD/prep" "$PFD/vars.fd" "$PFD/evidence" )             > "$PFD/pf1.log" 2>&1 || _rc=$?
+          ( cd "$PFWORK" && sudo env PREFIX="$PREFIX" ALLOWED_PREFIX="$ALLOWED_PREFIX" PATH="$PATH" ENROLL_PLANTED_FAULT=freemark \
+            "$REH/rehearsal-enroll.sh" config.json "$PREPP" "$PFD/vars.fd" "$PFD/evidence" ) \
+            > "$PFD/pf1.log" 2>&1 || _rc=$?
           cat "$PFD/pf1.log"
+          grep -F "PLANTED FAULT ACTIVE: freemark" "$PFD/pf1.log" \
+            || { echo "E_PF_NOT_INJECTED no PLANTED FAULT ACTIVE line" | tee -a "$PFD/pf1.log"; exit 97; }
+          grep -F "planted fault injection confirmation:" "$PFD/pf1.log" \
+            || { echo "E_PF_NOT_INJECTED no before/after injection confirmation" | tee -a "$PFD/pf1.log"; exit 97; }
           # strictness (peer run-12): provable injection first, then exact exit + named gate
           # + diagnostic; every wrapper verdict lands IN the durable evidence log (tee -a).
-          grep -F "PLANTED FAULT ACTIVE: freemark" "$PFD/pf1.log"             || { echo "E_PF_NOT_INJECTED no PLANTED FAULT ACTIVE line" | tee -a "$PFD/pf1.log"; exit 97; }
-          grep -F "planted fault injection confirmation:" "$PFD/pf1.log"             || { echo "E_PF_NOT_INJECTED no before/after injection confirmation" | tee -a "$PFD/pf1.log"; exit 97; }
-          [ "$_rc" = "97" ]             || { echo "E_PF_GATE_NOT_FIRED expected exit 97, got $_rc" | tee -a "$PFD/pf1.log"; exit 97; }
-          ! grep -F "E_BASH_ERRTRAP" "$PFD/pf1.log"             || { echo "E_PF_TRAP_MASKED E_BASH_ERRTRAP present - the named gate must be the failure" | tee -a "$PFD/pf1.log"; exit 97; }
-          grep -F "E_ENROLL_FAT_INVALID" "$PFD/pf1.log"             || { echo "E_PF_GATE_WRONG_CODE" | tee -a "$PFD/pf1.log"; exit 97; }
-          grep -F "Contains a free cluster" "$PFD/pf1.log"             || { echo "E_PF_GATE_WRONG_DIAG" | tee -a "$PFD/pf1.log"; exit 97; }
+          [ "$_rc" = "97" ] \
+            || { echo "E_PF_GATE_NOT_FIRED expected exit 97, got $_rc" | tee -a "$PFD/pf1.log"; exit 97; }
+          ! grep -F "E_BASH_ERRTRAP" "$PFD/pf1.log" \
+            || { echo "E_PF_TRAP_MASKED E_BASH_ERRTRAP present - the named gate must be the failure" | tee -a "$PFD/pf1.log"; exit 97; }
+          grep -F "E_ENROLL_FAT_INVALID" "$PFD/pf1.log" \
+            || { echo "E_PF_GATE_WRONG_CODE" | tee -a "$PFD/pf1.log"; exit 97; }
+          grep -F "Contains a free cluster" "$PFD/pf1.log" \
+            || { echo "E_PF_GATE_WRONG_DIAG" | tee -a "$PFD/pf1.log"; exit 97; }
           echo "PF_1_MUST_SHOW_OK injected free-marked-dir image died pre-boot with E_ENROLL_FAT_INVALID exit 97" | tee -a "$PFD/pf1.log"
           grep -F "PF_1_MUST_SHOW_OK" "$PFD/pf1.log" || { echo "E_PF_LOG_VERDICT_MISSING"; exit 97; }
-      - name: NON_CERTIFYING_SCRATCH planted-fault PF-2 missingblob gate must-show (peer condition 4)
+      - name: NON_CERTIFYING_SCRATCH planted-fault PF-2 missingblob name-contract gate must-show (peer condition 4 + run-12 L2/L3)
         id: pf2
-        if: always() && steps.pf-prereq.outputs.ok == 'true'
+        if: "!cancelled() && steps.pf-prereq.outputs.ok == 'true'"
         run: |
           set -euo pipefail
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
@@ -368,30 +421,49 @@ jobs:
           mkdir -p /tmp/$PREFIX-out
           export PATH="/tmp/$PREFIX-stage/shims:$PATH"
           PFD=/tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-pf2-dir
+          PREPP=/tmp/$PREFIX-pfprep-2
+          # K1 (peer run-12 K4): PF prep (which contains the throwaway private keys) lives
+          # OUTSIDE the upload tree and is removed by this step's own EXIT trap. Absolute
+          # rule: no *.key under any EVIDENCE_UPLOAD_PATHS entry.
+          trap 'rm -rf "$PREPP"' EXIT
           PFWORK="$PFD/work"
           mkdir -p "$PFWORK/build-output/enroll-app" "$PFWORK/build-output/ovmf-debug"
           cp /tmp/$PREFIX-app-a/enroll-app.efi "$PFWORK/build-output/enroll-app/enroll-app.efi"
-          [ "$(sha256sum "$PFWORK/build-output/enroll-app/enroll-app.efi" | cut -d' ' -f1)" = "540b4fa3990f998cb803160482bd50e9670a47da3d534acc3ade91364a85f3ee" ]             || { echo "E_PF_SETUP enroll-app sha mismatch after copy" | tee -a "$PFD/prep.log"; exit 97; }
+          [ "$(sha256sum "$PFWORK/build-output/enroll-app/enroll-app.efi" | cut -d' ' -f1)" = "540b4fa3990f998cb803160482bd50e9670a47da3d534acc3ade91364a85f3ee" ] \
+            || { echo "E_PF_SETUP enroll-app sha mismatch after copy" | tee -a "$PFD/prep.log"; exit 97; }
           cp /tmp/$PREFIX-ovmf-a/OVMF_CODE.fd "$PFWORK/build-output/ovmf-debug/OVMF_CODE.fd"
-          [ "$(sha256sum "$PFWORK/build-output/ovmf-debug/OVMF_CODE.fd" | cut -d' ' -f1)" = "fc150336fce10eb5508fa440cdf7300622c8c3ac71f2fbe10a0731422b9cef24" ]             || { echo "E_PF_SETUP OVMF_CODE sha mismatch after copy" | tee -a "$PFD/prep.log"; exit 97; }
+          [ "$(sha256sum "$PFWORK/build-output/ovmf-debug/OVMF_CODE.fd" | cut -d' ' -f1)" = "fc150336fce10eb5508fa440cdf7300622c8c3ac71f2fbe10a0731422b9cef24" ] \
+            || { echo "E_PF_SETUP OVMF_CODE sha mismatch after copy" | tee -a "$PFD/prep.log"; exit 97; }
           cp config.json "$PFWORK/config.json"
-          "$REH/enroll-prep.sh" /tmp/$PREFIX-stage/root "$PFD/prep" "$REH/evidence/c5-signing-cert.der" "$REH/evidence/C5-HOSTILE-FIXTURE.cer"             > "$PFD/prep.log" 2>&1             || { echo "E_PF_PREP rc=$?" | tee -a "$PFD/prep.log"; cat "$PFD/prep.log"; exit 97; }
+          "$REH/enroll-prep.sh" /tmp/$PREFIX-stage/root "$PREPP" "$REH/evidence/c5-signing-cert.der" "$REH/evidence/C5-HOSTILE-FIXTURE.cer" \
+            > "$PFD/prep.log" 2>&1 \
+            || { echo "E_PF_PREP rc=$?" | tee -a "$PFD/prep.log"; cat "$PFD/prep.log"; exit 97; }
           _rc=0
-          ( cd "$PFWORK" && sudo env PREFIX="$PREFIX" ALLOWED_PREFIX="$ALLOWED_PREFIX" PATH="$PATH" ENROLL_PLANTED_FAULT=missingblob             "$REH/rehearsal-enroll.sh" config.json "$PFD/prep" "$PFD/vars.fd" "$PFD/evidence" )             > "$PFD/pf2.log" 2>&1 || _rc=$?
+          ( cd "$PFWORK" && sudo env PREFIX="$PREFIX" ALLOWED_PREFIX="$ALLOWED_PREFIX" PATH="$PATH" ENROLL_PLANTED_FAULT=missingblob \
+            "$REH/rehearsal-enroll.sh" config.json "$PREPP" "$PFD/vars.fd" "$PFD/evidence" ) \
+            > "$PFD/pf2.log" 2>&1 || _rc=$?
           cat "$PFD/pf2.log"
-          # strictness (peer run-12): provable injection first, then exact exit + named gate
-          # + diagnostic; every wrapper verdict lands IN the durable evidence log (tee -a).
-          grep -F "PLANTED FAULT ACTIVE: missingblob" "$PFD/pf2.log"             || { echo "E_PF_NOT_INJECTED no PLANTED FAULT ACTIVE line" | tee -a "$PFD/pf2.log"; exit 97; }
-          grep -F "planted fault injection confirmation:" "$PFD/pf2.log"             || { echo "E_PF_NOT_INJECTED no before/after injection confirmation" | tee -a "$PFD/pf2.log"; exit 97; }
-          [ "$_rc" = "97" ]             || { echo "E_PF_GATE_NOT_FIRED expected exit 97, got $_rc" | tee -a "$PFD/pf2.log"; exit 97; }
-          ! grep -F "E_BASH_ERRTRAP" "$PFD/pf2.log"             || { echo "E_PF_TRAP_MASKED E_BASH_ERRTRAP present - the named gate must be the failure" | tee -a "$PFD/pf2.log"; exit 97; }
-          grep -F "E_ENROLL_FAT_INVALID directory round-trip failed" "$PFD/pf2.log"             || { echo "E_PF_GATE_WRONG_CODE" | tee -a "$PFD/pf2.log"; exit 97; }
-          grep -F "round-trip FAIL" "$PFD/pf2.log"             || { echo "E_PF_GATE_WRONG_DIAG" | tee -a "$PFD/pf2.log"; exit 97; }
-          echo "PF_2_MUST_SHOW_OK injected fsck-silent missing-blob image died pre-boot with E_ENROLL_FAT_INVALID exit 97" | tee -a "$PFD/pf2.log"
+          grep -F "PLANTED FAULT ACTIVE: missingblob" "$PFD/pf2.log" \
+            || { echo "E_PF_NOT_INJECTED no PLANTED FAULT ACTIVE line" | tee -a "$PFD/pf2.log"; exit 97; }
+          grep -F "planted fault injection confirmation:" "$PFD/pf2.log" \
+            || { echo "E_PF_NOT_INJECTED no before/after injection confirmation" | tee -a "$PFD/pf2.log"; exit 97; }
+          # strictness (peer run-12): fsck-silent, then exact exit + the run-12 name-contract
+          # gate code + reader diagnostic; every verdict lands IN the durable evidence log.
+          grep -F "enroll-fat-fsck.log (fsck.vfat -n rc=0)" "$PFD/pf2.log" \
+            || { echo "E_PF_GATE_WRONG_DIAG fault was not fsck-silent" | tee -a "$PFD/pf2.log"; exit 97; }
+          [ "$_rc" = "97" ] \
+            || { echo "E_PF_GATE_NOT_FIRED expected exit 97, got $_rc" | tee -a "$PFD/pf2.log"; exit 97; }
+          ! grep -F "E_BASH_ERRTRAP" "$PFD/pf2.log" \
+            || { echo "E_PF_TRAP_MASKED E_BASH_ERRTRAP present - the named gate must be the failure" | tee -a "$PFD/pf2.log"; exit 97; }
+          grep -F "E_ENROLL_FAT_NAME_CONTRACT" "$PFD/pf2.log" \
+            || { echo "E_PF_GATE_WRONG_CODE" | tee -a "$PFD/pf2.log"; exit 97; }
+          grep -F "has no valid LFN entry" "$PFD/pf2.log" \
+            || { echo "E_PF_GATE_WRONG_DIAG" | tee -a "$PFD/pf2.log"; exit 97; }
+          echo "PF_2_MUST_SHOW_OK injected fsck-silent missing-blob image died pre-boot with E_ENROLL_FAT_NAME_CONTRACT exit 97" | tee -a "$PFD/pf2.log"
           grep -F "PF_2_MUST_SHOW_OK" "$PFD/pf2.log" || { echo "E_PF_LOG_VERDICT_MISSING"; exit 97; }
-      - name: NON_CERTIFYING_SCRATCH planted-fault PF-4 missing-needed-file named-97 must-show (peer run-11/run-12)
+      - name: NON_CERTIFYING_SCRATCH planted-fault PF-4 missing-needed-file named-97 must-show (peer run-11/run-12 C1/C2)
         id: pf4
-        if: always() && steps.pf-prereq.outputs.ok == 'true'
+        if: "!cancelled() && steps.pf-prereq.outputs.ok == 'true'"
         run: |
           set -euo pipefail
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
@@ -402,36 +474,118 @@ jobs:
           mkdir -p /tmp/$PREFIX-out
           export PATH="/tmp/$PREFIX-stage/shims:$PATH"
           PFD=/tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-pf4-dir
+          PREPP=/tmp/$PREFIX-pfprep-4
+          # K1 (peer run-12 K4): PF prep (which contains the throwaway private keys) lives
+          # OUTSIDE the upload tree and is removed by this step's own EXIT trap. Absolute
+          # rule: no *.key under any EVIDENCE_UPLOAD_PATHS entry.
+          trap 'rm -rf "$PREPP"' EXIT
           PFWORK="$PFD/work"
           mkdir -p "$PFWORK/build-output/enroll-app" "$PFWORK/build-output/ovmf-debug"
           cp /tmp/$PREFIX-app-a/enroll-app.efi "$PFWORK/build-output/enroll-app/enroll-app.efi"
-          [ "$(sha256sum "$PFWORK/build-output/enroll-app/enroll-app.efi" | cut -d' ' -f1)" = "540b4fa3990f998cb803160482bd50e9670a47da3d534acc3ade91364a85f3ee" ]             || { echo "E_PF_SETUP enroll-app sha mismatch after copy" | tee -a "$PFD/prep.log"; exit 97; }
+          [ "$(sha256sum "$PFWORK/build-output/enroll-app/enroll-app.efi" | cut -d' ' -f1)" = "540b4fa3990f998cb803160482bd50e9670a47da3d534acc3ade91364a85f3ee" ] \
+            || { echo "E_PF_SETUP enroll-app sha mismatch after copy" | tee -a "$PFD/prep.log"; exit 97; }
           cp /tmp/$PREFIX-ovmf-a/OVMF_CODE.fd "$PFWORK/build-output/ovmf-debug/OVMF_CODE.fd"
-          [ "$(sha256sum "$PFWORK/build-output/ovmf-debug/OVMF_CODE.fd" | cut -d' ' -f1)" = "fc150336fce10eb5508fa440cdf7300622c8c3ac71f2fbe10a0731422b9cef24" ]             || { echo "E_PF_SETUP OVMF_CODE sha mismatch after copy" | tee -a "$PFD/prep.log"; exit 97; }
+          [ "$(sha256sum "$PFWORK/build-output/ovmf-debug/OVMF_CODE.fd" | cut -d' ' -f1)" = "fc150336fce10eb5508fa440cdf7300622c8c3ac71f2fbe10a0731422b9cef24" ] \
+            || { echo "E_PF_SETUP OVMF_CODE sha mismatch after copy" | tee -a "$PFD/prep.log"; exit 97; }
           cp config.json "$PFWORK/config.json"
-          "$REH/enroll-prep.sh" /tmp/$PREFIX-stage/root "$PFD/prep" "$REH/evidence/c5-signing-cert.der" "$REH/evidence/C5-HOSTILE-FIXTURE.cer"             > "$PFD/prep.log" 2>&1             || { echo "E_PF_PREP rc=$?" | tee -a "$PFD/prep.log"; cat "$PFD/prep.log"; exit 97; }
+          "$REH/enroll-prep.sh" /tmp/$PREFIX-stage/root "$PREPP" "$REH/evidence/c5-signing-cert.der" "$REH/evidence/C5-HOSTILE-FIXTURE.cer" \
+            > "$PFD/prep.log" 2>&1 \
+            || { echo "E_PF_PREP rc=$?" | tee -a "$PFD/prep.log"; cat "$PFD/prep.log"; exit 97; }
           # PF-4 planted condition: remove the pristine OVMF_VARS needed file; restore
           # BEFORE asserting so a failed must-show can never strand the ceremony.
-          CANON_TMP=/tmp/NON_CERTIFYING_REHEARSAL-
+          CANON_TMP=/tmp/NON_CERTIFYING_SCRATCH-
           PRISTINE=$(python3 -c "import json;print(json.load(open('config.json'))['ovmf_vars_pristine'])")
           PRISTINE=${PRISTINE//$CANON_TMP//tmp/$PREFIX-}
           [ -f "$PRISTINE" ] || { echo "E_PF_SETUP pristine vars not at $PRISTINE"; exit 97; }
           sudo cp -a "$PRISTINE" "$PFD/pristine-vars.saved"
+          SAVED_SHA=$(sudo sha256sum "$PFD/pristine-vars.saved" | cut -d' ' -f1)
           sudo rm "$PRISTINE"
-          echo "PF-4 planted condition: removed $PRISTINE (saved sha256=$(sudo sha256sum "$PFD/pristine-vars.saved" | cut -d' ' -f1))" | tee -a "$PFD/prep.log"
+          echo "PF-4 planted condition: removed $PRISTINE (saved sha256=$SAVED_SHA)" | tee -a "$PFD/prep.log"
           _rc=0
-          ( cd "$PFWORK" && sudo env PREFIX="$PREFIX" ALLOWED_PREFIX="$ALLOWED_PREFIX" PATH="$PATH"             "$REH/rehearsal-enroll.sh" config.json "$PFD/prep" "$PFD/vars.fd" "$PFD/evidence" )             > "$PFD/pf4.log" 2>&1 || _rc=$?
+          ( cd "$PFWORK" && sudo env PREFIX="$PREFIX" ALLOWED_PREFIX="$ALLOWED_PREFIX" PATH="$PATH"  \
+            "$REH/rehearsal-enroll.sh" config.json "$PREPP" "$PFD/vars.fd" "$PFD/evidence" ) \
+            > "$PFD/pf4.log" 2>&1 || _rc=$?
           cat "$PFD/pf4.log"
+          # C1 (peer run-12): the planted-condition line must land IN the durable pf4.log
+          echo "PF-4 planted condition: removed $PRISTINE (saved sha256=$SAVED_SHA)" | tee -a "$PFD/pf4.log"
           sudo cp -a "$PFD/pristine-vars.saved" "$PRISTINE"
-          [ "$(sudo sha256sum "$PRISTINE" | cut -d' ' -f1)" = "$(sudo sha256sum "$PFD/pristine-vars.saved" | cut -d' ' -f1)" ]             || { echo "E_PF_RESTORE_DRIFT pristine vars not restored byte-identical" | tee -a "$PFD/pf4.log"; exit 97; }
-          # strictness (peer run-12): provable injection first, then exact exit + named gate
-          # + diagnostic; every wrapper verdict lands IN the durable evidence log (tee -a).
-          [ "$_rc" = "97" ]             || { echo "E_PF_GATE_NOT_FIRED expected exit 97, got $_rc" | tee -a "$PFD/pf4.log"; exit 97; }
-          grep -E "E_BASH_ERRTRAP|E_ENROLL_PID_MISSING" "$PFD/pf4.log"             || { echo "E_PF_NAMED97_WRONG_CODE failure was not NAMED (bare death)" | tee -a "$PFD/pf4.log"; exit 97; }
-          echo "PF_4_MUST_SHOW_OK missing needed file died with a NAMED code, exit 97" | tee -a "$PFD/pf4.log"
+          [ "$(sudo sha256sum "$PRISTINE" | cut -d' ' -f1)" = "$SAVED_SHA" ] \
+            || { echo "E_PF_RESTORE_DRIFT pristine vars not restored byte-identical" | tee -a "$PFD/pf4.log"; exit 97; }
+          # C2 (peer run-12): the restore is verified against the FROZEN pristine sha,
+          # not merely against the saved copy.
+          [ "$(sudo sha256sum "$PRISTINE" | cut -d' ' -f1)" = "5d2ac383371b408398accee7ec27c8c09ea5b74a0de0ceea6513388b15be5d1e" ] \
+            || { echo "E_PF_RESTORE_DRIFT restored vars != frozen pristine sha 5d2ac383..." | tee -a "$PFD/pf4.log"; exit 97; }
+          # C1 (peer run-12): PF-4's correct death is EXACTLY the ERR trap at the pristine-VARS
+          # cp line (rehearsal-enroll.sh line 474) carrying the cp command text; a missing
+          # needed file has no narrower named gate, and E_ENROLL_PID_MISSING must NOT appear.
+          [ "$_rc" = "97" ] \
+            || { echo "E_PF_GATE_NOT_FIRED expected exit 97, got $_rc" | tee -a "$PFD/pf4.log"; exit 97; }
+          grep -F "E_BASH_ERRTRAP rehearsal-enroll.sh line 474" "$PFD/pf4.log" \
+            || { echo "E_PF_NAMED97_WRONG_CODE expected E_BASH_ERRTRAP at line 474" | tee -a "$PFD/pf4.log"; exit 97; }
+          grep -F 'cmd: cp ' "$PFD/pf4.log" | grep -F 'vars.fd' > /dev/null \
+            || { echo "E_PF_NAMED97_WRONG_CMD trap did not name the pristine-VARS cp" | tee -a "$PFD/pf4.log"; exit 97; }
+          ! grep -F "E_ENROLL_PID_MISSING" "$PFD/pf4.log" \
+            || { echo "E_PF_NAMED97_STALE_CODE E_ENROLL_PID_MISSING must not appear" | tee -a "$PFD/pf4.log"; exit 97; }
+          grep -F "PF-4 planted condition:" "$PFD/pf4.log" \
+            || { echo "E_PF_NOT_INJECTED planted-condition line missing from pf4.log" | tee -a "$PFD/pf4.log"; exit 97; }
+          echo "PF_4_MUST_SHOW_OK missing needed file died with E_BASH_ERRTRAP at line 474, exit 97" | tee -a "$PFD/pf4.log"
           grep -F "PF_4_MUST_SHOW_OK" "$PFD/pf4.log" || { echo "E_PF_LOG_VERDICT_MISSING"; exit 97; }
+      - name: NON_CERTIFYING_SCRATCH planted-fault PF-5 nolfn name-contract gate must-show (peer run-12 L4)
+        id: pf5
+        if: "!cancelled() && steps.pf-prereq.outputs.ok == 'true'"
+        run: |
+          set -euo pipefail
+          cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+          REH="$PWD"
+          # peer run-12 shape (chosen option): NO PF-only knobs to the shared code/config.
+          # Each PF wrapper recreates the ceremony's SAME relative cwd layout in its own
+          # work dir and runs the UNCHANGED shared code against the committed config bytes.
+          mkdir -p /tmp/$PREFIX-out
+          export PATH="/tmp/$PREFIX-stage/shims:$PATH"
+          PFD=/tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-pf5-dir
+          PREPP=/tmp/$PREFIX-pfprep-5
+          # K1 (peer run-12 K4): PF prep (which contains the throwaway private keys) lives
+          # OUTSIDE the upload tree and is removed by this step's own EXIT trap. Absolute
+          # rule: no *.key under any EVIDENCE_UPLOAD_PATHS entry.
+          trap 'rm -rf "$PREPP"' EXIT
+          PFWORK="$PFD/work"
+          mkdir -p "$PFWORK/build-output/enroll-app" "$PFWORK/build-output/ovmf-debug"
+          cp /tmp/$PREFIX-app-a/enroll-app.efi "$PFWORK/build-output/enroll-app/enroll-app.efi"
+          [ "$(sha256sum "$PFWORK/build-output/enroll-app/enroll-app.efi" | cut -d' ' -f1)" = "540b4fa3990f998cb803160482bd50e9670a47da3d534acc3ade91364a85f3ee" ] \
+            || { echo "E_PF_SETUP enroll-app sha mismatch after copy" | tee -a "$PFD/prep.log"; exit 97; }
+          cp /tmp/$PREFIX-ovmf-a/OVMF_CODE.fd "$PFWORK/build-output/ovmf-debug/OVMF_CODE.fd"
+          [ "$(sha256sum "$PFWORK/build-output/ovmf-debug/OVMF_CODE.fd" | cut -d' ' -f1)" = "fc150336fce10eb5508fa440cdf7300622c8c3ac71f2fbe10a0731422b9cef24" ] \
+            || { echo "E_PF_SETUP OVMF_CODE sha mismatch after copy" | tee -a "$PFD/prep.log"; exit 97; }
+          cp config.json "$PFWORK/config.json"
+          "$REH/enroll-prep.sh" /tmp/$PREFIX-stage/root "$PREPP" "$REH/evidence/c5-signing-cert.der" "$REH/evidence/C5-HOSTILE-FIXTURE.cer" \
+            > "$PFD/prep.log" 2>&1 \
+            || { echo "E_PF_PREP rc=$?" | tee -a "$PFD/prep.log"; cat "$PFD/prep.log"; exit 97; }
+          _rc=0
+          ( cd "$PFWORK" && sudo env PREFIX="$PREFIX" ALLOWED_PREFIX="$ALLOWED_PREFIX" PATH="$PATH" ENROLL_PLANTED_FAULT=nolfn \
+            "$REH/rehearsal-enroll.sh" config.json "$PREPP" "$PFD/vars.fd" "$PFD/evidence" ) \
+            > "$PFD/pf5.log" 2>&1 || _rc=$?
+          cat "$PFD/pf5.log"
+          grep -F "PLANTED FAULT ACTIVE: nolfn" "$PFD/pf5.log" \
+            || { echo "E_PF_NOT_INJECTED no PLANTED FAULT ACTIVE line" | tee -a "$PFD/pf5.log"; exit 97; }
+          grep -F "planted fault injection confirmation:" "$PFD/pf5.log" \
+            || { echo "E_PF_NOT_INJECTED no before/after injection confirmation" | tee -a "$PFD/pf5.log"; exit 97; }
+          # L4 must-show: the run-12 8.3-only layout is fsck-SILENT and must die pre-boot on
+          # the name-contract reader with E_ENROLL_FAT_NAME_CONTRACT, never at boot.
+          grep -F "enroll-fat-fsck.log (fsck.vfat -n rc=0)" "$PFD/pf5.log" \
+            || { echo "E_PF_GATE_WRONG_DIAG fault was not fsck-silent" | tee -a "$PFD/pf5.log"; exit 97; }
+          [ "$_rc" = "97" ] \
+            || { echo "E_PF_GATE_NOT_FIRED expected exit 97, got $_rc" | tee -a "$PFD/pf5.log"; exit 97; }
+          ! grep -F "E_BASH_ERRTRAP" "$PFD/pf5.log" \
+            || { echo "E_PF_TRAP_MASKED E_BASH_ERRTRAP present - the named gate must be the failure" | tee -a "$PFD/pf5.log"; exit 97; }
+          grep -F "E_ENROLL_FAT_NAME_CONTRACT" "$PFD/pf5.log" \
+            || { echo "E_PF_GATE_WRONG_CODE" | tee -a "$PFD/pf5.log"; exit 97; }
+          grep -F "has no valid LFN entry" "$PFD/pf5.log" \
+            || { echo "E_PF_GATE_WRONG_DIAG" | tee -a "$PFD/pf5.log"; exit 97; }
+          echo "PF_5_MUST_SHOW_OK injected fsck-silent 8.3-only image died pre-boot with E_ENROLL_FAT_NAME_CONTRACT exit 97" | tee -a "$PFD/pf5.log"
+          grep -F "PF_5_MUST_SHOW_OK" "$PFD/pf5.log" || { echo "E_PF_LOG_VERDICT_MISSING"; exit 97; }
       - name: NON_CERTIFYING_SCRATCH ceremony (network-enforced-off, tee'd log)
-        if: always() && steps.pf-prereq.outputs.ok == 'true' && steps.pf1.outcome == 'success' && steps.pf2.outcome == 'success' && steps.pf4.outcome == 'success'
+        if: "!cancelled() && steps.pf-prereq.outputs.ok == 'true' && steps.pf1.outcome == 'success' && steps.pf2.outcome == 'success' && steps.pf4.outcome == 'success' && steps.pf5.outcome == 'success'"
+        id: ceremony
         timeout-minutes: 120
         run: |
           set -euo pipefail
@@ -492,14 +646,32 @@ jobs:
           sudo chown "$(id -u):$(id -g)" /tmp/$PREFIX-out/$PREFIX-evidence-manifest.txt
           echo "ARTIFACT-DIGEST paths=EVIDENCE_UPLOAD_PATHS(shared-list) manifest=$PREFIX-evidence-manifest.txt manifest_sha256=$(sha256sum /tmp/$PREFIX-out/$PREFIX-evidence-manifest.txt | cut -d' ' -f1) files=$(grep -c . /tmp/$PREFIX-out/$PREFIX-evidence-manifest.txt) run_id=$GITHUB_RUN_ID run_attempt=$GITHUB_RUN_ATTEMPT run_number=$GITHUB_RUN_NUMBER workflow=$GITHUB_WORKFLOW commit=$GITHUB_SHA ref=$GITHUB_REF"
       - name: NON_CERTIFYING_SCRATCH ceremony interpreter cross-check (addendum2 condition 2b)
+        id: xcheck
         run: |
           set -euo pipefail
           grep '^host-python ' /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-host-inputs.txt > /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-expected-ceremony-python.txt
           diff /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-expected-ceremony-python.txt /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-ceremony-python.txt || { echo "E_CEREMONY_PYTHON_DRIFT"; exit 51; }
           echo "ceremony interpreter identical to the job record"
-      - name: NON_CERTIFYING_SCRATCH forbidden-marker guard
+      - name: NON_CERTIFYING_SCRATCH cross-check strictness (peer run-12 C4-addendum)
+        if: success()
+        env:
+          CEREMONY_OUTCOME: ${{ steps.ceremony.outcome }}
+          XCHECK_OUTCOME: ${{ steps.xcheck.outcome }}
         run: |
           set -euo pipefail
+          # a green ceremony MUST have been followed by a completed interpreter cross-check
+          if [ "$CEREMONY_OUTCOME" = "success" ] && [ "$XCHECK_OUTCOME" != "success" ]; then
+            echo "E_XCHECK_SKIPPED green ceremony without a completed interpreter cross-check"; exit 97
+          fi
+          echo "cross-check strictness: ceremony=$CEREMONY_OUTCOME xcheck=$XCHECK_OUTCOME"
+      - name: NON_CERTIFYING_SCRATCH forbidden-marker guard
+        if: '!cancelled()'
+        run: |
+          set -euo pipefail
+          # C4 stand-down: a run cancelled before staging has no evidence tree to scan
+          if [ ! -d /tmp/$PREFIX-out ]; then
+            echo "marker guard stand-down: evidence tree absent (cancelled before staging)"; exit 0
+          fi
           # fail-closed form: explicit if, fixed-string binary-inclusive scan (-a -F) of the
           # ENTIRE evidence tree (which includes the tee'd ceremony log), then a top-level
           # prefix guard so no un-prefixed path can sit next to the prefixed evidence.
@@ -516,8 +688,44 @@ jobs:
           if [ -n "$(find /tmp/$PREFIX-out -mindepth 1 -maxdepth 1 ! -name 'NON_CERTIFYING_SCRATCH*' -print -quit)" ]; then
             echo "E_UNPREFIXED_TOPLEVEL_EVIDENCE"; exit 94
           fi
+      - name: zero-private-key evidence gate K2 before evidence upload (peer run-12 K4)
+        id: k2gate-evidence
+        if: '!cancelled()'
+        env:
+          SCAN_PATHS: ${{ env.EVIDENCE_UPLOAD_PATHS }}
+        run: |
+          set -euo pipefail
+          # K2 (peer run-12 K4 containment): fail closed if any private-key material stands
+          # under ANY evidence upload path - by NAME (*.key/*.pem/*.p12/*.pfx) or CONTENT
+          # (PEM "PRIVATE KEY" markers, PKCS#8/RSA DER key headers). Upload only if this passed.
+          printf '%s\n' "$SCAN_PATHS" > /tmp/$PREFIX-k2-paths.txt
+          python3 - /tmp/$PREFIX-k2-paths.txt <<'PYK'
+          import sys, os, re
+          paths = [l.strip() for l in open(sys.argv[1]) if l.strip()]
+          namehit, conthit = [], []
+          pem = b"PRIVATE KEY"
+          der_rsa = re.compile(rb"\x30\x82..\x02\x01\x00\x02\x82", re.S)
+          der_p8 = re.compile(rb"\x30\x82..\x02\x01\x00\x30", re.S)
+          def scan_file(p):
+              if re.search(r"\.(key|pem|p12|pfx)$", os.path.basename(p), re.I):
+                  namehit.append(p); return
+              b = open(p, "rb").read()
+              if pem in b or der_rsa.search(b) or der_p8.search(b):
+                  conthit.append(p)
+          for p in paths:
+              if os.path.isfile(p):
+                  scan_file(p)
+              elif os.path.isdir(p):
+                  for base, _d, files in os.walk(p):
+                      for fn in files:
+                          scan_file(os.path.join(base, fn))
+          if namehit or conthit:
+              print("E_PRIVATE_KEY_IN_EVIDENCE names=%r content=%r" % (namehit[:3], conthit[:3]))
+              sys.exit(94)
+          print("zero-private-key gate: clean across %d upload paths" % len(paths))
+          PYK
       - name: NON_CERTIFYING_SCRATCH evidence upload (ephemeral CI artifact only)
-        if: always()
+        if: always() && steps.k2gate-evidence.outcome == 'success'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
         with:
           name: NON_CERTIFYING_SCRATCH-evidence
@@ -713,8 +921,44 @@ jobs:
           sudo mv "$man" /tmp/$PREFIX-env2-evidence/$PREFIX-env2-evidence-manifest.txt
           sudo chown "$(id -u):$(id -g)" /tmp/$PREFIX-env2-evidence/$PREFIX-env2-evidence-manifest.txt
           echo "ARTIFACT-DIGEST paths=ENV2_EVIDENCE_UPLOAD_PATHS(shared-list) manifest=$PREFIX-env2-evidence-manifest.txt manifest_sha256=$(sha256sum /tmp/$PREFIX-env2-evidence/$PREFIX-env2-evidence-manifest.txt | cut -d' ' -f1) files=$(grep -c . /tmp/$PREFIX-env2-evidence/$PREFIX-env2-evidence-manifest.txt) run_id=$GITHUB_RUN_ID run_attempt=$GITHUB_RUN_ATTEMPT run_number=$GITHUB_RUN_NUMBER workflow=$GITHUB_WORKFLOW commit=$GITHUB_SHA ref=$GITHUB_REF"
+      - name: zero-private-key evidence gate K2 before env2 evidence upload (peer run-12 K4)
+        id: k2gate-env2
+        if: '!cancelled()'
+        env:
+          SCAN_PATHS: ${{ env.ENV2_EVIDENCE_UPLOAD_PATHS }}
+        run: |
+          set -euo pipefail
+          # K2 (peer run-12 K4 containment): fail closed if any private-key material stands
+          # under ANY evidence upload path - by NAME (*.key/*.pem/*.p12/*.pfx) or CONTENT
+          # (PEM "PRIVATE KEY" markers, PKCS#8/RSA DER key headers). Upload only if this passed.
+          printf '%s\n' "$SCAN_PATHS" > /tmp/$PREFIX-k2-paths.txt
+          python3 - /tmp/$PREFIX-k2-paths.txt <<'PYK'
+          import sys, os, re
+          paths = [l.strip() for l in open(sys.argv[1]) if l.strip()]
+          namehit, conthit = [], []
+          pem = b"PRIVATE KEY"
+          der_rsa = re.compile(rb"\x30\x82..\x02\x01\x00\x02\x82", re.S)
+          der_p8 = re.compile(rb"\x30\x82..\x02\x01\x00\x30", re.S)
+          def scan_file(p):
+              if re.search(r"\.(key|pem|p12|pfx)$", os.path.basename(p), re.I):
+                  namehit.append(p); return
+              b = open(p, "rb").read()
+              if pem in b or der_rsa.search(b) or der_p8.search(b):
+                  conthit.append(p)
+          for p in paths:
+              if os.path.isfile(p):
+                  scan_file(p)
+              elif os.path.isdir(p):
+                  for base, _d, files in os.walk(p):
+                      for fn in files:
+                          scan_file(os.path.join(base, fn))
+          if namehit or conthit:
+              print("E_PRIVATE_KEY_IN_EVIDENCE names=%r content=%r" % (namehit[:3], conthit[:3]))
+              sys.exit(94)
+          print("zero-private-key gate: clean across %d upload paths" % len(paths))
+          PYK
       - name: NON_CERTIFYING_SCRATCH env2 evidence upload (ephemeral CI artifact only)
-        if: always()
+        if: always() && steps.k2gate-env2.outcome == 'success'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
         with:
           name: NON_CERTIFYING_SCRATCH-env2-evidence

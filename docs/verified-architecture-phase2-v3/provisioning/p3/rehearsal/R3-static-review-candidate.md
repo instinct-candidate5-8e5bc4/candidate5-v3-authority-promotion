@@ -934,3 +934,109 @@ the chain before #10. The #10 commit d1a097f3636cbbb7be35d3a5f7b7202a843af71d ca
 "candidate5-provisioning <candidate5-provisioning@localhost>" (a local -c override,
 cosmetic only, disclosed to the peer); it stays - the scratch lane is FF-only and history
 is never rewritten. Future commits use the pinned identity (repo-local git config set).
+
+Run-12 review (2026-09-24; run 35942759117, head at the #12 scratch commit) - root cause,
+rulings and the #13 correction batch:
+
+RUN-12 ROOT CAUSE (verified from the durable evidence zip, zip sha256
+3929105532ee6108e39c3922e0623c73fade318c44fe3de6a38f9deb75e6e88f, 6,581,581 B):
+the image writer stored the auth blobs as bare 8.3 directory entries (DB.AUT/KEK.AUT/
+PK.AUT) with no LFN entries; the pinned enroll app opens L"db.auth" on the volume root,
+which does not resolve against an LFN-less 8.3 alias DB~1-style entry set - the app wrote
+FATAL=READ_DB_AUTH and never produced SET_* statuses. The predicate then failed on the
+missing statuses (first surfaced error E_ENROLL_SET_DB), its exit 92 was masked by the
+tee'd pipeline, and the run died as E_BASH_ERRTRAP (run-ceremony.sh) - a masking chain,
+not a gate failure. Amplifier: the "independent" reader hardcoded the same truncated 8.3
+name contract as the writer, a common-mode blind spot.
+
+PEER RUN-12 RULINGS L1-L7 (adopted via main 2026-09-24 04:53):
+L1. The on-volume name contract is taken from the CONSUMER: the reader extracts the
+    UTF-16LE L"db.auth"/L"kek.auth"/L"pk.auth" literals from the pinned app binary
+    (sha256 540b4fa3990f998cb803160482bd50e9670a47da3d534acc3ade91364a85f3ee, pinned
+    in the reader), fails closed on missing or extra .auth literals, and cross-checks
+    against enroll-app.c lines 61-63. The contract is never hand-typed in the reader.
+L2. No db2.auth on the volume: in db2 mode the file NAMED db.auth holds db2 source
+    bytes; the reader verifies content sha per mode from the SOURCE files.
+L3. LFN correctness is checked by the reader: LFN entries immediately before the 8.3
+    alias in reverse sequence (last flagged 0x40), attr 0x0F, type 0, first-cluster 0,
+    one shared checksum over the 11-byte alias (derived independently from the writer),
+    UCS-2 name, NUL-terminated, 0xFFFF-padded, reassembled name == the L1 contract
+    string exactly; aliases unique per volume (dot entries skipped), well-formed 8.3,
+    and following the named generation rule (BASE~1.EXT, e.g. DB~1.AUT); resolution is
+    case-insensitive long-name-first then 8.3 alias (UEFI open order); fsck stays rc=0.
+L4. New scratch-only PF-5 "nolfn" (the run-12 8.3-only layout, fsck-silent) must die
+    pre-boot on the reader with E_ENROLL_FAT_NAME_CONTRACT - implemented in the scratch
+    workflow with the full must-show shape (provable injection, fsck rc=0 proof, exact
+    exit 97, no E_BASH_ERRTRAP, named code, reader diagnostic, tee'd verdict).
+L5. An app FATAL= line is the predicate's FIRST error: E_ENROLL_APP_FATAL <value>
+    ahead of the missing-status list (local test: FATAL=READ_DB_AUTH input yields
+    E_ENROLL_APP_FATAL first, exit 92).
+L6. Predicate failure exits with its OWN named code: the wrapper captures the
+    predicate's exit code unconditionally (PIPESTATUS, not the tee'd pipeline rc) and
+    exits E_ENROLL_PREDICATE_FAIL (rc 92) or E_ENROLL_PREDICATE_RC (any other rc),
+    exit 97; run-ceremony passes a named exit code up unchanged and reserves
+    E_BASH_ERRTRAP for signal/trap deaths (rc >= 128) only.
+L7. Writer, reader, predicate and config all changed in #13, so EVERY PF (1, 2, 4, 5)
+    re-runs on the #13 head with C1-C4, the C4-addendum and the C5-binding in. OPEN
+    after #13: sole + widened + sole-fresh guest passes with predicate PASS, the marker
+    guard actually running, db2 mode, and env2.
+
+PEER RUN-12 CORRECTIONS C1-C5 (adopted via main 2026-09-24 04:21-04:28):
+C1. PF-4 must-show demands EXACTLY E_BASH_ERRTRAP at the pristine-VARS cp line
+    (rehearsal-enroll.sh line 474 at the #13 head) carrying the cp command text;
+    E_ENROLL_PID_MISSING must not appear; the planted-condition line is tee'd into the
+    durable pf4.log and required by grep. Local gate simulation: positive shape passes;
+    wrong line number and stale-code shapes rejected.
+C2. After the PF-4 restore, the pristine VARS is verified against the FROZEN sha
+    5d2ac383371b408398accee7ec27c8c09ea5b74a0de0ceea6513388b15be5d1e, not merely the
+    saved copy.
+C3. PF steps and the scratch ceremony step run under "!cancelled() && ..." instead of
+    always(); cancelled runs skip the planted-fault gates.
+C4. The forbidden-marker guard runs under !cancelled() with an absent-tree stand-down.
+C4-addendum: a green run must have RUN the interpreter cross-check - new
+    E_XCHECK_SKIPPED strictness step (id ceremony + id xcheck wired; env-mapped
+    outcomes, no ${{ }} in run bodies); preflight 6e6 rehearsal pin 77->78 (one new
+    literal, the step name); cert holds 44.
+C5-binding (freeze-packet requirement, recorded here for the freeze order): the freeze
+    packet FREEZE-MANIFEST gains a SHARED-FILE-BLOB-SHAS table - the git blob sha of
+    rehearsal-enroll.sh, run-ceremony.sh, enroll-prep.sh, enroll-predicate-check.py,
+    parse-ovmf-vars.py, config.json, evidence/c5-signing-cert.der and
+    evidence/C5-HOSTILE-FIXTURE.cer at the PF-evidence head vs the frozen HEAD; any
+    DIFFERS means the PFs re-run before rehearsal-3.
+
+PEER RUN-12 K RULINGS (K4 containment executed 2026-09-24, adopted via main):
+K1. PF prep moved OUTSIDE the evidence upload tree to /tmp/$PREFIX-pfprep-<n>, removed
+    by the step's own EXIT trap. Absolute rule: no *.key under any
+    EVIDENCE_UPLOAD_PATHS entry.
+K2. New fail-closed zero-private-key gate (if: !cancelled()) immediately before EVERY
+    evidence upload (scratch, rehearsal, certification, env2, cert marker): any
+    *.key/*.pem/*.p12/*.pfx NAME or PEM "PRIVATE KEY" / PKCS#8 / RSA DER key content
+    fails E_PRIVATE_KEY_IN_EVIDENCE exit 94; uploads run only when their gate passed
+    (upload if: amended to require the gate outcome). Local negative tests: key-name
+    tree -> 94, PEM-content tree -> 94, clean tree -> 0.
+K3. Public material stays (*.crt/*.cer/*.esl/*.auth).
+K4. Containment record - private throwaway keys were present in two scratch evidence
+    artifacts and were DELETED via the repo owner's session, each deletion verified by
+    the anonymous public API; digests preserved here as the historical trail:
+    - run 35942759117 (#12): artifact NON_CERTIFYING_SCRATCH-evidence id 10785089772,
+      6,581,581 B, zip sha256 3929105532ee6108e39c3922e0623c73fade318c44fe3de6a38f9deb75e6e88f;
+      six key entries (pf1/pf2/pf4 prep kek.key+pk.key, PEM markers confirmed). DELETED.
+    - run 35941253435 (#11): artifact id 10784703075, 124,425 B, zip sha256
+      937fe7c87a9a4957ab1f399a2759521a3e51df2705ce1fbc8bf78fbca51e5ef7; two key entries
+      (pf1-freemark prep kek.key+pk.key). DELETED.
+    - run 35939070738 (#10): artifact id 10784597652, 158,160 B, zip sha256
+      a63235e2abf75ff2c5194e64562416b98c5d7bc20b48ba5f188dc87daaa391f5; CLEAN (kept).
+    - rehearsal-1 (run 35812361943): no live artifacts; the rehearsal lane carries no PF
+      steps and its ceremony prep sat outside the upload tree - nothing to delete.
+    Extension sweep (main 2026-09-24): all 8 other live scratch evidence artifacts
+    scanned by download + full-byte PEM/DER sweep - ALL CLEAN, including #9 (artifact
+    10783298343, run 35936156106, sha256 634719d2986e09ecd96f3ac06179fb7cd86fa0536bfa1bac3b13eb9c48211015;
+    its ceremony kept prep outside the upload tree) and seven preflight-era artifacts
+    (10781463985, 10780911049, 10779913586, 10779126442, 10778661746, 10777776130,
+    10775949767; sha256s in the K4 report). The 33 pre-project artifacts
+    (v3-foundation/closure-review/authority-routing-gate/github-pages) were swept the
+    same way on main's order (2026-09-24): ALL 33 CLEAN - 16,679 nested tar members
+    decompressed and swept alongside the zip entries; per-artifact digests in the K4
+    extension report. No VARS from the affected
+    runs is reused anywhere; the keys were one-day throwaway, no rotation required.
+K5. This record + the conformance audit's K1/K2 check (this section).

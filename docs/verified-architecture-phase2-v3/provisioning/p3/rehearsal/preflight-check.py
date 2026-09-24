@@ -259,9 +259,10 @@ if set(_fz2.keys())!=EXPECTED_KEYS|{"smoke_namespace"}:
 # workflow that adds/removes a literal NON_CERTIFYING_REHEARSAL occurrence fails closed here.
 import subprocess as _sp
 # counts updated for batch1-r3 #10 (peer N8/N9/N1b gates): cert 42->44 (N8 log path x2),
-# rehearsal 74->77 (N8 log path x2 + env2-manifest step-name literal).
+# rehearsal 74->77 (N8 log path x2 + env2-manifest step-name literal); rehearsal 77->78
+# (peer run-12 C4-addendum E_XCHECK_SKIPPED strictness step name, one literal).
 for _wf,_want in (("../../../../../.github/workflows/OVMF_CI_SECURE_BOOT_UKI-CERTIFICATION-workflow.yml",44),
-                  ("../../../../../.github/workflows/NON_CERTIFYING_REHEARSAL-workflow.yml",77)):
+                  ("../../../../../.github/workflows/NON_CERTIFYING_REHEARSAL-workflow.yml",78)):
     _n=len(_sp.run(["grep","-o","NON_CERTIFYING_REHEARSAL",os.path.join(here,_wf)],
                    capture_output=True,text=True,check=True).stdout.splitlines())
     if _n!=_want:

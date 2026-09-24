@@ -132,10 +132,21 @@ trap '_repair_out; rm -rf prep' EXIT
 for mode in sole widened sole-fresh; do
   d="$OUT/$PREFIX-enroll-$mode"
   mkdir -p "$d"
+  # L6 (peer run-12 ruling): the wrapper's NAMED exit code passes up unchanged;
+  # E_BASH_ERRTRAP is reserved for signal/trap deaths (rc>=128), never for a
+  # named gate failure (run-12: E_ENROLL_* rc 97 surfaced as E_BASH_ERRTRAP).
+  _enroll_rc=0
   if [ "$mode" = widened ]; then
-    ./rehearsal-enroll.sh "$CONFIG" prep "$d/vars-enrolled.fd" "$d/evidence" db2
+    ./rehearsal-enroll.sh "$CONFIG" prep "$d/vars-enrolled.fd" "$d/evidence" db2 || _enroll_rc=$?
   else
-    ./rehearsal-enroll.sh "$CONFIG" prep "$d/vars-enrolled.fd" "$d/evidence"
+    ./rehearsal-enroll.sh "$CONFIG" prep "$d/vars-enrolled.fd" "$d/evidence" || _enroll_rc=$?
+  fi
+  if [ "$_enroll_rc" != 0 ]; then
+    if [ "$_enroll_rc" -ge 128 ]; then
+      echo "E_BASH_ERRTRAP enrollment mode=$mode died on signal/trap rc=$_enroll_rc"; exit 97
+    fi
+    echo "enrollment mode=$mode failed rc=$_enroll_rc (named gate code in its log above) - passing the failure up unchanged"
+    exit "$_enroll_rc"
   fi
 done
 # the throwaway PK/KEK private keys never leave the runner and are plain-deleted the moment

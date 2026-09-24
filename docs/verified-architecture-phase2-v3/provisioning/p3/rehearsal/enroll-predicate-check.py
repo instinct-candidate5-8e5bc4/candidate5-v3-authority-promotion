@@ -62,6 +62,10 @@ for line in _text.splitlines():
     if "=" in line:
         k, v = line.split("=", 1)
         rec[k] = v
+# L5 (peer run-12 ruling): an app FATAL= line is the predicate's FIRST error,
+# ahead of the missing-status list - it names why the app never produced statuses.
+if "FATAL" in rec:
+    E.insert(0, ("E_ENROLL_APP_FATAL", rec["FATAL"]))
 def exp(key, want, code):
     got = rec.get(key)
     if got != want:

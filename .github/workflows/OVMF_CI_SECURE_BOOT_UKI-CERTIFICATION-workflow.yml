@@ -244,6 +244,42 @@ jobs:
           # env2 cross-runner comparison, and log the artifact digest tied to this run.
           sha256sum /tmp/$PREFIX-esp-a/c5-root-admitter-uki-v3-esp.raw >> /tmp/$PREFIX-fw-hashes.txt
           echo "ARTIFACT-DIGEST path=/tmp/$PREFIX-fw-hashes.txt sha256=$(sha256sum /tmp/$PREFIX-fw-hashes.txt | cut -d' ' -f1) run_id=$GITHUB_RUN_ID run_attempt=$GITHUB_RUN_ATTEMPT run_number=$GITHUB_RUN_NUMBER workflow=$GITHUB_WORKFLOW commit=$GITHUB_SHA ref=$GITHUB_REF"
+      - name: zero-private-key evidence gate K2 before firmware-hash upload (peer run-12 K4)
+        id: k2gate-fw
+        if: '!cancelled()'
+        env:
+          SCAN_PATHS: ${{ env.EVIDENCE_UPLOAD_PATHS }}
+        run: |
+          set -euo pipefail
+          # K2 (peer run-12 K4 containment): fail closed if any private-key material stands
+          # under ANY evidence upload path - by NAME (*.key/*.pem/*.p12/*.pfx) or CONTENT
+          # (PEM "PRIVATE KEY" markers, PKCS#8/RSA DER key headers). Upload only if this passed.
+          printf '%s\n' "$SCAN_PATHS" > /tmp/$PREFIX-k2-paths.txt
+          python3 - /tmp/$PREFIX-k2-paths.txt <<'PYK'
+          import sys, os, re
+          paths = [l.strip() for l in open(sys.argv[1]) if l.strip()]
+          namehit, conthit = [], []
+          pem = b"PRIVATE KEY"
+          der_rsa = re.compile(rb"\x30\x82..\x02\x01\x00\x02\x82", re.S)
+          der_p8 = re.compile(rb"\x30\x82..\x02\x01\x00\x30", re.S)
+          def scan_file(p):
+              if re.search(r"\.(key|pem|p12|pfx)$", os.path.basename(p), re.I):
+                  namehit.append(p); return
+              b = open(p, "rb").read()
+              if pem in b or der_rsa.search(b) or der_p8.search(b):
+                  conthit.append(p)
+          for p in paths:
+              if os.path.isfile(p):
+                  scan_file(p)
+              elif os.path.isdir(p):
+                  for base, _d, files in os.walk(p):
+                      for fn in files:
+                          scan_file(os.path.join(base, fn))
+          if namehit or conthit:
+              print("E_PRIVATE_KEY_IN_EVIDENCE names=%r content=%r" % (namehit[:3], conthit[:3]))
+              sys.exit(94)
+          print("zero-private-key gate: clean across %d upload paths" % len(paths))
+          PYK
       - name: OVMF_CI_SECURE_BOOT_UKI firmware hash upload (env2 comparison input)
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
         with:
@@ -403,8 +439,44 @@ jobs:
           if [ -n "$(find /tmp/$PREFIX-out -mindepth 1 -maxdepth 1 ! -name 'NON_CERTIFYING_REHEARSAL*' -print -quit)" ]; then
             echo "E_UNPREFIXED_TOPLEVEL_EVIDENCE"; exit 94
           fi
+      - name: zero-private-key evidence gate K2 before evidence upload (peer run-12 K4)
+        id: k2gate-evidence
+        if: '!cancelled()'
+        env:
+          SCAN_PATHS: ${{ env.EVIDENCE_UPLOAD_PATHS }}
+        run: |
+          set -euo pipefail
+          # K2 (peer run-12 K4 containment): fail closed if any private-key material stands
+          # under ANY evidence upload path - by NAME (*.key/*.pem/*.p12/*.pfx) or CONTENT
+          # (PEM "PRIVATE KEY" markers, PKCS#8/RSA DER key headers). Upload only if this passed.
+          printf '%s\n' "$SCAN_PATHS" > /tmp/$PREFIX-k2-paths.txt
+          python3 - /tmp/$PREFIX-k2-paths.txt <<'PYK'
+          import sys, os, re
+          paths = [l.strip() for l in open(sys.argv[1]) if l.strip()]
+          namehit, conthit = [], []
+          pem = b"PRIVATE KEY"
+          der_rsa = re.compile(rb"\x30\x82..\x02\x01\x00\x02\x82", re.S)
+          der_p8 = re.compile(rb"\x30\x82..\x02\x01\x00\x30", re.S)
+          def scan_file(p):
+              if re.search(r"\.(key|pem|p12|pfx)$", os.path.basename(p), re.I):
+                  namehit.append(p); return
+              b = open(p, "rb").read()
+              if pem in b or der_rsa.search(b) or der_p8.search(b):
+                  conthit.append(p)
+          for p in paths:
+              if os.path.isfile(p):
+                  scan_file(p)
+              elif os.path.isdir(p):
+                  for base, _d, files in os.walk(p):
+                      for fn in files:
+                          scan_file(os.path.join(base, fn))
+          if namehit or conthit:
+              print("E_PRIVATE_KEY_IN_EVIDENCE names=%r content=%r" % (namehit[:3], conthit[:3]))
+              sys.exit(94)
+          print("zero-private-key gate: clean across %d upload paths" % len(paths))
+          PYK
       - name: OVMF_CI_SECURE_BOOT_UKI evidence upload (ephemeral CI artifact only)
-        if: always()
+        if: always() && steps.k2gate-evidence.outcome == 'success'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
         with:
           name: OVMF_CI_SECURE_BOOT_UKI-evidence
@@ -599,8 +671,44 @@ jobs:
           sudo mv "$man" /tmp/$PREFIX-env2-evidence/$PREFIX-env2-evidence-manifest.txt
           sudo chown "$(id -u):$(id -g)" /tmp/$PREFIX-env2-evidence/$PREFIX-env2-evidence-manifest.txt
           echo "ARTIFACT-DIGEST paths=ENV2_EVIDENCE_UPLOAD_PATHS(shared-list) manifest=$PREFIX-env2-evidence-manifest.txt manifest_sha256=$(sha256sum /tmp/$PREFIX-env2-evidence/$PREFIX-env2-evidence-manifest.txt | cut -d' ' -f1) files=$(grep -c . /tmp/$PREFIX-env2-evidence/$PREFIX-env2-evidence-manifest.txt) run_id=$GITHUB_RUN_ID run_attempt=$GITHUB_RUN_ATTEMPT run_number=$GITHUB_RUN_NUMBER workflow=$GITHUB_WORKFLOW commit=$GITHUB_SHA ref=$GITHUB_REF"
+      - name: zero-private-key evidence gate K2 before env2 evidence upload (peer run-12 K4)
+        id: k2gate-env2
+        if: '!cancelled()'
+        env:
+          SCAN_PATHS: ${{ env.ENV2_EVIDENCE_UPLOAD_PATHS }}
+        run: |
+          set -euo pipefail
+          # K2 (peer run-12 K4 containment): fail closed if any private-key material stands
+          # under ANY evidence upload path - by NAME (*.key/*.pem/*.p12/*.pfx) or CONTENT
+          # (PEM "PRIVATE KEY" markers, PKCS#8/RSA DER key headers). Upload only if this passed.
+          printf '%s\n' "$SCAN_PATHS" > /tmp/$PREFIX-k2-paths.txt
+          python3 - /tmp/$PREFIX-k2-paths.txt <<'PYK'
+          import sys, os, re
+          paths = [l.strip() for l in open(sys.argv[1]) if l.strip()]
+          namehit, conthit = [], []
+          pem = b"PRIVATE KEY"
+          der_rsa = re.compile(rb"\x30\x82..\x02\x01\x00\x02\x82", re.S)
+          der_p8 = re.compile(rb"\x30\x82..\x02\x01\x00\x30", re.S)
+          def scan_file(p):
+              if re.search(r"\.(key|pem|p12|pfx)$", os.path.basename(p), re.I):
+                  namehit.append(p); return
+              b = open(p, "rb").read()
+              if pem in b or der_rsa.search(b) or der_p8.search(b):
+                  conthit.append(p)
+          for p in paths:
+              if os.path.isfile(p):
+                  scan_file(p)
+              elif os.path.isdir(p):
+                  for base, _d, files in os.walk(p):
+                      for fn in files:
+                          scan_file(os.path.join(base, fn))
+          if namehit or conthit:
+              print("E_PRIVATE_KEY_IN_EVIDENCE names=%r content=%r" % (namehit[:3], conthit[:3]))
+              sys.exit(94)
+          print("zero-private-key gate: clean across %d upload paths" % len(paths))
+          PYK
       - name: OVMF_CI_SECURE_BOOT_UKI env2 evidence upload (ephemeral CI artifact only)
-        if: always()
+        if: always() && steps.k2gate-env2.outcome == 'success'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
         with:
           name: OVMF_CI_SECURE_BOOT_UKI-env2-evidence
@@ -669,8 +777,44 @@ jobs:
             "EVIDENCE_MANIFEST_SHA256=$MANIFEST_SHA" \
             "${{ github.sha }}" "${{ github.run_id }}" "${{ github.ref }}" \
             > /tmp/$PREFIX-out/OVMF_CI_SECURE_BOOT_UKI-certification-marker.txt
+      - name: zero-private-key evidence gate K2 before marker upload (peer run-12 K4)
+        id: k2gate-marker
+        if: '!cancelled()'
+        env:
+          SCAN_PATHS: ${{ env.EVIDENCE_UPLOAD_PATHS }}
+        run: |
+          set -euo pipefail
+          # K2 (peer run-12 K4 containment): fail closed if any private-key material stands
+          # under ANY evidence upload path - by NAME (*.key/*.pem/*.p12/*.pfx) or CONTENT
+          # (PEM "PRIVATE KEY" markers, PKCS#8/RSA DER key headers). Upload only if this passed.
+          printf '%s\n' "$SCAN_PATHS" > /tmp/$PREFIX-k2-paths.txt
+          python3 - /tmp/$PREFIX-k2-paths.txt <<'PYK'
+          import sys, os, re
+          paths = [l.strip() for l in open(sys.argv[1]) if l.strip()]
+          namehit, conthit = [], []
+          pem = b"PRIVATE KEY"
+          der_rsa = re.compile(rb"\x30\x82..\x02\x01\x00\x02\x82", re.S)
+          der_p8 = re.compile(rb"\x30\x82..\x02\x01\x00\x30", re.S)
+          def scan_file(p):
+              if re.search(r"\.(key|pem|p12|pfx)$", os.path.basename(p), re.I):
+                  namehit.append(p); return
+              b = open(p, "rb").read()
+              if pem in b or der_rsa.search(b) or der_p8.search(b):
+                  conthit.append(p)
+          for p in paths:
+              if os.path.isfile(p):
+                  scan_file(p)
+              elif os.path.isdir(p):
+                  for base, _d, files in os.walk(p):
+                      for fn in files:
+                          scan_file(os.path.join(base, fn))
+          if namehit or conthit:
+              print("E_PRIVATE_KEY_IN_EVIDENCE names=%r content=%r" % (namehit[:3], conthit[:3]))
+              sys.exit(94)
+          print("zero-private-key gate: clean across %d upload paths" % len(paths))
+          PYK
       - name: OVMF_CI_SECURE_BOOT_UKI marker upload (ephemeral CI artifact only)
-        if: always()
+        if: always() && steps.k2gate-marker.outcome == 'success'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
         with:
           name: OVMF_CI_SECURE_BOOT_UKI-marker
