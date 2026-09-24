@@ -129,7 +129,7 @@ for c in cfg.get("cases",[]):
             fail("E_CONFIG_PATH_MISSING", c["id"]+"."+pth_key)
 
 # 6) staged tool presence
-for t in ("usr/bin/qemu-system-x86_64","usr/bin/sbvarsign","usr/bin/openssl","usr/sbin/mkfs.vfat","sbin/sgdisk","usr/bin/nasm","usr/bin/iasl","usr/bin/gcc-13","usr/bin/bwrap"):
+for t in ("usr/bin/qemu-system-x86_64","usr/bin/sbvarsign","usr/bin/openssl","usr/sbin/mkfs.vfat","usr/sbin/fsck.vfat","sbin/sgdisk","usr/bin/nasm","usr/bin/iasl","usr/bin/gcc-13","usr/bin/bwrap"):
     if not os.path.exists(os.path.join(stage,"root",t)): fail("E_STAGED_TOOL_MISSING", t)
 
 # 6b) batch1r3 A1 exec bits: every git-tracked script under provisioning/p3 must be mode
@@ -250,19 +250,45 @@ for _cid,_pin in CASE_ARGV_PINS:
     # pins and the frozen file's own fields cannot drift apart silently.
     if _h!=_m[0].get("argv_sha256"): fail("E_CASE_ARGV_PIN_STORED",_cid+" stored argv_sha256 disagrees: "+repr(_m[0].get("argv_sha256")))
 EXPECTED_KEYS={"bwrap_argv","bwrap_helper","cases","cpu_model","memory_mb","note","qemu",
-               "qmp_sock_max_bytes","qmp_sock_template","schema","v3_serials"}
+               "qmp_sock_max_bytes","qmp_sock_template","schema","v3_serials",
+               "enroll_qmp_sock_basename"}
 if set(_fz2.keys())!=EXPECTED_KEYS|{"smoke_namespace"}:
     fail("E_FREEZE_KEYS","argv-freeze.json top-level keys drifted: "+repr(sorted(_fz2.keys())))
 # 6e6) peer FINAL COUNT RULING: pin the EXACT prefix occurrence counts (grep -o ... | wc -l,
 # not line counts) of BOTH lane workflows, recomputed at the frozen bytes. Any edit to either
 # workflow that adds/removes a literal NON_CERTIFYING_REHEARSAL occurrence fails closed here.
 import subprocess as _sp
-for _wf,_want in (("../../../../../.github/workflows/OVMF_CI_SECURE_BOOT_UKI-CERTIFICATION-workflow.yml",42),
-                  ("../../../../../.github/workflows/NON_CERTIFYING_REHEARSAL-workflow.yml",74)):
+# counts updated for batch1-r3 #10 (peer N8/N9/N1b gates): cert 42->44 (N8 log path x2),
+# rehearsal 74->77 (N8 log path x2 + env2-manifest step-name literal).
+for _wf,_want in (("../../../../../.github/workflows/OVMF_CI_SECURE_BOOT_UKI-CERTIFICATION-workflow.yml",44),
+                  ("../../../../../.github/workflows/NON_CERTIFYING_REHEARSAL-workflow.yml",77)):
     _n=len(_sp.run(["grep","-o","NON_CERTIFYING_REHEARSAL",os.path.join(here,_wf)],
                    capture_output=True,text=True,check=True).stdout.splitlines())
     if _n!=_want:
         fail("E_PREFIX_COUNT_MISMATCH",_wf+" occurrences="+str(_n)+" pinned="+str(_want))
+
+# 6e7) peer N4: PREFIX==ALLOWED_PREFIX equality alone accepts any literal from the same
+# workflow - bind the literals to the LANE statically per workflow file.
+import re as _re
+for _wf,_lit in (("../../../../../.github/workflows/NON_CERTIFYING_SCRATCH-workflow.yml","NON_CERTIFYING_SCRATCH"),
+                 ("../../../../../.github/workflows/NON_CERTIFYING_REHEARSAL-workflow.yml","NON_CERTIFYING_REHEARSAL"),
+                 ("../../../../../.github/workflows/OVMF_CI_SECURE_BOOT_UKI-CERTIFICATION-workflow.yml","NON_CERTIFYING_REHEARSAL")):
+    _t=open(os.path.join(here,_wf),errors="replace").read()
+    for _k in ("PREFIX","ALLOWED_PREFIX"):
+        _m=_re.search(r"^  %s: (\S+)\s*$" % _k, _t, _re.M)
+        if not _m or _m.group(1)!=_lit:
+            fail("E_PREFIX_LANE_LITERAL",_wf+" "+_k+" must be exactly "+_lit+" (found "+(_m.group(1) if _m else "<absent>")+")")
+
+# 6e8) peer N1: the enrollment QMP socket is pinned and must never reach the upload - pin the
+# basename, the sun_path assert, and the post-query unlink in rehearsal-enroll.sh.
+_qbs=_fz2.get("enroll_qmp_sock_basename")
+if _qbs != "qmp.sock":
+    fail("E_FREEZE_KEYS","argv-freeze.json enroll_qmp_sock_basename drifted: "+repr(_qbs))
+_en=open(os.path.join(here,"rehearsal-enroll.sh"),errors="replace").read()
+for _pat in ('QMP_SOCK="$EVD/'+_qbs+'"',"[ \"${#QMP_SOCK}\" -le 107 ]","E_QMP_PATH_TOO_LONG",
+             '-qmp unix:"$QMP_SOCK",server,nowait','rm -f "$QMP_SOCK"'):
+    if _pat not in _en:
+        fail("E_QMP_SOCK_PIN","rehearsal-enroll.sh lost pinned QMP-socket handling: "+_pat)
 
 # 6e5) peer: the ESP-builder chatter acceptance stands ONLY while the image-hash log lines
 # exist - pin their presence fail-closed so they cannot be silently dropped.

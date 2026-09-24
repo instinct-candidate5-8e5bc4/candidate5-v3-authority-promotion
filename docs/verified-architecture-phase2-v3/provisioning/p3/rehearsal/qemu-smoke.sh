@@ -36,9 +36,14 @@ if [ "${QEMU_SMOKE_NS:-0}" != "1" ]; then
   # with a POSITIONAL option allowlist with declared arities (F3). newline-joined: the
   # pinned token set and host /usr names carry no newlines.
   mkdir -p "/tmp/$PREFIX-out"
-  # run-8 defect-1 fix: this mkdir may run as root before any runner-side mkdir; keep the
-  # ephemeral out dir writable+readable for the runner (CI output only, never hashed input).
-  chmod o+rwx "/tmp/$PREFIX-out"
+  # run-8 defect-1 fix + peer N2: this mkdir may run as root before any runner-side mkdir;
+  # hand the ephemeral out dir to the invoking runner user (never world-writable). chmod
+  # fallback is at most o+rx (CI output only, never hashed input).
+  if [ -n "${SUDO_UID:-}" ] && [ -n "${SUDO_GID:-}" ]; then
+    chown "$SUDO_UID:$SUDO_GID" "/tmp/$PREFIX-out" || chmod o+rx "/tmp/$PREFIX-out"
+  else
+    chmod o+rx "/tmp/$PREFIX-out"
+  fi
   ARGVF="/tmp/$PREFIX-out/$PREFIX-smoke-argv.txt"; NSMAN="$ARGVF.ns-manifest"
   if ! python3 - "$HERE/argv-freeze.json" "$STAGE" "$PREFIX" "$ARGVF" "$NSMAN" <<'SMOKE_NS_EOF'
 import hashlib, json, os, sys
@@ -134,12 +139,23 @@ CFG="${1:?usage: qemu-smoke.sh CONFIG FREEZE IDX}"; FREEZE="${2:?}"; IDX="${3:?}
 echo "in-namespace evidence:"
 stat -c '%A %a %U:%g %n' "$0"
 findmnt -T "$(readlink -f "$0")" -o TARGET,SOURCE,FSTYPE,OPTIONS || true
-QBIN="$(command -v qemu-system-x86_64 || true)"
-echo "frozen argv0: $(python3 -c "import json;print(json.load(open('$FREEZE'))['cases'][$IDX]['argv'][0])") resolved: ${QBIN:-MISSING}"
-if [ -n "$QBIN" ]; then
-  stat -c '%A %a %U:%g %n' "$QBIN"
-  findmnt -T "$QBIN" -o TARGET,SOURCE,FSTYPE,OPTIONS || true
+# peer N7: stat/findmnt the ACTUAL EXECUTED argv0 - the frozen case argv0 after the
+# lane-prefix rewrite, resolved to an absolute path - and fail closed if it is missing.
+# (The old PATH lookup of a bare name printed "resolved: MISSING" even on healthy runs,
+# a prefix-confusion artifact; the smoke never execs a PATH-resolved binary.)
+RAW_ARGV0=$(python3 -c "import json;print(json.load(open('$FREEZE'))['cases'][$IDX]['argv'][0])")
+EXEC_ARGV0=${RAW_ARGV0//\/tmp\/NON_CERTIFYING_REHEARSAL-/\/tmp\/$PREFIX-}
+echo "frozen argv0 raw: $RAW_ARGV0"
+echo "executed argv0 (lane-resolved absolute): $EXEC_ARGV0"
+case "$EXEC_ARGV0" in
+  /*) ;;
+  *) echo "E_QEMU_SMOKE_ARGV0_NOT_ABSOLUTE $EXEC_ARGV0"; exit 97;;
+esac
+if [ ! -x "$EXEC_ARGV0" ]; then
+  echo "E_QEMU_SMOKE_ARGV0_MISSING executed argv0 not present+executable in-namespace: $EXEC_ARGV0"; exit 97
 fi
+stat -c '%A %a %U:%g %n' "$EXEC_ARGV0"
+findmnt -T "$EXEC_ARGV0" -o TARGET,SOURCE,FSTYPE,OPTIONS || true
 stat -c '%A %a %U:%g %n' /dev/kvm
 findmnt -T /dev/kvm -o TARGET,SOURCE,FSTYPE,OPTIONS || true
 W="/tmp/$PREFIX-smoke-work"
@@ -229,6 +245,11 @@ for a in argv:
         if (tok.startswith("file=") or tok.startswith("file:")) and not tok[5:].startswith("/"):
             if not os.path.exists(os.path.join(W,tok[5:])):
                 print("E_QEMU_SMOKE missing relative argv path", tok[5:]); sys.exit(97)
+# peer N7 (exec site): the argv0 about to be exec'd must be an absolute, executable file.
+_argv0=argv[0]
+print("executed argv0 at spawn (lane-resolved absolute):", _argv0)
+if not _argv0.startswith("/") or not os.path.isfile(_argv0) or not os.access(_argv0, os.X_OK):
+    print("E_QEMU_SMOKE_ARGV0_MISSING at spawn:", _argv0); sys.exit(97)
 i=argv.index("-qmp"); sock=argv[i+1].split("unix:",1)[1].split(",",1)[0]
 if os.path.lexists(sock): os.unlink(sock)
 os.makedirs(os.path.dirname(sock), exist_ok=True)

@@ -648,5 +648,107 @@ job gated if: github.ref == 'refs/heads/candidate5', exact equality) produces a 
 run record on every filtered-ref push of the candidate SHA. R4 records its skipped-run
 URL and conclusion per push alongside the rehearsal runs; any JOB EXECUTION of it on a
 rehearsal or certification ref is a stray run: stop, preserve, report.
+
+Certification exactly-one-run verifier (peer N5): the check that exactly one certification
+run exists for the accepted SHA keys by the certification WORKFLOW PATH, never by all runs
+for the SHA: query the workflow-scoped endpoint
+/repos/<repo>/actions/workflows/OVMF_CI_SECURE_BOOT_UKI-CERTIFICATION-workflow.yml/runs?head_sha=<SHA>
+(equivalently: list runs for the SHA and filter .path ==
+".github/workflows/OVMF_CI_SECURE_BOOT_UKI-CERTIFICATION-workflow.yml") and assert exactly
+one run, run_attempt == 1, conclusion success. EXPECTED SIBLING on the same push:
+v3-closure-temp.yml (on: [push], job gated if: github.ref == 'refs/heads/candidate5')
+produces a SKIPPED run record for the same SHA - it is not a certification run and must not
+be counted; v3-foundation-temp.yml and v3-structural-enforcement-preflight.yml filter
+candidate5* branches, so they produce NO run records on p3-* refs. Any second
+certification-workflow run for the SHA, any attempt > 1, or any JOB EXECUTION of the
+closure sibling on a p3-* ref = stray run: stop, preserve, report.
 Any failed expectation or any byte change = new candidate + conformance + two fresh
 refs/runs. Certification remains forbidden until STATIC ACCEPT of the exact SHA.
+
+Batch1-r3 #10 corrections (post-run-9, peer orders via main 2026-09-24; implemented, locally
+validated, UNCOMMITTED pending freeze order):
+
+FAT double defect (run 9 root cause, two independent classes, both proven locally on the
+staged dosfstools 4.2 against the exact writer bytes, matching the peer's independent parse
+of the run-9 image and main's fsck):
+- Defect 1: the hand writer never allocated the /EFI and /EFI/BOOT directory clusters in
+  the FAT (FAT[3]=FAT[4]=0, FREE). fsck tolerates a free cluster inside a directory chain
+  ("Contains a free cluster (3). Assuming EOF."); OVMF hard-fails it with "FATDirSize:
+  cluster chain corrupt", the app never ran, ENROLL.TXT was never written. Fix: both
+  directory clusters written EOC.
+- Defect 2: 8.3 directory names were 12 bytes ("DB      AUTH" - 4-char extension), and
+  bytearray slice assignment silently produced 33-byte entries, shifting every later root
+  entry out of slot alignment. KEK/PK became unreachable orphans (fsck: "Reclaimed 107
+  unused clusters" = 103 app + 2 KEK + 2 PK clusters, matching the peer's orphan count on
+  the actual run-9 bytes). Fix: exact 11-byte 8.3 names (DB/KEK/PK .AUT) with a hard
+  length assert; every directory built as one contiguous block and written once.
+- Also repaired per the peer's fix bar: "." / ".." entries (".." of a root-child points at
+  cluster 0 per the FAT spec), a volume-label entry matching the boot-sector label, and
+  the FSInfo free count derived from the BPB geometry instead of mkfs deltas.
+Pre-boot gates (BOTH must pass before any boot; E_ENROLL_FAT_INVALID, exit 97):
+- Gate 1 - fsck.vfat -n keyed on DIAGNOSTICS, never the exit code (dosfstools 4.2 returned
+  rc=0 in one container and rc=1 in another on the same corrupt run-9 image): any output
+  line beyond the banner and the final "N files, X/Y clusters" summary fails closed. Full
+  output preserved to enroll-fat-fsck.log and echoed.
+- Gate 2 - independent directory round-trip against the CONTRACT (never the produced
+  output): MODE=sole (sole + sole-fresh templates) requires exactly db.auth/kek.auth/
+  pk.auth; MODE=db2 (widened template) requires exactly db2.auth/kek.auth/pk.auth at the
+  volume root; /EFI/BOOT holds exactly BOOTX64.EFI. Names, sizes and SHA-256 of every
+  readback are compared against the source files; anything missing, extra, or
+  byte-different fails closed. Output preserved to enroll-fat-roundtrip.log and echoed.
+- Per-run enroll-fat.raw sha256+size logged every run (unpinned by design).
+- Local gate matrix on the exact production gate bytes (staged tools): sole PASS, db2
+  PASS; planted free-marked-dir image fails gate 1 pre-boot; planted missing-blob image
+  fails gate 1 (orphaned chain) and, in an fsck-silent variant, fails gate 2 (contract
+  mismatch); planted corrupted-blob-bytes image passes fsck and fails gate 2 (SHA
+  mismatch, both hashes quoted).
+- mtools/mcopy (the peer's preferred placement) is NOT in the locked stage and not in
+  main's container; adding it is a platform.lock revision. The retained hand writer is
+  fixed and independently round-trip-verified every run for the executed mode (the peer's
+  stated alternative), locally exercised for both modes. mtools-lock decision surfaced to
+  main/peer.
+N7: qemu-smoke in-namespace evidence now stats/findmnts the ACTUAL EXECUTED argv0 (frozen
+case argv0 after the lane-prefix rewrite, absolute, executable) and fails closed
+(E_QEMU_SMOKE_ARGV0_MISSING / E_QEMU_SMOKE_ARGV0_NOT_ABSOLUTE, exit 97) if absent - in the
+shell evidence block AND at the python spawn site. The old PATH lookup of a bare name
+("resolved: MISSING") is gone.
+N8: both lane workflows assert the durable smoke log carries EXACTLY ONE "lane argv
+check:" reverse-rewrite verification line (the two source print sites are if/else
+branches, one per executed smoke) and fail closed (E_QEMU_SMOKE_ARGV_LANE_LOG, exit 97) on
+absent OR duplicated. Run-9 ground truth (log sha256
+4a07f1dcb809e4aec1e2b041f6e397f3f906183a69f10519645fd02ae0834fdd): the line fired exactly
+once (line 38, scratch-lane form), the executed argv+-S sha256 b6fca059...2e55 equals the
+lane table's R1-positive value, and QEMU_SMOKE_OK followed - the publisher's earlier
+"absent" claim was WRONG; raw/executed equivalence was proven in run 9.
+N9: the evidence manifest now covers EVERY uploaded path (out dir + fw-hashes + the three
+basetools build logs), absent members noted explicitly; env2 gained the same manifest +
+ARTIFACT-DIGEST covering the env2-evidence tree and the ovmf-env2 basetools log.
+N1b: post-unlink leftover check on the enrollment QMP socket (E_QMP_SOCK_LEFTOVER, exit
+97; -e and -L both checked) and a workflow evidence-tree sweep failing closed on ANY
+non-regular file (E_EVIDENCE_NONREGULAR, exit 94; find -type f misses sockets).
+Peer ruling (2026-09-24, pre-#10-freeze conditions; repaired hand writer ACCEPTED, no
+mtools, no lock revision) - all six implemented and validated:
+1. ZERO code sharing: the round-trip reader is a separate python program sharing no
+   code/imports/helpers with the writer (both blocks carry the independence note);
+   expectations are hardcoded from the mode contract + SOURCE-file bytes only.
+2. BOTH gates run on EVERY enrollment image: they are inline in rehearsal-enroll.sh, which
+   the ceremony invokes for ALL THREE modes - sole (MODE=sole), widened (MODE=db2), and
+   sole-fresh/R6 (MODE=sole) - in every lane.
+3. Writer named asserts: E_ENROLL_FAT_WRITER_NAME83 (8.3 name != 11 bytes),
+   E_ENROLL_FAT_WRITER_DENT (entry != 32 bytes), E_ENROLL_FAT_WRITER_DIRBLOCK (directory
+   block not a multiple of 32) - all exit 97, never a bare AssertionError.
+4. CI must-show: PF-1 (freemark) and PF-2 (missingblob, fsck-silent) are folded into the
+   #10 scratch run as two dedicated must-show steps (scratch-only derivation injection;
+   the ENROLL_PLANTED_FAULT switch refuses non-scratch lanes with E_PLANTED_FAULT_LANE and
+   unknown names with E_PLANTED_FAULT_UNKNOWN). Each step asserts exit 97 AND the expected
+   gate's diagnostic; any other outcome fails the step. Proven locally through the exact
+   production blocks: PF-1 -> gate 1 ("Contains a free cluster (3)"), PF-2 -> fsck SILENT,
+   gate 2 (contract mismatch quoted).
+5. Image sha256+size logged unpinned every run (already in place).
+6. fsck.vfat resolution printed in-log before every gate-1 run: shim path -> staged
+   fsck.vfat -> real fsck.fat target with sha256+size (fail-closed E_ENROLL_FSCK_SHIM_MISSING
+   / E_ENROLL_FSCK_STAGED_MISSING / E_ENROLL_FSCK_SHIM_DRIFT).
+Planted-fault queue (remaining MUST-SHOW, owed as dedicated scratch runs):
+- PF-3 argv lane-mismatch (reverse-rewrite tamper): must fail the smoke with
+  E_QEMU_SMOKE_ARGV_LANE; and any run whose smoke log lacks the verification line must
+  fail with E_QEMU_SMOKE_ARGV_LANE_LOG.

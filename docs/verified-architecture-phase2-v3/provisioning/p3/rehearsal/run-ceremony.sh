@@ -21,6 +21,7 @@ mkdir -p "$OUT" build-output/esp build-output/esp-variant build-output/ovmf-debu
 # hash again, assert equal. chown to the invoking user when under sudo (never root-upload);
 # chmod fallback otherwise. The repair must never alter evidence BYTES.
 _repair_out() {
+  _rc=$?
   [ -d "$OUT" ] || return 0
   _before=$(find "$OUT" -type f -print0 | sort -z | xargs -0 -r sha256sum)
   _mode=chmod
@@ -33,7 +34,13 @@ _repair_out() {
     find "$OUT" -type f ! -perm -004 -print -exec chmod o+r {} + || true
   fi
   _after=$(find "$OUT" -type f -print0 | sort -z | xargs -0 -r sha256sum)
-  [ "$_before" = "$_after" ] || { echo "E_EVIDENCE_HASH_DRIFT readability repair altered evidence bytes"; exit 96; }
+  # peer N3: the original named failure code is preserved - drift forces 96 ONLY when the
+  # ceremony itself was succeeding; a primary failure (e.g. 97) is never masked to 0/96.
+  if [ "$_before" != "$_after" ]; then
+    echo "E_EVIDENCE_HASH_DRIFT readability repair altered evidence bytes"
+    if [ "$_rc" -eq 0 ]; then exit 96; fi
+    echo "W_EVIDENCE_HASH_DRIFT preserving primary failure exit=$_rc (drift exit 96 suppressed)"
+  fi
   echo "evidence readability repair ($_mode): $(printf '%s' "$_after" | grep -c . || true) files, content hashes unchanged"
 }
 trap '_repair_out' EXIT
@@ -118,7 +125,7 @@ assert_sha "$STAGE/root/usr/share/OVMF/OVMF_CODE_4M.secboot.fd" "${PINS[5]}"
 assert_sha build-output/enroll-app/enroll-app.efi "${PINS[6]}"
 # enrollments (three independent pristine VARS derivations, each a single enrollment invocation)
 ./enroll-prep.sh "$STAGE/root" prep evidence/c5-signing-cert.der evidence/C5-HOSTILE-FIXTURE.cer
-trap 'rm -rf prep' EXIT
+trap '_repair_out; rm -rf prep' EXIT
 for mode in sole widened sole-fresh; do
   d="$OUT/$PREFIX-enroll-$mode"
   mkdir -p "$d"
