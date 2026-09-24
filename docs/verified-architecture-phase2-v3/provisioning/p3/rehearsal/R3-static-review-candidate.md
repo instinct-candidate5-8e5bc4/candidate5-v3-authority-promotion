@@ -131,7 +131,7 @@ exercises exactly that staged binary before any build starts.
   appears only as the R7 behavior-only sibling; NO RELEASE/DEBUG equivalence is claimed.
 
 ## 5. Key enrollment (same-invocation rule)
-The enrollment EFI app (enroll-app.c sha256 859c01bbae9b134aed08a17f550ba9add7d9f3efd8500757a64bd56b8d0fdf47;
+The enrollment EFI app (enroll-app.c sha256 762c5d09a2a7b556b98f876626cd09f08c4bc724f2205ceb1bd4de863639fdda;
 dual build byte-identity enforced) writes db/db2, then KEK, then PK, and in the SAME invocation
 GetVariable-captures SecureBoot + SetupMode (raw value + attributes + status) to ENROLL.TXT on the
 FAT evidence disk. An unsigned reader app is never booted after PK enrollment; no reader cert is
@@ -1338,7 +1338,7 @@ S3 re-run on the #16 tree: preflight-check.py PASS rc=0 (verbatim JSON in the
     6e9: 0/0/4 (the new scratch steps carry no lane token or planted-fault
     refs). Scratch workflow: 0 canonical literals, 0 CANON_TMP.
 
-## 11a. #16-prime corrections (peer review of the #16 bundle: B1-B6 + N1/N2)
+## 11a. #16-prime corrections (review findings B1-B6 + N1/N2 on the #16 bundle)
 
 B1 PF-4 line pin: no hand-typed number anywhere. The pristine-cp line is
     derived at RUN TIME from the committed rehearsal-enroll.sh - grep -c must
@@ -1386,3 +1386,57 @@ payload E_AUTH_FORMAT / usage E_DB2_SET, gate 9-case battery incl
 sibling-prefix and find-error, preflight PASS + 6e10 planted-literal negative,
 yaml + bash -n x3 workflows, bash -n x4 scripts, 6e6 44/78, 6e9 0/0/4, scratch
 0 canonical literals. All throwaway keys shredded.
+
+## 12. Run-15 follow-up (app follow-on head): enroll-app hex() print bug - D3 resolved as app defect, new app pin
+
+Reviewer technical finding on run-15 evidence, confirmed from source and
+evidence bytes: enroll-app.c line 21 hex() built a 2-char CHAR16 buffer per
+byte but called f->Write with size 2 BYTES = ONE CHAR16, so only the
+high-nibble character of each data byte reached ENROLL.TXT. Consequences:
+SetupMode 0x01 printed "0" (the D3 anomaly - firmware init logged SetupMode=1
+at ovmf-debug.log:768 while the guest print showed 0; the volatile-shadow
+hypothesis is withdrawn; D3 is an app print defect, not firmware); SecureBoot
+0x00 printed "0"; and any enrolled PK/KEK/db _DATA would print HALF its hex
+digits, so no successful enrollment could ever satisfy
+enroll-predicate-check.py (SecureBoot_DATA='01', SetupMode_DATA='00', full
+PK/KEK/db _DATA hex vs the ESLs - the predicate's reading is correct and
+unchanged). Half-length re-derived from the run-15 ENROLL.TXT bytes:
+SecureBoot_SIZE=1 with a 1-char DATA field; SetupMode_SIZE=1 with a 1-char
+DATA field (UTF-16LE, 826 B).
+
+Fix: parent decision (path 1) under the owner's standing runtime-correctness
+authorization; reviewer technical finding. Line 21 Write size 2 -> 4 (one
+token; ATTRS line 15 untouched, the 16-prime E3 contract source intact). This
+is its own head ON TOP of the corrected 16-prime head
+d20bbf3de79e2165e982565bebb3aa022a71b4a5 - strictly separate from 16-prime
+content, one head per review, one run per head.
+Dual build (same two-pass pattern as the OVMF dual build) reproducible in
+/tmp builds A/B byte-identical. New app pin:
+dccc181800051a80df93b5ac2d280d3ff292d4193f7c223467e27df765e1dbbb (replaces
+540b4fa3990f998cb803160482bd50e9670a47da3d534acc3ade91364a85f3ee). NOTE:
+dccc1818 is reviewer-reported until a CI app build on this exact head asserts
+it (the scratch run's E_APP_PIN_MISMATCH gate is that proof).
+Gate demonstration: a build against the OLD pin fails closed with
+E_APP_PIN_MISMATCH dccc1818...; against the new pin the same build passes rc=0.
+Pin rewritten at every pinned location (12 spots): build-enroll-app.sh:44,
+config.json:109 (byte-stable), rehearsal-enroll.sh:265 (reader L1),
+NON_CERTIFYING_REHEARSAL-workflow.yml:679,
+OVMF_CI_SECURE_BOOT_UKI-CERTIFICATION-workflow.yml:647,
+NON_CERTIFYING_SCRATCH-workflow.yml x6 (derive-scratch.py template +
+re-derive; byte-consistency verified), this file x2. Source-file identity
+updated at R3 line 134 and A3-publication-manifest.json line 67:
+enroll-app.c sha256 762c5d09a2a7b556b98f876626cd09f08c4bc724f2205ceb1bd4de863639fdda
+(replaces 859c01bbae9b134aed08a17f550ba9add7d9f3efd8500757a64bd56b8d0fdf47).
+X4 acknowledged: A3-publication-manifest.json is a hash manifest now stale for
+other files changed across 16-prime/this head; it will be REGENERATED at the
+eventual frozen r3 SHA and presented in that review (not regenerated here -
+it would be stale again immediately).
+Stop-condition check: firmware untouched (OVMF_CODE fc150336... pin
+unchanged), UKI untouched (13309697...), ESP variants untouched (PINS[0..5]
+unchanged - the app travels on its own C5ENROLL FAT image, never inside the
+ESP), predicate untouched. All PFs plus the ceremony re-run on this head; this
+head's scratch run must show a GREEN predicate (the 16-prime run is expected
+to fail the predicate on DATA only - not patched around).
+Validation on this head: preflight PASS rc=0; yaml + bash -n clean x3;
+6e6 pins unchanged (cert 44, rehearsal 78); 6e9 0/0/4; scratch workflow 0
+canonical literals / 0 CANON_TMP; re-derive byte-identical.

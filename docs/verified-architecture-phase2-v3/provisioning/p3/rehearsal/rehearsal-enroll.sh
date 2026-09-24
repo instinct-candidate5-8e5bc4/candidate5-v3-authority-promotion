@@ -262,7 +262,7 @@ python3 - "$IMG" "$APP" "$PREP" "$MODE" "$HERE/enroll-app.c" > "$EVD/enroll-fat-
 # (E_ENROLL_FAT_NAME_CONTRACT), 1 = content/layout violation (E_ENROLL_FAT_INVALID).
 import sys, struct, hashlib, re
 img, app, prep, mode, appsrc = sys.argv[1:6]
-PIN_APP_SHA256 = "540b4fa3990f998cb803160482bd50e9670a47da3d534acc3ade91364a85f3ee"
+PIN_APP_SHA256 = "dccc181800051a80df93b5ac2d280d3ff292d4193f7c223467e27df765e1dbbb"
 def ncfail(msg):
     print("E_ENROLL_FAT_NAME_CONTRACT", msg); sys.exit(2)
 def fail(msg):

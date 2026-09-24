@@ -41,4 +41,4 @@ build_one "$OUTB"
 cmp "$OUTA/enroll-app.efi" "$OUTB/enroll-app.efi" || { echo "E_APP_DUAL_BUILD_MISMATCH"; exit 44; }
 # frozen output pin (C2, asserted at the source; both jobs also gate it in the workflows)
 APP_SHA=$(sha256sum "$OUTA/enroll-app.efi" | cut -d' ' -f1)
-[ "$APP_SHA" = "540b4fa3990f998cb803160482bd50e9670a47da3d534acc3ade91364a85f3ee" ] || { echo "E_APP_PIN_MISMATCH $APP_SHA"; exit 46; }
+[ "$APP_SHA" = "dccc181800051a80df93b5ac2d280d3ff292d4193f7c223467e27df765e1dbbb" ] || { echo "E_APP_PIN_MISMATCH $APP_SHA"; exit 46; }

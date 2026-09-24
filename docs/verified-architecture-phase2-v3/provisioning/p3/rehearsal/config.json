@@ -106,7 +106,7 @@
  "cpu_model": "Skylake-Server",
  "disk_dir": "disks",
  "enroll_app": "build-output/enroll-app/enroll-app.efi",
- "enroll_app_sha256": "540b4fa3990f998cb803160482bd50e9670a47da3d534acc3ade91364a85f3ee",
+ "enroll_app_sha256": "dccc181800051a80df93b5ac2d280d3ff292d4193f7c223467e27df765e1dbbb",
  "esp_sha256": "2bfa621238890890765c9636f99dabfb46233bfa626afb580ce33e65858019c9",
  "esp_variant_sha256": {
   "hostile": "1a2a064022576e42634ad1dae2d625dbd41c6016bd81e468929782b646fb1c62",

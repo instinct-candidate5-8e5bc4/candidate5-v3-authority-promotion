@@ -18,7 +18,7 @@ static EFI_FILE *root;
 static EFI_FILE *ev;
 static UINTN line_no;
 
-static void hex(EFI_FILE *f, UINT8 *p, UINTN n){ CHAR16 b[3]; UINTN i; for(i=0;i<n;i++){ b[0]=(CHAR16)L"0123456789abcdef"[p[i]>>4]; b[1]=(CHAR16)L"0123456789abcdef"[p[i]&15]; b[2]=0; uefi_call_wrapper(f->Write,3,f,&(UINTN){2},b);} }
+static void hex(EFI_FILE *f, UINT8 *p, UINTN n){ CHAR16 b[3]; UINTN i; for(i=0;i<n;i++){ b[0]=(CHAR16)L"0123456789abcdef"[p[i]>>4]; b[1]=(CHAR16)L"0123456789abcdef"[p[i]&15]; b[2]=0; uefi_call_wrapper(f->Write,3,f,&(UINTN){4},b);} }
 static void put(EFI_FILE *f, CHAR16 *s){ uefi_call_wrapper(f->Write,3,f,&(UINTN){StrLen(s)*2},s); }
 static void putnum(EFI_FILE *f, UINTN v){ CHAR16 b[24]; UINTN i=24; b[--i]=0; if(!v)b[--i]=L'0'; while(v){b[--i]=(CHAR16)(L'0'+v%10);v/=10;} put(f,&b[i]); }
 

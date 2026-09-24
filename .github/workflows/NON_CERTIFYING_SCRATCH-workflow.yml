@@ -463,7 +463,7 @@ jobs:
           PFWORK="$PFD/work"
           mkdir -p "$PFWORK/build-output/enroll-app" "$PFWORK/build-output/ovmf-debug"
           cp /tmp/$PREFIX-app-a/enroll-app.efi "$PFWORK/build-output/enroll-app/enroll-app.efi"
-          [ "$(sha256sum "$PFWORK/build-output/enroll-app/enroll-app.efi" | cut -d' ' -f1)" = "540b4fa3990f998cb803160482bd50e9670a47da3d534acc3ade91364a85f3ee" ] \
+          [ "$(sha256sum "$PFWORK/build-output/enroll-app/enroll-app.efi" | cut -d' ' -f1)" = "dccc181800051a80df93b5ac2d280d3ff292d4193f7c223467e27df765e1dbbb" ] \
             || { echo "E_PF_SETUP enroll-app sha mismatch after copy" | tee -a "$PFD/prep.log"; exit 97; }
           cp /tmp/$PREFIX-ovmf-a/OVMF_CODE.fd "$PFWORK/build-output/ovmf-debug/OVMF_CODE.fd"
           [ "$(sha256sum "$PFWORK/build-output/ovmf-debug/OVMF_CODE.fd" | cut -d' ' -f1)" = "fc150336fce10eb5508fa440cdf7300622c8c3ac71f2fbe10a0731422b9cef24" ] \
@@ -514,7 +514,7 @@ jobs:
           PFWORK="$PFD/work"
           mkdir -p "$PFWORK/build-output/enroll-app" "$PFWORK/build-output/ovmf-debug"
           cp /tmp/$PREFIX-app-a/enroll-app.efi "$PFWORK/build-output/enroll-app/enroll-app.efi"
-          [ "$(sha256sum "$PFWORK/build-output/enroll-app/enroll-app.efi" | cut -d' ' -f1)" = "540b4fa3990f998cb803160482bd50e9670a47da3d534acc3ade91364a85f3ee" ] \
+          [ "$(sha256sum "$PFWORK/build-output/enroll-app/enroll-app.efi" | cut -d' ' -f1)" = "dccc181800051a80df93b5ac2d280d3ff292d4193f7c223467e27df765e1dbbb" ] \
             || { echo "E_PF_SETUP enroll-app sha mismatch after copy" | tee -a "$PFD/prep.log"; exit 97; }
           cp /tmp/$PREFIX-ovmf-a/OVMF_CODE.fd "$PFWORK/build-output/ovmf-debug/OVMF_CODE.fd"
           [ "$(sha256sum "$PFWORK/build-output/ovmf-debug/OVMF_CODE.fd" | cut -d' ' -f1)" = "fc150336fce10eb5508fa440cdf7300622c8c3ac71f2fbe10a0731422b9cef24" ] \
@@ -567,7 +567,7 @@ jobs:
           PFWORK="$PFD/work"
           mkdir -p "$PFWORK/build-output/enroll-app" "$PFWORK/build-output/ovmf-debug"
           cp /tmp/$PREFIX-app-a/enroll-app.efi "$PFWORK/build-output/enroll-app/enroll-app.efi"
-          [ "$(sha256sum "$PFWORK/build-output/enroll-app/enroll-app.efi" | cut -d' ' -f1)" = "540b4fa3990f998cb803160482bd50e9670a47da3d534acc3ade91364a85f3ee" ] \
+          [ "$(sha256sum "$PFWORK/build-output/enroll-app/enroll-app.efi" | cut -d' ' -f1)" = "dccc181800051a80df93b5ac2d280d3ff292d4193f7c223467e27df765e1dbbb" ] \
             || { echo "E_PF_SETUP enroll-app sha mismatch after copy" | tee -a "$PFD/prep.log"; exit 97; }
           cp /tmp/$PREFIX-ovmf-a/OVMF_CODE.fd "$PFWORK/build-output/ovmf-debug/OVMF_CODE.fd"
           [ "$(sha256sum "$PFWORK/build-output/ovmf-debug/OVMF_CODE.fd" | cut -d' ' -f1)" = "fc150336fce10eb5508fa440cdf7300622c8c3ac71f2fbe10a0731422b9cef24" ] \
@@ -646,7 +646,7 @@ jobs:
           PFWORK="$PFD/work"
           mkdir -p "$PFWORK/build-output/enroll-app" "$PFWORK/build-output/ovmf-debug"
           cp /tmp/$PREFIX-app-a/enroll-app.efi "$PFWORK/build-output/enroll-app/enroll-app.efi"
-          [ "$(sha256sum "$PFWORK/build-output/enroll-app/enroll-app.efi" | cut -d' ' -f1)" = "540b4fa3990f998cb803160482bd50e9670a47da3d534acc3ade91364a85f3ee" ] \
+          [ "$(sha256sum "$PFWORK/build-output/enroll-app/enroll-app.efi" | cut -d' ' -f1)" = "dccc181800051a80df93b5ac2d280d3ff292d4193f7c223467e27df765e1dbbb" ] \
             || { echo "E_PF_SETUP enroll-app sha mismatch after copy" | tee -a "$PFD/prep.log"; exit 97; }
           cp /tmp/$PREFIX-ovmf-a/OVMF_CODE.fd "$PFWORK/build-output/ovmf-debug/OVMF_CODE.fd"
           [ "$(sha256sum "$PFWORK/build-output/ovmf-debug/OVMF_CODE.fd" | cut -d' ' -f1)" = "fc150336fce10eb5508fa440cdf7300622c8c3ac71f2fbe10a0731422b9cef24" ] \
@@ -710,7 +710,7 @@ jobs:
           PFWORK="$PFD/work"
           mkdir -p "$PFWORK/build-output/enroll-app" "$PFWORK/build-output/ovmf-debug"
           cp /tmp/$PREFIX-app-a/enroll-app.efi "$PFWORK/build-output/enroll-app/enroll-app.efi"
-          [ "$(sha256sum "$PFWORK/build-output/enroll-app/enroll-app.efi" | cut -d' ' -f1)" = "540b4fa3990f998cb803160482bd50e9670a47da3d534acc3ade91364a85f3ee" ] \
+          [ "$(sha256sum "$PFWORK/build-output/enroll-app/enroll-app.efi" | cut -d' ' -f1)" = "dccc181800051a80df93b5ac2d280d3ff292d4193f7c223467e27df765e1dbbb" ] \
             || { echo "E_PF_SETUP enroll-app sha mismatch after copy" | tee -a "$PFD/prep.log"; exit 97; }
           cp /tmp/$PREFIX-ovmf-a/OVMF_CODE.fd "$PFWORK/build-output/ovmf-debug/OVMF_CODE.fd"
           [ "$(sha256sum "$PFWORK/build-output/ovmf-debug/OVMF_CODE.fd" | cut -d' ' -f1)" = "fc150336fce10eb5508fa440cdf7300622c8c3ac71f2fbe10a0731422b9cef24" ] \
@@ -1140,7 +1140,7 @@ jobs:
           sudo unshare -n ./build-enroll-app.sh /tmp/$PREFIX-stage-env2 /tmp/$PREFIX-app-env2-a /tmp/$PREFIX-app-env2-b
           cmp /tmp/$PREFIX-app-env2-a/enroll-app.efi /tmp/$PREFIX-app-env2-b/enroll-app.efi
           HA=$(sha256sum /tmp/$PREFIX-app-env2-a/enroll-app.efi | cut -d' ' -f1)
-          [ "$HA" = "540b4fa3990f998cb803160482bd50e9670a47da3d534acc3ade91364a85f3ee" ] || { echo "E_APP_PIN_MISMATCH $HA"; exit 46; }
+          [ "$HA" = "dccc181800051a80df93b5ac2d280d3ff292d4193f7c223467e27df765e1dbbb" ] || { echo "E_APP_PIN_MISMATCH $HA"; exit 46; }
           sha256sum /tmp/$PREFIX-app-env2-a/enroll-app.efi > /tmp/$PREFIX-env2-evidence/NON_CERTIFYING_SCRATCH-env2-app-hash.txt
       - name: NON_CERTIFYING_SCRATCH env2 ESP image reproduction (peer gap close - ESP is a frozen output)
         run: |
