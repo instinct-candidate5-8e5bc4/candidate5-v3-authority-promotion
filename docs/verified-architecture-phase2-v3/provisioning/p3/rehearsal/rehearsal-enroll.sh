@@ -19,16 +19,17 @@ QMP_SOCK="$EVD/qmp.sock"
 PREFIX="${PREFIX:-}"
 [ -n "$PREFIX" ] || { echo "E_PREFIX_UNSET"; exit 97; }
 [ "$PREFIX" = "${ALLOWED_PREFIX:-}" ] || { echo "E_PREFIX_MISMATCH prefix=$PREFIX allowed=$ALLOWED_PREFIX"; exit 97; }
-CANON_TMP=/tmp/NON_CERTIFYING_REHEARSAL-; LANE_TMP=/tmp/$PREFIX-
+# peer #16 D15-2: canonical-config prefix resolution lives in ONE shared script.
+RESOLVE="$(cd "$(dirname "$0")" && pwd)/resolve-lane-path.sh"
 [ -e /dev/kvm ] || { echo "E_NO_KVM" >&2; exit 90; }
 [ -e "$EVD" ] && { echo "E_EVD_EXISTS" >&2; exit 1; }
 mkdir -p "$EVD"
 QEMU=$(python3 -c "import json;print(json.load(open('$CFG'))['qemu'])")
-QEMU=${QEMU//$CANON_TMP/$LANE_TMP}
+QEMU=$("$RESOLVE" "$QEMU" "$PREFIX")
 CPU=$(python3 -c "import json;print(json.load(open('$CFG'))['cpu_model'])")
 FW=$(python3 -c "import json;print(json.load(open('$CFG'))['ovmf_code_debug'])")
 PRISTINE=$(python3 -c "import json;print(json.load(open('$CFG'))['ovmf_vars_pristine'])")
-PRISTINE=${PRISTINE//$CANON_TMP/$LANE_TMP}
+PRISTINE=$("$RESOLVE" "$PRISTINE" "$PREFIX")
 APP=$(python3 -c "import json;print(json.load(open('$CFG'))['enroll_app'])")
 # enrollment FAT32 image (64 MiB): app as /EFI/BOOT/BOOTX64.EFI + auth blobs at the VOLUME ROOT
 # (G2/T5 F4: the app opens db.auth/kek.auth/pk.auth on the volume root and writes ENROLL.TXT there)

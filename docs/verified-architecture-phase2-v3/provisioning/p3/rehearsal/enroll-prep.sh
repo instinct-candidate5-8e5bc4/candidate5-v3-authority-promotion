@@ -23,8 +23,14 @@ openssl x509 -in "$W/kek.crt" -outform DER -out "$W/kek.cer"
 python3 - "$CERT" "$W/kek.cer" "$W/pk.cer" "$HOSTILE" "$W" <<'PY'
 import sys,struct
 cert,kek,pk,hostile,W=sys.argv[1:6]
-g=bytes.fromhex("a159c0a5e494a74a87b5ab155c2bf072")
-disk=struct.pack("<IHH",int.from_bytes(g[0:4],'big'),int.from_bytes(g[4:6],'big'),int.from_bytes(g[6:8],'big'))+g[8:]
+import uuid as _uuid
+# peer #16 E1: the GUID comes from ONE canonical source (uuid module, RFC string);
+# the bytes are ALREADY the EFI struct layout - no second conversion (the run-15
+# defect shipped the string-order bytes and every ESL died E_INVALID_PARAMETER).
+g=_uuid.UUID("a5c059a1-94e4-4aa7-87b5-ab155c2bf072").bytes_le
+if g.hex() != "a159c0a5e494a74a87b5ab155c2bf072":
+    raise SystemExit("E_ESL_GUID uuid.bytes_le mismatch vs pinned literal - python uuid broken")
+disk=g
 OWNER=struct.pack("<IHH",0xc501e570,0x0de0,0x0001)+bytes(8)
 def esl(certs,out):
     # one EFI_SIGNATURE_LIST per distinct cert size, concatenated (spec-correct for mixed sizes)
@@ -48,10 +54,13 @@ esl([kek],f"{W}/kek.esl")
 esl([pk],f"{W}/pk.esl")
 if hostile: esl([cert,hostile],f"{W}/db2.esl")
 PY
-"$SBV" --key "$W/pk.key"  --cert "$W/pk.crt"  --output "$W/pk.auth"  PK  "$W/pk.esl"
-"$SBV" --key "$W/pk.key"  --cert "$W/pk.crt"  --output "$W/kek.auth" KEK "$W/kek.esl"
-"$SBV" --key "$W/kek.key" --cert "$W/kek.crt" --output "$W/db.auth"  db  "$W/db.esl"
+"$SBV" --attr NON_VOLATILE,BOOTSERVICE_ACCESS,RUNTIME_ACCESS --key "$W/pk.key"  --cert "$W/pk.crt"  --output "$W/pk.auth"  PK  "$W/pk.esl"
+"$SBV" --attr NON_VOLATILE,BOOTSERVICE_ACCESS,RUNTIME_ACCESS --key "$W/pk.key"  --cert "$W/pk.crt"  --output "$W/kek.auth" KEK "$W/kek.esl"
+"$SBV" --attr NON_VOLATILE,BOOTSERVICE_ACCESS,RUNTIME_ACCESS --key "$W/kek.key" --cert "$W/kek.crt" --output "$W/db.auth"  db  "$W/db.esl"
 if [ -n "$HOSTILE" ]; then
-  "$SBV" --key "$W/kek.key" --cert "$W/kek.crt" --output "$W/db2.auth" db "$W/db2.esl"
+  "$SBV" --attr NON_VOLATILE,BOOTSERVICE_ACCESS,RUNTIME_ACCESS --key "$W/kek.key" --cert "$W/kek.crt" --output "$W/db2.auth" db "$W/db2.esl"
 fi
+HERE_PREP="$(cd "$(dirname "$0")" && pwd)"
+VA_MODE=--no-db2; [ -n "$HOSTILE" ] && VA_MODE=--expect-db2
+python3 "$HERE_PREP/verify-auth.py" "$W" "$HERE_PREP/enroll-app.c" "$SHIMS/openssl" "$VA_MODE"   || { echo "E_PREP_VERIFY verify-auth.py rc=$?" >&2; exit 97; }
 echo "enroll-prep complete (keys remain in $W for the enrollment window only)"

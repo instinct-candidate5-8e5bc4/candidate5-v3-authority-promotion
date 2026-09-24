@@ -578,9 +578,11 @@ jobs:
             || { echo "E_PF_PREP rc=$?" | tee -a "$PFD/prep.log"; cat "$PFD/prep.log"; exit 97; }
           # PF-4 planted condition: remove the pristine OVMF_VARS needed file; restore
           # BEFORE asserting so a failed must-show can never strand the ceremony.
-          CANON_TMP=/tmp/NON_CERTIFYING_SCRATCH-
+          # peer #16 D15-2: canonical-config path resolution via the ONE shared script;
+          # no remap literal in any derived workflow. Assert lane + existence.
           PRISTINE=$(python3 -c "import json;print(json.load(open('config.json'))['ovmf_vars_pristine'])")
-          PRISTINE=${PRISTINE//$CANON_TMP//tmp/$PREFIX-}
+          PRISTINE=$("$REH/resolve-lane-path.sh" "$PRISTINE" "$PREFIX")             || { echo "E_PF_SETUP resolve-lane-path rejected the config pristine path"; exit 97; }
+          case "$PRISTINE" in /tmp/$PREFIX-*) ;; *) echo "E_PF_SETUP resolved path outside lane: $PRISTINE"; exit 97;; esac
           [ -f "$PRISTINE" ] || { echo "E_PF_SETUP pristine vars not at $PRISTINE"; exit 97; }
           sudo cp -a "$PRISTINE" "$PFD/pristine-vars.saved"
           SAVED_SHA=$(sudo sha256sum "$PFD/pristine-vars.saved" | cut -d' ' -f1)
@@ -602,18 +604,26 @@ jobs:
             || { echo "E_PF_RESTORE_DRIFT restored vars != frozen pristine sha 5d2ac383..." | tee -a "$PFD/pf4.log"; exit 97; }
           # C1 + D13-3 (peer run-12/#13 review): PF-4's correct death is EXACTLY the ERR trap
           # at the pristine-VARS cp line, ONE fixed string ($BASH_COMMAND carries the command
-          # text unexpanded). Line pin 477 tracks the #14 head (the badpred guard shifted the
-          # cp by 3); a missing needed file has no narrower named gate, and
+          # text unexpanded). B1 (#16-prime): the line number is DERIVED AT RUN TIME from
+          # the committed script - count==1 via grep -c, exact-content assert, no
+          # hand-typed pin. A missing needed file has no narrower named gate, and
           # E_ENROLL_PID_MISSING must NOT appear.
+          CPN=$(grep -c 'cp "$PRISTINE" "$EVD/vars.fd"' "$REH/rehearsal-enroll.sh")
+          CPLINE=$(grep -n 'cp "$PRISTINE" "$EVD/vars.fd"' "$REH/rehearsal-enroll.sh")
+          [ "$CPN" = "1" ] \
+            || { echo "E_PF_SETUP cp pin not unique in rehearsal-enroll.sh (count=$CPN)" | tee -a "$PFD/pf4.log"; exit 97; }
+          CPLINENO=${CPLINE%%:*}
+          [ "${CPLINE#*:}" = 'cp "$PRISTINE" "$EVD/vars.fd"' ] \
+            || { echo "E_PF_SETUP cp line content drift: $CPLINE" | tee -a "$PFD/pf4.log"; exit 97; }
           [ "$_rc" = "97" ] \
             || { echo "E_PF_GATE_NOT_FIRED expected exit 97, got $_rc" | tee -a "$PFD/pf4.log"; exit 97; }
-          grep -F 'E_BASH_ERRTRAP rehearsal-enroll.sh line 477 rc=1 cmd: cp "$PRISTINE" "$EVD/vars.fd"' "$PFD/pf4.log" \
-            || { echo "E_PF_NAMED97_WRONG_CODE expected the exact line-477 ERRTRAP string" | tee -a "$PFD/pf4.log"; exit 97; }
+          grep -F 'E_BASH_ERRTRAP rehearsal-enroll.sh line '"$CPLINENO"' rc=1 cmd: cp "$PRISTINE" "$EVD/vars.fd"' "$PFD/pf4.log" \
+            || { echo "E_PF_NAMED97_WRONG_CODE expected the exact line-$CPLINENO ERRTRAP string" | tee -a "$PFD/pf4.log"; exit 97; }
           ! grep -F "E_ENROLL_PID_MISSING" "$PFD/pf4.log" \
             || { echo "E_PF_NAMED97_STALE_CODE E_ENROLL_PID_MISSING must not appear" | tee -a "$PFD/pf4.log"; exit 97; }
           grep -F "PF-4 planted condition:" "$PFD/pf4.log" \
             || { echo "E_PF_NOT_INJECTED planted-condition line missing from pf4.log" | tee -a "$PFD/pf4.log"; exit 97; }
-          echo "PF_4_MUST_SHOW_OK missing needed file died with the exact line-477 ERRTRAP string, exit 97" | tee -a "$PFD/pf4.log"
+          echo "PF_4_MUST_SHOW_OK missing needed file died with the exact line-$CPLINENO ERRTRAP string, exit 97" | tee -a "$PFD/pf4.log"
           grep -F "PF_4_MUST_SHOW_OK" "$PFD/pf4.log" || { echo "E_PF_LOG_VERDICT_MISSING"; exit 97; }
       - name: NON_CERTIFYING_SCRATCH planted-fault PF-5 nolfn name-contract gate must-show (peer run-12 L4)
         id: pf5
@@ -887,6 +897,58 @@ jobs:
           retention-days: 90
           if-no-files-found: error
 
+      - name: NON_CERTIFYING_SCRATCH verify-auth negative tests (peer #16 E5)
+        if: "!cancelled()"
+        run: |
+          set -euo pipefail
+          R=docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+          cd "$GITHUB_WORKSPACE/$R"
+          V=/tmp/$PREFIX-verify-auth-test; rm -rf "$V"; mkdir -p "$V"
+          trap 'shred -u "$V"/prep/*.key 2>/dev/null || true; rm -rf "$V"' EXIT
+          ./enroll-prep.sh /tmp/$PREFIX-stage/root "$V/prep" evidence/c5-signing-cert.der evidence/C5-HOSTILE-FIXTURE.cer > "$V/pos.log" 2>&1             || { echo "E_VATEST clean prep failed"; cat "$V/pos.log"; exit 97; }
+          grep -F "VERIFY_AUTH_OK" "$V/pos.log" > /dev/null || { echo "E_VATEST no VERIFY_AUTH_OK in clean pass"; cat "$V/pos.log"; exit 97; }
+          VA() { python3 verify-auth.py "$1" enroll-app.c /tmp/$PREFIX-stage/shims/openssl --expect-db2; }
+          # one 0x67-signed .auth among the 0x27 set -> E_AUTH_DIGEST
+          cp -r "$V/prep" "$V/n1"
+          /tmp/$PREFIX-stage/shims/sbvarsign --key "$V/prep/pk.key" --cert "$V/prep/pk.crt" --output "$V/n1/pk.auth" PK "$V/n1/pk.esl"
+          rc=0; VA "$V/n1" > "$V/n1.log" 2>&1 || rc=$?
+          [ "$rc" = "97" ] && grep -F "E_AUTH_DIGEST" "$V/n1.log" > /dev/null             || { echo "E_VATEST 0x67-single case rc=$rc"; cat "$V/n1.log"; exit 97; }
+          # string-order SignatureType GUID -> E_ESL_FORMAT
+          cp -r "$V/prep" "$V/n2"
+          python3 -c "b=bytearray(open('$V/n2/db.esl','rb').read()); b[0:16]=bytes.fromhex('a5c059a194e44aa787b5ab155c2bf072'); open('$V/n2/db.esl','wb').write(bytes(b))"
+          rc=0; VA "$V/n2" > "$V/n2.log" 2>&1 || rc=$?
+          [ "$rc" = "97" ] && grep -F "E_ESL_FORMAT" "$V/n2.log" > /dev/null             || { echo "E_VATEST guid case rc=$rc"; cat "$V/n2.log"; exit 97; }
+          # whole set signed 0x67 -> E_AUTH_ATTR_CONTRACT
+          cp -r "$V/prep" "$V/n3"
+          /tmp/$PREFIX-stage/shims/sbvarsign --key "$V/prep/pk.key" --cert "$V/prep/pk.crt" --output "$V/n3/pk.auth" PK "$V/n3/pk.esl"
+          /tmp/$PREFIX-stage/shims/sbvarsign --key "$V/prep/pk.key" --cert "$V/prep/pk.crt" --output "$V/n3/kek.auth" KEK "$V/n3/kek.esl"
+          /tmp/$PREFIX-stage/shims/sbvarsign --key "$V/prep/kek.key" --cert "$V/prep/kek.crt" --output "$V/n3/db.auth" db "$V/n3/db.esl"
+          /tmp/$PREFIX-stage/shims/sbvarsign --key "$V/prep/kek.key" --cert "$V/prep/kek.crt" --output "$V/n3/db2.auth" db "$V/n3/db2.esl"
+          rc=0; VA "$V/n3" > "$V/n3.log" 2>&1 || rc=$?
+          [ "$rc" = "97" ] && grep -F "E_AUTH_ATTR_CONTRACT" "$V/n3.log" > /dev/null             || { echo "E_VATEST contract case rc=$rc"; cat "$V/n3.log"; exit 97; }
+          # n4: db.esl signed by the WRONG key (pk) with the CORRECT --attr - digest matches, verification against kek.crt must die E_AUTH_SIG
+          cp -r "$V/prep" "$V/n4"
+          /tmp/$PREFIX-stage/shims/sbvarsign --attr NON_VOLATILE,BOOTSERVICE_ACCESS,RUNTIME_ACCESS --key "$V/prep/pk.key" --cert "$V/prep/pk.crt" --output "$V/n4/db.auth" db "$V/n4/db.esl"
+          rc=0; VA "$V/n4" > "$V/n4.log" 2>&1 || rc=$?
+          [ "$rc" = "97" ] && grep -F "E_AUTH_SIG" "$V/n4.log" > /dev/null || { echo "E_VATEST wrong-signer case rc=$rc"; cat "$V/n4.log"; exit 97; }
+          # n5: structural corruption (wRevision 0x0100) -> E_AUTH_FORMAT
+          cp -r "$V/prep" "$V/n5"
+          python3 -c "b=bytearray(open('$V/n5/db.auth','rb').read()); b[20:22]=(0x00,0x01); open('$V/n5/db.auth','wb').write(bytes(b))"
+          rc=0; VA "$V/n5" > "$V/n5.log" 2>&1 || rc=$?
+          [ "$rc" = "97" ] && grep -F "E_AUTH_FORMAT" "$V/n5.log" > /dev/null || { echo "E_VATEST wrevision case rc=$rc"; cat "$V/n5.log"; exit 97; }
+          # B4: corrupt the SECOND list SignatureType GUID in two-list db2.esl (signing cert 1092B vs hostile 799B - size-grouped, so two lists), re-signed to keep payload consistent -> E_ESL_FORMAT
+          cp -r "$V/prep" "$V/n6"
+          python3 -c "import struct; b=bytearray(open('$V/n6/db2.esl','rb').read()); lsz=struct.unpack_from('<I',b,16)[0]; b[lsz:lsz+16]=bytes.fromhex('a5c059a194e44aa787b5ab155c2bf072'); open('$V/n6/db2.esl','wb').write(bytes(b))"
+          /tmp/$PREFIX-stage/shims/sbvarsign --attr NON_VOLATILE,BOOTSERVICE_ACCESS,RUNTIME_ACCESS --key "$V/prep/kek.key" --cert "$V/prep/kek.crt" --output "$V/n6/db2.auth" db "$V/n6/db2.esl"
+          rc=0; VA "$V/n6" > "$V/n6.log" 2>&1 || rc=$?
+          [ "$rc" = "97" ] && grep -F "E_ESL_FORMAT" "$V/n6.log" > /dev/null || { echo "E_VATEST second-list-guid case rc=$rc"; cat "$V/n6.log"; exit 97; }
+          # B6: db2 half-present (auth removed) -> E_DB2_SET
+          cp -r "$V/prep" "$V/n7"; rm "$V/n7/db2.auth"
+          rc=0; VA "$V/n7" > "$V/n7.log" 2>&1 || rc=$?
+          [ "$rc" = "97" ] && grep -F "E_DB2_SET" "$V/n7.log" > /dev/null || { echo "E_VATEST db2-half case rc=$rc"; cat "$V/n7.log"; exit 97; }
+          # clean pass on the uncorrupted set
+          VA "$V/prep" > "$V/clean.log" 2>&1 || { echo "E_VATEST final clean pass failed"; cat "$V/clean.log"; exit 97; }
+          echo "VERIFY_AUTH_TESTS_OK clean/0x67-single/guid-order/0x67-uniform/wrong-signer/wrevision/second-list-guid/db2-half all verified; keys shredded outside upload tree"
       - name: NON_CERTIFYING_SCRATCH checkout-gate negative tests (D15-1)
         if: "!cancelled()"
         run: |
@@ -935,9 +997,23 @@ jobs:
           [ "$rc" = "98" ] && grep -F "E_PREP_LEFT_BEHIND" "$T/prep.log" > /dev/null \
             || { echo "E_GATETEST prep case rc=$rc"; cat "$T/prep.log"; exit 97; }
           rm -rf "$P"
+          # space+quote+dollar filename under an allowed root must PASS (-z form)
+          touch "$B/esp/weird name 'quote' \$dollar.efi"
+          "$GATE" "$T/repo" "$P" "$B" "$D" || { echo "E_GATETEST unusual-name case failed"; exit 97; }
+          rm "$B/esp/weird name 'quote' \$dollar.efi"
+          # sibling-prefix path must NOT be admitted by the allowlist (B2)
+          mkdir "${B}x-evil"; touch "${B}x-evil/e"
+          rc=0; "$GATE" "$T/repo" "$P" "$B" "$D" > "$T/sib.log" 2>&1 || rc=$?
+          [ "$rc" = "97" ] && grep -F "E_CHECKOUT_MUTATED unexpected untracked path: ${B}x-evil/e" "$T/sib.log" > /dev/null || { echo "E_GATETEST sibling-prefix case rc=$rc"; cat "$T/sib.log"; exit 97; }
+          rm -rf "${B}x-evil"
+          # symlink under an allowed root -> named 97 (K2 alignment)
+          ln -s /tmp "$B/link"
+          rc=0; "$GATE" "$T/repo" "$P" "$B" "$D" > "$T/link.log" 2>&1 || rc=$?
+          [ "$rc" = "97" ] && grep -F "E_CHECKOUT_MUTATED symlink under allowed root: $B/link" "$T/link.log" > /dev/null             || { echo "E_GATETEST symlink case rc=$rc"; cat "$T/link.log"; exit 97; }
+          rm "$B/link"
           # final clean pass
           "$GATE" "$T/repo" "$P" "$B" "$D" || { echo "E_GATETEST final clean pass failed"; exit 97; }
-          echo "CHECKOUT_GATE_TESTS_OK clean/stray/pycache/tracked/staged/prep all verified on a COPY"
+          echo "CHECKOUT_GATE_TESTS_OK clean/stray/pycache/tracked/staged/prep/unusual-name/sibling-prefix/symlink all verified on a COPY"
       - name: checkout immutability gate (end of job, frozen SHA)
         if: "!cancelled()"
         run: |

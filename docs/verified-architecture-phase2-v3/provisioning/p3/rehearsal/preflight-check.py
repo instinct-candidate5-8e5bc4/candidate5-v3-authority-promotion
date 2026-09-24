@@ -279,6 +279,24 @@ for _wf,_lo,_hi in (("../../../../../.github/workflows/OVMF_CI_SECURE_BOOT_UKI-C
     if not (_lo <= _n <= _hi):
         fail("E_PLANTED_FAULT_WORKFLOW_SCOPE",_wf+" ENROLL_PLANTED_FAULT occurrences="+str(_n)+" (cert+rehearsal must be 0; scratch must be >=1)")
 
+# 6e10) peer #16 D15-2(b): DERIVATION CONFORMANCE. The derived scratch workflow must
+# contain ZERO canonical-path occurrences (NON_CERTIFYING_REHEARSAL) and ZERO remap-needle
+# occurrences (CANON_TMP): every canonical-config path reaches it ONLY through
+# resolve-lane-path.sh. A canonical literal in the derived workflow means the derivation
+# bypassed the shared resolver (the run-15 PF-4 defect class).
+_scwf=os.path.join(here,"../../../../../.github/workflows/NON_CERTIFYING_SCRATCH-workflow.yml")
+if not os.path.exists(_scwf):
+    fail("E_DERIVED_CANON_LITERAL","scratch workflow missing: "+_scwf)
+else:
+    for _tok in ("NON_CERTIFYING_REHEARSAL","CANON_TMP"):
+        _r=_sp.run(["grep","-o",_tok,_scwf],capture_output=True,text=True)
+        if _r.returncode not in (0,1):
+            fail("E_DERIVED_CANON_LITERAL","grep rc="+str(_r.returncode)+" on scratch workflow ("+_tok+") - cannot prove purity")
+            continue
+        _n=len(_r.stdout.splitlines())
+        if _n!=0:
+            fail("E_DERIVED_CANON_LITERAL","scratch workflow carries "+str(_n)+" "+_tok+" occurrences (must be 0; resolve via resolve-lane-path.sh)")
+
 # 6e7) peer N4: PREFIX==ALLOWED_PREFIX equality alone accepts any literal from the same
 # workflow - bind the literals to the LANE statically per workflow file.
 import re as _re
@@ -364,7 +382,8 @@ if m is not None and m.group(1)=="%s" and "lock.get('snapshot_ts')" not in _sp_t
 # allow-list, over every committed .py file AND every python heredoc body in committed .sh
 import re as _re3
 PY_ALLOW={"collections","datetime","glob","hashlib","json","lzma","os","re",
-          "shutil","signal","socket","struct","subprocess","sys","time","urllib"}
+          "shutil","signal","socket","struct","subprocess","sys","time","urllib",
+          "tempfile","uuid"}  # #16: uuid (E1 GUID canonicalization), tempfile (verify-auth scratch)
 def _py_mods(text):
     mods=set()
     for ln in text.splitlines():

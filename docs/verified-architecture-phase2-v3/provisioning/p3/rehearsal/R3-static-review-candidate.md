@@ -1240,3 +1240,149 @@ lane's gate step AND by the scratch negative tests on COPIES.
     pre-commit (case table in the #15-REV packet).
 S3 re-run on the reworked tree: preflight-check.py PASS rc=0 (verbatim JSON in
     the packet).
+
+## 11. Run-15 verdict fixes (#16): guest enrollment root causes, fail-closed prep verification, resolver conformance
+
+Scope (peer-approved batch): enroll-prep.sh only + ONE new shipped checker
+(verify-auth.py) + D15-2 resolver conformance + checkout-gate follow-ups. No
+firmware, app, UKI, lock, or workflow-behavior changes outside the scratch-lane
+derivation. Full D1-D5 research packet with exact log line numbers and byte
+offsets is attached to the #16 report as files (D1..D5 + evidence index).
+
+E1 (root cause A, D1): enroll-prep.sh lines 26-33 - the X.509 SignatureType GUID
+    now derives from ONE canonical source,
+    uuid.UUID("a5c059a1-94e4-4aa7-87b5-ab155c2bf072").bytes_le, asserted equal to
+    the pinned struct-layout literal a159c0a5... (fail named E_ESL_GUID); the
+    double-conversion swap is removed. Shipped .esl SignatureType bytes are
+    struct-order, matching gEfiCertX509Guid for CheckSignatureListFormat
+    (AuthService.c:512, undefined-type return at 580-582).
+E2 (root cause B, D2): all four sbvarsign calls (lines 57-61) carry
+    --attr NON_VOLATILE,BOOTSERVICE_ACCESS,RUNTIME_ACCESS (0x27), overriding the
+    v0.9.4 default 0x67 (sbvarsign.c:99-103) so the signed attributes equal the
+    app's SetVariable call attributes (enroll-app.c:15 ATTRS=0x27) that the
+    firmware digest-binds (AuthService.c:2155-2192, Pkcs7Verify at 2238).
+E3 (consumer contract, L1): verify-auth.py extracts ATTRS from enroll-app.c
+    itself (macro-name table; unknown name -> E_AUTH_ATTR_CONTRACT). No
+    hand-typed attribute contract anywhere.
+E4 (NEW shipped fail-closed checker, verify-auth.py, runs at END of enroll-prep
+    before the complete echo; failure -> E_PREP_VERIFY 97; stdlib + staged
+    openssl only):
+    per .esl: SignatureType bytes == E1 bytes; SignatureListSize/SignatureSize
+    arithmetic; every DER entry parses as X.509 (E_ESL_FORMAT).
+    per .auth: EFI_TIME padding zero; dwLength == file size; wRevision 0x0200;
+    wCertificateType 0x0EF1; CertType == PKCS7 GUID; payload == matching .esl
+    (structural failures -> E_AUTH_FORMAT).
+    digest: sha256 over the firmware-exact composite
+    name_utf16le_no_nul||vendor_guid||attrs_LE||timestamp||esl recomputed and
+    compared to the PKCS#7 messageDigest (mismatch -> E_AUTH_DIGEST, or
+    E_AUTH_ATTR_CONTRACT when EVERY processed file uniformly binds one other
+    value, i.e. a systemic signer/consumer contract break).
+    signature: openssl smime -verify over the reconstructed composite against
+    the embedded signer certificate (failure -> E_AUTH_SIG).
+    DISCLOSURE: E_AUTH_FORMAT is one code beyond the three the peer named; it
+    carries structural .auth failures so E_AUTH_DIGEST stays purely a digest
+    verdict. The uniform-vs-partial split preserves the peer's E5 expectation
+    (a single 0x67 file among 0x27 files reports E_AUTH_DIGEST).
+E5 (scratch-only negative tests, new derived step "verify-auth negative
+    tests"): builds a throwaway prep set OUTSIDE the upload tree, then:
+    single 0x67-signed .auth -> E_AUTH_DIGEST; string-order GUID .esl ->
+    E_ESL_FORMAT; uniform 0x67 set -> E_AUTH_ATTR_CONTRACT; clean pass. Keys
+    shredded in-step via EXIT trap. All four cases ALSO verified locally
+    pre-commit, plus payload/esl mismatch and wRevision corruption cases
+    (six-case battery, all named codes observed).
+E6 (C5 blob rule): PF-1/2/4/5/6 and the ceremony all re-run on the #16 head;
+    per main's standing requirement the run must show: SetupMode anomaly
+    re-checked (D3); sole/widened/sole-fresh ENROLL.TXT SET_*_STATUS=0 + the
+    predicate PASS; PF-6 exercisable + PF_6_MUST_SHOW_OK; PF-4 C1, C2, exact
+    line; cross-check, guard, K2, checkout gate after a REAL ceremony.
+
+D15-2 (resolver conformance):
+    (a) resolve-lane-path.sh (NEW, shipped): the single owner of the
+    canonical->lane mapping. Its needle is the ONLY canonical literal in any
+    consumer. Idempotent (lane paths pass through); E_LANE_PATH_USAGE /
+    E_LANE_PATH / E_LANE_PATH_NOT_CANON fail closed.
+    (b) consumers rewired: rehearsal-enroll.sh (QEMU + pristine paths),
+    derive-scratch.py PF-4 wrapper (remap needle REMOVED - the run-15 PF-4
+    defect: the template needle carried the lane prefix, the committed config
+    carries canonical, no-op remap, raw job log line 1707),
+    derive-scratch.py ceremony QEMU line (already resolver-based).
+    (c) static conformance: preflight-check.py 6e10 E_DERIVED_CANON_LITERAL -
+    the derived scratch workflow must contain ZERO NON_CERTIFYING_REHEARSAL and
+    ZERO CANON_TMP occurrences. Negative-tested locally (planted literal ->
+    named failure; restored byte-identical; PASS).
+    MECHANISM NOTE (peer's diagnosis corrected): the PF-4 template authors the
+    needle pre-replaced; the global line-15 swap is NOT the mechanism.
+    DISCLOSURE: preflight-check.py's own pref() normalization keeps its pinned
+    canonical literal (it statically validates canonical committed bytes, same
+    sanctioned-carrier role as the resolver); a resolver-based refactor was
+    attempted and REVERTED because pref() also passes non-path strings
+    (hashes, case names) through unchanged, which the resolver correctly
+    rejects. Candidate follow-up if the peer wants total needle elimination.
+
+checkout-gate.sh follow-ups (peer-approved into the batch):
+    untracked enumeration now NUL-delimited (git status --porcelain=v1 -z
+    --untracked-files=all) - filenames with spaces/quotes/$ cannot spoof the
+    parse; symlink rejection under allowed roots (find -type l non-empty ->
+    E_CHECKOUT_MUTATED naming the link, K2 alignment). DISCLOSURE: the
+    E_PREP_LEFT_BEHIND check was restored BEFORE the untracked enumeration -
+    the rewrite had reordered it so a surviving prep/ with files reported 97
+    instead of its dedicated 98; shipped D15-1 semantics preserved. 13-case
+    local battery (incl. space+quote+$ filename PASS, symlink 97, prep-with-key
+    98, empty-prep 98, env2 zero-root shape) ALL PASS; the scratch gate-test
+    step gains the unusual-name and symlink cases.
+    preflight PY_ALLOW widened with tempfile,uuid (stdlib, used by E1/E4).
+
+S3 re-run on the #16 tree: preflight-check.py PASS rc=0 (verbatim JSON in the
+    #16 packet). yaml + bash -n clean on all three workflows. 6e6 pins
+    unchanged: cert 44, rehearsal 78 (both workflows untouched this batch).
+    6e9: 0/0/4 (the new scratch steps carry no lane token or planted-fault
+    refs). Scratch workflow: 0 canonical literals, 0 CANON_TMP.
+
+## 11a. #16-prime corrections (peer review of the #16 bundle: B1-B6 + N1/N2)
+
+B1 PF-4 line pin: no hand-typed number anywhere. The pristine-cp line is
+    derived at RUN TIME from the committed rehearsal-enroll.sh - grep -c must
+    be exactly 1, the matched line must be exactly
+    cp "$PRISTINE" "$EVD/vars.fd" (E_PF_SETUP otherwise), and the ERRTRAP grep
+    uses that derived number. Local execution against the SHIPPED script:
+    CPN=1, CPLINE=478:cp "$PRISTINE" "$EVD/vars.fd", content assert PASS, the
+    assembled needle matches a simulated trap line at 478, and the stale 477
+    needle provably does NOT match (grep rc=1) - the run-15 needle defect
+    class is closed by construction.
+B2 allowlist path boundary restored: "$allowed"|"$allowed/"* only - a sibling
+    prefix (build-outputx-evil/e, build-output.sh) dies E_CHECKOUT_MUTATED 97.
+    Negative executed locally AND added to the scratch gate-test step.
+B3 fail-closed gate: find errors die E_CHECKOUT_SCAN 97 (rc captured, no
+    2>/dev/null||true swallow); every -z porcelain entry must start with
+    "?? " (anything else named E_CHECKOUT_MUTATED 97) before slicing.
+B4 ESL SignatureType check moved INSIDE the list walk - every list's 16 bytes
+    (b[off:off+16]), not just the first. db2.esl is TWO lists (the builder
+    size-groups entries; signing cert 1092B vs hostile fixture 799B), so the
+    second-list GUID corruption negative is a real two-list case:
+    E_ESL_FORMAT naming list at 1136.
+B5 E_AUTH_SIG now exercised: db.esl re-signed by the WRONG key (pk) with the
+    CORRECT --attr (digest matches) dies E_AUTH_SIG against kek.crt. n5
+    wRevision 0x0100 dies E_AUTH_FORMAT. openssl smime -verify now passes
+    -binary (no text canonicalization of detached content); clean pass + n4
+    prove it.
+B6 db2 set discipline: verify-auth.py takes a required 4th arg
+    (--expect-db2|--no-db2; enroll-prep passes it from HOSTILE given or not).
+    db2.esl/db2.auth must be BOTH or NEITHER (half-present -> E_DB2_SET);
+    presence must match the mode (missing in widened -> E_DB2_SET; present in
+    sole -> E_DB2_SET; absent/bogus mode arg -> E_DB2_SET usage, exit 97 -
+    that path printed a NameError in the first cut, caught by the executed
+    battery, now prints the named code directly).
+N1 messageDigest OID scan restricted to the PKCS7 slice (pkcs7.count/index),
+    never the whole file including the ESL payload.
+N2 preflight 6e10 fails closed on grep rc not in {0,1} and on a missing
+    scratch workflow - a silent 0 can no longer pass.
+
+Executed battery (verbatim outcomes in the #16-prime report): positives in
+both modes (widened 4 files VERIFY_AUTH_OK incl db2 entries=2 two lists; sole
+3 files), negatives n1 E_AUTH_DIGEST / n2 E_AUTH_ATTR_CONTRACT / n3 first-list
+E_ESL_FORMAT / n4 E_AUTH_SIG / n5 E_AUTH_FORMAT / B4 second-list E_ESL_FORMAT /
+B6 half E_DB2_SET / B6 missing-widened E_DB2_SET / B6 present-sole E_DB2_SET /
+payload E_AUTH_FORMAT / usage E_DB2_SET, gate 9-case battery incl
+sibling-prefix and find-error, preflight PASS + 6e10 planted-literal negative,
+yaml + bash -n x3 workflows, bash -n x4 scripts, 6e6 44/78, 6e9 0/0/4, scratch
+0 canonical literals. All throwaway keys shredded.
