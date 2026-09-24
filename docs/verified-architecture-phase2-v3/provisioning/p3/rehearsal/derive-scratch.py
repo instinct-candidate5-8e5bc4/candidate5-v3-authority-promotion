@@ -143,7 +143,7 @@ BLOCK_PF = r'''
           [ "$(sha256sum "$PFWORK/build-output/ovmf-debug/OVMF_CODE.fd" | cut -d' ' -f1)" = "fc150336fce10eb5508fa440cdf7300622c8c3ac71f2fbe10a0731422b9cef24" ] \
             || { echo "E_PF_SETUP OVMF_CODE sha mismatch after copy" | tee -a "$PFD/prep.log"; exit 97; }
           cp config.json "$PFWORK/config.json"
-          "$REH/enroll-prep.sh" /tmp/$PREFIX-stage/root "$PREPP" "$REH/evidence/c5-signing-cert.der" "$REH/build-output/c-sign/fixtures/C5-HOSTILE-FIXTURE.cer" \
+          "$REH/enroll-prep.sh" /tmp/$PREFIX-stage/root "$PREPP" "$REH/evidence/c5-signing-cert.der" "/tmp/$PREFIX-inrun/c-sign/fixtures/C5-HOSTILE-FIXTURE.cer" \
             > "$PFD/prep.log" 2>&1 \
             || { echo "E_PF_PREP rc=$?" | tee -a "$PFD/prep.log"; cat "$PFD/prep.log"; exit 97; }
           _rc=0
@@ -194,7 +194,7 @@ BLOCK_PF = r'''
           [ "$(sha256sum "$PFWORK/build-output/ovmf-debug/OVMF_CODE.fd" | cut -d' ' -f1)" = "fc150336fce10eb5508fa440cdf7300622c8c3ac71f2fbe10a0731422b9cef24" ] \
             || { echo "E_PF_SETUP OVMF_CODE sha mismatch after copy" | tee -a "$PFD/prep.log"; exit 97; }
           cp config.json "$PFWORK/config.json"
-          "$REH/enroll-prep.sh" /tmp/$PREFIX-stage/root "$PREPP" "$REH/evidence/c5-signing-cert.der" "$REH/build-output/c-sign/fixtures/C5-HOSTILE-FIXTURE.cer" \
+          "$REH/enroll-prep.sh" /tmp/$PREFIX-stage/root "$PREPP" "$REH/evidence/c5-signing-cert.der" "/tmp/$PREFIX-inrun/c-sign/fixtures/C5-HOSTILE-FIXTURE.cer" \
             > "$PFD/prep.log" 2>&1 \
             || { echo "E_PF_PREP rc=$?" | tee -a "$PFD/prep.log"; cat "$PFD/prep.log"; exit 97; }
           _rc=0
@@ -247,7 +247,7 @@ BLOCK_PF = r'''
           [ "$(sha256sum "$PFWORK/build-output/ovmf-debug/OVMF_CODE.fd" | cut -d' ' -f1)" = "fc150336fce10eb5508fa440cdf7300622c8c3ac71f2fbe10a0731422b9cef24" ] \
             || { echo "E_PF_SETUP OVMF_CODE sha mismatch after copy" | tee -a "$PFD/prep.log"; exit 97; }
           cp config.json "$PFWORK/config.json"
-          "$REH/enroll-prep.sh" /tmp/$PREFIX-stage/root "$PREPP" "$REH/evidence/c5-signing-cert.der" "$REH/build-output/c-sign/fixtures/C5-HOSTILE-FIXTURE.cer" \
+          "$REH/enroll-prep.sh" /tmp/$PREFIX-stage/root "$PREPP" "$REH/evidence/c5-signing-cert.der" "/tmp/$PREFIX-inrun/c-sign/fixtures/C5-HOSTILE-FIXTURE.cer" \
             > "$PFD/prep.log" 2>&1 \
             || { echo "E_PF_PREP rc=$?" | tee -a "$PFD/prep.log"; cat "$PFD/prep.log"; exit 97; }
           # PF-4 planted condition: remove the pristine OVMF_VARS needed file; restore
@@ -326,7 +326,7 @@ BLOCK_PF = r'''
           [ "$(sha256sum "$PFWORK/build-output/ovmf-debug/OVMF_CODE.fd" | cut -d' ' -f1)" = "fc150336fce10eb5508fa440cdf7300622c8c3ac71f2fbe10a0731422b9cef24" ] \
             || { echo "E_PF_SETUP OVMF_CODE sha mismatch after copy" | tee -a "$PFD/prep.log"; exit 97; }
           cp config.json "$PFWORK/config.json"
-          "$REH/enroll-prep.sh" /tmp/$PREFIX-stage/root "$PREPP" "$REH/evidence/c5-signing-cert.der" "$REH/build-output/c-sign/fixtures/C5-HOSTILE-FIXTURE.cer" \
+          "$REH/enroll-prep.sh" /tmp/$PREFIX-stage/root "$PREPP" "$REH/evidence/c5-signing-cert.der" "/tmp/$PREFIX-inrun/c-sign/fixtures/C5-HOSTILE-FIXTURE.cer" \
             > "$PFD/prep.log" 2>&1 \
             || { echo "E_PF_PREP rc=$?" | tee -a "$PFD/prep.log"; cat "$PFD/prep.log"; exit 97; }
           _rc=0
@@ -384,7 +384,7 @@ BLOCK_PF6 = r'''      - name: NON_CERTIFYING_SCRATCH planted-fault PF-6 badpred 
           [ "$(sha256sum "$PFWORK/build-output/ovmf-debug/OVMF_CODE.fd" | cut -d' ' -f1)" = "fc150336fce10eb5508fa440cdf7300622c8c3ac71f2fbe10a0731422b9cef24" ] \
             || { echo "E_PF_SETUP OVMF_CODE sha mismatch after copy" | tee -a "$PFD/prep.log"; exit 97; }
           cp config.json "$PFWORK/config.json"
-          "$REH/enroll-prep.sh" /tmp/$PREFIX-stage/root "$PREPP" "$REH/evidence/c5-signing-cert.der" "$REH/build-output/c-sign/fixtures/C5-HOSTILE-FIXTURE.cer" \
+          "$REH/enroll-prep.sh" /tmp/$PREFIX-stage/root "$PREPP" "$REH/evidence/c5-signing-cert.der" "/tmp/$PREFIX-inrun/c-sign/fixtures/C5-HOSTILE-FIXTURE.cer" \
             > "$PFD/prep.log" 2>&1 \
             || { echo "E_PF_PREP rc=$?" | tee -a "$PFD/prep.log"; cat "$PFD/prep.log"; exit 97; }
           _rc=0
@@ -529,7 +529,7 @@ BLOCK_NEG_TESTS = r'''      - name: NON_CERTIFYING_SCRATCH verify-auth negative 
           cd "$GITHUB_WORKSPACE/$R"
           V=/tmp/$PREFIX-verify-auth-test; rm -rf "$V"; mkdir -p "$V"
           trap 'shred -u "$V"/prep/*.key 2>/dev/null || true; rm -rf "$V"' EXIT
-          ./enroll-prep.sh /tmp/$PREFIX-stage/root "$V/prep" evidence/c5-signing-cert.der build-output/c-sign/fixtures/C5-HOSTILE-FIXTURE.cer > "$V/pos.log" 2>&1             || { echo "E_VATEST clean prep failed"; cat "$V/pos.log"; exit 97; }
+          ./enroll-prep.sh /tmp/$PREFIX-stage/root "$V/prep" evidence/c5-signing-cert.der /tmp/$PREFIX-inrun/c-sign/fixtures/C5-HOSTILE-FIXTURE.cer > "$V/pos.log" 2>&1             || { echo "E_VATEST clean prep failed"; cat "$V/pos.log"; exit 97; }
           grep -F "VERIFY_AUTH_OK" "$V/pos.log" > /dev/null || { echo "E_VATEST no VERIFY_AUTH_OK in clean pass"; cat "$V/pos.log"; exit 97; }
           VA() { python3 verify-auth.py "$1" enroll-app.c /tmp/$PREFIX-stage/shims/openssl --expect-db2; }
           # one 0x67-signed .auth among the 0x27 set -> E_AUTH_DIGEST

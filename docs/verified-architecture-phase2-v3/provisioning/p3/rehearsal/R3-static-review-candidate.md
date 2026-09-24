@@ -1879,3 +1879,19 @@ Fix per ruling (parts 3-4/4):
 
 Signed-slot deferred items 16d(a)-(e) still stand - NOT part of this head.
 
+## 22. C1'''''''' revision (C1''''''' verdict): relocation completed - eight stale reads retargeted, E_INRUN_STALE_PATH gate, prep-key shred
+
+The C1''''''' verdict accepted the relocation design but found it INCOMPLETE: eight consumers still read the pre-relocation in-checkout paths. C1'''''''' SUPERSEDES C1''''''' (3508536e7fcddfd6f1b236c1611f97de703dab2f), C1'''''' (dac532c3..), C1''''' (d53219d2..), C1'''' (c839727e..), C1''' (27bfd5c3..), C1'' (fe147879..), C1' (0d66fc2b..), C1 (b2eaef1d..); all remain in history as reviewed-and-revised heads.
+
+The eight stale reads (reviewer repro: git grep -nE 'build-output/(c-sign|uki)' on the shipped tree): run-ceremony.sh:174 (sole/widened enrollment hostile fixture) and :178 (prep-throwaway db cert + wrong-signer fixture) - the ceremony would have died at enrollment; SCRATCH lines 755/806/859/938/1002 (the five PF must-show steps) and 1364 (VATEST), all six generated from derive-scratch.py lines 146/197/250/329/387/532 - the PF must-shows could have "failed as expected" for the WRONG reason (missing file instead of the planted fault).
+
+Fix per the verdict:
+(a) All eight retargeted: run-ceremony.sh reads "$INRUN/c-sign/..."; derive-scratch.py embedded step text uses /tmp/$PREFIX-inrun/c-sign/...; SCRATCH re-derived (DERIVE_IDENTICAL). Post-fix grep: zero occurrences of build-output/(c-sign|uki) outside the excluded gate/test files.
+(b) NEW static gate E_INRUN_STALE_PATH (preflight 6n): no occurrence of build-output/uki or build-output/c-sign in any workflow, .sh, or .py - including derive-scratch.py's embedded step text - outside full-comment lines and the gate/test files themselves (preflight-check.py carries the pattern strings; test-inrun-writes.py and test-inrun-stale-path.py carry planted negatives; all three named in the gate). Committed planted negatives test-inrun-stale-path.py exec the EXACT 6n block: 8/8 (real tree clean; workflow/.sh/.py-embedded-text/uki-leg each fire; comment-only, excluded-file, clean-synthetic no-fire).
+(c) PF must-show strictness SURVEY (verdict item): each of the five PF steps already asserts its planted failure by NAMED CODE, never a bare non-zero - pf1: exact exit 97 + !E_BASH_ERRTRAP + E_ENROLL_FAT_INVALID + injection proof; pf2/pf5: exact exit 97 + !E_BASH_ERRTRAP + E_ENROLL_FAT_NAME_CONTRACT + injection proof; pf4: exact exit 97 + the exact run-time-derived line-N ERRTRAP string (cp pin count==1, content-verified) + !E_ENROLL_PID_MISSING + planted-condition line in the durable log; pf6: E_PF_BADPRED_PRECONDITION precondition guard + injection proof + E_ENROLL_SET_DB diagnostic + exact exit 97 + E_ENROLL_PREDICATE_FAIL + !E_BASH_ERRTRAP. No step accepts any failure; nothing to change.
+(d) prep/prep-throwaway key hygiene raised to the c-sign rule: CONFIRMED enroll-prep.sh writes the throwaway PK/KEK private keys at $W/pk.key and $W/kek.key (0600 via umask 077; W = the prep dir argument: prep, prep-throwaway). run-ceremony.sh now shred -u's all four key files in the EXIT trap AND in the explicit cleanup after the enrollment loop, with a fail-closed residue check (E_PREP_KEY_RESIDUE, exit 97) before the prep dirs are removed; the stale "plain-deleted" comments corrected.
+
+Mishap disclosed: C1''''''' shipped eight stale reads. The 6m gate covers WRITES only and could not see them; my retarget sweep checked the producers and the SHASUMS consumption but not every consumer, and both byte reviews missed it. The new 6n gate makes the whole path class unrepresentable outside the named exclusions.
+
+Signed-slot deferred items 16d(a)-(e) still stand - NOT part of this head.
+

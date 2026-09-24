@@ -171,12 +171,19 @@ if [ "$_gate_rc" != 0 ]; then
   exit "$_gate_rc"
 fi
 # enrollments (three independent pristine VARS derivations, each a single enrollment invocation)
-./enroll-prep.sh "$STAGE/root" prep evidence/c5-signing-cert.der build-output/c-sign/fixtures/C5-HOSTILE-FIXTURE.cer
+./enroll-prep.sh "$STAGE/root" prep evidence/c5-signing-cert.der "$INRUN/c-sign/fixtures/C5-HOSTILE-FIXTURE.cer"
 # criterion C: second prep whose db cert is the run's throwaway CI signing cert (wrong-signer
-# fixture as the unused hostile arg, keeping the 2-cert prep shape). Same key hygiene: the
-# throwaway PK/KEK private keys are plain-deleted with the prep dir below.
-./enroll-prep.sh "$STAGE/root" prep-throwaway build-output/c-sign/c5-throwaway-ci-cert.der build-output/c-sign/fixtures/C5-WRONG-SIGNER-FIXTURE.cer
-trap '_repair_out; rm -rf prep prep-throwaway' EXIT
+# fixture as the unused hostile arg, keeping the 2-cert prep shape). Same key hygiene as the
+# c-sign throwaway key (peer C1' verdict (d)): the prep PK/KEK private keys are shred -u'd
+# in the explicit cleanup below AND in the EXIT trap, with a fail-closed residue check.
+./enroll-prep.sh "$STAGE/root" prep-throwaway "$INRUN/c-sign/c5-throwaway-ci-cert.der" "$INRUN/c-sign/fixtures/C5-WRONG-SIGNER-FIXTURE.cer"
+_shred_prep_keys() {
+  local f
+  for f in prep/pk.key prep/kek.key prep-throwaway/pk.key prep-throwaway/kek.key; do
+    if [ -e "$f" ]; then shred -u "$f"; fi
+  done
+}
+trap '_repair_out; _shred_prep_keys; rm -rf prep prep-throwaway' EXIT
 for mode in sole widened sole-fresh throwaway; do
   d="$OUT/$PREFIX-enroll-$mode"
   mkdir -p "$d"
@@ -200,9 +207,14 @@ for mode in sole widened sole-fresh throwaway; do
     exit "$_enroll_rc"
   fi
 done
-# the throwaway PK/KEK private keys never leave the runner and are plain-deleted the moment
-# the enrollment window closes; their DER hashes are already recorded in each enrollment's
-# enroll-predicate.json evidence. (trap EXIT above also covers failure paths.)
+# the throwaway PK/KEK private keys never leave the runner and are shred -u'd the moment
+# the enrollment window closes (the EXIT trap above covers failure paths the same way);
+# their DER hashes are already recorded in each enrollment's enroll-predicate.json evidence.
+# Fail-closed residue check: a key file surviving shred -u stops the ceremony by name.
+_shred_prep_keys
+for f in prep/pk.key prep/kek.key prep-throwaway/pk.key prep-throwaway/kek.key; do
+  [ ! -e "$f" ] || { echo "E_PREP_KEY_RESIDUE $f still present after shred -u"; exit 97; }
+done
 rm -rf prep prep-throwaway
 # case suite (harness CLI: config + work_root + out_dir for the F4 allow-set construction)
 # H4 (peer run-35959397469 ruling): the harness's NAMED exit code passes up unchanged

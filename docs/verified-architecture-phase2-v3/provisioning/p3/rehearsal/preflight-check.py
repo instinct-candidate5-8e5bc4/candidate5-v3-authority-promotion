@@ -786,6 +786,27 @@ else:
             if _WRITE_RE.search(_l) and _TGT_RE.search(_l):
                 fail("E_INRUN_WRITES_CHECKOUT","%s:%d pre-ceremony step writes under build-output/disks/prep: %s"%(_inrun_wf,_ln,_ls[:100]))
 
+# 6n) peer C1''''''' verdict (b): E_INRUN_STALE_PATH - no READ or WRITE reference to the
+# pre-relocation in-run product paths may survive anywhere. The 6m gate covers WRITES; this
+# gate covers the paths themselves: no occurrence of build-output/uki or build-output/c-sign
+# in any workflow, .sh, or .py (including derive-scratch.py's embedded step text), outside
+# full-comment lines and the gate/test files themselves (named below - preflight-check.py
+# carries the pattern strings; the two test files carry planted negatives). Committed
+# planted negatives: test-inrun-stale-path.py.
+import re as _re_sp
+_STALE_RE=_re_sp.compile(r"build-output/(?:c-sign|uki)")
+_STALE_EXCL={"preflight-check.py","test-inrun-stale-path.py","test-inrun-writes.py"}
+_stale_files=[os.path.join(wf_dir,f) for f in sorted(os.listdir(wf_dir)) if f.endswith(".yml")]
+_stale_files+=[os.path.join(here,f) for f in sorted(os.listdir(here)) if f.endswith((".sh",".py"))]
+_stale_files+=[os.path.join(p3_root,f) for f in sorted(os.listdir(p3_root)) if f.endswith((".sh",".py"))]
+for _p in _stale_files:
+    if os.path.basename(_p) in _STALE_EXCL: continue
+    if not os.path.isfile(_p): continue
+    for _ln,_l in enumerate(open(_p,errors="replace").read().splitlines(),1):
+        if _l.strip().startswith("#"): continue
+        if _STALE_RE.search(_l):
+            fail("E_INRUN_STALE_PATH","%s:%d pre-relocation inrun path reference: %s"%(_p,_ln,_l.strip()[:100]))
+
 # 7) KVM requirement is declarative here; runtime fail-closed check lives in the workflow
 report={"schema":"NON_CERTIFYING_REHEARSAL-preflight/v1","lane":PREFIX,"errors":E,
         "heredoc_coverage":_heredoc_coverage,
