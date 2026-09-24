@@ -80,7 +80,7 @@ jobs:
           # D2 gate (reviewer ruling): every relative file/script argument used by later
           # steps must exist in the committed tree. Fixed list, fail-closed exit 88.
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
-          for f in             platform.lock.json             config.json             stage-platform.sh             make-shims.sh             test-c-sign-confinement.py             test-enroll-predicate-env.py             test-cert-positive-guard.py             test-k2-sweeps.py             test-inrun-writes.py             test-inrun-stale-path.py             test-inrun-allowlist.py             test-stale-state-committed.py             test-heredoc-structure.py             test-h5-planted-errset.py             preflight-check.py             build-ovmf-debug.sh             scan-pe-pdb-paths.py             build-enroll-app.sh             bwrap-argv.sh             enroll-predicate-check.py             rehearsal-enroll.sh             ../build-esp-image.sh             evidence/successor-signed.efi             run-ceremony.sh             qemu-smoke.sh             config_schema.py             bind-fixture-certs.sh             test-config-schema.py             test-fixture-cert-binding.py             test-env-contract.py             test-hist-esp-guard.py             test-workdir-sibling.py; do
+          for f in             platform.lock.json             config.json             stage-platform.sh             make-shims.sh             test-c-sign-confinement.py             test-enroll-predicate-env.py             test-cert-positive-guard.py             test-k2-sweeps.py             test-inrun-writes.py             test-inrun-stale-path.py             test-inrun-allowlist.py             test-stale-state-committed.py             test-heredoc-structure.py             test-h5-planted-errset.py             preflight-check.py             build-ovmf-debug.sh             scan-pe-pdb-paths.py             build-enroll-app.sh             bwrap-argv.sh             enroll-predicate-check.py             rehearsal-enroll.sh             ../build-esp-image.sh             evidence/successor-signed.efi             run-ceremony.sh             qemu-smoke.sh             config_schema.py             bind-fixture-certs.sh             test-config-schema.py             test-fixture-cert-binding.py             test-env-contract.py             test-hist-esp-guard.py             test-workdir-sibling.py             test-h3-precheck.py             test-argv-freeze.py             test-marker-absence.py; do
             [ -e "$f" ] || { echo "E_WORKFLOW_ARG_MISSING $f"; exit 88; }
           done
       - name: NON_CERTIFYING_REHEARSAL host inputs declared (B3)
@@ -206,6 +206,10 @@ jobs:
           # peer run-36024634796 ruling: historical-ESP boot-expectation guard + workdir sibling-closure gate
           python3 test-hist-esp-guard.py 2>&1 | tee /tmp/$PREFIX-out/$PREFIX-hist-esp-guard-tests.log
           python3 test-workdir-sibling.py 2>&1 | tee /tmp/$PREFIX-out/$PREFIX-workdir-sibling-tests.log
+          # peer run-36031372949 ruling: H3 precheck taxonomy, executed-argv freeze contract, marker-at-rest
+          python3 test-h3-precheck.py 2>&1 | tee /tmp/$PREFIX-out/$PREFIX-h3-precheck-tests.log
+          python3 test-argv-freeze.py 2>&1 | tee /tmp/$PREFIX-out/$PREFIX-argv-freeze-tests.log
+          python3 test-marker-absence.py 2>&1 | tee /tmp/$PREFIX-out/$PREFIX-marker-absence-tests.log
 
       - name: NON_CERTIFYING_REHEARSAL reproducible OVMF DEBUG dual build + accepted-firmware pins
         timeout-minutes: 150

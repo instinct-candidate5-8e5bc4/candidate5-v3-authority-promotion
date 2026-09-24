@@ -505,6 +505,7 @@ BLOCK_BOOT_TARGET_NEG = r'''      - name: NON_CERTIFYING_SCRATCH planted-fault H
           cp rehearsal-harness.py "$T/rehearsal-harness.py"
           cp lane_resolve.py "$T/lane_resolve.py"
           cp config_schema.py "$T/config_schema.py"
+          cp argv-freeze.json "$T/argv-freeze.json"
           [ "$(grep -c -F ',bootindex=0' "$T/rehearsal-harness.py")" = "1" ] || { echo "E_H3_NEG_INJECTION ESP-device bootindex count != 1 in harness source"; exit 97; }
           sed -i 's/,bootindex=0//' "$T/rehearsal-harness.py"
           [ "$(grep -c -F ',bootindex=0' "$T/rehearsal-harness.py")" = "0" ] || { echo "E_H3_NEG_INJECTION bootindex removal failed"; exit 97; }
@@ -520,14 +521,24 @@ BLOCK_BOOT_TARGET_NEG = r'''      - name: NON_CERTIFYING_SCRATCH planted-fault H
           # into the checkout. The harness copy carries the H5a bytecode guard.
           _rc=0
           sudo unshare -n env PREFIX="$PREFIX" ALLOWED_PREFIX="$ALLOWED_PREFIX" PYTHONDONTWRITEBYTECODE=1 python3 "$T/rehearsal-harness.py" "$T/config.json" "$T/cases" /tmp/$PREFIX-out > "$T/h3.log" 2>&1 || _rc=$?
+          # peer run-36031372949 ruling (1): the injected harness wrote $T as root. Repair
+          # OWNERSHIP of $T only (chown to runner) before any runner-side read - NO
+          # world-readable chmod, nothing outside $T. Fail closed if the repair fails.
+          sudo chown -R "$(id -u):$(id -g)" "$T" || { echo "E_H3_PERM_REPAIR_FAILED chown rc=$? on $T"; exit 97; }
           # before accepting the named target death, ASSERT qemu really started (an
           # environmental death would be E_QEMU_START, also rc 90 - indistinguishable
           # without this proof): the case argv.txt exists AND a NONEMPTY ovmf-debug.log
           # carries a "[Bds]Booting " line.
-          [ -d "$T/cases" ] || { echo "E_H3_CASES_MISSING harness produced no cases dir (early death - see h3.log)"; cat "$T/h3.log"; exit 97; }
+          # peer run-36031372949 ruling (2): DISTINCT named deaths - a permissions death is
+          # never "environmental", and grep's rc branches 0/1/2 (rc 2 never folds into "no match").
+          [ -d "$T/cases" ] || { echo "E_H3_QEMU_NOT_STARTED case dir $T/cases missing (early harness death - see h3.log)"; cat "$T/h3.log"; exit 97; }
           _cdir=$(find "$T/cases" -mindepth 1 -maxdepth 1 -type d | head -1)
-          [ -n "$_cdir" ] && [ -s "$_cdir/argv.txt" ] || { echo "E_H3_QEMU_NOT_STARTED case argv.txt missing (environmental)"; cat "$T/h3.log"; exit 97; }
-          [ -s "$_cdir/ovmf-debug.log" ] && grep -q '^\[Bds\]Booting ' "$_cdir/ovmf-debug.log" || { echo "E_H3_QEMU_NOT_STARTED no nonempty debug log with a Booting line (environmental)"; cat "$T/h3.log"; exit 97; }
+          [ -n "$_cdir" ] && [ -f "$_cdir/argv.txt" ] || { echo "E_H3_QEMU_NOT_STARTED case dir or argv.txt missing"; cat "$T/h3.log"; exit 97; }
+          if [ ! -e "$_cdir/ovmf-debug.log" ]; then echo "E_H3_NO_BOOT_LINE $_cdir/ovmf-debug.log absent (qemu produced no debug log)"; cat "$T/h3.log"; exit 97; fi
+          if [ ! -r "$_cdir/ovmf-debug.log" ]; then echo "E_H3_DEBUG_LOG_UNREADABLE $_cdir/ovmf-debug.log present but not readable by the runner"; cat "$T/h3.log"; exit 97; fi
+          _grc=0; grep -q '^\[Bds\]Booting ' "$_cdir/ovmf-debug.log" || _grc=$?
+          if [ "$_grc" = "1" ]; then echo "E_H3_NO_BOOT_LINE readable log carries no '^\[Bds\]Booting ' line"; cat "$T/h3.log"; exit 97; fi
+          if [ "$_grc" != "0" ]; then echo "E_H3_DEBUG_LOG_UNREADABLE grep rc=$_grc on $_cdir/ovmf-debug.log"; cat "$T/h3.log"; exit 97; fi
           grep -m1 '^\[Bds\]Booting ' "$_cdir/ovmf-debug.log" | sed 's/^/H3 observed first Booting line: /' >> "$T/h3.log"
           [ "$_rc" = "90" ] || { echo "E_H3_GATE_NOT_FIRED rc=$_rc expected 90 (E_CASE_BOOT_TARGET)"; cat "$T/h3.log"; exit 97; }
           grep -F "E_CASE_BOOT_TARGET" "$T/h3.log" || { echo "E_H3_NEG_CODE_ABSENT named boot-target code missing"; cat "$T/h3.log"; exit 97; }

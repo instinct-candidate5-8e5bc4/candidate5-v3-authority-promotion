@@ -7,6 +7,8 @@
 #   2. synthetic full-closure copy of the H3 block               -> passes
 #   3. planted: config_schema.py removed from the H3 workdir copy (run
 #      36024634796's exact D2 defect) -> E_WORKDIR_SIBLING_MISSING naming config_schema.py
+#   4. planted: argv-freeze.json removed from the H3 workdir copy (peer run-36031372949
+#      ruling (8): required non-.py sibling) -> E_WORKDIR_SIBLING_MISSING naming argv-freeze.json
 import os, shutil, sys, tempfile
 
 sys.dont_write_bytecode = True
@@ -72,9 +74,16 @@ try:
     else:
         open(os.path.join(syn, "derive-scratch.py"), "w").write(planted)
         check("planted config_schema removal fires", syn, "E_WORKDIR_SIBLING_MISSING", "config_schema.py")
+    planted2 = ds.replace('          cp argv-freeze.json "$T/argv-freeze.json"\n', "", 1)
+    if planted2 == ds:
+        print("FAIL could not plant the argv-freeze.json removal (derive-scratch.py source drift)")
+        FAILS += 1
+    else:
+        open(os.path.join(syn, "derive-scratch.py"), "w").write(planted2)
+        check("planted argv-freeze.json removal fires", syn, "E_WORKDIR_SIBLING_MISSING", "argv-freeze.json")
 finally:
     shutil.rmtree(root)
 
 if FAILS:
     sys.exit(1)
-print("test-workdir-sibling: all 3 checks pass")
+print("test-workdir-sibling: all 4 checks pass")

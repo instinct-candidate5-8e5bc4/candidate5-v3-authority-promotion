@@ -413,6 +413,23 @@ EXPECTED_KEYS={"bwrap_argv","bwrap_helper","cases","cpu_model","memory_mb","note
                "enroll_qmp_sock_basename"}
 if set(_fz2.keys())!=EXPECTED_KEYS|{"smoke_namespace"}:
     fail("E_FREEZE_KEYS","argv-freeze.json top-level keys drifted: "+repr(sorted(_fz2.keys())))
+# 6e3b) peer run-36031372949 ruling (6ii): the freeze covers EXACTLY the committed case
+# set - config case ids == argv-freeze case ids, in both directions (today only the count
+# and the per-pin lookup are tied down; nothing binds the two id SETS). Planted negative:
+# test-argv-freeze.py.
+_frz_ids=sorted(_c["id"] for _c in _fz2["cases"])
+_cfg_ids=sorted(_c.get("id","?") for _c in cfg.get("cases",[]))
+if _frz_ids!=_cfg_ids:
+    fail("E_CASE_ARGV_FREEZE_SET","config case ids != argv-freeze case ids: only-in-config=%s only-in-freeze=%s"%(sorted(set(_cfg_ids)-set(_frz_ids)),sorted(set(_frz_ids)-set(_cfg_ids))))
+# 6e3c) peer run-36031372949 ruling (9) companion: the harness's ARGV_FREEZE_SHA256
+# constant must equal the committed argv-freeze.json's sha256, or a harness/freeze drift
+# goes unnoticed until runtime. Planted negative: test-argv-freeze.py.
+import re as _re_af
+_hsrc=open(os.path.join(here,"rehearsal-harness.py")).read()
+_mpin=_re_af.search(r'ARGV_FREEZE_SHA256="([0-9a-f]{64})"',_hsrc)
+if not _mpin: fail("E_ARGV_FREEZE_PIN_DRIFT","ARGV_FREEZE_SHA256 constant absent from rehearsal-harness.py")
+elif _mpin.group(1)!=hashlib.sha256(open(os.path.join(here,"argv-freeze.json"),"rb").read()).hexdigest():
+    fail("E_ARGV_FREEZE_PIN_DRIFT","harness pin "+_mpin.group(1)+" != committed argv-freeze.json sha256")
 # 6e6) peer FINAL COUNT RULING: pin the EXACT prefix occurrence counts (grep -o ... | wc -l,
 # not line counts) of BOTH lane workflows, recomputed at the frozen bytes. Any edit to either
 # workflow that adds/removes a literal NON_CERTIFYING_REHEARSAL occurrence fails closed here.
@@ -876,7 +893,10 @@ for _c in cfg.get("cases",[]):
 # workflows. A copy group is a maximal run of 'cp NAME.py ...' lines (blank/comment lines
 # do not break a run); sibling detection mirrors 6j (E_BYTECODE_GUARD): 'import X' /
 # 'from X import' with X.py present in this directory. Planted negative:
-# test-workdir-sibling.py (removes config_schema.py from the H3 copy).
+# test-workdir-sibling.py (removes config_schema.py from the H3 copy; removes
+# argv-freeze.json from the H3 copy). peer run-36031372949 ruling (8): argv-freeze.json is
+# a REQUIRED non-.py sibling of any workdir harness copy - the harness refuses to run
+# without it (E_ARGV_FREEZE_MISSING), so a workdir missing it dies late instead of here.
 import re as _re_ws
 _WS_SCAN=(os.path.join(here,"derive-scratch.py"),
           os.path.join(here,"../../../../../.github/workflows/NON_CERTIFYING_REHEARSAL-workflow.yml"),
@@ -885,7 +905,7 @@ for _wsf in _WS_SCAN:
     if not os.path.isfile(_wsf): fail("E_WORKDIR_SIBLING_MISSING","scan target missing: "+_wsf)
     _wsgroups=[]; _wscur=None
     for _wsln in open(_wsf,errors="replace").read().splitlines():
-        _wsm=_re_ws.match(r"\s*cp\s+([A-Za-z0-9_-]+\.py)\s+\S",_wsln)
+        _wsm=_re_ws.match(r"\s*cp\s+([A-Za-z0-9_.-]+)\s+\S",_wsln)
         if _wsm:
             if _wscur is None: _wscur=[]
             _wscur.append(_wsm.group(1))
@@ -895,8 +915,9 @@ for _wsf in _WS_SCAN:
             if _wscur: _wsgroups.append(_wscur); _wscur=None
     if _wscur: _wsgroups.append(_wscur)
     for _wsg in _wsgroups:
-        _wscopied=set(_n[:-3] for _n in _wsg)   # module-name space, matching the closure
-        for _wsname in _wsg:
+        _wspy=[_n for _n in _wsg if _n.endswith(".py")]
+        _wscopied=set(_n[:-3] for _n in _wspy)   # module-name space, matching the closure
+        for _wsname in _wspy:
             if not os.path.isfile(os.path.join(here,_wsname)): continue
             _wsclosure=set(); _wsstack=[_wsname[:-3]]
             while _wsstack:
@@ -910,6 +931,8 @@ for _wsf in _WS_SCAN:
             _wsmissing=_wsclosure-_wscopied
             if _wsmissing:
                 fail("E_WORKDIR_SIBLING_MISSING","%s copies %s without sibling module(s) %s (full transitive closure required)"%(_wsf,_wsname,", ".join(sorted(s+".py" for s in _wsmissing))))
+        if "rehearsal-harness.py" in _wsg and "argv-freeze.json" not in _wsg:
+            fail("E_WORKDIR_SIBLING_MISSING","%s copies rehearsal-harness.py without required sibling argv-freeze.json"%_wsf)
 
 # 7) KVM requirement is declarative here; runtime fail-closed check lives in the workflow
 report={"schema":"NON_CERTIFYING_REHEARSAL-preflight/v1","lane":PREFIX,"errors":E,

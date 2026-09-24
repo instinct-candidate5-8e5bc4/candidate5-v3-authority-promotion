@@ -43,6 +43,10 @@ STR_DBX_REJECT      = "Image is signed but signature is forbidden by DBX"
 STR_MALFORMED_PE    = "Not a valid PE/COFF image"
 STR_FINAL_REJECT    = "The image doesn't pass verification"
 ALL_REJECT_STRINGS = [STR_UNSIGNED_REJECT, STR_SIGNED_REJECT, STR_DBX_REJECT, STR_MALFORMED_PE, STR_FINAL_REJECT]
+# peer run-36031372949 ruling (9): sha256 of the committed argv-freeze.json - the harness
+# refuses any other bytes, so a workdir copy cannot drift from the committed file.
+# preflight 6e3c pins this constant to the committed file (E_ARGV_FREEZE_PIN_DRIFT).
+ARGV_FREEZE_SHA256="e9a38cec9a63986b6898203ffc39de3ba706607646b66a9610c1a87b74713f94"
 ADAPTER_STRINGS = [s.encode() for s in ("E_PROVIDER_NAMESPACE","E_PROVIDER_LINK_MISSING")]  # the signed adapter's own fail() reasons (cloud-boot-adapter.sh). OBSERVATIONAL ONLY: these strings are at-rest bytes inside the accepted signed UKI's uncompressed newc initrd, and the firmware loads the UKI image into guest RAM for hash verification even on REJECT paths, so their presence/absence in a post-run RAM dump is non-evidentiary. Execution provenance is the frozen runtime-formatted panic records (section 6 markers).
 
 # Frozen per-case VARS template binding (reviewer ruling): each case must draw its VARS from
@@ -69,6 +73,42 @@ def sha(p):
 
 def fail(code, msg):
     print(json.dumps({"result":"FAIL","code":code,"detail":msg}, sort_keys=True)); sys.exit(90)
+
+# peer run-36031372949 ruling (8)+(9): the freeze load is fail-closed - a missing or
+# unreadable freeze dies E_ARGV_FREEZE_MISSING (never skipped, never treated as an empty
+# freeze); the loaded bytes must hash to ARGV_FREEZE_SHA256 (E_ARGV_FREEZE_PIN_MISMATCH).
+# Extracted by test-argv-freeze.py.
+def _load_argv_freeze(_fzpath):
+    try: _raw=open(_fzpath,"rb").read()
+    except Exception as _e: fail("E_ARGV_FREEZE_MISSING","argv-freeze.json unreadable: "+str(_e))
+    if hashlib.sha256(_raw).hexdigest()!=ARGV_FREEZE_SHA256:
+        fail("E_ARGV_FREEZE_PIN_MISMATCH","argv-freeze.json sha256 != committed pin "+ARGV_FREEZE_SHA256)
+    try: return dict((_c["id"],_c["argv_sha256"]) for _c in json.loads(_raw.decode())["cases"])
+    except Exception as _e: fail("E_ARGV_FREEZE_MISSING","argv-freeze.json unparseable: "+str(_e))
+# end peer run-36031372949 ruling (8)+(9)
+
+# peer run-36031372949 ruling (11): the behavioral boot-target proof is sound ONLY if the
+# three runtime panic markers are absent from every guest input - otherwise a post-run RAM
+# hit could be at-rest input bytes, not execution. Before ANY guest runs, each executed
+# case's ESP, every attached disk image, its vars template and its firmware are scanned for
+# all three marker byte strings; any hit dies E_MARKER_AT_REST. Chunked reads with a
+# marker-length overlap so a marker spanning a chunk boundary still fires.
+# Extracted by test-marker-absence.py.
+def _marker_scan(_inputs, cid):
+    _hits=[]
+    _maxm=max(len(MARKER_KERNEL_EXEC),len(MARKER_EXIT_98),len(MARKER_EXIT_97))
+    for _kind,_p in _inputs:
+        _tail=b""
+        with open(_p,"rb") as _f:
+            while True:
+                _chunk=_f.read(1<<23)
+                if not _chunk: break
+                _buf=_tail+_chunk
+                for _m in (MARKER_KERNEL_EXEC,MARKER_EXIT_98,MARKER_EXIT_97):
+                    if _m in _buf: _hits.append("%s %s marker=%r"%(_kind,_p,_m.decode()))
+                _tail=_buf[-(_maxm-1):]
+    if _hits: fail("E_MARKER_AT_REST",cid+" marker bytes at rest in guest input(s): "+repr(_hits))
+# end peer run-36031372949 ruling (11)
 
 def check_schema(cfg):
     try: check_top(cfg)
@@ -231,6 +271,18 @@ def run_case(cfg, case, idx):
     trust_ok={"PK","KEK","db"}<={x["name"] for x in prej.get("variables",[])}
     argv=build_argv(cfg,cdir,vars_fd,case["esp"],case["firmware"],sock)
     with open(os.path.join(cdir,"argv.txt"),"w") as f: f.write("\0".join(argv))
+    # peer run-36031372949 ruling (6i): the executed argv must equal its frozen pin. The
+    # freeze stores the CANONICAL-lane form; the executed argv is reverse-rewritten to
+    # canonical before hashing (the qemu-smoke lane-argv discipline: identity in the
+    # rehearsal/certification lanes, only the /tmp/<prefix>- rewrite in scratch), so any
+    # non-prefix difference fires. An executed id missing from the freeze dies named.
+    # Extracted by test-argv-freeze.py.
+    _fz_sha=_ARGV_FREEZE.get(cid)
+    if _fz_sha is None: fail("E_CASE_ARGV_FROZEN_MISSING",cid+" executed but absent from argv-freeze.json")
+    _argv_back=[_t.replace("/tmp/%s-"%PREFIX,"/tmp/NON_CERTIFYING_REHEARSAL-") for _t in argv]
+    _argv_back_sha=hashlib.sha256("\0".join(_argv_back).encode()).hexdigest()
+    if _argv_back_sha!=_fz_sha: fail("E_CASE_ARGV_FROZEN_MISMATCH",cid+" executed(canonicalized) "+_argv_back_sha+" != frozen "+_fz_sha)
+    # end peer run-36031372949 ruling (6i)
     if not os.path.exists("/dev/kvm"): fail("E_NO_KVM", cid)
     # A5: free-disk preflight before the RAM dump
     need=cfg["memory_mb"]*(1<<20)+DISK_MARGIN
@@ -297,6 +349,7 @@ def run_case(cfg, case, idx):
          "argv_sha256":hashlib.sha256("\0".join(argv).encode()).hexdigest(),
          "vars_template":case["vars_template"],
          "vars_provenance":_vars_prov,
+         "marker_absence":cfg["_marker_absence"][cid],
          "esp_sha256":sha(case["esp"]),
          "firmware_sha256":sha(case["firmware"]),
          "disk_free_margin_bytes":DISK_MARGIN,
@@ -353,6 +406,17 @@ if __name__=="__main__":
         if _lane is None: fail("E_LANE_UNKNOWN","PREFIX="+repr(PREFIX))
         cfg["cases"]=[c for c in cfg["cases"] if _lane in c.get("lanes",[])]
         if not cfg["cases"]: fail("E_LANE_CASE_SET_EMPTY","lane="+_lane)
+    _ARGV_FREEZE=_load_argv_freeze(os.path.join(os.path.dirname(os.path.abspath(__file__)),"argv-freeze.json"))
+    # peer run-36031372949 ruling (11): marker-at-rest pre-pass over EVERY executed case's
+    # inputs before any guest runs; the per-case record lands in the deterministic manifest.
+    cfg["_marker_absence"]={}
+    for _mc in cfg["cases"]:
+        _inputs=[("esp",_mc["esp"]),("vars_template",_mc["vars_template"]),("firmware",_mc["firmware"])]
+        for _i,_role in enumerate(cfg["v3_serials"]):
+            _inputs.append(("disk%d"%_i, os.path.join(cfg["disk_dir"],"disk%d.raw"%_i)))
+        _marker_scan(_inputs,_mc["id"])
+        cfg["_marker_absence"][_mc["id"]]={"markers_absent":[_m.decode() for _m in (MARKER_KERNEL_EXEC,MARKER_EXIT_98,MARKER_EXIT_97)],
+                                           "inputs":dict(_inputs),"result":"ABSENT"}
     cfg["work_root"]=sys.argv[2]
     ALLOWED_VARS_TEMPLATES.update(allowed_vars_templates(sys.argv[3],PREFIX))
     os.makedirs(cfg["work_root"],exist_ok=True)
