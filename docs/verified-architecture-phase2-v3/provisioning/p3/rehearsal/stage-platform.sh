@@ -12,60 +12,48 @@ PREFIX="${PREFIX:-}"
 [ -n "$PREFIX" ] || { echo "E_PREFIX_UNSET"; exit 97; }
 [ "$PREFIX" = "${ALLOWED_PREFIX:-}" ] || { echo "E_PREFIX_MISMATCH prefix=$PREFIX allowed=$ALLOWED_PREFIX"; exit 97; }
 mkdir -p "$DEST/debs" "$DEST/root"
+STAGE_HELPER_DIR="$(cd "$(dirname "$0")" && pwd)"
+export STAGE_HELPER_DIR
 python3 - "$LOCK" "$DEST" <<'PYEOF'
-import json, sys, urllib.request, urllib.error, hashlib, os
+import json, sys, hashlib, os
+sys.path.insert(0, os.environ.get('STAGE_HELPER_DIR', os.getcwd()))
+from fetch_locked import fetch_locked
 lock=json.load(open(sys.argv[1])); dest=sys.argv[2]
-# batch1r3 D7 (owner-approved snapshot.ubuntu.com fallback, 2026-09-23): ONE fixed
-# snapshot_ts is frozen in the lock; the per-deb sha256/size in the lock remains the ONLY
-# trust chain. Source order per deb: archive first (60s timeout, 3 attempts); the snapshot
-# URL is tried only after the archive returns HTTP 404/410 or a network/timeout failure on
-# all 3 attempts. Wrong bytes or wrong size from ANY source fail IMMEDIATELY
-# (E_LOCK_HASH_MISMATCH exit 38, no retry, no fallback). Both sources unavailable:
-# E_LOCK_DOWNLOAD_FAILED (exit 34). The per-deb source (archive|snapshot|preexisting-cache,
-# final URL, attempts) is recorded in DEST/source-manifest.json; the source column is
-# observational, the per-deb sha256 is deterministic evidence.
+# batch1r3 D7 (snapshot.ubuntu.com fallback, 2026-09-23): ONE fixed snapshot_ts is
+# frozen in the lock; the per-deb sha256/size in the lock remains the ONLY trust
+# chain. F1-F6 (peer ruling): every fetch goes through the shared fetch-locked.py
+# helper - max 4 attempts, bounded backoff, transient-only retries (5xx/429/
+# timeout/reset/refused/DNS), one log line per attempt; wrong bytes or wrong size
+# from ANY source fail IMMEDIATELY (E_LOCK_HASH_MISMATCH exit 38, no retry, no
+# fallback); non-429 4xx is never retried - archive 404/410 falls through to the
+# snapshot URL (constructed from the lock-recorded snapshot_ts + pool path, same
+# pin), any other 4xx fails E_STAGE_FETCH_HTTP <code> exit 54 at once; a source
+# whose transient retries are exhausted is reported soft here so the fallback
+# still applies. Both sources unavailable: E_LOCK_DOWNLOAD_FAILED (exit 34). The
+# per-deb source (archive|snapshot|preexisting-cache, final URL, attempts) is
+# recorded in DEST/source-manifest.json; the source column is observational, the
+# per-deb sha256 is deterministic evidence.
 TS=lock.get('snapshot_ts')
 if not TS: print('E_SNAPSHOT_TS missing in lock', file=sys.stderr); sys.exit(37)
 pkgs=lock['packages']
 seen=set(); sources=[]
-def fetch_from(url, part):
-    try:
-        with urllib.request.urlopen(url, timeout=60) as r, open(part,'wb') as f:
-            while True:
-                chunk=r.read(1<<20)
-                if not chunk: break
-                f.write(chunk)
-        return ('ok',)
-    except urllib.error.HTTPError as ex:
-        if os.path.exists(part): os.unlink(part)
-        return ('http', ex.code)
-    except Exception as ex:
-        if os.path.exists(part): os.unlink(part)
-        return ('net', str(ex))
-def verify_bytes(e, part, url):
-    if os.path.getsize(part)!=e['size']:
-        print('E_LOCK_HASH_MISMATCH %s size %d != %d (%s)'%(e['name'],os.path.getsize(part),e['size'],url), file=sys.stderr); sys.exit(38)
-    d=hashlib.sha256(open(part,'rb').read()).hexdigest()
-    if d!=e['sha256']:
-        print('E_LOCK_HASH_MISMATCH %s sha256 %s != %s (%s)'%(e['name'],d,e['sha256'],url), file=sys.stderr); sys.exit(38)
-    return d
 def fetch(e, fn):
-    part=fn+'.part'
     pool=e['url'].split('/ubuntu/',1)[1]
     for source,url in (('archive',e['url']),
                        ('snapshot','https://snapshot.ubuntu.com/ubuntu/%s/%s'%(TS,pool))):
-        last=None
-        for a in (1,2,3):
-            print('download attempt %d/3 [%s]: %s' % (a,source,e['name']), flush=True)
-            res=fetch_from(url,part)
-            if res[0]=='ok':
-                d=verify_bytes(e,part,url)
-                print('verified %s (%d bytes, %s)' % (e['name'],e['size'],source), flush=True)
-                sources.append({'name':e['name'],'source':source,'url':url,'attempts':a,'sha256':d,'size':e['size']})
-                return
-            print('attempt %d/3 [%s] failed: %s: %s' % (a,source,e['name'],res[1]), file=sys.stderr, flush=True)
-            last=res
-        print('source unavailable [%s] for %s: %s' % (source,e['name'],last), file=sys.stderr, flush=True)
+        res=fetch_locked(url, e['name'], fn, e['sha256'], e['size'],
+                         mismatch_name='E_LOCK_HASH_MISMATCH', mismatch_rc=38, hard=False)
+        if res[0]=='ok':
+            print('verified %s (%d bytes, %s)' % (e['name'],e['size'],source), flush=True)
+            sources.append({'name':e['name'],'source':source,'url':url,'attempts':res[2],'sha256':res[1],'size':e['size']})
+            return
+        if res[0]=='http':
+            if source=='archive' and res[1] in (404,410):
+                print('archive HTTP %d for %s; trying snapshot fallback' % (res[1],e['name']), file=sys.stderr, flush=True)
+                continue
+            print('E_STAGE_FETCH_HTTP %d %s %s' % (res[1],e['name'],url), file=sys.stderr)
+            sys.exit(54)
+        print('source unavailable [%s] for %s: %s' % (source,e['name'],res[1]), file=sys.stderr, flush=True)
     print('E_LOCK_DOWNLOAD_FAILED '+e['name'], file=sys.stderr)
     sys.exit(34)
 for e in pkgs:
@@ -75,7 +63,7 @@ for e in pkgs:
         sources.append({'name':e['name'],'source':'preexisting-cache','url':e['url'],'attempts':0,'sha256':e['sha256'],'size':e['size']})
         continue
     fetch(e, fn)
-    os.rename(fn+'.part', fn); seen.add(fn)
+    seen.add(fn)
 extra=[f for f in os.listdir(os.path.join(dest,'debs')) if os.path.join(dest,'debs',f) not in seen]
 if extra:
     print('E_LOCK_EXTRA_FILES '+' '.join(extra), file=sys.stderr); sys.exit(32)

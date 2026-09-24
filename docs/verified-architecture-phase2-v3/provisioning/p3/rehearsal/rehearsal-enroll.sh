@@ -167,10 +167,12 @@ if [ -n "$ENROLL_PLANTED_FAULT" ]; then
   # peer pushed-byte review 3(b): BOTH lane vars must name the scratch lane, not one.
   [ "$PREFIX" = "NON_CERTIFYING_SCRATCH" ] && [ "$ALLOWED_PREFIX" = "NON_CERTIFYING_SCRATCH" ] \
     || { echo "E_PLANTED_FAULT_LANE faults are scratch-lane only (PREFIX=$PREFIX ALLOWED_PREFIX=$ALLOWED_PREFIX)"; exit 97; }
-  case "$ENROLL_PLANTED_FAULT" in freemark|missingblob|nolfn) ;; *) echo "E_PLANTED_FAULT_UNKNOWN $ENROLL_PLANTED_FAULT"; exit 97;; esac
+  case "$ENROLL_PLANTED_FAULT" in freemark|missingblob|nolfn|badpred) ;; *) echo "E_PLANTED_FAULT_UNKNOWN $ENROLL_PLANTED_FAULT"; exit 97;; esac
   echo "PLANTED FAULT ACTIVE: $ENROLL_PLANTED_FAULT (scratch-lane gate must-show; this run certifies nothing)"
+  if [ "$ENROLL_PLANTED_FAULT" != "badpred" ]; then
   # peer run-12 strictness: the injection must be PROVABLE - bound the injector with
-  # before/after image hashes and fail closed if it changed nothing.
+  # before/after image hashes and fail closed if it changed nothing. (badpred is NOT an
+  # image fault - it injects into the extracted ENROLL.TXT after the guest, below.)
   _pf_before=$(sha256sum "$IMG" | cut -d' ' -f1)
   python3 - "$IMG" "$ENROLL_PLANTED_FAULT" <<'PYF'
 import sys, struct
@@ -215,6 +217,7 @@ PYF
   _pf_after=$(sha256sum "$IMG" | cut -d' ' -f1)
   echo "planted fault injection confirmation: image sha256 before=$_pf_before after=$_pf_after"
   [ "$_pf_before" != "$_pf_after" ] || { echo "E_PF_INJECTION_NOOP injector left the image unchanged"; exit 97; }
+  fi
 fi
 # run-9 per-run image identity (peer: unpinned by design, logged every run)
 echo "enroll-fat image sha256=$(sha256sum "$IMG" | cut -d' ' -f1) size=$(stat -c %s "$IMG") (unpinned by design; per-run logged)"
@@ -591,12 +594,34 @@ if [ "$_rc" != 0 ]; then
   exit 97
 fi
 echo "ENROLL.TXT extracted sha256=$(sha256sum "$EVD/ENROLL.TXT" | cut -d' ' -f1) size=$(stat -c %s "$EVD/ENROLL.TXT")"
+if [ "$ENROLL_PLANTED_FAULT" = "badpred" ]; then
+  # D13-1 scratch negative test (PF-6): flip SET_DB_STATUS 0->1 in the extracted
+  # ENROLL.TXT (UTF-16LE, no BOM guaranteed) so the frozen predicate MUST reject the
+  # evidence; the wrapper must then die E_ENROLL_PREDICATE_FAIL, never E_BASH_ERRTRAP.
+  _pf_before=$(sha256sum "$EVD/ENROLL.TXT" | cut -d' ' -f1)
+  python3 - "$EVD/ENROLL.TXT" <<'PYB'
+import sys
+p = sys.argv[1]
+b = open(p, "rb").read()
+needle = "SET_DB_STATUS=0".encode("utf-16-le")
+assert b.count(needle) == 1, "badpred: SET_DB_STATUS=0 not present exactly once"
+open(p, "wb").write(b.replace(needle, "SET_DB_STATUS=1".encode("utf-16-le")))
+print("badpred: SET_DB_STATUS flipped 0->1 in the extracted ENROLL.TXT")
+PYB
+  _pf_after=$(sha256sum "$EVD/ENROLL.TXT" | cut -d' ' -f1)
+  echo "planted fault injection confirmation: ENROLL.TXT sha256 before=$_pf_before after=$_pf_after"
+  [ "$_pf_before" != "$_pf_after" ] || { echo "E_PF_INJECTION_NOOP injector left ENROLL.TXT unchanged"; exit 97; }
+fi
 cp "$EVD/vars.fd" "$OUT"
 # frozen enrollment predicate gate (requirement 5a/5b resolution): any deviation fails the run
-# L6 (peer run-12 ruling): the predicate's exit code is captured unconditionally -
-# a tee'd pipeline otherwise masks it (run-12: rc 92 surfaced as E_BASH_ERRTRAP).
-python3 "$HERE/enroll-predicate-check.py" "$MODE" "$EVD/ENROLL.TXT" "$PREP" "$OUT" "$HERE/../parse-ovmf-vars.py" | tee "$EVD/enroll-predicate.json"
-_pred_rc=${PIPESTATUS[0]}
+# L6 (peer run-12 ruling + D13-1 review): the predicate's exit code is captured via
+# "|| _pred_rc=$?" - under set -eE + pipefail a failing PIPELINE fires the ERR trap on
+# that same line before PIPESTATUS is ever read (peer reproduced: rc 92 -> E_BASH_ERRTRAP
+# on tee). The || form exempts the command from the trap; verified reaching the named
+# branch with rc=92. The json lands via redirect + cat, same durable evidence as tee.
+_pred_rc=0
+python3 "$HERE/enroll-predicate-check.py" "$MODE" "$EVD/ENROLL.TXT" "$PREP" "$OUT" "$HERE/../parse-ovmf-vars.py" > "$EVD/enroll-predicate.json" || _pred_rc=$?
+cat "$EVD/enroll-predicate.json"
 if [ "$_pred_rc" != 0 ]; then
   # L6: predicate failures exit under their OWN named code + log line; the ERR
   # trap is reserved for unnamed failures. 92 = frozen predicate rejected evidence.

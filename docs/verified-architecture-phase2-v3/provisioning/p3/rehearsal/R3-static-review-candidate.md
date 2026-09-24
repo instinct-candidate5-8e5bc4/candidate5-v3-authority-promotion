@@ -1040,3 +1040,106 @@ K4. Containment record - private throwaway keys were present in two scratch evid
     extension report. No VARS from the affected
     runs is reused anywhere; the keys were one-day throwaway, no rotation required.
 K5. This record + the conformance audit's K1/K2 check (this section).
+
+PEER RUN-13 D RULINGS (D13 review of #13 head 2f157d0f, adopted via main 2026-09-24):
+D13-1. BLOCKING - the #13 L6 predicate line still masked under set -eEuo pipefail +
+    ERR trap: a failing pipeline fires the trap on its own line before PIPESTATUS is
+    read (peer reproduced: rc 92 -> E_BASH_ERRTRAP on tee -> 97). Fixed to the peer's
+    tested form: `_pred_rc=0; python3 enroll-predicate-check.py ... > json ||
+    _pred_rc=$?; cat json`. Negative tests: (a) the EXACT extracted wrapper block run
+    under the real trap with a 92-exiting predicate dies E_ENROLL_PREDICATE_FAIL
+    exit 97 with ZERO E_BASH_ERRTRAP; rc=0 control continues; (b) new PF-6 scratch
+    must-show (badpred planted fault): SET_DB_STATUS flipped 0->1 in the extracted
+    UTF-16LE ENROLL.TXT (before/after sha256 confirmation + noop guard); the frozen
+    predicate MUST reject with E_ENROLL_SET_DB rc 92 and the wrapper MUST die
+    E_ENROLL_PREDICATE_FAIL exit 97, never E_BASH_ERRTRAP; ceremony_if extended with
+    steps.pf6. Local evidence: injector before
+    600eeb0085f61784c18b15a1160a35c2cdb79f2b089ed41bddd961b0cabb5f52 after
+    6131a73609a36cb31b9bf032e36abfe07c499e7e76a27c060f090227f5fa1fd1; real
+    enroll-predicate-check.py on the flipped file: rc 92, first error
+    E_ENROLL_SET_DB ("SET_DB_STATUS='1' expected '0'"); injector second-run noop
+    assert fires.
+D13-2. PF-2/PF-5 must-show greps tightened to the exact consumer-extracted contract
+    strings: PF-2 requires `contract name 'pk.auth' has no valid LFN entry`, PF-5
+    `contract name 'db.auth' has no valid LFN entry` (no shared generic diagnostic).
+    Verified prefix-substrings of the reader's ncfail format `contract name %r has
+    no valid LFN entry reassembling to it exactly` (rehearsal-enroll.sh line 417).
+D13-3. PF-4 command check is now the exact fixed single-line string
+    `E_BASH_ERRTRAP rehearsal-enroll.sh line 477 rc=1 cmd: cp "$PRISTINE"
+    "$EVD/vars.fd"` (the two-grep cmd/vars.fd shape is deleted). LINE-PIN SHIFT
+    DISCLOSED: the #14 badpred guard moved the pristine-VARS cp from line 474 (#13
+    head) to line 477 (#14 head); grep -n confirms 477. Trap-string simulation:
+    under set -eEuo pipefail + the production trap, a failing cp emits exactly
+    `... rc=1 cmd: cp "$PRISTINE" "$EVD/vars.fd"` (unexpanded $BASH_COMMAND text)
+    and exits 97.
+D13-4. K2 zero-private-key gate now also fails on ANY symlink under an upload path
+    (top-level path, directory entry, file entry, dangling): E_SYMLINK_IN_EVIDENCE
+    exit 94, checked before name/content. Applied to all 3 rehearsal gates + 4
+    certification gates; scratch re-derived. Negative tests on the extracted gate:
+    clean rc=0; symlink file/dir/top-level/dangling each rc=94 named.
+D13-FIND RETRACTED (peer challenge 2026-09-24, verified correct): my claim that
+    #13's K2 DER regexes were dead was WRONG. In a raw bytes REGEX pattern the re
+    engine itself interprets \xNN as byte 0xNN, so the shipped rb"\x30\x82..." forms
+    ARE live byte patterns. The flaw was in MY negative test: I double-escaped the
+    pattern in the harness (tested rb"\\x30...", which matches literal ASCII), not the
+    shipped form. Re-verified: shipped patterns match real RSA/PKCS#8 DER bytes and
+    reject literal ASCII; a bytes() clarity variant I had spliced in matched
+    identically over 120k sampled inputs (0 diffs), so the two der_ lines were
+    REVERTED to the #13 text byte-for-byte in all 7 gate copies - no shared-gate
+    byte churn, no behavior change. #13's K2 green stands for DER as well (scoped to
+    the near-empty evidence tree that run produced). K2 negative tests re-run
+    against the shipped gate with freshly generated throwaway keys (deleted after):
+    openssl genrsa 2048 -> PKCS#1 DER (openssl rsa -outform DER), PKCS#8 DER
+    (openssl pkcs8 -nocrypt -outform DER), PEM - each planted under a neutral name
+    independently fired E_PRIVATE_KEY_IN_EVIDENCE exit 94 (content hit); a *.key
+    name fired 94 (name hit); the clean tree passed rc=0.
+RUN 35946339217 FOLD-IN (#13 scratch run verdict: transient infra, adopted via main
+    2026-09-24): the lockgen index snapshot fetch in platform staging was a
+    single-shot urllib call that died on HTTP 502 with a bare traceback outside
+    named-gate coverage. Now mirrors the stage-platform retry pattern (3 attempts,
+    60s timeout, "attempt n/3 [index]" log lines) and fails named
+    E_LOCKGEN_INDEX_FETCH exit 52 after the third attempt - never a bare traceback.
+    Applied to rehearsal + certification; scratch re-derived. Local tests:
+    fail-fail-succeed proceeds after 3 calls; all-fail exits 52 with the named
+    line. Green data points preserved from that run: both executed K2 gates PASSED
+    ("zero-private-key gate: clean across 5 upload paths"); the forbidden-marker
+    guard ran for the first time and PASSED fail-closed; readability repair +
+    evidence upload succeeded; publisher's independent full-log scan found
+    OVMF_CI_SECURE_BOOT_UKI_PASS exactly once - the cyan echo of the guard's own
+    grep command text, not evidence content.
+PINS after #14: 6e6 grep -o NON_CERTIFYING_REHEARSAL counts unchanged (cert 44,
+    rehearsal 78); 6e9 ENROLL_PLANTED_FAULT counts: cert 0, rehearsal 0, scratch 4
+    (was 3; +1 for the PF-6 badpred step - disclosed, pin is >=1). All three
+    workflows yaml-parse and every run block passes bash -n.
+
+PEER F1-F6 RULING (fetch retry wrapper, adopted via main 2026-09-24, F1 capped at 3
+attempts to match D7 per main's reconciliation):
+F1/F4/F5. New shared helper fetch-locked.py - ONE implementation for every staging
+    HTTP(S) fetch (stage-platform.sh debs + the lockgen index loop, all lanes):
+    max 3 attempts, bounded backoff (5s/10s), per-attempt log line with URL +
+    status/exception + attempt n/3; transient-only retries (HTTP 5xx, 429,
+    timeouts, connection reset/refused, DNS); attempts exhausted ->
+    E_STAGE_FETCH_EXHAUSTED <name> <url> <last error> exit 53; no bare tracebacks.
+F2. sha256/size mismatch fails at once named (E_LOCKGEN_INDEX_MISMATCH exit 52 for
+    indices; E_LOCK_HASH_MISMATCH exit 38 for debs - D7 codes preserved); non-429
+    4xx fails at once E_STAGE_FETCH_HTTP <code> exit 54. No retrying mismatches.
+F3. Sources restricted to lock-recorded URLs: the four lockgen indices ARE
+    lock-recorded snapshot.ubuntu.com/ubuntu/20260922T000000Z URLs (verified
+    against platform.lock.json); the deb archive->snapshot fallback (D7,
+    pre-existing) constructs from the lock-recorded snapshot_ts + pool path under
+    the same pinned sha256/size. No new source, no lock change. The index loop
+    retries ONLY its own lock-recorded URL (no alternate source for indices).
+F5 audit: urlopen appears ONLY in fetch-locked.py across the p3 lanes; no
+    curl/wget anywhere. Residual urlopen hits are in
+    tools/verified-architecture-phase3/*-browser-runner.py - localhost Chrome
+    DevTools JSON probes in unrelated phase-3 tooling, not staging fetches, not
+    in any lane's network phase. The edk2 source cache uses git protocol via
+    src_fetch (existing 3-attempt + E_SOURCE_STAGE_FAILED 35 shape; not
+    urlopen/curl/wget, unchanged).
+F6. Scratch-only step "fetch-locked helper negative tests (F6)" (localhost
+    127.0.0.1 server, no external network): case1 500,500-then-bytes recovers on
+    attempt 3 with exact bytes; case2 wrong-sha fails attempt 1 named
+    E_LOCKGEN_INDEX_MISMATCH exit 52 with ZERO retry lines; case3 404 fails
+    attempt 1 named E_STAGE_FETCH_HTTP 404 exit 54; case4 always-500 runs 3
+    attempts then E_STAGE_FETCH_EXHAUSTED exit 53. All four cases verified
+    LOCALLY against the shipped helper before commit (same flow, same asserts).

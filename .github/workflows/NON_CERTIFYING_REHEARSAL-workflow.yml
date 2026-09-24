@@ -117,10 +117,16 @@ jobs:
           # byte-for-byte lockgen regeneration gate (inside the only network phase)
           mkdir -p /tmp/$PREFIX-lockgen-indices
           python3 - platform.lock.json "$PREFIX" <<'PYEOF'
-          import json, hashlib, urllib.request, sys
+          import json, hashlib, sys, os
+          sys.path.insert(0, os.getcwd())
+          from fetch_locked import fetch_locked
           lock = json.load(open("platform.lock.json"))
           for name, ent in sorted(lock["indices"].items()):
-              data = urllib.request.urlopen(ent["url"], timeout=60).read()
+              # F-ruling: retry ONLY the lock-recorded URL through the shared helper
+              # (transient-only, 3 attempts; mismatch/non-429-4xx fail at once named)
+              data = None
+              res = fetch_locked(ent["url"], name, "/tmp/" + sys.argv[2] + "-lockgen-indices/" + name + ".xz", ent["sha256"])
+              data = open("/tmp/" + sys.argv[2] + "-lockgen-indices/" + name + ".xz", "rb").read()
               got = hashlib.sha256(data).hexdigest()
               if got != ent["sha256"]:
                   print("E_LOCKGEN_INDEX_MISMATCH", name, got)
@@ -254,7 +260,7 @@ jobs:
           python3 - /tmp/$PREFIX-k2-paths.txt <<'PYK'
           import sys, os, re
           paths = [l.strip() for l in open(sys.argv[1]) if l.strip()]
-          namehit, conthit = [], []
+          namehit, conthit, linkhit = [], [], []
           pem = b"PRIVATE KEY"
           der_rsa = re.compile(rb"\x30\x82..\x02\x01\x00\x02\x82", re.S)
           der_p8 = re.compile(rb"\x30\x82..\x02\x01\x00\x30", re.S)
@@ -265,12 +271,23 @@ jobs:
               if pem in b or der_rsa.search(b) or der_p8.search(b):
                   conthit.append(p)
           for p in paths:
+              if os.path.islink(p):
+                  linkhit.append(p); continue
               if os.path.isfile(p):
                   scan_file(p)
               elif os.path.isdir(p):
-                  for base, _d, files in os.walk(p):
+                  for base, dirs, files in os.walk(p):
+                      for dn in dirs:
+                          if os.path.islink(os.path.join(base, dn)):
+                              linkhit.append(os.path.join(base, dn))
                       for fn in files:
-                          scan_file(os.path.join(base, fn))
+                          full = os.path.join(base, fn)
+                          if os.path.islink(full):
+                              linkhit.append(full); continue
+                          scan_file(full)
+          if linkhit:
+              print("E_SYMLINK_IN_EVIDENCE symlinks=%r" % linkhit[:3])
+              sys.exit(94)
           if namehit or conthit:
               print("E_PRIVATE_KEY_IN_EVIDENCE names=%r content=%r" % (namehit[:3], conthit[:3]))
               sys.exit(94)
@@ -482,7 +499,7 @@ jobs:
           python3 - /tmp/$PREFIX-k2-paths.txt <<'PYK'
           import sys, os, re
           paths = [l.strip() for l in open(sys.argv[1]) if l.strip()]
-          namehit, conthit = [], []
+          namehit, conthit, linkhit = [], [], []
           pem = b"PRIVATE KEY"
           der_rsa = re.compile(rb"\x30\x82..\x02\x01\x00\x02\x82", re.S)
           der_p8 = re.compile(rb"\x30\x82..\x02\x01\x00\x30", re.S)
@@ -493,12 +510,23 @@ jobs:
               if pem in b or der_rsa.search(b) or der_p8.search(b):
                   conthit.append(p)
           for p in paths:
+              if os.path.islink(p):
+                  linkhit.append(p); continue
               if os.path.isfile(p):
                   scan_file(p)
               elif os.path.isdir(p):
-                  for base, _d, files in os.walk(p):
+                  for base, dirs, files in os.walk(p):
+                      for dn in dirs:
+                          if os.path.islink(os.path.join(base, dn)):
+                              linkhit.append(os.path.join(base, dn))
                       for fn in files:
-                          scan_file(os.path.join(base, fn))
+                          full = os.path.join(base, fn)
+                          if os.path.islink(full):
+                              linkhit.append(full); continue
+                          scan_file(full)
+          if linkhit:
+              print("E_SYMLINK_IN_EVIDENCE symlinks=%r" % linkhit[:3])
+              sys.exit(94)
           if namehit or conthit:
               print("E_PRIVATE_KEY_IN_EVIDENCE names=%r content=%r" % (namehit[:3], conthit[:3]))
               sys.exit(94)
@@ -717,7 +745,7 @@ jobs:
           python3 - /tmp/$PREFIX-k2-paths.txt <<'PYK'
           import sys, os, re
           paths = [l.strip() for l in open(sys.argv[1]) if l.strip()]
-          namehit, conthit = [], []
+          namehit, conthit, linkhit = [], [], []
           pem = b"PRIVATE KEY"
           der_rsa = re.compile(rb"\x30\x82..\x02\x01\x00\x02\x82", re.S)
           der_p8 = re.compile(rb"\x30\x82..\x02\x01\x00\x30", re.S)
@@ -728,12 +756,23 @@ jobs:
               if pem in b or der_rsa.search(b) or der_p8.search(b):
                   conthit.append(p)
           for p in paths:
+              if os.path.islink(p):
+                  linkhit.append(p); continue
               if os.path.isfile(p):
                   scan_file(p)
               elif os.path.isdir(p):
-                  for base, _d, files in os.walk(p):
+                  for base, dirs, files in os.walk(p):
+                      for dn in dirs:
+                          if os.path.islink(os.path.join(base, dn)):
+                              linkhit.append(os.path.join(base, dn))
                       for fn in files:
-                          scan_file(os.path.join(base, fn))
+                          full = os.path.join(base, fn)
+                          if os.path.islink(full):
+                              linkhit.append(full); continue
+                          scan_file(full)
+          if linkhit:
+              print("E_SYMLINK_IN_EVIDENCE symlinks=%r" % linkhit[:3])
+              sys.exit(94)
           if namehit or conthit:
               print("E_PRIVATE_KEY_IN_EVIDENCE names=%r content=%r" % (namehit[:3], conthit[:3]))
               sys.exit(94)
