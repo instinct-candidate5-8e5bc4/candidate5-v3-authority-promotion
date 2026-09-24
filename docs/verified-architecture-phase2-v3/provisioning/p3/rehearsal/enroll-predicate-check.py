@@ -7,8 +7,10 @@
 #     exactly 6 (BS|RT only), size 1, data 0x00.
 #   VARS: stored PK/KEK/db data byte-equal the enrolled ESL payloads; PK and KEK each exactly
 #     one X509 ESL entry with owner c501e570-0de0-0001-0000-000000000000 and DER equal to this
-#     run's throwaway PK/KEK DER; sole db exactly {production cert 7cda4ddc..}; widened db
-#     exactly {7cda4ddc.., 4428760c..}; dbx ABSENT (frozen form); dbt and all *Default trust
+#     run's throwaway PK/KEK DER; sole db the ordered entry list [7cda4ddc..]; widened db the
+#     ordered entry list [7cda4ddc.., 4428760c..] (peer run-35963407323 ruling (1): exact
+#     ordered-list binding, superseding the former set-equality form); dbx ABSENT (frozen
+#     form); dbt and all *Default trust
 #     variables ABSENT. SecureBootEnable is recorded observationally (expected present NV|BS,
 #     value 0x01, post-enrollment; absent in the pristine VARS).
 # Any deviation FAILS the ceremony run (exit 92). The predicate cannot be reinterpreted;
@@ -138,14 +140,19 @@ kek_der = sha_f(os.path.join(prep, "kek.cer")) if os.path.exists(os.path.join(pr
 if pk_der: one_x509("PK", pk_der)
 if kek_der: one_x509("KEK", kek_der)
 db = der_entries("db")
-db_expected = {PROD_CERT, HOSTILE_CERT} if widened else {PROD_CERT}
+# peer run-35963407323 ruling (1): db content bound EXACTLY as the ordered ESL entry list -
+# sole/sole-fresh db == [7cda4ddc..]; widened/db2 db == [7cda4ddc.., 4428760c..]. Entry
+# order, count and DER hashes all gate; the bound list is recorded in the report.
+db_expected = [PROD_CERT, HOSTILE_CERT] if widened else [PROD_CERT]
+db_ders = None
 if db is None:
     fail("E_TRUST_MISSING", "db")
 else:
     if any(t != X509 for t, _, _ in db): fail("E_TRUST_TYPE", "db non-X509 list")
     if any(o != OWNER_GUID for _, o, _ in db): fail("E_TRUST_OWNER", "db owner mismatch")
-    if {h for _, _, h in db} != db_expected or len(db) != len(db_expected):
-        fail("E_TRUST_DER_SET", "db ders=%s" % sorted(h for _, _, h in db))
+    db_ders = [h for _, _, h in db]
+    if db_ders != db_expected:
+        fail("E_TRUST_DER_SET", "db ders=%s expected=%s" % (db_ders, db_expected))
 present = TRUST_FORBIDDEN & set(by_name)
 if present:
     fail("E_TRUST_FORBIDDEN_PRESENT", sorted(present))
@@ -160,6 +167,7 @@ if sbe:
 # record. Predicate check semantics byte-for-byte unchanged.
 report = {"schema": "NON_CERTIFYING_REHEARSAL-enroll-predicate/v1", "lane": PREFIX, "mode": mode,
           "widened": widened, "pk_der_sha256": pk_der, "kek_der_sha256": kek_der,
+          "db_der_sha256s": db_ders,
           "enrolled_fd_sha256": sha_f(fd),
           "secure_boot_enable_observed": sbe_note, "errors": E,
           "result": "PASS" if not E else "FAIL"}

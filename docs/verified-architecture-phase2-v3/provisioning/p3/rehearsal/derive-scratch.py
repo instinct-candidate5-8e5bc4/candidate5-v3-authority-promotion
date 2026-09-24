@@ -23,6 +23,13 @@ sha256 == committed sha256 == 8e07462c49876a73b1674764855f27e9527d2295271b3c92ca
 recorded in the #18 bundle notes). #18 then added exactly ONE injected block
 (BLOCK_TIE_NEGS: the F3 out-of-set gate and F6 byte-flip tie must-shows); the #18 scratch
 workflow is the 8871ef65 derivation plus that one block, re-derived by this file.
+#20 (peer run-35963407323 ruling): the F3/F6/H3 must-show blocks gained `if: always()` (F3
+also gained a named committed-input prerequisite) so each runs whenever its own prerequisites
+exist, INDEPENDENT of the ceremony outcome, dying with its own named code otherwise - never
+skipped silently; BLOCK_BYTECODE_GUARD_NEG was redesigned baseline-first/planted/post-clean
+with all three preflight reports captured into the evidence tree and no /dev/null anywhere.
+#20' (peer byte verdict on #20): the four must-show blocks carry `if: ${{ !cancelled() }}`,
+never always() - always() would also fire on job cancellation, contradicting ruling C3.
 """
 import re, sys
 
@@ -407,9 +414,12 @@ BLOCK_PF6 = r'''      - name: NON_CERTIFYING_SCRATCH planted-fault PF-6 badpred 
 '''
 
 BLOCK_TIE_NEGS = r'''      - name: NON_CERTIFYING_SCRATCH planted-fault F3 out-of-set vars_template gate must-show (peer #17 F3)
+        if: ${{ !cancelled() }}
         run: |
           set -euo pipefail
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+          [ -f config.json ] || { echo "E_F3_NEG_INPUT committed config.json absent"; exit 97; }
+          [ -f lane_resolve.py ] || { echo "E_F3_NEG_INPUT committed lane_resolve.py absent"; exit 97; }
           T=/tmp/$PREFIX-pf/f3gate; rm -rf "$T"; mkdir -p "$T"
           # the planted input is DERIVED from the pinned config.json (never a canonical
           # literal in this YAML): R1's real vars_template with the inner enrollment
@@ -428,6 +438,7 @@ BLOCK_TIE_NEGS = r'''      - name: NON_CERTIFYING_SCRATCH planted-fault F3 out-o
           grep -F "E_VARS_TEMPLATE_GATE" "$T/f3.log" || { echo "E_F3_NEG_CODE_ABSENT named gate code missing"; cat "$T/f3.log"; exit 97; }
           echo "F3_GATE_MUST_SHOW_OK planted out-of-set vars_template died named (E_VARS_TEMPLATE_GATE rc=97)"
       - name: NON_CERTIFYING_SCRATCH planted-fault F6 byte-flip enroll-tie must-show (peer #17 F6)
+        if: ${{ !cancelled() }}
         run: |
           set -euo pipefail
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
@@ -463,6 +474,7 @@ BLOCK_TIE_NEGS = r'''      - name: NON_CERTIFYING_SCRATCH planted-fault F3 out-o
 '''
 
 BLOCK_BOOT_TARGET_NEG = r'''      - name: NON_CERTIFYING_SCRATCH planted-fault H3 boot-target gate must-show (peer run-35959397469 H3)
+        if: ${{ !cancelled() }}
         run: |
           set -euo pipefail
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
@@ -626,30 +638,61 @@ BLOCK_NEG_TESTS = r'''      - name: NON_CERTIFYING_SCRATCH verify-auth negative 
 
 A_USERNS   = "      - name: NON_CERTIFYING_SCRATCH userns/bwrap preflight (staged, lock-verified bwrap)\n"
 A_CEREMONY = "      - name: NON_CERTIFYING_SCRATCH ceremony (network-enforced-off, tee'd log)\n"
-BLOCK_BYTECODE_GUARD_NEG = r'''      - name: NON_CERTIFYING_SCRATCH planted-fault H5 bytecode-guard must-show (peer run-35959397469 H5c)
-        if: ${{ always() }}
+BLOCK_BYTECODE_GUARD_NEG = r'''      - name: NON_CERTIFYING_SCRATCH planted-fault H5 bytecode-guard must-show (peer run-35963407323 redesign)
+        if: ${{ !cancelled() }}
         run: |
           set -eEuo pipefail
           REH=docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
-          # planted sibling importer WITHOUT sys.dont_write_bytecode, scanned by the REAL
-          # preflight E_BYTECODE_GUARD check. The EXIT trap guarantees the probe never
-          # survives the step: the end-of-job checkout gate must see a clean tree.
-          trap 'rm -f "$REH/zz_bytecode_probe.py"' EXIT
-          printf 'from lane_resolve import resolve_config_value\n' > "$REH/zz_bytecode_probe.py"
+          OUT=/tmp/$PREFIX-out
+          mkdir -p "$OUT"
           cd "$REH"
+          REH_ABS="$PWD"
+          # peer run-35963407323 redesign: (a) clean baseline FIRST, before any plant,
+          # captured into the evidence tree - a must-show step NAMES every non-zero exit
+          # (the run-19' phase-2 clean re-run died silent exit 30 into /dev/null).
           _rc=0
-          python3 preflight-check.py config.json /tmp/$PREFIX-stage > /tmp/$PREFIX-h5-preflight.json 2>&1 || _rc=$?
-          if [ "$_rc" -ne 30 ]; then
-            echo "E_BYTECODE_GUARD_MUST_SHOW rc=$_rc (want 30)"; cat /tmp/$PREFIX-h5-preflight.json; exit 90
+          python3 preflight-check.py config.json /tmp/$PREFIX-stage > "$OUT/$PREFIX-h5-baseline.json" 2>&1 || _rc=$?
+          if [ "$_rc" -ne 0 ]; then
+            echo "E_H5_BASELINE_PREFLIGHT_FAIL rc=$_rc"; cat "$OUT/$PREFIX-h5-baseline.json"; exit 90
           fi
-          grep -q '"E_BYTECODE_GUARD"' /tmp/$PREFIX-h5-preflight.json \
-            || { echo "E_BYTECODE_GUARD_MUST_SHOW named code missing"; cat /tmp/$PREFIX-h5-preflight.json; exit 90; }
-          grep -q 'zz_bytecode_probe.py' /tmp/$PREFIX-h5-preflight.json \
-            || { echo "E_BYTECODE_GUARD_MUST_SHOW probe file not named"; cat /tmp/$PREFIX-h5-preflight.json; exit 90; }
-          rm -f zz_bytecode_probe.py
+          # (b) planted sibling importer WITHOUT sys.dont_write_bytecode, scanned by the REAL
+          # preflight E_BYTECODE_GUARD check; the EXIT trap guarantees the probe never survives
+          # the step (the end-of-job checkout gate must see a clean tree).
+          trap 'rm -f "$REH_ABS/zz_bytecode_probe.py"' EXIT
+          printf 'from lane_resolve import resolve_config_value\n' > "$REH_ABS/zz_bytecode_probe.py"
+          _rc=0
+          python3 preflight-check.py config.json /tmp/$PREFIX-stage > "$OUT/$PREFIX-h5-planted.json" 2>&1 || _rc=$?
+          rm -f "$REH_ABS/zz_bytecode_probe.py"
           trap - EXIT
-          python3 preflight-check.py config.json /tmp/$PREFIX-stage > /dev/null
-          echo "H5_BYTECODE_GUARD_MUST_SHOW_OK"
+          if [ "$_rc" -ne 30 ]; then
+            echo "E_H5_PLANTED_ERRSET_MISMATCH rc=$_rc (want 30)"; cat "$OUT/$PREFIX-h5-planted.json"; exit 90
+          fi
+          python3 - "$OUT/$PREFIX-h5-planted.json" <<'PYT'
+          import json, sys
+          try:
+              rep = json.load(open(sys.argv[1]))
+          except Exception as e:
+              print("E_H5_PLANTED_ERRSET_MISMATCH planted report unparseable: %s" % e)
+              print(open(sys.argv[1], errors="replace").read())
+              sys.exit(90)
+          errs = rep.get("errors")
+          ok = (isinstance(errs, list) and len(errs) == 1
+                and errs[0][0] == "E_BYTECODE_GUARD" and "zz_bytecode_probe.py" in str(errs[0][1]))
+          if not ok:
+              print("E_H5_PLANTED_ERRSET_MISMATCH errors=%r (want exactly {E_BYTECODE_GUARD naming zz_bytecode_probe.py})" % (errs,))
+              print(json.dumps(rep, indent=1, sort_keys=True))
+              sys.exit(90)
+          print("planted error set exactly {E_BYTECODE_GUARD naming zz_bytecode_probe.py}")
+          PYT
+          # (c) probe removed; the post-clean run must pass clean, else NAMED with JSON printed.
+          _rc=0
+          python3 preflight-check.py config.json /tmp/$PREFIX-stage > "$OUT/$PREFIX-h5-post.json" 2>&1 || _rc=$?
+          if [ "$_rc" -ne 0 ]; then
+            echo "E_H5_POST_PREFLIGHT_FAIL rc=$_rc"; cat "$OUT/$PREFIX-h5-post.json"; exit 90
+          fi
+          # (d) all three reports sit under the evidence upload path (each written BEFORE any
+          # death, captured on success AND failure); (e) no output to /dev/null in this step.
+          echo "H5_BYTECODE_GUARD_MUST_SHOW_OK baseline+planted+post captured as $PREFIX-h5-{baseline,planted,post}.json"
 '''
 A_REPAIR   = "      - name: NON_CERTIFYING_SCRATCH evidence readability repair (ephemeral out tree only)\n"
 A_GATE     = "      - name: checkout immutability gate (end of job, frozen SHA)\n"

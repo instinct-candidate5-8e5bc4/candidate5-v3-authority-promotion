@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # NON_CERTIFYING_REHEARSAL preflight: static conformance only, starts no VM.
 # usage: preflight-check.py <config.json> <stage_dir>
-import sys, os, json, hashlib, subprocess
+import sys, os, json, hashlib, subprocess, struct
 
 # Lane prefix resolution (#18 F1, peer #17 final ruling): committed config bytes keep the
 # canonical NON_CERTIFYING_REHEARSAL prefix; at load time every absolute /tmp lane path
@@ -105,6 +105,66 @@ for fn,(h,sz) in EXPECT.items():
     p=os.path.join(ev,fn)
     if not os.path.exists(p): fail("E_EVIDENCE_MISSING", fn); continue
     if os.path.getsize(p)!=sz or sha(p)!=h: fail("E_EVIDENCE_HASH_MISMATCH", fn)
+
+# 4b) peer run-35963407323 ruling (2): the pinned accepted UKI's EDK2-style (section-wise)
+# Authenticode digest must EQUAL the messageDigest embedded in its own WIN_CERTIFICATE
+# signature. OVMF/EDK2 hashes PE sections by ascending PointerToRawData (inter-section gaps
+# SKIPPED); a signer that hashes the file straight through embeds a digest the firmware can
+# never reproduce - the run-19' R1 rejection: pinned UKI 13309697.. embeds ab95a4c3.. (the
+# contiguous hash includes the 10,240-byte inter-section gap (not zero-filled) between
+# .dynsym end 51200 and .cmdline start 61440) while the section-wise digest is 78eb453c... This gate is SUPPOSED TO FAIL on the current pinned
+# UKI until the owner-level production-signing decision lands: correct fail-closed behavior.
+# It must never be weakened, special-cased, or made diagnostic-only.
+def _pe_auth_digest(b):
+    e_lfanew=struct.unpack_from("<I",b,0x3c)[0]
+    if b[e_lfanew:e_lfanew+4]!=b"PE\0\0": raise ValueError("no PE signature")
+    coff=e_lfanew+4
+    nsec=struct.unpack_from("<H",b,coff+2)[0]
+    optsz=struct.unpack_from("<H",b,coff+16)[0]
+    opt=coff+20
+    magic=struct.unpack_from("<H",b,opt)[0]
+    if magic==0x20b: dd=opt+112
+    elif magic==0x10b: dd=opt+96
+    else: raise ValueError("bad optional-header magic 0x%04x"%magic)
+    csum=opt+64
+    soh=struct.unpack_from("<I",b,opt+60)[0]
+    secdir=dd+4*8   # IMAGE_DIRECTORY_ENTRY_SECURITY
+    cert_va,cert_sz=struct.unpack_from("<II",b,secdir)
+    secs=[]
+    for i in range(nsec):
+        o=opt+optsz+i*40
+        rawsz,rawptr=struct.unpack_from("<II",b,o+16)
+        if rawsz>0: secs.append((rawptr,rawsz))
+    h=hashlib.sha256()
+    h.update(b[:csum]); h.update(b[csum+4:secdir]); h.update(b[secdir+8:soh])
+    for rawptr,rawsz in sorted(secs): h.update(b[rawptr:rawptr+rawsz])
+    sobh=soh+sum(s[1] for s in secs)
+    end=cert_va if cert_va else len(b)
+    if end>sobh: h.update(b[sobh:end])
+    return h.hexdigest(),cert_va,cert_sz
+_DIGESTINFO_SHA256=bytes.fromhex("3031300d060960864801650304020105000420")  # DigestInfo{sha256,NULL,OCTET STRING 32}
+_uki=os.path.join(ev,"successor-signed.efi")
+if os.path.exists(_uki) and sha(_uki)==EXPECT["successor-signed.efi"][0]:
+    _b=open(_uki,"rb").read()
+    try:
+        _computed,_cva,_csz=_pe_auth_digest(_b)
+        if _cva==0 or _csz<8: raise ValueError("no attribute certificate table")
+        _dwlen,_wrev,_wtype=struct.unpack_from("<IHH",_b,_cva)
+        if _wtype!=0x0002 or _dwlen<8 or _cva+_dwlen>len(_b):
+            raise ValueError("bad WIN_CERTIFICATE hdr dwLength=%d type=0x%04x"%(_dwlen,_wtype))
+        _der=_b[_cva+8:_cva+_dwlen]
+        _hits=[]; _i=_der.find(_DIGESTINFO_SHA256)
+        while _i>=0:
+            _hits.append(_i); _i=_der.find(_DIGESTINFO_SHA256,_i+1)
+        if len(_hits)!=1: raise ValueError("embedded sha256 DigestInfo occurrences=%d (want exactly 1)"%len(_hits))
+        _off=_hits[0]+len(_DIGESTINFO_SHA256)
+        if _off+32>len(_der): raise ValueError("truncated embedded digest")
+        _embedded=_der[_off:_off+32].hex()
+        if _computed!=_embedded:
+            fail("E_UKI_FIRMWARE_DIGEST_MISMATCH",
+                 "successor-signed.efi section-wise(EDK2)=%s embedded=%s (firmware hashes section-wise, gap skipped; signer hashed gap-included)"%(_computed,_embedded))
+    except Exception as _e:
+        fail("E_UKI_FIRMWARE_DIGEST_MISMATCH","successor-signed.efi digest equality unprovable: %s"%_e)
 
 # 5) config schema: no wildcards, exact values only
 try: cfg=resolve_config_value(json.load(open(cfg_path)),PREFIX)

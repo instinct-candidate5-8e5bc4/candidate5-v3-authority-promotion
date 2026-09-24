@@ -21,7 +21,8 @@
     "exit_98": false,
     "kernel_exec": false,
     "reject_strings": [
-     "Image is not signed and %s hash of image is not found in DB/DBX"
+     "Image is not signed and %s hash of image is not found in DB/DBX",
+     "The image doesn't pass verification"
     ]
    },
    "firmware": "build-output/ovmf-debug/OVMF_CODE.fd",
@@ -36,7 +37,8 @@
     "exit_98": false,
     "kernel_exec": false,
     "reject_strings": [
-     "Image is signed but signature is not allowed by DB and %s hash of image is not found in DB/DBX"
+     "Image is signed but signature is not allowed by DB and %s hash of image is not found in DB/DBX",
+     "The image doesn't pass verification"
     ]
    },
    "firmware": "build-output/ovmf-debug/OVMF_CODE.fd",
@@ -51,7 +53,8 @@
     "exit_98": false,
     "kernel_exec": false,
     "reject_strings": [
-     "Image is signed but signature is not allowed by DB and %s hash of image is not found in DB/DBX"
+     "Image is signed but signature is not allowed by DB and %s hash of image is not found in DB/DBX",
+     "The image doesn't pass verification"
     ]
    },
    "firmware": "build-output/ovmf-debug/OVMF_CODE.fd",
@@ -80,7 +83,8 @@
     "exit_98": false,
     "kernel_exec": false,
     "reject_strings": [
-     "Image is signed but signature is not allowed by DB and %s hash of image is not found in DB/DBX"
+     "Image is signed but signature is not allowed by DB and %s hash of image is not found in DB/DBX",
+     "The image doesn't pass verification"
     ]
    },
    "firmware": "build-output/ovmf-debug/OVMF_CODE.fd",
