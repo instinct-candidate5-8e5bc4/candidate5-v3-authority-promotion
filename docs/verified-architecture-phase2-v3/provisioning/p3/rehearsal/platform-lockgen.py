@@ -29,7 +29,7 @@ def cand(name):
     return None, None
 SNAPSHOT_TS='20260922T000000Z'
 SNAP='https://snapshot.ubuntu.com/ubuntu/'+SNAPSHOT_TS
-SEEDS_RUNTIME=['qemu-system-x86','ovmf','sbsigntool','openssl','dosfstools','gdisk','bubblewrap']
+SEEDS_RUNTIME=['qemu-system-x86','ovmf','sbsigntool','osslsigncode','openssl','dosfstools','gdisk','bubblewrap']
 SEEDS_BUILD=['gcc','make','nasm','acpica-tools','uuid-dev','bison','flex','gnu-efi','m4','perl']
 seen={}; order=[]
 def resolve(name, role):

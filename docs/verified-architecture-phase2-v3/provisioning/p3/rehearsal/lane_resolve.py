@@ -34,7 +34,7 @@
 import sys, os, json, re
 
 CANON = "NON_CERTIFYING_REHEARSAL"
-ENROLL_MODES = ("sole", "widened", "sole-fresh")
+ENROLL_MODES = ("sole", "widened", "sole-fresh", "throwaway")
 
 class LaneError(Exception):
     def __init__(self, code, detail):

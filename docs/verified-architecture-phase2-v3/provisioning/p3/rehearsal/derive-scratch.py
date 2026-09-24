@@ -30,6 +30,10 @@ skipped silently; BLOCK_BYTECODE_GUARD_NEG was redesigned baseline-first/planted
 with all three preflight reports captured into the evidence tree and no /dev/null anywhere.
 #20' (peer byte verdict on #20): the four must-show blocks carry `if: ${{ !cancelled() }}`,
 never always() - always() would also fire on job cancellation, contradicting ruling C3.
+C1' (peer 2026-09-24 B1): the criterion-C c-sign step rides the lane prefix swap (transform 2)
+into the scratch workflow BY DESIGN - one source of truth, no duplicated step text. The
+derivation now ASSERTS the carried step's presence (E_DERIVE_C_SIGN_MISSING) so a silent
+drop of the C lane from either lane's workflow fails the generator closed.
 """
 import re, sys
 
@@ -139,7 +143,7 @@ BLOCK_PF = r'''
           [ "$(sha256sum "$PFWORK/build-output/ovmf-debug/OVMF_CODE.fd" | cut -d' ' -f1)" = "fc150336fce10eb5508fa440cdf7300622c8c3ac71f2fbe10a0731422b9cef24" ] \
             || { echo "E_PF_SETUP OVMF_CODE sha mismatch after copy" | tee -a "$PFD/prep.log"; exit 97; }
           cp config.json "$PFWORK/config.json"
-          "$REH/enroll-prep.sh" /tmp/$PREFIX-stage/root "$PREPP" "$REH/evidence/c5-signing-cert.der" "$REH/evidence/C5-HOSTILE-FIXTURE.cer" \
+          "$REH/enroll-prep.sh" /tmp/$PREFIX-stage/root "$PREPP" "$REH/evidence/c5-signing-cert.der" "$REH/build-output/c-sign/fixtures/C5-HOSTILE-FIXTURE.cer" \
             > "$PFD/prep.log" 2>&1 \
             || { echo "E_PF_PREP rc=$?" | tee -a "$PFD/prep.log"; cat "$PFD/prep.log"; exit 97; }
           _rc=0
@@ -190,7 +194,7 @@ BLOCK_PF = r'''
           [ "$(sha256sum "$PFWORK/build-output/ovmf-debug/OVMF_CODE.fd" | cut -d' ' -f1)" = "fc150336fce10eb5508fa440cdf7300622c8c3ac71f2fbe10a0731422b9cef24" ] \
             || { echo "E_PF_SETUP OVMF_CODE sha mismatch after copy" | tee -a "$PFD/prep.log"; exit 97; }
           cp config.json "$PFWORK/config.json"
-          "$REH/enroll-prep.sh" /tmp/$PREFIX-stage/root "$PREPP" "$REH/evidence/c5-signing-cert.der" "$REH/evidence/C5-HOSTILE-FIXTURE.cer" \
+          "$REH/enroll-prep.sh" /tmp/$PREFIX-stage/root "$PREPP" "$REH/evidence/c5-signing-cert.der" "$REH/build-output/c-sign/fixtures/C5-HOSTILE-FIXTURE.cer" \
             > "$PFD/prep.log" 2>&1 \
             || { echo "E_PF_PREP rc=$?" | tee -a "$PFD/prep.log"; cat "$PFD/prep.log"; exit 97; }
           _rc=0
@@ -243,7 +247,7 @@ BLOCK_PF = r'''
           [ "$(sha256sum "$PFWORK/build-output/ovmf-debug/OVMF_CODE.fd" | cut -d' ' -f1)" = "fc150336fce10eb5508fa440cdf7300622c8c3ac71f2fbe10a0731422b9cef24" ] \
             || { echo "E_PF_SETUP OVMF_CODE sha mismatch after copy" | tee -a "$PFD/prep.log"; exit 97; }
           cp config.json "$PFWORK/config.json"
-          "$REH/enroll-prep.sh" /tmp/$PREFIX-stage/root "$PREPP" "$REH/evidence/c5-signing-cert.der" "$REH/evidence/C5-HOSTILE-FIXTURE.cer" \
+          "$REH/enroll-prep.sh" /tmp/$PREFIX-stage/root "$PREPP" "$REH/evidence/c5-signing-cert.der" "$REH/build-output/c-sign/fixtures/C5-HOSTILE-FIXTURE.cer" \
             > "$PFD/prep.log" 2>&1 \
             || { echo "E_PF_PREP rc=$?" | tee -a "$PFD/prep.log"; cat "$PFD/prep.log"; exit 97; }
           # PF-4 planted condition: remove the pristine OVMF_VARS needed file; restore
@@ -322,7 +326,7 @@ BLOCK_PF = r'''
           [ "$(sha256sum "$PFWORK/build-output/ovmf-debug/OVMF_CODE.fd" | cut -d' ' -f1)" = "fc150336fce10eb5508fa440cdf7300622c8c3ac71f2fbe10a0731422b9cef24" ] \
             || { echo "E_PF_SETUP OVMF_CODE sha mismatch after copy" | tee -a "$PFD/prep.log"; exit 97; }
           cp config.json "$PFWORK/config.json"
-          "$REH/enroll-prep.sh" /tmp/$PREFIX-stage/root "$PREPP" "$REH/evidence/c5-signing-cert.der" "$REH/evidence/C5-HOSTILE-FIXTURE.cer" \
+          "$REH/enroll-prep.sh" /tmp/$PREFIX-stage/root "$PREPP" "$REH/evidence/c5-signing-cert.der" "$REH/build-output/c-sign/fixtures/C5-HOSTILE-FIXTURE.cer" \
             > "$PFD/prep.log" 2>&1 \
             || { echo "E_PF_PREP rc=$?" | tee -a "$PFD/prep.log"; cat "$PFD/prep.log"; exit 97; }
           _rc=0
@@ -380,7 +384,7 @@ BLOCK_PF6 = r'''      - name: NON_CERTIFYING_SCRATCH planted-fault PF-6 badpred 
           [ "$(sha256sum "$PFWORK/build-output/ovmf-debug/OVMF_CODE.fd" | cut -d' ' -f1)" = "fc150336fce10eb5508fa440cdf7300622c8c3ac71f2fbe10a0731422b9cef24" ] \
             || { echo "E_PF_SETUP OVMF_CODE sha mismatch after copy" | tee -a "$PFD/prep.log"; exit 97; }
           cp config.json "$PFWORK/config.json"
-          "$REH/enroll-prep.sh" /tmp/$PREFIX-stage/root "$PREPP" "$REH/evidence/c5-signing-cert.der" "$REH/evidence/C5-HOSTILE-FIXTURE.cer" \
+          "$REH/enroll-prep.sh" /tmp/$PREFIX-stage/root "$PREPP" "$REH/evidence/c5-signing-cert.der" "$REH/build-output/c-sign/fixtures/C5-HOSTILE-FIXTURE.cer" \
             > "$PFD/prep.log" 2>&1 \
             || { echo "E_PF_PREP rc=$?" | tee -a "$PFD/prep.log"; cat "$PFD/prep.log"; exit 97; }
           _rc=0
@@ -525,7 +529,7 @@ BLOCK_NEG_TESTS = r'''      - name: NON_CERTIFYING_SCRATCH verify-auth negative 
           cd "$GITHUB_WORKSPACE/$R"
           V=/tmp/$PREFIX-verify-auth-test; rm -rf "$V"; mkdir -p "$V"
           trap 'shred -u "$V"/prep/*.key 2>/dev/null || true; rm -rf "$V"' EXIT
-          ./enroll-prep.sh /tmp/$PREFIX-stage/root "$V/prep" evidence/c5-signing-cert.der evidence/C5-HOSTILE-FIXTURE.cer > "$V/pos.log" 2>&1             || { echo "E_VATEST clean prep failed"; cat "$V/pos.log"; exit 97; }
+          ./enroll-prep.sh /tmp/$PREFIX-stage/root "$V/prep" evidence/c5-signing-cert.der build-output/c-sign/fixtures/C5-HOSTILE-FIXTURE.cer > "$V/pos.log" 2>&1             || { echo "E_VATEST clean prep failed"; cat "$V/pos.log"; exit 97; }
           grep -F "VERIFY_AUTH_OK" "$V/pos.log" > /dev/null || { echo "E_VATEST no VERIFY_AUTH_OK in clean pass"; cat "$V/pos.log"; exit 97; }
           VA() { python3 verify-auth.py "$1" enroll-app.c /tmp/$PREFIX-stage/shims/openssl --expect-db2; }
           # one 0x67-signed .auth among the 0x27 set -> E_AUTH_DIGEST
@@ -703,6 +707,23 @@ def _insert_before(t, anchor, block):
     return t.replace(anchor, block + anchor)
 
 def derive(t):
+    # C1' (peer 2026-09-24 B1 conditions 2-3): source-side c-sign guarantees, checked
+    # BEFORE any transform. Exactly one c-sign step in the SOURCE (0/2+ get distinct
+    # named codes); it must sit after the ESP dual builds and before the first K2 gate
+    # and carry !cancelled() (placement ruling).
+    _n_src = t.count("- name: NON_CERTIFYING_REHEARSAL criterion-C throwaway signing")
+    if _n_src == 0:
+        raise SystemExit("E_DERIVE_C_SIGN_MISSING source c-sign step occurrences=0")
+    if _n_src > 1:
+        raise SystemExit("E_DERIVE_C_SIGN_DUPLICATE source c-sign step occurrences=%d" % _n_src)
+    _i_c = t.index("- name: NON_CERTIFYING_REHEARSAL criterion-C throwaway signing")
+    _i_esp = t.index("- name: NON_CERTIFYING_REHEARSAL enrollment app + ESP dual builds")
+    _i_k2 = t.index("- name: zero-private-key evidence gate K2 before firmware-hash upload")
+    if not (_i_esp < _i_c < _i_k2):
+        raise SystemExit("E_DERIVE_C_SIGN_PLACEMENT c-sign step must follow the ESP dual builds and precede the first K2 gate")
+    _src_blk = t[_i_c:t.index("\n      - name:", _i_c)]
+    if "if: ${{ !cancelled() }}" not in _src_blk:
+        raise SystemExit("E_DERIVE_C_SIGN_PLACEMENT c-sign step lacks if: ${{ !cancelled() }}")
     t = NEW_HDR + t[t.index("name: "):]
     t = t.replace("NON_CERTIFYING_REHEARSAL", "NON_CERTIFYING_SCRATCH")
     t = t.replace("branches: [p3-rehearsal-3, p3-rehearsal-4]", "branches: ['p3-scratch-*']")
@@ -721,6 +742,19 @@ def derive(t):
     t = _insert_before(t, A_REPAIR, BLOCK_BOOT_TARGET_NEG)
     t = _insert_before(t, A_REPAIR, BLOCK_BYTECODE_GUARD_NEG)
     t = _insert_before(t, A_GATE, BLOCK_NEG_TESTS)
+    # C1' (peer 2026-09-24 B1 conditions 1-3): output-side carry guarantees. Exactly one
+    # c-sign step in the OUTPUT (0/2+ get distinct named codes), and the carried block
+    # must equal the source block under ONLY the lane-prefix swap - any scratch-only
+    # edit inside the step dies here.
+    _n = t.count("- name: NON_CERTIFYING_SCRATCH criterion-C throwaway signing")
+    if _n == 0:
+        raise SystemExit("E_DERIVE_C_SIGN_MISSING output c-sign step occurrences=0")
+    if _n > 1:
+        raise SystemExit("E_DERIVE_C_SIGN_DUPLICATE output c-sign step occurrences=%d" % _n)
+    _i_oc = t.index("- name: NON_CERTIFYING_SCRATCH criterion-C throwaway signing")
+    _i_oend = t.index("\n      - name:", _i_oc)
+    if t[_i_oc:_i_oend] != _src_blk.replace("NON_CERTIFYING_REHEARSAL", "NON_CERTIFYING_SCRATCH"):
+        raise SystemExit("E_DERIVE_C_SIGN_CARRY_DRIFT c-sign step edited beyond the lane-prefix swap")
     return t
 
 def main():

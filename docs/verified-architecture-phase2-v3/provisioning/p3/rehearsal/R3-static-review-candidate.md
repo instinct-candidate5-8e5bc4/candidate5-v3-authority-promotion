@@ -1,5 +1,20 @@
 # R3 — Static Review Candidate: Option A CI Ceremony (NON_CERTIFYING_REHEARSAL pre-freeze rehearsal)
 
+> **REVISION (E freeze head, 2026-09-24):** the previously accepted signed UKI
+> 13309697.. is HISTORICAL EVIDENCE ONLY - firmware-rejected in run 19' (R1), root-caused in
+> UKI-13309697-ROOT-CAUSE.md (inter-section gap = the stub's COFF symbol table; embedded
+> digest ab95a4c3.. gap-included vs firmware section-wise 78eb453c..). Per the owner decision
+> of 2026-09-24 this revision carries the gapless deterministic rebuild (unsigned UKI
+> 4cda9c3e.., 21,154,304 B, symtab-zeroed; dual-equal Authenticode digest b2f655b0..), the
+> re-derived hostile fixtures (fresh ephemeral fixture certs 64eb51a0../5b5e4edc.., both
+> embedding b2f655b0..), rebuilt ESP-variant pins, the new builder
+> (successor-uki-candidate/build-successor-gapless.py) and gates (verify-uki-layout.py,
+> verify-uki-signed.py, verify-signed-delta.py, verify-uki-authenticode.py) with executed
+> negatives. The 13309697-signed pristine ESP pin and every 13309697-bearing doc remain
+> pinned to the historical artifact until the fresh signing ceremony (criterion F); they are
+> re-derived in the post-ceremony recertification pass.
+
+
 Status: STATIC REVIEW CANDIDATE. This document, the rehearsal branch content, and every value
 in it freeze before static review. Any byte change after review starts restarts the review
 (ONE SHA = ONE REVIEW). This document NEVER emits the closing marker; the closing marker for
@@ -23,35 +38,40 @@ rehearsal runs happen in CI; the local sandbox has no KVM.
   is 92741cbdefaa78adc33bc3c74935a45f9558b88c, a VERIFIED ANCESTOR of cd455a06
   (git merge-base --is-ancestor 92741cbd cd455a06 -> true, run locally 2026-09-23). These are
   distinct identities and must not be conflated.
-- A4 record (requirement 7): fixtures regenerated 2026-09-22 ~18:00 IDT under requirement A4 -
+- A4 record (requirement 7) [SUPERSEDED by section 15, C1' route-(ii): negative-control fixtures are now generated IN-RUN from runner-ephemeral keys and property-gated; the pinned bytes below are a HISTORICAL record only and the binary files were deleted from the tree in C1' after the 2026-09-24 C2 byte-loss event disclosed in section 15]: fixtures regenerated 2026-09-22 ~18:00 IDT under requirement A4 -
   prior ad-hoc generation (F-WRONGSIG 75c24ffc.., F-HOSTILEUKI 860389a7..) is VOID. Sole bound
   fixtures: generator fixture-generate.sh sha256 8a4661d57961c7a86d83d638325022fa81da7ed309e7df78eaeadcdc59167a85
   (public inputs only: unsigned UKI ed5d9d72.. + pinned sbsigntool; keys 0600 in mktemp, never
   logged, plain-deleted after the single reviewed run); F-WRONGSIG.efi
-  44706c4a02bc013a248d4ba228b731471d373a813ea7fd921416c9119071b50a with cert
-  98abb484874dd3c850c6930dd0ba474d1c287b6372292ff6efe44c5a92dda485 (809 B); F-HOSTILEUKI.efi
-  5f6cfe5cf11b5e71158ce3a5736175eae925f33dec2a308370618c3aceec939e with cert
-  4428760c1ba2322bd9f9254e45cbbdb5b89c3f8b4e594f0efff337a4d3c4e07a (799 B). ANY regeneration
+  e4c49342bfd9f1c7a90ea3364b6619865d8187a17f10f146cd25cce57721cfdb with cert
+  64eb51a0deb3bc67df051de22bdd205426dd4b70931b1f8d49fee4e894339ca6 (809 B); F-HOSTILEUKI.efi
+  e3547cd573b49caa8f5e9f0c20c0c78f1bbac694577bfd7fe19236092bd8dd3b with cert
+  5b5e4edc11fd12787580fc9885fcdd4ebefecdabd82b893988be321483b68a8b (799 B). ANY regeneration
   = new review.
-- signed UKI sha256 13309697... (above), unsigned UKI sha256 ed5d9d72be40592af3b14bd1fd9dc91a5976b14f350f9124ea414b975464d536 (21,164,544 B)
+- signed UKI sha256 13309697... (above), unsigned UKI sha256 4cda9c3e285b5b639364234400bf0b121178f12447cc88d896cd2623e07d18e1 (21,154,304 B)
 - production signing cert DER sha256 7cda4ddc149849cc61191d4b5b3d218d14770c0401e9e66dd9617b82ba1ae441 (1,092 B)
-- F-WRONGSIG.efi sha256 44706c4a02bc013a248d4ba228b731471d373a813ea7fd921416c9119071b50a (21,166,128 B), cert DER 98abb484874dd3c850c6930dd0ba474d1c287b6372292ff6efe44c5a92dda485 (809 B)
-- F-HOSTILEUKI.efi sha256 5f6cfe5cf11b5e71158ce3a5736175eae925f33dec2a308370618c3aceec939e (21,166,112 B), cert DER 4428760c1ba2322bd9f9254e45cbbdb5b89c3f8b4e594f0efff337a4d3c4e07a (799 B)
+- F-WRONGSIG.efi sha256 e4c49342bfd9f1c7a90ea3364b6619865d8187a17f10f146cd25cce57721cfdb (21,155,888 B), cert DER 64eb51a0deb3bc67df051de22bdd205426dd4b70931b1f8d49fee4e894339ca6 (809 B) [HISTORICAL only; file deleted in C1', see section 15]
+- F-HOSTILEUKI.efi sha256 e3547cd573b49caa8f5e9f0c20c0c78f1bbac694577bfd7fe19236092bd8dd3b (21,155,872 B), cert DER 5b5e4edc11fd12787580fc9885fcdd4ebefecdabd82b893988be321483b68a8b (799 B) [HISTORICAL only; file deleted in C1', see section 15]
 - pristine VARS: OVMF_VARS_4M.fd from ovmf 2024.02-2ubuntu0.9, sha256 5d2ac383371b408398accee7ec27c8c09ea5b74a0de0ceea6513388b15be5d1e (540,672 B, EMPTY store)
 - frozen ESP image (built, pinned): c5-root-admitter-uki-v3-esp.raw sha256 2bfa621238890890765c9636f99dabfb46233bfa626afb580ce33e65858019c9 (EPOCH 1789923381, disk GUID a42ac99f-298e-71d7-54e9-69cea084f6d6, partition GUID a1eee143-302e-bfce-2da6-410baab6c2ea)
 - accepted source commit 92741cbdefaa78adc33bc3c74935a45f9558b88c
-Fixture keys were generated once, used once, plain-deleted; any regeneration requires a new static review.
+Fixture keys were generated once, used once, plain-deleted; any regeneration requires a new static review. [SUPERSEDED in C1': fixture keys are now generated in-run per ceremony and shredded end-of-step; see section 15.]
 
 ## 3. Platform lock (A2: complete build+runtime closure)
-platform.lock.json sha256 86454077ee27514fc9e750b1c6aa47d7902a5128010dd4f5728681967c45423a:
-160 debs (ubuntu-24.04 noble amd64; noble + noble-updates main+universe indices, all four index
-hashes recorded; regenerated with the byte-identical recorded indices - the 159 prior entries are
-unchanged, exactly one package added). 93 runtime incl. qemu-system-x86 1:8.2.2+ds-0ubuntu1.18,
+platform.lock.json sha256 330aea4630f1674da9dca242fda41ed3555f496a3be6b4ed3d6f9beedfbd89e4:
+161 debs (ubuntu-24.04 noble amd64; noble + noble-updates main+universe indices, all four index
+hashes recorded; regenerated with the byte-identical recorded indices - the 147 entries of the
+previously committed lock are unchanged, exactly 14 packages added for criterion C: osslsigncode
+2.8-2 (deb sha256 1aee7be603102633e80b4c67cd939bba2e16a62813e4a3035696727783f632b0, 79,478 B)
+plus its libcurl4t64 dependency chain; zero removals). 107 runtime incl. qemu-system-x86 1:8.2.2+ds-0ubuntu1.18,
 ovmf 2024.02-2ubuntu0.9
 (deb sha256 a094c13d06f2740691ff57d108dff32aa087179363ddb0de42d463b4f7f9bc13), sbsigntool
 0.9.4-3.1ubuntu7, gdisk, dosfstools, openssl, bubblewrap 0.9.0-1ubuntu0.3 (deb sha256
-2461f1beee9cb04c8942739fe1a2b37e7b7c2a3d518f0779dc75f9245baa3094); 67 build-only incl. gcc-13 13.3.0, nasm 2.16.01,
+2461f1beee9cb04c8942739fe1a2b37e7b7c2a3d518f0779dc75f9245baa3094); 54 build-only incl. gcc-13 13.3.0, nasm 2.16.01,
 acpica-tools 20230628, gnu-efi 3.0.15-1build1 (deb sha256 cb325283fa03f323fb2f2f2db6085c57518afe0a2d4f752efcc1a836dd2c48e6 — the noble index entry; an earlier "jammy" label and a "3.0.18-1" remark were corrected).
+osslsigncode joins the runtime set for the c-sign step (staged like every other
+tool, loader-explicit shim; the Q2 E_TOOL_FORBIDDEN guard confines every osslsigncode reference
+to the c-sign step of the rehearsal workflow and bans it from the certification/scratch lanes).
 stage-platform.sh downloads every deb, verifies every sha256, rejects any extra or
 substituted file (E_LOCK_EXTRA_FILES), extracts to a private tree, and verifies the pristine
 VARS hash (E_VARS_PRISTINE_MISMATCH). Download hardening (D3 ruling, round 5): explicit 60s
@@ -140,13 +160,16 @@ Throwaway PK/KEK (1-day, CN=C5-THROWAWAY-*), generated per ceremony run, never l
 ESLs use EFI_CERT_X509_GUID (a159c0a5-e494-a74a-87b5-ab155c2bf072), fixture owner GUID
 c501e570-0de0-0001-0000-000000000000; mixed cert sizes are emitted as concatenated per-size
 EFI_SIGNATURE_LISTs. .auth blobs via sbvarsign (db KEK-signed, KEK PK-signed, PK self-signed).
-Three templates: sole db=[production cert], widened db2=[production, hostile fixture cert],
-sole-fresh (second independent sole enrollment for R6).
+Four templates: sole db=[production cert], widened db2=[production, hostile fixture cert],
+sole-fresh (second independent sole enrollment for R6), throwaway db=[the run's ephemeral CI
+signing cert] (criterion C: generated in-run by the c-sign step, private key plain-deleted by an
+in-step trap, never committed/logged/uploaded; the expectation reaches the predicate checker as
+the ceremony-exported C5_THROWAWAY_CERT_SHA256 bound to the c-sign SHASUMS record).
 
 Enrollment predicate (requirement 5a resolution, pre-frozen - reviewer ruling: any different
 rehearsal value = FAIL; the predicate cannot be reinterpreted; changing the predicate = new
 SHA + two rehearsals). enroll-predicate-check.py (sha256
-d69e0a76579c27d0f78552c039ccb1b2f9aec24b6ee65cf0572a01f739c0f659, exit 92, E_ENROLL_* /
+35309a3a45e4ddc0d904c4428d3a944e476f3a5088b28fd13c646cc5b88cf3ca, exit 92, E_ENROLL_* /
 E_TRUST_* codes) runs inside the ceremony immediately after each enrollment's ENROLL.TXT
 extraction and fails the run on any deviation; its report is stored as that enrollment's
 enroll-predicate.json evidence. Frozen predicate: SET_{DB,KEK,PK}_STATUS = EFI_SUCCESS(0);
@@ -174,7 +197,15 @@ edc6681206c1a8791981a2f911d2fb8b3d2f5768, the certified firmware's pinned commit
   predicate is the SecureBoot/SetupMode pair above.
 
 ## 6. Case set (config.json, exact values, no wildcards)
-R1 positive: frozen ESP, DEBUG firmware, sole template. Expect: post-run RAM contains the
+NON_CERTIFYING_REHEARSAL-R1-historical-13309697-reject-control (renamed from "R1" in C1', ruling B3, see section 15) historical-death control: frozen ESP (carrying the accepted signed UKI 13309697..), DEBUG
+firmware, sole template (db=[production cert]). Expect: NO kernel exec, exactly the
+signed-untrusted reject pair ("Image is signed but signature is not allowed by DB and %s hash
+of image is not found in DB/DBX" plus the companion "The image doesn't pass verification").
+The 13309697 signature is cryptographically valid yet its embedded digest does not match its
+own bytes (run-19' evidence; UKI-13309697-ROOT-CAUSE.md), so the owner-db firmware rejects it.
+The positive contract below now attaches to the criterion-C throwaway cases (C-*), whose ESP
+variants carry the in-run throwaway-signed successor UKI.
+Positive contract (frozen): post-run RAM contains the
 CONTIGUOUS runtime-formatted kernel panic records "Kernel panic - not syncing: Attempted to
 kill init!" AND "Attempted to kill init! exitcode=0x00006200" (exit 98), zero reject strings,
 zero "Attempted to kill init! exitcode=0x00006100" (exit 97). Additionally (requirement 6):
@@ -206,14 +237,20 @@ R4 N3a: ESP variant carrying F-HOSTILEUKI.efi, sole template. Expect: signed-unt
 R5 N3b: same hostile ESP, WIDENED template (db2 includes hostile cert). Expect: firmware ACCEPTS
 (kernel exec true, zero reject strings) — proves db content controls the decision.
 R6 N3c: same hostile ESP, sole-FRESH template. Expect: rejected again — no persistence across VMs.
-R7: RELEASE sibling, R1 inputs. Behavior-only observation; no string claims, no equivalence claims.
+R7: RELEASE sibling, R1-historical inputs (case id renamed in C1', see section 15). Behavior-only observation; no string claims, no equivalence claims.
+C-ossl-throwaway-debug / C-ossl-throwaway-release: ESP variant built in-ceremony from the
+c-sign step's osslsigncode arm (in-run ephemeral cert), throwaway template, DEBUG resp.
+RELEASE firmware. Expect: the frozen positive contract (kernel exec, exit 98, zero reject strings).
+C-sbsign-throwaway-debug / C-sbsign-throwaway-release: same shape for the sbsign arm.
+The runtime ESPs and throwaway cert are per-run and carry no committed hash pins; the ceremony
+binds them to the c-sign SHASUMS record before any guest runs (E_THROWAWAY_PAYLOAD_MISMATCH).
 R8 (VARS delta + predicates, requirement 5b resolution - pre-frozen): stored PK/KEK/db data
 byte-equal the enrolled ESL payloads; PK and KEK each exactly one X509 ESL entry
 (EFI_CERT_X509_GUID a159c0a5-e494-a74a-87b5-ab155c2bf072), owner
 c501e570-0de0-0001-0000-000000000000, DER equal to this run's throwaway PK/KEK DER (DER
 hashes recorded in each enroll-predicate.json; private keys plain-deleted when the
 enrollment window closes, never logged/uploaded/published); sole db exactly {7cda4ddc..};
-widened db exactly {7cda4ddc.., 4428760c..}; dbx ABSENT (frozen form: absent, not empty);
+widened db exactly {7cda4ddc.., 5b5e4edc..}; throwaway db exactly {the run's ephemeral CI signing cert DER sha256}; dbx ABSENT (frozen form: absent, not empty);
 dbt and all *Default trust variables ABSENT; no other authenticated trust variables. Each
 case draws its VARS from exactly one of the three run-fresh post-enrollment templates via
 absolute config paths; the harness asserts the template allowlist and byte-identity before
@@ -231,7 +268,10 @@ Skylake-Server, pflash unit0 readonly + cfi.pflash01 secure=on, pflash unit1 VAR
 (bootindex=0 since #19, H1) + six v3-serial virtio-blk drives, -daemonize. argv_sha256 per
 case (NUL-joined, identical to the harness's own recording): R1 c581e7dda5d855f2.., R2
 f382e94075d87cd0.., R3 46d5c1c485cec634.., R4 daa8eee9131d7d2c.., R5 4a780d858f457e07.., R6
-6f2fc5a541aebbd2.., R7 2d450e95e778d9f1..
+6f2fc5a541aebbd2.., R7 2d450e95e778d9f1.., C-ossl-debug ddc0e5c285dd0884.., C-ossl-release
+efe08f207a651493.., C-sbsign-debug db4a6507297b386c.., C-sbsign-release 0765626bfa54dacd..
+(the four criterion-C argvs are template transforms of R1/R7 - same qemu/firmware/disk shape,
+case-dir and ESP paths substituted; all seven original pins byte-unchanged)
 (full 64-hex values and complete argv vectors in argv-freeze.json). Per-case work dirs live
 under OUT/NON_CERTIFYING_REHEARSAL-cases/ so every top-level evidence path carries the
 rehearsal prefix (workflow guard E_UNPREFIXED_TOPLEVEL_EVIDENCE).
@@ -252,9 +292,9 @@ the workflow_dispatch event, your workflow must be in the default branch.") - re
 default branch is never touched.
 Placement: exactly ONE copy of each workflow, both at .github/workflows/ on the candidate
 commit: NON_CERTIFYING_REHEARSAL-workflow.yml (sha256
-4f0f6c7f44ce46af05b853dd0849ddeb664c40cda0e2cfd9143cad374ba55dff) and
+864a91a57ffea84c946835e71e04b4f3f20843f9da65c26e9df7e00110b1c96b) and
 OVMF_CI_SECURE_BOOT_UKI-CERTIFICATION-workflow.yml (sha256
-0921ca7657c1fe9ab14d63a97aab75a84ee6ecd5dfb9d66f739fdbae0a3ad3f8). No docs/ copies
+202c8c263137fd3cce8803cdaaf6bda48a1e33b82e9d0468a3db8b07ec8aa8ea). No docs/ copies
 (preflight E_STALE_DOCS_WORKFLOW / E_WORKFLOW_MISSING).
 Rehearsal trigger: on push, exact branches filter [p3-rehearsal-3, p3-rehearsal-4] - two
 names, no wildcards, no other events (ref rotation per the reviewer ruling after D2:
@@ -1718,3 +1758,51 @@ simulated - branch A (no debug log) dies E_H3_QEMU_NOT_STARTED, branch B (starte
 death) reaches H3_BOOT_TARGET_MUST_SHOW_OK with the observed-line evidence. Local limit:
 this sandbox has neither passwordless sudo nor /dev/kvm, so the full planted-guest path is
 CI-only; the harness copy itself runs green as the runner up to the E_NO_KVM wall.
+
+## 15. C1' revision (peer review of C1): B1/B2/B3 fixes, C2 byte-loss disclosure, route-(ii) in-run negative-control scheme
+
+This section records the complete C1' change set. C1 (commit b2eaef1d1b8b56f7aea55d33a881b5eb8d37f348, tree a6f3caed..) was delivered for peer review on 2026-09-24. The peer returned ruling items B1, B2, B3 plus a C2 decision point with route options; the owner chose route (ii) (in-run fixtures, runner-ephemeral keys, property gates). C1' SUPERSEDES C1 as the review candidate; C1 remains in history as a reviewed-and-revised head.
+
+### 15a. B1: osslsigncode confinement (derive-scratch carried-step mechanism)
+osslsigncode now appears only inside the c-sign step of the rehearsal and scratch workflows (ZERO occurrences in the certification workflow). The scratch workflow lacked a c lane; it is derived from the rehearsal workflow by derive-scratch.py using the PEER-PREFERRED carried-step mechanism (accepted over literal BLOCK on 5 conditions, all implemented): (1) c-sign is carried byte-identical after ONLY the prefix swap - enforced by E_DERIVE_C_SIGN_CARRY_DRIFT; (2) exactly-one c-sign step asserted in BOTH source and output - 0 -> E_DERIVE_C_SIGN_MISSING, >1 -> E_DERIVE_C_SIGN_DUPLICATE; (3) placement asserted by the generator: after the ESP dual builds, before the K2 sweep, gated !cancelled() - E_DERIVE_C_SIGN_PLACEMENT; (4) preflight independently checks the one-step count in both lanes plus confinement - E_C_SIGN_STEP_COUNT; (5) planted negatives are COMMITTED RUNNABLE TESTS: test-c-sign-confinement.py (this directory) (9 cases, all pass in-run, tee'd to $PREFIX-csign-negtests.log, D2-registered).
+
+### 15b. B2: historical signed UKI out of the certification-target pin set
+The historical signed UKI 13309697.. (evidence/successor-signed.efi) is HISTORY-ONLY: preflight EXPECT now contains exactly c5-signing-cert.der; HISTORY contains successor-signed.efi. The certification-target signed slot is ABSENT by design: the certification workflow declares CERTIFICATION_TARGET=1 and dies E_SIGNED_UKI_ABSENT (no fallback) until the owner-signed successor arrives. The in-run unsigned UKI build output is the EXACT owner-signing-packet input; the owner-signed file will later enter as its OWN reviewed head/commit, never inside this tree. Gate 4b (verify-signed-delta) is re-scoped to the slot and will check every criterion-C throwaway output now and the real signtool output later. Certification-workflow path references retargeted to successor-to-certify.efi; two D2 gates die E_SIGNED_UKI_ABSENT.
+
+### 15c. B3: case rename and lane scoping
+Case "R1" renamed to "NON_CERTIFYING_REHEARSAL-R1-historical-13309697-reject-control" (config.json, argv-freeze.json argv pin recomputed: argv_sha256 4110dad173e5a1d4a9bbe0fae05d9aaa21fc20859c599d63ab43bda6a3c22891 over NUL-joined argv; preflight CASE_ARGV_PINS updated). config.json gains per-case "lanes": criterion-C cases and R1-historical are scratch/rehearsal-only; R2-R7 keep certification lanes. Preflight enforces the certification case set == frozen list (E_CONFIG_CASE_LANES, E_CERT_CASE_SET, FROZEN_CERT_CASE_IDS). rehearsal-harness.py filters to certification-lane cases in the certification lane. The esp_variant_sha256 config pin is dropped: ESP variant hashes are RECORDED per run ($PREFIX-esp-variant-recorded.sha256), not pinned.
+
+### 15d. C2 byte-loss disclosure (2026-09-24)
+DISCLOSED MISHAP: on 2026-09-24 the C2 review-packet transfer LOST THE BYTES of five committed fixture binaries; only their names/sizes/sha256 metadata survived. The deleted files: evidence/F-WRONGSIG.efi (e4c49342bfd9f1c7a90ea3364b6619865d8187a17f10f146cd25cce57721cfdb), evidence/F-HOSTILEUKI.efi (e3547cd573b49caa8f5e9f0c20c0c78f1bbac694577bfd7fe19236092bd8dd3b), evidence/C5-HOSTILE-FIXTURE.cer (5b5e4edc11fd12787580fc9885fcdd4ebefecdabd82b893988be321483b68a8b), evidence/C5-WRONG-SIGNER-FIXTURE.cer (64eb51a0deb3bc67df051de22bdd205426dd4b70931b1f8d49fee4e894339ca6), evidence/successor-unsigned.efi. These files are REMOVED from the tree in C1'. The metadata-only record is NOT evidence and is never used as evidence: the pin policy changes ONLY for the negative controls (they move to in-run generation, route (ii)); all positive-evidence pins are untouched. c5-signing-cert.der (7cda4ddc.., public owner cert) and successor-signed.efi (13309697.., history-only) are unaffected and remain. evidence/C2-BINARY-PINS.json (zero consumers) is deleted; this section carries the scheme instead. Signed fixture bytes are NOT reproducible by design (per-signature signingTime); only the deterministic unsigned build is reproducible, which is exactly why route (ii) gates on properties, not bytes.
+
+### 15e. Route (ii): in-run fixtures, runner-ephemeral keys, property gates
+The rehearsal workflow gains two steps: (1) "unsigned UKI in-run build" (network-off; committed builder successor-uki-candidate/build-successor-gapless.py reproduces 4cda9c3e285b5b639364234400bf0b121178f12447cc88d896cd2623e07d18e1, 21,154,304 B, verified byte-exactly locally; NAMED FAIL E_UNSIGNED_UKI_DRIFT on any mismatch; root-admitter-candidate/uki/build-unsigned-uki.py is the OLD gapped builder dcaacb36.. and is NOT the certification input); (2) "criterion-C fixture generation" (network-off fixture-generate.sh against staged /tmp/$PREFIX-stage/root sbsigntool; K2-style sweep E_PRIVATE_KEY_IN_FIXTURE_TREE; emits 4 public artifacts to build-output/c-sign/fixtures/ plus GENERATION-RECORD.json and FIXTURE-SHASUMS). The c-sign step consumes the in-run unsigned UKI (E_UNSIGNED_PIN retired). run-ceremony.sh binds fixture record vs payload (E_UKI_BUILD_MISSING, E_FIXTURE_RECORD_MISSING, E_FIXTURE_PAYLOAD_MISMATCH) and exports C5_HOSTILE_CERT_SHA256 / C5_WRONG_SIGNER_CERT_SHA256 to enroll-predicate-check.py, whose HOSTILE_CERT constant is DELETED: E_HOSTILE_CERT_UNSET, E_HOSTILE_CERT_DISTINCT (hostile != 7cda4ddc), E_HOSTILE_CERT_IN_SOLE_DB (hostile absent from sole db), E_WRONG_SIGNER_IN_DB (wrong-signer absent from every db), E_THROWAWAY_CERT_DISTINCT; H/W DER hashes recorded in the predicate report. Throwaway db == [T] with T distinct from both the owner cert and the hostile cert (E_FIXTURE_CERT_DISTINCT pairwise). Keys are generated network-off under /tmp/$PREFIX-*, shredded end-of-step; K2 sweep runs after EACH generating step and before EVERY upload; records carry public DER hashes and tool versions ONLY. Committed test-enroll-predicate-env.py (9 cases, all pass) is wired into the same must-show step and D2-registered. Negative controls are never committed as bytes anywhere in this scheme.
+
+### 15f. A3 manifest and housekeeping
+A3-publication-manifest.json is regenerated for the C1' tree (asset sha256/bytes recomputed; deleted binaries dropped; new files added: test-c-sign-confinement.py (this directory), test-enroll-predicate-env.py (this directory), UKI-13309697-ROOT-CAUSE.md, UKI-NEGATIVE-SUITE-EVIDENCE.md, derive-scratch.py). The manifest self-declaration path count is updated to the C1' name-status. Open design point flagged for the future slot-fill review: the certification workflow qemu-smoke currently runs case index 0 (the R1-historical ESP path), unreachable while the signed slot is absent; revisit when the owner-signed slot lands.
+
+## 16. C1'' revision (peer verdict on C1'): bytecode purge, c-sign key lifecycle, positive-case guard
+
+The peer's C1' verdict accepted the bytes on the derive-identical mechanism, the c-sign carried step and confinement, the in-step gates, the B2 absent-slot behavior, the B3 rename/lane-scoping, the env-driven predicate, and the certification YAML scope. Two blockers and one required guard were ruled; all three are fixed in C1''. C1'' SUPERSEDES C1' (0d66fc2b6b7644e157f7a305530d82066f2195ab) and C1 (b2eaef1d1b8b56f7aea55d33a881b5eb8d37f348); both remain in history as reviewed-and-revised heads.
+
+### 16a. BLOCKING 1: tracked compiled bytecode (own mishap, disclosed)
+C1' tracked 19 __pycache__/*.pyc files under provisioning/p3/, p3/rehearsal/, and successor-uki-candidate/ - the #18'/H5 defect class, introduced by a local git add -A sweeping in interpreter caches. All 19 are removed; .gitignore now covers __pycache__/ and *.pyc; preflight gains E_BYTECODE_COMMITTED (zero tracked __pycache__/.pyc in git ls-files, fail-closed). Negative-tested EXECUTED: clean temp repo no fire, planted __pycache__/a.cpython-310.pyc fires E_BYTECODE_COMMITTED naming the path, real C1'' tree no fire. Local tooling runs with PYTHONDONTWRITEBYTECODE=1 from here on.
+
+### 16b. BLOCKING 2: throwaway key location and lifecycle in c-sign
+The c-sign throwaway key previously lived at build-output/c-sign/throwaway-key.pem (INSIDE the checkout) and was plain-rm'd. Now: the key is generated at /tmp/$PREFIX-csign-key/throwaway-key.pem (directory mode 0700, outside the checkout and every upload path); shred -u runs BOTH in the step's EXIT trap (guaranteed on cancellation) and in the explicit post-gate cleanup; E_KEY_RESIDUE targets /tmp/$PREFIX-csign-key; the directory itself is removed. K2 now also sweeps the checkout build-output tree after the c-sign gates and again after fixture copy-out: any key-named file or PEM/DER private-key content anywhere under build-output dies E_PRIVATE_KEY_IN_BUILD_TREE (exit 95). fixture-generate.sh gets the same rule: its workdir is now /tmp/$PREFIX-fixture-keys.XXXXXX (mktemp, mode 0700) and its keys are shred -u'd both in its EXIT trap and in the explicit cleanup (replacing the A4-era plain-delete, which the old comment explicitly disclaimed).
+
+### 16c. REQUIRED GUARD: E_CERT_POSITIVE_MISSING
+Preflight now fails E_CERT_POSITIVE_MISSING when evidence/successor-to-certify.efi exists but the certification case set does not contain exactly ONE positive case: sole db [owner cert 7cda4ddc..] via the enroll-sole template, expect.kernel_exec true, exit_98 true, exit_97 false, zero reject strings. A negative-only certification set can never reach the PASS emitter. Negative-tested EXECUTED: slot absent + negative-only no fire; slot present + negative-only fires; exactly one sole-db positive no fire; two positives fires; widened-db "positive" fires; positive carrying reject strings fires.
+
+### 16d. FUTURE signed-slot head (recorded per peer part 3/3; NOT implemented in C1'')
+When the owner-signed slot lands, its own reviewed head must: (a) retarget qemu-smoke case index 0 away from the historical R1 ESP; (b) replace the certification ESP pin 2bfa6212.. in both runner and env2 with the new signed ESP pin; (c) add the positive case and update the frozen certification set (FROZEN_CERT_CASE_IDS) together with the E_CERT_POSITIVE_MISSING guard passing. These are explicitly distinguished from the C1'' blockers and deferred to that head.
+
+## 17. C1''' revision (peer verdict on C1''): tight positive predicate + committed planted negative + comment fix
+
+The peer's C1'' verdict accepted the bytecode purge, E_BYTECODE_COMMITTED, the c-sign/fixture key lifecycles, the retargeted E_KEY_RESIDUE, both K2 sweeps, and the identical rehearsal/scratch deltas. One blocker remained: E_CERT_POSITIVE_MISSING passed on the current frozen R2-R7 set with a planted slot. Two causes, both confirmed and fixed: (a) R7 matched the loose v1 predicate (enroll-sole template substring + kernel_exec + exit_98) while running the HISTORICAL ESP; (b) the reject-string clause was dead code - the schema uses expect.no_reject_strings=true, not a reject_strings absence test.
+
+The v2 guard (E_CERT_POSITIVE_MISSING, same code) requires exactly ONE certification case satisfying ALL of: (1) esp == build-output/esp/c5-successor-to-certify-esp.raw - the designated exact path for the ESP built from evidence/successor-to-certify.efi (the signed head pins its hash); (2) vars enrollment whose trust DER set is exactly [7cda4ddc149849cc61191d4b5b3d218d14770c0401e9e66dd9617b82ba1ae441] per the NEW committed enrollment record (config.json "enrollments": sole and sole-fresh map to [owner DER]; widened to [owner DER, IN-RUN:c5-hostile-fixture]; throwaway to [IN-RUN:c5-throwaway-ci-cert]) - never a template-name substring; (3) positive expectations under the real schema keys (kernel_exec true, exit_98 true, exit_97 false, no_reject_strings true).
+
+Committed planted negatives: test-cert-positive-guard.py EXTRACTS the exact guard block from preflight-check.py and execs it against the REAL config.json - 9 cases, all pass, including the reviewer's exact repro (current frozen set + planted slot -> E_CERT_POSITIVE_MISSING, since neither R5 nor R7 satisfies the slot-ESP condition), plus wrong-ESP, throwaway-enrollment, two-positives, missing no_reject_strings, reject-strings-present, and unknown-enrollment mutations. Wired into the same must-show step (tee'd to $PREFIX-certpos-guard-negtests.log) and D2-registered. Also fixed: fixture-generate.sh's stale header comment claiming plain-delete (the lifecycle was accepted on the bytes; the comment now says shred -u).
+
+Mishap disclosed: my v1 negative suite tested synthetic configs and missed the simplest case - the CURRENT config plus a planted slot. The v2 suite leads with exactly that case. C1''' SUPERSEDES C1'' (fe147879d468994f696fb09d50eb8425bfbcdc47), C1' (0d66fc2b..) and C1 (b2eaef1d..); all remain in history as reviewed-and-revised heads.

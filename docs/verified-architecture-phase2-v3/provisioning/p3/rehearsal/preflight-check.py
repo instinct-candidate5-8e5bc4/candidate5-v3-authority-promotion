@@ -95,16 +95,33 @@ elif sha(vars_p)!="5d2ac383371b408398accee7ec27c8c09ea5b74a0de0ceea6513388b15be5
     fail("E_VARS_PRISTINE_MISMATCH", sha(vars_p))
 
 # 4) evidence inputs, exact hashes
+# PRE-SIGNING STATE (peer 2026-09-24 B2): the certification-target signed-UKI slot
+# (evidence/successor-to-certify.efi) is ABSENT until the owner-signed production UKI
+# returns and enters as its own reviewed head/commit. The historical signed UKI
+# 13309697.. is pinned below ONLY as history: it is the R1 reject-control's input and
+# its gap-included signature is exactly why it can never be a certification target
+# (UKI-13309697-ROOT-CAUSE.md). The unsigned UKI and every criterion-C fixture are
+# IN-RUN products (runner-ephemeral keys; nothing signed is committed): the unsigned
+# builder output is gated in-run against 4cda9c3e.. (E_UNSIGNED_UKI_DRIFT) and the C
+# outputs are property-gated in-run - see the rehearsal/scratch c-sign steps.
 ev=os.path.join(here,"evidence")
-EXPECT={"successor-signed.efi":("133096976ee70a8c272cbcc8c28d369bfc65d93d994cbff4174b947df00239d1",21166416),
-        "successor-unsigned.efi":("ed5d9d72be40592af3b14bd1fd9dc91a5976b14f350f9124ea414b975464d536",21164544),
-        "c5-signing-cert.der":("7cda4ddc149849cc61191d4b5b3d218d14770c0401e9e66dd9617b82ba1ae441",1092),
-        "F-WRONGSIG.efi":("44706c4a02bc013a248d4ba228b731471d373a813ea7fd921416c9119071b50a",21166128),
-        "F-HOSTILEUKI.efi":("5f6cfe5cf11b5e71158ce3a5736175eae925f33dec2a308370618c3aceec939e",21166112)}
+EXPECT={"c5-signing-cert.der":("7cda4ddc149849cc61191d4b5b3d218d14770c0401e9e66dd9617b82ba1ae441",1092)}
+HISTORY={"successor-signed.efi":("133096976ee70a8c272cbcc8c28d369bfc65d93d994cbff4174b947df00239d1",21166416)}
 for fn,(h,sz) in EXPECT.items():
     p=os.path.join(ev,fn)
     if not os.path.exists(p): fail("E_EVIDENCE_MISSING", fn); continue
     if os.path.getsize(p)!=sz or sha(p)!=h: fail("E_EVIDENCE_HASH_MISMATCH", fn)
+for fn,(h,sz) in HISTORY.items():
+    p=os.path.join(ev,fn)
+    if not os.path.exists(p): fail("E_HISTORY_MISSING", fn); continue
+    if os.path.getsize(p)!=sz or sha(p)!=h: fail("E_HISTORY_HASH_MISMATCH", fn)
+# certification-target signed-UKI slot: ABSENT in the pre-signing state, no fallback.
+# The certification workflow sets CERTIFICATION_TARGET=1; every other lane runs the
+# ceremony with in-run throwaway signing and never touches this slot.
+SLOT=os.path.join(ev,"successor-to-certify.efi")
+CERT_TARGET=os.environ.get("CERTIFICATION_TARGET","")=="1"
+if CERT_TARGET and not os.path.exists(SLOT):
+    fail("E_SIGNED_UKI_ABSENT","evidence/successor-to-certify.efi slot absent (pre-signing state; owner-signed UKI enters later as its own reviewed head)")
 
 # 4b) peer run-35963407323 ruling (2): the pinned accepted UKI's EDK2-style (section-wise)
 # Authenticode digest must EQUAL the messageDigest embedded in its own WIN_CERTIFICATE
@@ -143,8 +160,12 @@ def _pe_auth_digest(b):
     if end>sobh: h.update(b[sobh:end])
     return h.hexdigest(),cert_va,cert_sz
 _DIGESTINFO_SHA256=bytes.fromhex("3031300d060960864801650304020105000420")  # DigestInfo{sha256,NULL,OCTET STRING 32}
-_uki=os.path.join(ev,"successor-signed.efi")
-if os.path.exists(_uki) and sha(_uki)==EXPECT["successor-signed.efi"][0]:
+# (peer 2026-09-24 B2: this gate runs on the certification SLOT when filled, and in-run
+# on every throwaway C output via the c-sign steps; the historical 13309697 file is
+# NEVER gate-4b'd here - its embedded/section-wise mismatch is documented history in
+# UKI-13309697-ROOT-CAUSE.md, not a target defect.)
+_uki=SLOT
+if os.path.exists(_uki):
     _b=open(_uki,"rb").read()
     try:
         _computed,_cva,_csz=_pe_auth_digest(_b)
@@ -162,9 +183,9 @@ if os.path.exists(_uki) and sha(_uki)==EXPECT["successor-signed.efi"][0]:
         _embedded=_der[_off:_off+32].hex()
         if _computed!=_embedded:
             fail("E_UKI_FIRMWARE_DIGEST_MISMATCH",
-                 "successor-signed.efi section-wise(EDK2)=%s embedded=%s (firmware hashes section-wise, gap skipped; signer hashed gap-included)"%(_computed,_embedded))
+                 "successor-to-certify.efi section-wise(EDK2)=%s embedded=%s (firmware hashes section-wise, gap skipped; signer hashed gap-included)"%(_computed,_embedded))
     except Exception as _e:
-        fail("E_UKI_FIRMWARE_DIGEST_MISMATCH","successor-signed.efi digest equality unprovable: %s"%_e)
+        fail("E_UKI_FIRMWARE_DIGEST_MISMATCH","successor-to-certify.efi digest equality unprovable: %s"%_e)
 
 # 5) config schema: no wildcards, exact values only
 try: cfg=resolve_config_value(json.load(open(cfg_path)),PREFIX)
@@ -179,9 +200,52 @@ def scan_wildcards(o, path=""):
 scan_wildcards(cfg)
 for req in ("qemu","cpu_model","memory_mb","v3_serials","disk_dir","vars_parser","ovmf_code_debug","ovmf_vars_pristine","enroll_app","cases"):
     if req not in cfg: fail("E_CONFIG_MISSING_FIELD", req)
+LANES_ALL={"scratch","rehearsal","certification"}
+# peer 2026-09-24 B3: every case is lane-scoped. The four criterion-C cases and the R1
+# historical reject-control are scratch/rehearsal-only; the certification lane consumes
+# exactly the frozen six-case set below (no C, no historical control), enforced here.
+FROZEN_CERT_CASE_IDS=("NON_CERTIFYING_REHEARSAL-R2-N1-unsigned",
+                      "NON_CERTIFYING_REHEARSAL-R3-N2-wrongsig",
+                      "NON_CERTIFYING_REHEARSAL-R4-N3a-hostile-sole-db",
+                      "NON_CERTIFYING_REHEARSAL-R5-N3b-hostile-widened-db",
+                      "NON_CERTIFYING_REHEARSAL-R6-N3c-hostile-fresh-sole-db",
+                      "NON_CERTIFYING_REHEARSAL-R7-release-sibling-behavior-only")
 for c in cfg.get("cases",[]):
-    for req in ("id","vars_template","esp","firmware","expect"):
+    for req in ("id","vars_template","esp","firmware","expect","lanes"):
         if req not in c: fail("E_CONFIG_CASE_MISSING_FIELD", c.get("id","?")+"."+req)
+    _lanes=c.get("lanes")
+    if not isinstance(_lanes,list) or not _lanes or set(_lanes)-LANES_ALL:
+        fail("E_CONFIG_CASE_LANES", c.get("id","?")+" lanes="+repr(_lanes))
+if CERT_TARGET:
+    _cert_ids=tuple(sorted(c["id"] for c in cfg.get("cases",[]) if "certification" in c.get("lanes",[])))
+    if _cert_ids!=tuple(sorted(FROZEN_CERT_CASE_IDS)):
+        fail("E_CERT_CASE_SET","certification case set drifted: %s != frozen %s"%(repr(_cert_ids),repr(tuple(sorted(FROZEN_CERT_CASE_IDS)))))
+    # peer 2026-09-24 REQUIRED GUARD (v2, C1'''): once the signed slot exists, exactly
+    # ONE certification case must be the real positive, satisfying ALL of: (1) esp ==
+    # the ESP built from evidence/successor-to-certify.efi (exact designated path; the
+    # signed head pins its hash); (2) vars enrollment whose trust DER set is exactly
+    # [owner cert 7cda4ddc..] per the committed enrollment record (config.json
+    # "enrollments"), never a template-name substring; (3) positive expectations under
+    # the real schema keys (kernel_exec true, exit_98 true, exit_97 false,
+    # no_reject_strings true). A negative-only set must never reach the PASS emitter.
+    if os.path.exists(os.path.join(here,"evidence","successor-to-certify.efi")):
+        _SLOT_ESP="build-output/esp/c5-successor-to-certify-esp.raw"
+        _OWNER_DER="7cda4ddc149849cc61191d4b5b3d218d14770c0401e9e66dd9617b82ba1ae441"
+        _enr=cfg.get("enrollments",{})
+        _pos=[]
+        for c in cfg.get("cases",[]):
+            if "certification" not in c.get("lanes",[]): continue
+            e=c.get("expect",{})
+            if not (e.get("kernel_exec") is True and e.get("exit_98") is True
+                    and e.get("exit_97") is False and e.get("no_reject_strings") is True):
+                continue
+            if c.get("esp")!=_SLOT_ESP: continue
+            _nm=[nm for nm in _enr if ("/"+nm+"/") in c.get("vars_template","")]
+            if len(_nm)!=1: continue
+            if _enr[_nm[0]].get("db_der_sha256")!=[_OWNER_DER]: continue
+            _pos.append(c["id"])
+        if len(_pos)!=1:
+            fail("E_CERT_POSITIVE_MISSING","signed slot present but %d cases satisfy the full positive predicate (need exactly 1: esp==%s, sole-db enrollment trust DER==[7cda4ddc..] per enrollment record, kernel_exec/exit_98/no_reject_strings): %s"%(len(_pos),_SLOT_ESP,repr(_pos)))
     for pth_key in ("vars_template","esp","firmware"):
         p=c.get(pth_key,"")
         # build-output/ and out/ are generated during the ceremony by hash-pinned producers;
@@ -210,6 +274,14 @@ else:
             if mode!="100755": fail("E_EXEC_BIT", path+" mode="+mode)
             fp=os.path.join(repo_root,path)
             if not os.access(fp,os.X_OK): fail("E_EXEC_BIT", path+" not -x")
+
+# 6b2) peer 2026-09-24 BLOCKING 1 (#18'/H5 defect class): zero tracked bytecode anywhere
+# in the tree. Run local tooling with PYTHONDONTWRITEBYTECODE=1.
+_bc=_sp.run(["git","-C",repo_root,"ls-files"],capture_output=True,text=True)
+if _bc.returncode!=0: fail("E_GIT_LSFILES", _bc.stderr[:200])
+else:
+    _hits=[f for f in _bc.stdout.splitlines() if "__pycache__" in f or f.endswith(".pyc")]
+    if _hits: fail("E_BYTECODE_COMMITTED","tracked bytecode in tree: %s"%repr(_hits[:10]))
 
 # 6c) batch1r3 C1: no ceremony state in the committed tree
 for stale in ("build-output","disks","prep"):
@@ -291,13 +363,17 @@ if "COMMON=(" not in _bh or _bh.count('exec "$BWRAP" "${COMMON[@]}"')!=2:
 # ONLY (never the ceremony); and the freeze file's top-level key set must be exactly the
 # pre-addition keys plus smoke_namespace (additive-only proof).
 CASE_ARGV_PINS=(
-    ("NON_CERTIFYING_REHEARSAL-R1-positive", "c581e7dda5d855f2dc4be9fc587765305220107cc8225a87a27ce06b1bbee0b0"),
+    ("NON_CERTIFYING_REHEARSAL-R1-historical-13309697-reject-control", "4110dad173e5a1d4a9bbe0fae05d9aaa21fc20859c599d63ab43bda6a3c22891"),
     ("NON_CERTIFYING_REHEARSAL-R2-N1-unsigned", "f382e94075d87cd0cb00df84b1f393f59ff7ee0e5de138f668713309ab2b1edc"),
     ("NON_CERTIFYING_REHEARSAL-R3-N2-wrongsig", "46d5c1c485cec634c3e0546e03395184b089d11ded01ffef0ca4db588bce6072"),
     ("NON_CERTIFYING_REHEARSAL-R4-N3a-hostile-sole-db", "daa8eee9131d7d2cc5ad48ceb8e1f6b164327dbf489412d8761aa83289c04215"),
     ("NON_CERTIFYING_REHEARSAL-R5-N3b-hostile-widened-db", "4a780d858f457e078c4a982d007cbfafd9f5f66e797c83b00ff523456c0df156"),
     ("NON_CERTIFYING_REHEARSAL-R6-N3c-hostile-fresh-sole-db", "6f2fc5a541aebbd23c4dc875d405519a2d834ea3b8376d71c6a3e9a8313bac10"),
     ("NON_CERTIFYING_REHEARSAL-R7-release-sibling-behavior-only", "2d450e95e778d9f1d1c9d165993c31023fb00c9b12c585bd068be89749774b05"),
+    ("NON_CERTIFYING_REHEARSAL-C-ossl-throwaway-debug", "ddc0e5c285dd08847b17477f332255f65f4885b358e9a4111a21be483f73b1ec"),
+    ("NON_CERTIFYING_REHEARSAL-C-ossl-throwaway-release", "efe08f207a651493c5145e1afce230c502ab2be054483c799fe939b7c98548da"),
+    ("NON_CERTIFYING_REHEARSAL-C-sbsign-throwaway-debug", "db4a6507297b386c664ce85602a38bfb86f7aa1efe8bb6c300ae94ec8cf043b0"),
+    ("NON_CERTIFYING_REHEARSAL-C-sbsign-throwaway-release", "0765626bfa54dacd00fdd02d13adb5e32d9b86f3b6010f44a74344352dc1c89e"),
 )
 if len(_fz2["cases"])!=len(CASE_ARGV_PINS):
     fail("E_CASE_ARGV_PIN","case count drifted: %d != %d"%(len(_fz2["cases"]),len(CASE_ARGV_PINS)))
@@ -322,13 +398,36 @@ if set(_fz2.keys())!=EXPECTED_KEYS|{"smoke_namespace"}:
 import subprocess as _sp
 # counts updated for batch1-r3 #10 (peer N8/N9/N1b gates): cert 42->44 (N8 log path x2),
 # rehearsal 74->77 (N8 log path x2 + env2-manifest step-name literal); rehearsal 77->78
-# (peer run-12 C4-addendum E_XCHECK_SKIPPED strictness step name, one literal).
+# (peer run-12 C4-addendum E_XCHECK_SKIPPED strictness step name, one literal);
+# rehearsal 78->79 (criterion-C c-sign step name, one literal).
 for _wf,_want in (("../../../../../.github/workflows/OVMF_CI_SECURE_BOOT_UKI-CERTIFICATION-workflow.yml",44),
-                  ("../../../../../.github/workflows/NON_CERTIFYING_REHEARSAL-workflow.yml",78)):
+                  ("../../../../../.github/workflows/NON_CERTIFYING_REHEARSAL-workflow.yml",79)):
     _n=len(_sp.run(["grep","-o","NON_CERTIFYING_REHEARSAL",os.path.join(here,_wf)],
                    capture_output=True,text=True,check=True).stdout.splitlines())
     if _n!=_want:
         fail("E_PREFIX_COUNT_MISMATCH",_wf+" occurrences="+str(_n)+" pinned="+str(_want))
+
+# 6e8b) criterion-C Q2 guard (E_TOOL_FORBIDDEN): the osslsigncode signer is staged for
+# exactly ONE purpose - the c-sign step. Every osslsigncode occurrence in the rehearsal
+# and scratch workflows must live inside that lane's c-sign step block; the
+# certification workflow must reference it NOWHERE. Any drift fails closed here.
+for _wf,_lane in (("../../../../../.github/workflows/NON_CERTIFYING_REHEARSAL-workflow.yml","NON_CERTIFYING_REHEARSAL"),
+                  ("../../../../../.github/workflows/NON_CERTIFYING_SCRATCH-workflow.yml","NON_CERTIFYING_SCRATCH")):
+    _rwt = open(os.path.join(here,_wf),errors="replace").read()
+    # (peer 2026-09-24 B1 condition 4): each lane carries EXACTLY ONE c-sign step -
+    # checked here independently, never trusting the derivation.
+    _nc = _rwt.count("- name: "+_lane+" criterion-C throwaway signing")
+    if _nc != 1: fail("E_C_SIGN_STEP_COUNT",_wf+" c-sign step occurrences="+str(_nc)+" (want exactly 1)")
+    _cs = _rwt.find("- name: "+_lane+" criterion-C throwaway signing")
+    if _cs < 0: fail("E_TOOL_FORBIDDEN","c-sign step not found in "+_wf)
+    _ce = _rwt.find("\n      - name:", _cs)
+    if _ce < 0: fail("E_TOOL_FORBIDDEN","c-sign step block unterminated in "+_wf)
+    _tot = _rwt.count("osslsigncode")
+    _in = _rwt[_cs:_ce].count("osslsigncode")
+    if _tot == 0 or _tot != _in:
+        fail("E_TOOL_FORBIDDEN",_wf+" osslsigncode occurrences=%d inside-c-sign=%d (must be equal, nonzero)"%(_tot,_in))
+_n = open(os.path.join(here,"../../../../../.github/workflows/OVMF_CI_SECURE_BOOT_UKI-CERTIFICATION-workflow.yml"),errors="replace").read().count("osslsigncode")
+if _n != 0: fail("E_TOOL_FORBIDDEN","certification workflow osslsigncode occurrences="+str(_n))
 
 # 6e9) peer pushed-byte review 3(a): the planted-fault hook is scratch-only - the
 # certification and rehearsal workflows must contain ZERO ENROLL_PLANTED_FAULT references;
@@ -366,8 +465,8 @@ else:
 # vacuous there by construction; it bites in the scratch lane, where any surviving
 # canonical component proves a resolution bypass). The ruled exemptions are structural,
 # never listed strings: relative build-output esp filenames, case IDs, and schema strings
-# do not start with /tmp and never enter this check (the esp_variant_sha256 assertion
-# site - run-ceremony.sh PINS[1..3] over build-output/esp-variant/ - is the writer/reader
+# do not start with /tmp and never enter this check (the ESP-variant recording
+# site - run-ceremony.sh sha256sum over build-output/esp-variant/ - is the writer/reader
 # agreement for those relative names).
 def _resolved_paths(o):
     if isinstance(o,dict):

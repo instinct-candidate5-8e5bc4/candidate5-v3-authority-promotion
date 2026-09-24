@@ -97,12 +97,37 @@ else
 fi
 # inputs: disks, ESP variants, frozen ESP, DEBUG firmware
 ./make-disks.sh disks
-for pair in "successor-unsigned.efi unsigned" "F-WRONGSIG.efi wrongsig" "F-HOSTILEUKI.efi hostile"; do
+# peer 2026-09-24 route-(ii): the unsigned UKI and both fixtures are IN-RUN products
+# (uki-build + c-fixtures steps; runner-ephemeral keys, nothing signed committed). Bind
+# the fixture payload to the c-fixtures FIXTURE-SHASUMS record BEFORE building (fail
+# closed on any drift), mirroring the c-sign SHASUMS binding below.
+[ -f build-output/uki/successor-unsigned.efi ] || { echo "E_UKI_BUILD_MISSING build-output/uki/successor-unsigned.efi"; exit 94; }
+[ -f build-output/c-sign/fixtures/FIXTURE-SHASUMS ] || { echo "E_FIXTURE_RECORD_MISSING build-output/c-sign/fixtures/FIXTURE-SHASUMS"; exit 94; }
+( cd build-output/c-sign/fixtures && sha256sum -c FIXTURE-SHASUMS ) || { echo "E_FIXTURE_PAYLOAD_MISMATCH FIXTURE-SHASUMS"; exit 94; }
+for pair in "build-output/uki/successor-unsigned.efi unsigned" "build-output/c-sign/fixtures/F-WRONGSIG.efi wrongsig" "build-output/c-sign/fixtures/F-HOSTILEUKI.efi hostile"; do
   set -- $pair
-  ./build-esp-variant.sh "evidence/$1" "$2" "build-output/tmp-$2"
+  ./build-esp-variant.sh "$1" "$2" "build-output/tmp-$2"
   mv "build-output/tmp-$2/NON_CERTIFYING_REHEARSAL-esp-$2.raw" build-output/esp-variant/
   rm -rf "build-output/tmp-$2"
 done
+# criterion C: the two runtime throwaway-signed ESP variants. Inputs are the c-sign step's
+# outputs (in-run ephemeral key, plain-deleted there); they are NOT committed and NOT
+# config-pinned. Bind them to the c-sign SHASUMS record BEFORE building (fail closed on
+# any drift), then record the runtime ESP hashes into the ceremony evidence tree.
+[ -f build-output/c-sign/SHASUMS ] || { echo "E_CSIGN_RECORD_MISSING build-output/c-sign/SHASUMS"; exit 94; }
+( cd build-output/c-sign && sha256sum -c SHASUMS ) || { echo "E_THROWAWAY_PAYLOAD_MISMATCH c-sign SHASUMS"; exit 94; }
+export C5_THROWAWAY_CERT_SHA256=$(awk '$2=="c5-throwaway-ci-cert.der"{print $1}' build-output/c-sign/SHASUMS)
+[ -n "$C5_THROWAWAY_CERT_SHA256" ] || { echo "E_THROWAWAY_CERT_UNSET not in SHASUMS"; exit 94; }
+for pair in "signed-ossl.efi ossl-throwaway" "signed-sbsign.efi sbsign-throwaway"; do
+  set -- $pair
+  ./build-esp-variant.sh "build-output/c-sign/$1" "$2" "build-output/tmp-$2"
+  mv "build-output/tmp-$2/NON_CERTIFYING_REHEARSAL-esp-$2.raw" build-output/esp-variant/
+  rm -rf "build-output/tmp-$2"
+done
+mkdir -p "$OUT"
+( cd build-output && sha256sum esp-variant/NON_CERTIFYING_REHEARSAL-esp-ossl-throwaway.raw \
+    esp-variant/NON_CERTIFYING_REHEARSAL-esp-sbsign-throwaway.raw c-sign/signed-ossl.efi \
+    c-sign/signed-sbsign.efi c-sign/c5-throwaway-ci-cert.der ) > "$OUT/$PREFIX-throwaway-runtime.sha256"
 # batch1r2 C1: the frozen ESP is copied from the dual-built workflow step, never rebuilt here
 # scratch-8 peer ask: a missing/wrong-prefix source must FAIL with a NAMED error BEFORE cp
 # (run 35931520373 died on cp's bare exit 1 with no gate code); print the exact path.
@@ -116,19 +141,19 @@ cp "/tmp/$PREFIX-app-a/enroll-app.efi" build-output/enroll-app/enroll-app.efi
 mapfile -t PINS < <(python3 - "$CONFIG" <<'PYEOF'
 import json,sys
 c=json.load(open(sys.argv[1]))
-v=c["esp_variant_sha256"]
-for h in (c["esp_sha256"],v["unsigned"],v["wrongsig"],v["hostile"],
+# peer 2026-09-24 C2-route-(ii): ESP variants are built in-run from runner-ephemeral
+# fixtures - their hashes are RECORDED below, never pinned; only the ceremony ESP
+# (from the pinned history UKI), firmware, and enroll-app keep exact pins.
+for h in (c["esp_sha256"],
           c["firmware_debug_sha256"],c["firmware_release_sha256"],c["enroll_app_sha256"]): print(h)
 PYEOF
 )
 assert_sha() { local got; got=$(sha256sum "$1" | cut -d' ' -f1); [ "$got" = "$2" ] || { echo "E_INPUT_PIN_MISMATCH $1 $got"; exit 94; }; }
 assert_sha build-output/esp/c5-root-admitter-uki-v3-esp.raw "${PINS[0]}"
-assert_sha build-output/esp-variant/NON_CERTIFYING_REHEARSAL-esp-unsigned.raw "${PINS[1]}"
-assert_sha build-output/esp-variant/NON_CERTIFYING_REHEARSAL-esp-wrongsig.raw "${PINS[2]}"
-assert_sha build-output/esp-variant/NON_CERTIFYING_REHEARSAL-esp-hostile.raw "${PINS[3]}"
-assert_sha build-output/ovmf-debug/OVMF_CODE.fd "${PINS[4]}"
-assert_sha "$STAGE/root/usr/share/OVMF/OVMF_CODE_4M.secboot.fd" "${PINS[5]}"
-assert_sha build-output/enroll-app/enroll-app.efi "${PINS[6]}"
+( cd build-output && sha256sum esp-variant/NON_CERTIFYING_REHEARSAL-esp-unsigned.raw     esp-variant/NON_CERTIFYING_REHEARSAL-esp-wrongsig.raw     esp-variant/NON_CERTIFYING_REHEARSAL-esp-hostile.raw ) > "$OUT/$PREFIX-esp-variant-recorded.sha256"
+assert_sha build-output/ovmf-debug/OVMF_CODE.fd "${PINS[1]}"
+assert_sha "$STAGE/root/usr/share/OVMF/OVMF_CODE_4M.secboot.fd" "${PINS[2]}"
+assert_sha build-output/enroll-app/enroll-app.efi "${PINS[3]}"
 # #18 F3 (peer #17 final ruling): pre-guest static gate - every case vars_template must
 # resolve (component-wise, the ONE resolver) into THIS ceremony's constructed enrolled-
 # template set (F4 single source: lane_resolve.allowed_vars_templates); anything else dies
@@ -142,19 +167,26 @@ if [ "$_gate_rc" != 0 ]; then
   exit "$_gate_rc"
 fi
 # enrollments (three independent pristine VARS derivations, each a single enrollment invocation)
-./enroll-prep.sh "$STAGE/root" prep evidence/c5-signing-cert.der evidence/C5-HOSTILE-FIXTURE.cer
-trap '_repair_out; rm -rf prep' EXIT
-for mode in sole widened sole-fresh; do
+./enroll-prep.sh "$STAGE/root" prep evidence/c5-signing-cert.der build-output/c-sign/fixtures/C5-HOSTILE-FIXTURE.cer
+# criterion C: second prep whose db cert is the run's throwaway CI signing cert (wrong-signer
+# fixture as the unused hostile arg, keeping the 2-cert prep shape). Same key hygiene: the
+# throwaway PK/KEK private keys are plain-deleted with the prep dir below.
+./enroll-prep.sh "$STAGE/root" prep-throwaway build-output/c-sign/c5-throwaway-ci-cert.der build-output/c-sign/fixtures/C5-WRONG-SIGNER-FIXTURE.cer
+trap '_repair_out; rm -rf prep prep-throwaway' EXIT
+for mode in sole widened sole-fresh throwaway; do
   d="$OUT/$PREFIX-enroll-$mode"
   mkdir -p "$d"
+  _prep=prep; [ "$mode" = throwaway ] && _prep=prep-throwaway
   # L6 (peer run-12 ruling): the wrapper's NAMED exit code passes up unchanged;
   # E_BASH_ERRTRAP is reserved for signal/trap deaths (rc>=128), never for a
   # named gate failure (run-12: E_ENROLL_* rc 97 surfaced as E_BASH_ERRTRAP).
   _enroll_rc=0
   if [ "$mode" = widened ]; then
-    ./rehearsal-enroll.sh "$CONFIG" prep "$d/vars-enrolled.fd" "$d/evidence" db2 || _enroll_rc=$?
+    ./rehearsal-enroll.sh "$CONFIG" "$_prep" "$d/vars-enrolled.fd" "$d/evidence" db2 || _enroll_rc=$?
+  elif [ "$mode" = throwaway ]; then
+    ./rehearsal-enroll.sh "$CONFIG" "$_prep" "$d/vars-enrolled.fd" "$d/evidence" throwaway || _enroll_rc=$?
   else
-    ./rehearsal-enroll.sh "$CONFIG" prep "$d/vars-enrolled.fd" "$d/evidence" || _enroll_rc=$?
+    ./rehearsal-enroll.sh "$CONFIG" "$_prep" "$d/vars-enrolled.fd" "$d/evidence" || _enroll_rc=$?
   fi
   if [ "$_enroll_rc" != 0 ]; then
     if [ "$_enroll_rc" -ge 128 ]; then
@@ -167,7 +199,7 @@ done
 # the throwaway PK/KEK private keys never leave the runner and are plain-deleted the moment
 # the enrollment window closes; their DER hashes are already recorded in each enrollment's
 # enroll-predicate.json evidence. (trap EXIT above also covers failure paths.)
-rm -rf prep
+rm -rf prep prep-throwaway
 # case suite (harness CLI: config + work_root + out_dir for the F4 allow-set construction)
 # H4 (peer run-35959397469 ruling): the harness's NAMED exit code passes up unchanged
 # (the L6 pattern from the F3 gate and enrollment wrappers); E_BASH_ERRTRAP is reserved

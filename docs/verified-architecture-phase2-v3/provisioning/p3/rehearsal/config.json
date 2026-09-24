@@ -4,14 +4,17 @@
    "esp": "build-output/esp/c5-root-admitter-uki-v3-esp.raw",
    "expect": {
     "exit_97": false,
-    "exit_98": true,
-    "kernel_exec": true,
-    "no_reject_strings": true,
-    "reject_strings": []
+    "exit_98": false,
+    "kernel_exec": false,
+    "reject_strings": [
+     "Image is signed but signature is not allowed by DB and %s hash of image is not found in DB/DBX",
+     "The image doesn't pass verification"
+    ]
    },
    "firmware": "build-output/ovmf-debug/OVMF_CODE.fd",
-   "id": "NON_CERTIFYING_REHEARSAL-R1-positive",
-   "settle_seconds": 45,
+   "id": "NON_CERTIFYING_REHEARSAL-R1-historical-13309697-reject-control",
+   "lanes": ["scratch", "rehearsal"],
+   "settle_seconds": 30,
    "vars_template": "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-enroll-sole/vars-enrolled.fd"
   },
   {
@@ -27,6 +30,7 @@
    },
    "firmware": "build-output/ovmf-debug/OVMF_CODE.fd",
    "id": "NON_CERTIFYING_REHEARSAL-R2-N1-unsigned",
+   "lanes": ["scratch", "rehearsal", "certification"],
    "settle_seconds": 30,
    "vars_template": "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-enroll-sole/vars-enrolled.fd"
   },
@@ -43,6 +47,7 @@
    },
    "firmware": "build-output/ovmf-debug/OVMF_CODE.fd",
    "id": "NON_CERTIFYING_REHEARSAL-R3-N2-wrongsig",
+   "lanes": ["scratch", "rehearsal", "certification"],
    "settle_seconds": 30,
    "vars_template": "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-enroll-sole/vars-enrolled.fd"
   },
@@ -59,6 +64,7 @@
    },
    "firmware": "build-output/ovmf-debug/OVMF_CODE.fd",
    "id": "NON_CERTIFYING_REHEARSAL-R4-N3a-hostile-sole-db",
+   "lanes": ["scratch", "rehearsal", "certification"],
    "settle_seconds": 30,
    "vars_template": "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-enroll-sole/vars-enrolled.fd"
   },
@@ -73,6 +79,7 @@
    },
    "firmware": "build-output/ovmf-debug/OVMF_CODE.fd",
    "id": "NON_CERTIFYING_REHEARSAL-R5-N3b-hostile-widened-db",
+   "lanes": ["scratch", "rehearsal", "certification"],
    "settle_seconds": 45,
    "vars_template": "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-enroll-widened/vars-enrolled.fd"
   },
@@ -89,6 +96,7 @@
    },
    "firmware": "build-output/ovmf-debug/OVMF_CODE.fd",
    "id": "NON_CERTIFYING_REHEARSAL-R6-N3c-hostile-fresh-sole-db",
+   "lanes": ["scratch", "rehearsal", "certification"],
    "settle_seconds": 30,
    "vars_template": "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-enroll-sole-fresh/vars-enrolled.fd"
   },
@@ -103,20 +111,82 @@
    },
    "firmware": "/tmp/NON_CERTIFYING_REHEARSAL-stage/root/usr/share/OVMF/OVMF_CODE_4M.secboot.fd",
    "id": "NON_CERTIFYING_REHEARSAL-R7-release-sibling-behavior-only",
+   "lanes": ["scratch", "rehearsal", "certification"],
    "settle_seconds": 45,
    "vars_template": "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-enroll-sole/vars-enrolled.fd"
+  },
+  {
+   "esp": "build-output/esp-variant/NON_CERTIFYING_REHEARSAL-esp-ossl-throwaway.raw",
+   "expect": {
+    "exit_97": false,
+    "exit_98": true,
+    "kernel_exec": true,
+    "no_reject_strings": true,
+    "reject_strings": []
+   },
+   "firmware": "build-output/ovmf-debug/OVMF_CODE.fd",
+   "id": "NON_CERTIFYING_REHEARSAL-C-ossl-throwaway-debug",
+   "lanes": ["scratch", "rehearsal"],
+   "settle_seconds": 45,
+   "vars_template": "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-enroll-throwaway/vars-enrolled.fd"
+  },
+  {
+   "esp": "build-output/esp-variant/NON_CERTIFYING_REHEARSAL-esp-ossl-throwaway.raw",
+   "expect": {
+    "exit_97": false,
+    "exit_98": true,
+    "kernel_exec": true,
+    "no_reject_strings": true,
+    "reject_strings": []
+   },
+   "firmware": "/tmp/NON_CERTIFYING_REHEARSAL-stage/root/usr/share/OVMF/OVMF_CODE_4M.secboot.fd",
+   "id": "NON_CERTIFYING_REHEARSAL-C-ossl-throwaway-release",
+   "lanes": ["scratch", "rehearsal"],
+   "settle_seconds": 45,
+   "vars_template": "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-enroll-throwaway/vars-enrolled.fd"
+  },
+  {
+   "esp": "build-output/esp-variant/NON_CERTIFYING_REHEARSAL-esp-sbsign-throwaway.raw",
+   "expect": {
+    "exit_97": false,
+    "exit_98": true,
+    "kernel_exec": true,
+    "no_reject_strings": true,
+    "reject_strings": []
+   },
+   "firmware": "build-output/ovmf-debug/OVMF_CODE.fd",
+   "id": "NON_CERTIFYING_REHEARSAL-C-sbsign-throwaway-debug",
+   "lanes": ["scratch", "rehearsal"],
+   "settle_seconds": 45,
+   "vars_template": "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-enroll-throwaway/vars-enrolled.fd"
+  },
+  {
+   "esp": "build-output/esp-variant/NON_CERTIFYING_REHEARSAL-esp-sbsign-throwaway.raw",
+   "expect": {
+    "exit_97": false,
+    "exit_98": true,
+    "kernel_exec": true,
+    "no_reject_strings": true,
+    "reject_strings": []
+   },
+   "firmware": "/tmp/NON_CERTIFYING_REHEARSAL-stage/root/usr/share/OVMF/OVMF_CODE_4M.secboot.fd",
+   "id": "NON_CERTIFYING_REHEARSAL-C-sbsign-throwaway-release",
+   "lanes": ["scratch", "rehearsal"],
+   "settle_seconds": 45,
+   "vars_template": "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-enroll-throwaway/vars-enrolled.fd"
   }
  ],
  "cpu_model": "Skylake-Server",
  "disk_dir": "disks",
  "enroll_app": "build-output/enroll-app/enroll-app.efi",
  "enroll_app_sha256": "dccc181800051a80df93b5ac2d280d3ff292d4193f7c223467e27df765e1dbbb",
- "esp_sha256": "2bfa621238890890765c9636f99dabfb46233bfa626afb580ce33e65858019c9",
- "esp_variant_sha256": {
-  "hostile": "1a2a064022576e42634ad1dae2d625dbd41c6016bd81e468929782b646fb1c62",
-  "unsigned": "c28e76dc6961832cf0d830279d420f44e920a2634b290100b4b0cccdc02d9ed3",
-  "wrongsig": "4d08971da077b9b9979eef580468c7d3dc00390e1594610305aa15d5628b74c8"
+ "enrollments": {
+  "NON_CERTIFYING_REHEARSAL-enroll-sole": {"db_der_sha256": ["7cda4ddc149849cc61191d4b5b3d218d14770c0401e9e66dd9617b82ba1ae441"]},
+  "NON_CERTIFYING_REHEARSAL-enroll-sole-fresh": {"db_der_sha256": ["7cda4ddc149849cc61191d4b5b3d218d14770c0401e9e66dd9617b82ba1ae441"]},
+  "NON_CERTIFYING_REHEARSAL-enroll-throwaway": {"db_der_sha256": ["IN-RUN:c5-throwaway-ci-cert"]},
+  "NON_CERTIFYING_REHEARSAL-enroll-widened": {"db_der_sha256": ["7cda4ddc149849cc61191d4b5b3d218d14770c0401e9e66dd9617b82ba1ae441", "IN-RUN:c5-hostile-fixture"]}
  },
+ "esp_sha256": "2bfa621238890890765c9636f99dabfb46233bfa626afb580ce33e65858019c9",
  "firmware_debug_sha256": "fc150336fce10eb5508fa440cdf7300622c8c3ac71f2fbe10a0731422b9cef24",
  "firmware_release": "/tmp/NON_CERTIFYING_REHEARSAL-stage/root/usr/share/OVMF/OVMF_CODE_4M.secboot.fd",
  "firmware_release_sha256": "1dbb7f9b7e7285b950929bbbc1494c186bfb061cde60cf531ff9756ef87dab7a",

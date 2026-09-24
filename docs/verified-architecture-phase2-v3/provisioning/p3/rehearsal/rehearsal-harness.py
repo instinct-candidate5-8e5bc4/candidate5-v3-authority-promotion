@@ -50,14 +50,13 @@ ALLOWED_VARS_TEMPLATES = set()
 
 # C4 strict closed schema (T4 F6): unknown or missing keys fail.
 TOP_KEYS = {"cases","cpu_model","disk_dir","enroll_app","enroll_app_sha256","esp_sha256",
-            "esp_variant_sha256","firmware_debug_sha256","firmware_release","firmware_release_sha256",
+            "firmware_debug_sha256","firmware_release","firmware_release_sha256",
             "memory_mb","note","ovmf_code_debug","ovmf_vars_pristine","qemu","schema",
             "v3_serials","vars_parser"}
 TOP_REQUIRED = TOP_KEYS - {"note"}
-CASE_KEYS = {"esp","expect","firmware","id","settle_seconds","vars_template"}
+CASE_KEYS = {"esp","expect","firmware","id","lanes","settle_seconds","vars_template"}
 EXPECT_KEYS = {"kernel_exec","exit_98","exit_97","reject_strings","no_reject_strings"}
 EXPECT_REQUIRED = {"kernel_exec","exit_98","exit_97","reject_strings"}
-VARIANT_KEYS = {"unsigned","wrongsig","hostile"}
 QMP_SOCK_MAX = 107          # G1/T5 F3: AF_UNIX sun_path limit
 DISK_MARGIN = 1 << 30       # A5: free disk must cover the RAM dump plus this stated margin
 
@@ -73,8 +72,6 @@ def fail(code, msg):
 def check_schema(cfg):
     extra=set(cfg)-TOP_KEYS; missing=TOP_REQUIRED-set(cfg)
     if extra or missing: fail("E_CONFIG_SCHEMA", "top extra=%s missing=%s"%(sorted(extra),sorted(missing)))
-    v=cfg.get("esp_variant_sha256",{})
-    if set(v)!=VARIANT_KEYS: fail("E_CONFIG_SCHEMA","esp_variant_sha256 keys=%s"%sorted(v))
     if not isinstance(cfg.get("cases"),list) or not cfg["cases"]: fail("E_CONFIG_SCHEMA","cases")
     for case in cfg["cases"]:
         extra=set(case)-CASE_KEYS; missing=CASE_KEYS-set(case)
@@ -316,6 +313,19 @@ if __name__=="__main__":
     try: cfg=resolve_config_value(json.load(open(sys.argv[1])),PREFIX)
     except LaneError as e: print("%s %s"%(e.code,e.detail)); sys.exit(97)
     check_schema(cfg)
+    # peer 2026-09-24 B3: the certification lane runs ONLY the frozen six-case set
+    # (no criterion-C, no historical reject-control); anything else fails closed.
+    if os.environ.get("CERTIFICATION_TARGET","")=="1":
+        _CERT_IDS=frozenset(("NON_CERTIFYING_REHEARSAL-R2-N1-unsigned",
+                             "NON_CERTIFYING_REHEARSAL-R3-N2-wrongsig",
+                             "NON_CERTIFYING_REHEARSAL-R4-N3a-hostile-sole-db",
+                             "NON_CERTIFYING_REHEARSAL-R5-N3b-hostile-widened-db",
+                             "NON_CERTIFYING_REHEARSAL-R6-N3c-hostile-fresh-sole-db",
+                             "NON_CERTIFYING_REHEARSAL-R7-release-sibling-behavior-only"))
+        _sel=[c for c in cfg["cases"] if "certification" in c.get("lanes",[])]
+        if len(_sel)!=6 or frozenset(c["id"] for c in _sel)!=_CERT_IDS:
+            fail("E_CERT_CASE_SET","certification lane cases=%s != frozen six"%sorted(c.get("id","?") for c in _sel))
+        cfg["cases"]=_sel
     cfg["work_root"]=sys.argv[2]
     ALLOWED_VARS_TEMPLATES.update(allowed_vars_templates(sys.argv[3],PREFIX))
     os.makedirs(cfg["work_root"],exist_ok=True)

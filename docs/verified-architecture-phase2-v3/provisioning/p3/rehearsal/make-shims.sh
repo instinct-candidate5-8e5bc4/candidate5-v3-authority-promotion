@@ -19,7 +19,7 @@ wrap() { # name, relpath, extra-args...
     printf '"$@"\n'; } > "$SHIMS/$name"
   chmod +x "$SHIMS/$name"
 }
-for t in as ar ranlib nm objcopy objdump ld ld.bfd cpp make nasm iasl sbsign sbverify mkfs.vfat mkfs.fat fsck.vfat truncate bwrap; do
+for t in as ar ranlib nm objcopy objdump ld ld.bfd cpp make nasm iasl sbsign sbverify osslsigncode mkfs.vfat mkfs.fat fsck.vfat truncate bwrap; do
   for d in usr/bin usr/sbin sbin; do
     [ -f "$RT/$d/$t" ] && { wrap "$t" "$d/$t"; break; }
   done

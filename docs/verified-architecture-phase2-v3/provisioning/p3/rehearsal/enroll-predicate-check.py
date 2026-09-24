@@ -21,7 +21,13 @@ import sys, os, json, hashlib, subprocess
 OWNER_GUID = "c501e570-0de0-0001-0000-000000000000"
 X509 = "X509"
 PROD_CERT = "7cda4ddc149849cc61191d4b5b3d218d14770c0401e9e66dd9617b82ba1ae441"
-HOSTILE_CERT = "4428760c1ba2322bd9f9254e45cbbdb5b89c3f8b4e594f0efff337a4d3c4e07a"
+# peer 2026-09-24 route-(ii): NO fixture constants anywhere. The in-run hostile (H) and
+# wrong-signer (W) cert DER hashes arrive from the c-fixtures GENERATION-RECORD via the
+# ceremony-exported env vars below; both fail closed when unset. H gates the widened-db
+# expectation and must differ from PROD_CERT and be absent from every sole/sole-fresh db;
+# W is recorded and must be absent from EVERY db.
+HOSTILE_CERT = os.environ.get("C5_HOSTILE_CERT_SHA256", "")
+WRONG_SIGNER_CERT = os.environ.get("C5_WRONG_SIGNER_CERT_SHA256", "")
 TRUST_FORBIDDEN = {"dbx", "dbt", "PKDefault", "KEKDefault", "dbDefault", "dbxDefault", "dbtDefault"}
 
 E = []
@@ -34,7 +40,7 @@ def sha_f(p):
 
 mode, enroll_txt, prep, fd, parser = sys.argv[1:6]
 widened = mode in ("widened", "db2")
-if mode not in ("sole", "widened", "sole-fresh", "db2"):
+if mode not in ("sole", "widened", "sole-fresh", "db2", "throwaway"):
     fail("E_PRED_MODE", mode)
 
 # --- ENROLL.TXT predicate ---
@@ -141,9 +147,33 @@ if pk_der: one_x509("PK", pk_der)
 if kek_der: one_x509("KEK", kek_der)
 db = der_entries("db")
 # peer run-35963407323 ruling (1): db content bound EXACTLY as the ordered ESL entry list -
-# sole/sole-fresh db == [7cda4ddc..]; widened/db2 db == [7cda4ddc.., 4428760c..]. Entry
+# sole/sole-fresh db == [PROD_CERT]; widened/db2 db == [PROD_CERT, HOSTILE_CERT]; throwaway db == [run cert]. Entry
 # order, count and DER hashes all gate; the bound list is recorded in the report.
-db_expected = [PROD_CERT, HOSTILE_CERT] if widened else [PROD_CERT]
+if mode == "throwaway":
+    # criterion-C throwaway enrollment: db == [the run's ephemeral CI signing cert]. The
+    # cert is generated in-run (never committed, never pinned), so the expectation comes
+    # from the ceremony-exported env var bound to the c-sign SHASUMS record - fail closed
+    # when unset/empty rather than ever weakening the db predicate.
+    _th = _os.environ.get("C5_THROWAWAY_CERT_SHA256", "")
+    if not _th:
+        fail("E_THROWAWAY_CERT_UNSET", "C5_THROWAWAY_CERT_SHA256 not exported for throwaway mode")
+        db_expected = None
+    else:
+        if _th == PROD_CERT:
+            fail("E_THROWAWAY_CERT_DISTINCT", "throwaway cert DER == owner cert DER (impossible by construction)")
+        if HOSTILE_CERT and _th == HOSTILE_CERT:
+            fail("E_THROWAWAY_CERT_DISTINCT", "throwaway cert DER == in-run hostile cert DER (impossible by construction)")
+        db_expected = [_th]
+else:
+    if not HOSTILE_CERT:
+        fail("E_HOSTILE_CERT_UNSET", "C5_HOSTILE_CERT_SHA256 not exported (c-fixtures generation record)")
+        db_expected = None
+    else:
+        if HOSTILE_CERT == PROD_CERT:
+            fail("E_HOSTILE_CERT_DISTINCT", "in-run hostile cert DER == owner cert DER (impossible by construction)")
+        db_expected = [PROD_CERT, HOSTILE_CERT] if widened else [PROD_CERT]
+if WRONG_SIGNER_CERT and WRONG_SIGNER_CERT == PROD_CERT:
+    fail("E_WRONG_SIGNER_CERT_DISTINCT", "in-run wrong-signer cert DER == owner cert DER (impossible by construction)")
 db_ders = None
 if db is None:
     fail("E_TRUST_MISSING", "db")
@@ -153,6 +183,12 @@ else:
     db_ders = [h for _, _, h in db]
     if db_ders != db_expected:
         fail("E_TRUST_DER_SET", "db ders=%s expected=%s" % (db_ders, db_expected))
+    # peer 2026-09-24 route-(ii) absence rules, explicit and named (the exact-list gate
+    # above already implies them; these give each rule its own code):
+    if HOSTILE_CERT and not widened and HOSTILE_CERT in (db_ders or []):
+        fail("E_HOSTILE_CERT_IN_SOLE_DB", "in-run hostile cert present in %s db" % mode)
+    if WRONG_SIGNER_CERT and WRONG_SIGNER_CERT in (db_ders or []):
+        fail("E_WRONG_SIGNER_IN_DB", "in-run wrong-signer cert present in %s db" % mode)
 present = TRUST_FORBIDDEN & set(by_name)
 if present:
     fail("E_TRUST_FORBIDDEN_PRESENT", sorted(present))
@@ -167,6 +203,8 @@ if sbe:
 # record. Predicate check semantics byte-for-byte unchanged.
 report = {"schema": "NON_CERTIFYING_REHEARSAL-enroll-predicate/v1", "lane": PREFIX, "mode": mode,
           "widened": widened, "pk_der_sha256": pk_der, "kek_der_sha256": kek_der,
+          "hostile_cert_der_sha256": HOSTILE_CERT or None,
+          "wrong_signer_cert_der_sha256": WRONG_SIGNER_CERT or None,
           "db_der_sha256s": db_ders,
           "enrolled_fd_sha256": sha_f(fd),
           "secure_boot_enable_observed": sbe_note, "errors": E,

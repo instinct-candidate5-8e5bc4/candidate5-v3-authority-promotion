@@ -1,6 +1,6 @@
 # OVMF_CI_SECURE_BOOT_UKI — Option A CI certification ceremony workflow.
 # Scope: QEMU/KVM + reproducible DEBUG OVMF Secure Boot certification of the EXACT accepted
-# signed UKI 133096976ee70a8c272cbcc8c28d369bfc65d93d994cbff4174b947df00239d1.
+# signed UKI enters via evidence/successor-to-certify.efi (peer 2026-09-24 B2: slot absent pre-signing; this workflow dies E_SIGNED_UKI_ABSENT while absent).
 # Expected pass = firmware Secure Boot accept + kernel exec + signed-init exit-98
 # (E_PROVIDER_NAMESPACE / E_PROVIDER_LINK_MISSING on non-Google hardware). This is NOT a
 # full runtime PASS, NOT a dm-verity runtime PASS, NOT a provisioning PASS, NOT a Google
@@ -37,6 +37,7 @@ env:
   PREFIX: NON_CERTIFYING_REHEARSAL
   # peer adjudication (1): per-workflow singleton allowlist; scripts fail closed on mismatch.
   ALLOWED_PREFIX: NON_CERTIFYING_REHEARSAL
+  CERTIFICATION_TARGET: "1"
   # peer run-11 D-e: cert uses the SAME shared-list mechanism - the evidence upload paths
   # AND the manifest members come from this ONE list (upload step aliases the anchor), so
   # the two can never drift. Directories expand to their files at manifest time.
@@ -86,7 +87,8 @@ jobs:
           # D2 gate (reviewer ruling): every relative file/script argument used by later
           # steps must exist in the committed tree. Fixed list, fail-closed exit 88.
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
-          for f in             platform.lock.json             config.json             stage-platform.sh             make-shims.sh             preflight-check.py             build-ovmf-debug.sh             scan-pe-pdb-paths.py             build-enroll-app.sh             bwrap-argv.sh             enroll-predicate-check.py             rehearsal-enroll.sh             ../build-esp-image.sh             evidence/successor-signed.efi             run-ceremony.sh             qemu-smoke.sh; do
+          [ -e evidence/successor-to-certify.efi ] || { echo "E_SIGNED_UKI_ABSENT evidence/successor-to-certify.efi (pre-signing state: owner-signed UKI enters as its own reviewed head; no fallback)"; exit 90; }
+          for f in             platform.lock.json             config.json             stage-platform.sh             make-shims.sh             preflight-check.py             build-ovmf-debug.sh             scan-pe-pdb-paths.py             build-enroll-app.sh             bwrap-argv.sh             enroll-predicate-check.py             rehearsal-enroll.sh             ../build-esp-image.sh             run-ceremony.sh             qemu-smoke.sh; do
             [ -e "$f" ] || { echo "E_WORKFLOW_ARG_MISSING $f"; exit 88; }
           done
       - name: OVMF_CI_SECURE_BOOT_UKI host inputs declared (B3)
@@ -248,8 +250,8 @@ jobs:
           sha256sum /tmp/$PREFIX-app-a/enroll-app.efi >> /tmp/$PREFIX-fw-hashes.txt
           # batch1r3 C1: the ESP step runs with the staged-loader shims on PATH
           export PATH="/tmp/$PREFIX-stage/shims:$PATH"
-          sudo unshare -n env PATH="$PATH" ../build-esp-image.sh evidence/successor-signed.efi /tmp/$PREFIX-esp-a
-          sudo unshare -n env PATH="$PATH" ../build-esp-image.sh evidence/successor-signed.efi /tmp/$PREFIX-esp-b
+          sudo unshare -n env PATH="$PATH" ../build-esp-image.sh evidence/successor-to-certify.efi /tmp/$PREFIX-esp-a
+          sudo unshare -n env PATH="$PATH" ../build-esp-image.sh evidence/successor-to-certify.efi /tmp/$PREFIX-esp-b
           [ "$(sha256sum /tmp/$PREFIX-esp-a/c5-root-admitter-uki-v3-esp.raw | cut -d' ' -f1)" = \
             "2bfa621238890890765c9636f99dabfb46233bfa626afb580ce33e65858019c9" ]
           cmp /tmp/$PREFIX-esp-a/c5-root-admitter-uki-v3-esp.raw /tmp/$PREFIX-esp-b/c5-root-admitter-uki-v3-esp.raw
@@ -399,7 +401,7 @@ jobs:
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
           mkdir -p /tmp/$PREFIX-out
           date +%s >> /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-step-stamps.txt
-          sudo unshare -n env PREFIX="$PREFIX" ALLOWED_PREFIX="$ALLOWED_PREFIX" ./run-ceremony.sh config.json /tmp/$PREFIX-stage /tmp/$PREFIX-out 2>&1 \
+          sudo unshare -n env PREFIX="$PREFIX" ALLOWED_PREFIX="$ALLOWED_PREFIX" CERTIFICATION_TARGET="$CERTIFICATION_TARGET" ./run-ceremony.sh config.json /tmp/$PREFIX-stage /tmp/$PREFIX-out 2>&1 \
             | tee /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-ceremony.log
       - name: OVMF_CI_SECURE_BOOT_UKI evidence readability repair (ephemeral out tree only)
         if: always()
@@ -558,7 +560,8 @@ jobs:
           # D2 gate (reviewer ruling): every relative file/script argument used by later
           # steps must exist in the committed tree. Fixed list, fail-closed exit 88.
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
-          for f in             platform.lock.json             config.json             stage-platform.sh             make-shims.sh             preflight-check.py             build-ovmf-debug.sh             scan-pe-pdb-paths.py             build-enroll-app.sh             bwrap-argv.sh             enroll-predicate-check.py             rehearsal-enroll.sh             ../build-esp-image.sh             evidence/successor-signed.efi             run-ceremony.sh; do
+          [ -e evidence/successor-to-certify.efi ] || { echo "E_SIGNED_UKI_ABSENT evidence/successor-to-certify.efi (pre-signing state: owner-signed UKI enters as its own reviewed head; no fallback)"; exit 90; }
+          for f in             platform.lock.json             config.json             stage-platform.sh             make-shims.sh             preflight-check.py             build-ovmf-debug.sh             scan-pe-pdb-paths.py             build-enroll-app.sh             bwrap-argv.sh             enroll-predicate-check.py             rehearsal-enroll.sh             ../build-esp-image.sh             run-ceremony.sh; do
             [ -e "$f" ] || { echo "E_WORKFLOW_ARG_MISSING $f"; exit 88; }
           done
       - name: OVMF_CI_SECURE_BOOT_UKI env2 host inputs declared (B3)
@@ -651,8 +654,8 @@ jobs:
           set -euo pipefail
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
           export PATH="/tmp/$PREFIX-stage-env2/shims:$PATH"
-          sudo unshare -n env PATH="$PATH" ../build-esp-image.sh evidence/successor-signed.efi /tmp/$PREFIX-esp-env2-a
-          sudo unshare -n env PATH="$PATH" ../build-esp-image.sh evidence/successor-signed.efi /tmp/$PREFIX-esp-env2-b
+          sudo unshare -n env PATH="$PATH" ../build-esp-image.sh evidence/successor-to-certify.efi /tmp/$PREFIX-esp-env2-a
+          sudo unshare -n env PATH="$PATH" ../build-esp-image.sh evidence/successor-to-certify.efi /tmp/$PREFIX-esp-env2-b
           cmp /tmp/$PREFIX-esp-env2-a/c5-root-admitter-uki-v3-esp.raw /tmp/$PREFIX-esp-env2-b/c5-root-admitter-uki-v3-esp.raw
           HE=$(sha256sum /tmp/$PREFIX-esp-env2-a/c5-root-admitter-uki-v3-esp.raw | cut -d' ' -f1)
           [ "$HE" = "2bfa621238890890765c9636f99dabfb46233bfa626afb580ce33e65858019c9" ] || { echo "E_ESP_PIN_MISMATCH $HE"; exit 46; }
@@ -818,7 +821,7 @@ jobs:
           MANIFEST_SHA=$(sha256sum "$MANIFEST" | cut -d' ' -f1)
           printf '%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\nSHA=%s\nRUN_ID=%s\nREF=%s\n' \
             'OVMF_CI_SECURE_BOOT_UKI_PASS' \
-            'SCOPE: QEMU/KVM + reproducible DEBUG OVMF Secure Boot certification of the accepted signed UKI 133096976ee70a8c272cbcc8c28d369bfc65d93d994cbff4174b947df00239d1 only.' \
+            'SCOPE: QEMU/KVM + reproducible DEBUG OVMF Secure Boot certification of the owner-signed UKI in evidence/successor-to-certify.efi only.' \
             'EXPECTED-PASS: firmware Secure Boot accept + kernel exec + signed-init exit-98 (E_PROVIDER_NAMESPACE/E_PROVIDER_LINK_MISSING on non-Google hardware).' \
             'NOT a full runtime PASS. NOT a dm-verity runtime PASS. NOT a provisioning PASS.' \
             'NOT a Google platform certification. NOT a complete boot-chain certification.' \
@@ -830,7 +833,7 @@ jobs:
             "${{ github.sha }}" "${{ github.run_id }}" "${{ github.ref }}"
           printf '%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\nSHA=%s\nRUN_ID=%s\nREF=%s\n' \
             'OVMF_CI_SECURE_BOOT_UKI_PASS' \
-            'SCOPE: QEMU/KVM + reproducible DEBUG OVMF Secure Boot certification of the accepted signed UKI 133096976ee70a8c272cbcc8c28d369bfc65d93d994cbff4174b947df00239d1 only.' \
+            'SCOPE: QEMU/KVM + reproducible DEBUG OVMF Secure Boot certification of the owner-signed UKI in evidence/successor-to-certify.efi only.' \
             'EXPECTED-PASS: firmware Secure Boot accept + kernel exec + signed-init exit-98 (E_PROVIDER_NAMESPACE/E_PROVIDER_LINK_MISSING on non-Google hardware).' \
             'NOT a full runtime PASS. NOT a dm-verity runtime PASS. NOT a provisioning PASS.' \
             'NOT a Google platform certification. NOT a complete boot-chain certification.' \

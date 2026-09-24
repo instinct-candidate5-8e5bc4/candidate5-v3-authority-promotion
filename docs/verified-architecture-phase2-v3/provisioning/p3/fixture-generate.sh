@@ -4,7 +4,7 @@
 # two fresh ephemeral RSA-2048 self-signed certs. NO production secrets anywhere:
 # inputs are the public unsigned UKI + public tools only. Keys are created with
 # 0600 in a private work dir, never logged/printed/uploaded/cached, and are
-# plain-deleted (rm) before exit; the run transcript prints only public outputs.
+# shred -u'd before exit (explicit cleanup AND EXIT trap; peer 2026-09-24 BLOCKING 2); the run transcript prints only public outputs.
 # usage: fixture-generate.sh <unsigned_uki.efi> <sbsigntool_extract_dir> <out_dir>
 set -euo pipefail
 export LC_ALL=C TZ=UTC
@@ -14,8 +14,8 @@ SBS=${2:?}; OUT=${3:?}
 SB=$SBS/usr/bin
 [ -d "$OUT" ] && { echo "E_OUT_EXISTS" >&2; exit 1; }
 mkdir -p "$OUT"
-W=$(mktemp -d)
-cleanup(){ rm -rf "$W"; }
+W=$(mktemp -d "/tmp/${PREFIX:-noprefix}-fixture-keys.XXXXXX")
+cleanup(){ shred -u "$W"/*.key 2>/dev/null || true; rm -rf "$W"; }
 trap cleanup EXIT
 fail(){ echo "FAIL $1" >&2; exit 1; }
 echo "== fixture-generate.sh (NON_CERTIFYING_REHEARSAL) =="
@@ -23,7 +23,7 @@ for t in "$SB/sbsign" "$SB/sbverify" openssl sha256sum python3; do
   [ -x "$t" ] || command -v "$t" >/dev/null || fail "E_TOOL_MISSING $t"
 done
 UKI_SHA=$(sha256sum "$UKI" | cut -d' ' -f1)
-[ "$UKI_SHA" = ed5d9d72be40592af3b14bd1fd9dc91a5976b14f350f9124ea414b975464d536 ] || fail "E_UKI_HASH $UKI_SHA"
+[ "$UKI_SHA" = 4cda9c3e285b5b639364234400bf0b121178f12447cc88d896cd2623e07d18e1 ] || fail "E_UKI_HASH $UKI_SHA"
 echo "unsigned-uki $UKI_SHA"
 gen(){ # name -> key/cert/cer in $W (never printed)
   openssl req -new -newkey rsa:2048 -nodes -x509 -days 3650 -subj "/CN=$1/" \
@@ -44,7 +44,7 @@ python3 - "$OUT" <<'PY'
 import sys, struct, hashlib, json
 OUT=sys.argv[1]
 PROD="7cda4ddc149849cc61191d4b5b3d218d14770c0401e9e66dd9617b82ba1ae441"
-UNSIGNED="ed5d9d72be40592af3b14bd1fd9dc91a5976b14f350f9124ea414b975464d536"
+UNSIGNED="4cda9c3e285b5b639364234400bf0b121178f12447cc88d896cd2623e07d18e1"
 def analyze(path):
     d=open(path,"rb").read()
     pe=struct.unpack_from("<I",d,0x3c)[0]
@@ -83,7 +83,8 @@ for name in ("C5-WRONG-SIGNER-FIXTURE.cer","C5-HOSTILE-FIXTURE.cer"):
     res[name]={"bytes":len(d),"sha256":hashlib.sha256(d).hexdigest()}
 print(json.dumps(res,indent=1,sort_keys=True))
 PY
-# plain-delete keys (A4: no shred claim; ephemeral workspace, runner discarded)
-rm -f "$W"/*.key "$W"/*.crt
+# shred keys (peer 2026-09-24 BLOCKING 2: same rule as c-sign; /tmp/$PREFIX-* workdir, shred -u)
+shred -u "$W"/*.key
+rm -f "$W"/*.crt
 [ -z "$(ls -A "$W" 2>/dev/null)" ] && echo "keys deleted, workdir empty"
 echo "== fixture generation complete =="
