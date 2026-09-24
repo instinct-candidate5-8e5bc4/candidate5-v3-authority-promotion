@@ -1,0 +1,30 @@
+{
+ "correctionVersion": "1.0.0",
+ "kind": "TRACK_B_LIFECYCLE_STATUS_CORRECTION",
+ "issued": "2026-09-24",
+ "basis": "Track B coordinator current-head review correction (relayed by main), verified against the grounded lifecycle records in this repo. Status-only documentation correction: no canonical bytes, contracts, digests, or certification-candidate changes; anchors unchanged (package 187cf1a4..., world fa1bbaa9..., descriptor 5f6829b7..., raw pin 6e9878bd...).",
+ "casualty": {
+  "entityId": "school-casualty-adult-v1",
+  "gate": "GATE B",
+  "gateResult": "VERIFIED_FOR_SLICE",
+  "verifiedForSlice": true,
+  "reviewId": "gate-b-user-review-ee04481",
+  "reviewDecision": "APPROVED_FOR_SLICE",
+  "reviewScope": "SCHOOL_VERTICAL_SLICE|adult-v1|MALE|SUPINE_FLOOR|PHASE2_CONSERVATIVE_AGGREGATE_AABB",
+  "groundedRecord": "evidence/clean-runtime/gate-a2-admission/exact-review.json",
+  "caveat": "Male casualty body adult-v1 is VERIFIED_FOR_SLICE (reviewId gate-b-user-review-ee04481, APPROVED_FOR_SLICE within its recorded review scope; limitations per the grounded record). Uncertified areas remaining are the Gate D declared unknowns, including visual-physical lineage."
+ },
+ "chair": {
+  "entityId": "school-treatment-chair",
+  "gate": "GATE C",
+  "gateResult": "VERIFIED_FOR_SLICE",
+  "verifiedForSlice": true,
+  "reviewId": "gate-c-user-review-0c27c92",
+  "reviewDecision": "APPROVED_FOR_SLICE",
+  "reviewScope": "SCHOOL_VERTICAL_SLICE|TREATMENT_CHAIR_R1|SEAT_SUPPORT_SURFACE_R1|PHYSICAL_SUPPORT_AND_DEPENDENCY_VALIDATION",
+  "groundedRecord": "evidence/clean-runtime/gate-c-admission/gate-result.json",
+  "caveat": "Treatment chair is VERIFIED_FOR_SLICE (reviewId gate-c-user-review-0c27c92, APPROVED_FOR_SLICE within its recorded review scope; limitations per the grounded record, including PHYSICAL_ONLY_NO_VISUAL_BINDING)."
+ },
+ "hardStop": "docs/clean-runtime-school/gate-b-promotion/lifecycle-digest-hard-stop.md is HISTORICAL RECORD describing the state that led to the A.2 envelope fix - never an active blocker.",
+ "note": "The engine builders (src/clean-runtime/**) intentionally still carry the older provisional labels; this correction overlays the status at the presentation layer (scene-bundle statusCaveats + page status text) exactly as the acceptance spec requires."
+}

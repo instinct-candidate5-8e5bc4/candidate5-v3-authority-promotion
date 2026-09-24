@@ -1447,8 +1447,8 @@ var require_visual_descriptor = __commonJS({
     function entityView(e3) {
       return { entityId: e3.entityId, entityTypeId: e3.entityTypeId, revision: e3.revision, lifecycleState: e3.lifecycleState, transform: structuredClone(e3.transform), physicalBodyRef: structuredClone(e3.physicalBodyRef), geometrySourceRef: structuredClone(e3.geometrySourceRef), postureStateId: e3.postureStateId, participatesIn: structuredClone(e3.participatesIn || []), physicalState: structuredClone(e3.physicalState) };
     }
-    function buildVisualSceneDescriptor2() {
-      const r2 = instantiate(PACKAGE);
+    function buildVisualSceneDescriptor2(committedResult) {
+      const r2 = committedResult || instantiate(PACKAGE);
       if (r2.status !== "COMMITTED") return deepFreeze({ descriptorVersion: "1.0.0", kind: "VISUAL_SCENE_DESCRIPTOR", status: "REJECTED", code: r2.code || "INSTANTIATION_NOT_COMMITTED", sourcePackage: { scenePackageId: PACKAGE.scenePackageId, scenePackageDigest: PACKAGE.scenePackageDigest } });
       const s2 = r2.after, entityIds = Object.keys(s2.entities).sort();
       const descriptor = {
@@ -1586,14 +1586,73 @@ var require_visual_equipment = __commonJS({
   }
 });
 
+// src/clean-runtime/school/scene-v2/demo-session.js
+var require_demo_session = __commonJS({
+  "src/clean-runtime/school/scene-v2/demo-session.js"(exports, module) {
+    "use strict";
+    init_buffer_inject();
+    var { empty } = require_instantiate();
+    var { PACKAGE, model } = require_package();
+    var { validateScenePackage } = require_validate();
+    var { schoolGeometryAdapter } = require_school_geometry_adapter();
+    var { createMultiSupportRuntime } = require_runtime();
+    var { replay } = require_replay();
+    var { world } = require_world_state();
+    function createDemoSession2() {
+      const v = validateScenePackage(PACKAGE);
+      const api = createMultiSupportRuntime({ initialWorld: empty(), legalityPort: schoolGeometryAdapter({ surfaceModel: model }) });
+      if (v.status !== "VALIDATED") return Object.freeze({ status: "REJECTED", code: v.code });
+      const commands = PACKAGE.entities.map((e3) => ({ commandId: "spawn:" + e3.entityId, type: "SpawnEntity", expectedWorldRevision: 0, entity: e3 })).concat(PACKAGE.supportRelations.map((r2) => ({ commandId: "support:" + r2.relationId, type: "AttachSupportRelation", expectedWorldRevision: 0, relation: r2 })));
+      const init = api.proposeTransaction({ transactionId: "instantiate:" + PACKAGE.scenePackageDigest, expectedWorldRevision: 0, commands });
+      if (init.status !== "COMMITTED") return Object.freeze({ status: "REJECTED", code: "INSTANTIATION_NOT_COMMITTED" });
+      const base = api.getWorldState();
+      return Object.freeze({
+        status: "READY",
+        baseRevision: base.revision,
+        baseStateDigest: base.stateDigest,
+        getWorldState: () => api.getWorldState(),
+        replayResult: () => replay(world(empty()), api.getEventLog()),
+        // One proposal = one transaction through the gate. Never throws for
+        // gate-level rejections; returns the frozen REJECTED record with the code.
+        proposeBagPlacement({ transactionId, positionMicrounits, relation }) {
+          const before = api.getWorldState();
+          const targetRevision = before.revision + 1;
+          const rebinds = before.supportRelations.filter((r2) => r2.relationId !== "school:bag:floor").map((r2) => ({
+            commandId: transactionId + ":rebind:" + r2.relationId,
+            type: "ReplaceSupportRelation",
+            expectedWorldRevision: before.revision,
+            relationId: r2.relationId,
+            relation: { ...structuredClone(r2), boundWorldRevision: targetRevision }
+          }));
+          const result = api.proposeTransaction({ transactionId, expectedWorldRevision: before.revision, commands: [
+            { commandId: transactionId + ":set-transform", type: "SetTransform", expectedWorldRevision: before.revision, entityId: "school-medical-bag", transform: { positionMicrounits: [...positionMicrounits], orientation: [0, 0, 0, 1], scaleMicrounits: [1e6, 1e6, 1e6] } },
+            { commandId: transactionId + ":replace-support", type: "ReplaceSupportRelation", expectedWorldRevision: before.revision, relationId: "school:bag:floor", relation: { ...structuredClone(relation), boundWorldRevision: targetRevision } },
+            ...rebinds
+          ] });
+          const after = api.getWorldState();
+          return Object.freeze({ status: result.status, code: result.code || null, evidence: result.evidence || null, priorStateDigest: before.stateDigest, stateDigest: after.stateDigest, worldDigestUnchanged: before.stateDigest === after.stateDigest, state: result.status === "COMMITTED" ? after : null });
+        }
+      });
+    }
+    function bagRelationOnSurface2({ relationId, surfaceId, expectedSurfaceType, capabilityId, boundWorldRevision }) {
+      const src = PACKAGE.supportRelations.find((r2) => r2.relationId === "school:bag:floor");
+      return { ...structuredClone(src), relationId, surfaceId, expectedSurfaceType: expectedSurfaceType || src.expectedSurfaceType, capabilityId: capabilityId || src.capabilityId, boundWorldRevision };
+    }
+    module.exports = { createDemoSession: createDemoSession2, bagRelationOnSurface: bagRelationOnSurface2 };
+  }
+});
+
 // visual-slice/engine/entry.mjs
 init_buffer_inject();
 var import_visual_descriptor = __toESM(require_visual_descriptor(), 1);
 var import_visual_casualty = __toESM(require_visual_casualty(), 1);
 var import_visual_equipment = __toESM(require_visual_equipment(), 1);
+var import_demo_session = __toESM(require_demo_session(), 1);
 var buildVisualSceneDescriptor = import_visual_descriptor.default.buildVisualSceneDescriptor;
 var buildVisualCasualty = import_visual_casualty.default.buildVisualCasualty;
 var buildVisualEquipment = import_visual_equipment.default.buildVisualEquipment;
+var createDemoSession = import_demo_session.default.createDemoSession;
+var bagRelationOnSurface = import_demo_session.default.bagRelationOnSurface;
 var EXPECTED = Object.freeze({
   packageDigest: "187cf1a4c0af01ef12087879f44eeb88a355499a860665e29cdb2f5ab0d06aec",
   worldDigest: "fa1bbaa985a63a8bfa30c2bbd7fbaf14b2c4972d985815a093bdd68f7fe954ea",
@@ -1601,9 +1660,11 @@ var EXPECTED = Object.freeze({
 });
 export {
   EXPECTED,
+  bagRelationOnSurface,
   buildVisualCasualty,
   buildVisualEquipment,
-  buildVisualSceneDescriptor
+  buildVisualSceneDescriptor,
+  createDemoSession
 };
 /**
  * [js-sha256]{@link https://github.com/emn178/js-sha256}

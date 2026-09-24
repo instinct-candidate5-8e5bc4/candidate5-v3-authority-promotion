@@ -1,0 +1,24 @@
+{
+ "registryVersion": "1.0.0",
+ "kind": "TRACK_B_SCENE_FAMILY_REGISTRY",
+ "policy": "Requested scene families resolve through this registry ONLY. AVAILABLE families render their scene; UNAVAILABLE families render an explicit UNAVAILABLE state. There is no default-scene fallback, no substitution, and no placeholder render for an unready family. Scene expansion beyond school-treatment-room-v1 is frozen until the quality program (C2/C3/C5) proves the existing slice.",
+ "families": {
+  "school-treatment-room": {
+   "status": "AVAILABLE",
+   "sceneId": "school-treatment-room-v1",
+   "bundle": "scene-bundle.json",
+   "notes": "The existing vertical slice. Status caveats ride visibly (casualty Gate B PASS_PENDING_LIFECYCLE_REVIEW; chair Gate C PASS_PENDING_USER_REVIEW_FOR_ADMISSION)."
+  },
+  "drowning": {
+   "status": "UNAVAILABLE",
+   "reason": "No semantically fitting drowning scene exists. Scene expansion is frozen; substituting the treatment room for a drowning scenario is forbidden (no wrong-scene fallback).",
+   "reasonHe": "הסצנה אינה זמינה: סצנת טביעה מתאימה טרם נבנתה. הרחבת הסצנות קפואה, ואין להציג את חדר הטיפול כתחליף לתרחיש טביעה."
+  },
+  "synagogue": {
+   "status": "UNAVAILABLE",
+   "reason": "No synagogue scene exists. Recognizability cannot be claimed for a scene that has not been built and gated; registry stays honest (UNAVAILABLE), never a placeholder render.",
+   "reasonHe": "הסצנה אינה זמינה: סצנת בית כנסת טרם נבנתה וטרם עברה את שערי האיכות. לא תוצג סצנת placeholder."
+  }
+ },
+ "unknownReasonHe": "הסצנה המבוקשת אינה קיימת במערכת."
+}

@@ -12,6 +12,15 @@
  #hud details{margin-top:4px}#hud summary{cursor:pointer;color:#8fb8cc}
  #hud code{color:#9fd3a8;font-size:11px}
  #err{position:fixed;inset:0;display:none;align-items:center;justify-content:center;text-align:center;color:#ff9d66;background:#0d1417;font-size:16px;padding:24px;z-index:10}
+ @media (max-width:700px){#demo{bottom:110px !important;max-width:62vw}}
+#rigbar button{background:#1d2f3a;color:#cfe3ee;border:1px solid #3a5566;border-radius:5px;padding:2px 10px;cursor:pointer}
+#rigbar button[data-active="true"]{background:#2e5266;border-color:#7fb3d5}
+#demo{position:fixed;left:10px;bottom:10px;max-width:min(480px,92vw);background:rgba(13,20,23,.92);border:1px solid #2a3a42;border-radius:8px;padding:10px 12px;font-size:12px;color:#cfd8dc;z-index:5}
+ #demo .t{font-weight:bold;color:#ffd27a;margin-bottom:6px}
+ #demo button{margin:2px 4px 2px 0;padding:5px 10px;background:#1d3038;color:#e3edf2;border:1px solid #3a5563;border-radius:6px;cursor:pointer;font-size:12px}
+ #demo button:hover{background:#27424d}
+ #demoOut{margin-top:6px;line-height:1.5}
+ #demoOut code{color:#9fd3a8;font-size:11px}
  canvas{display:block}
  @media (max-width:520px){
   #hud{padding:6px 8px;font-size:11px;line-height:1.35}
@@ -29,14 +38,42 @@
  <span id="engine"></span>
  <details><summary>Status caveats, declared unknowns, digests</summary><div id="caveats"></div></details>
 </div>
+<div id="rigbar" dir="rtl" style="position:fixed;right:10px;bottom:10px;z-index:6;background:rgba(8,14,18,.85);border:1px solid #2a3f4a;border-radius:8px;padding:8px 10px;color:#cfe3ee;font:13px/1.5 system-ui">
+<b>תאורה בלבד (יום/לילה/חורף) - ללא שינוי גאומטריה או נתונים</b><br>
+<button data-rig="day" data-active="true">יום</button> <button data-rig="night">לילה</button> <button data-rig="winter">חורף</button>
+</div>
+<div id="demo" dir="rtl" lang="he">
+ <div class="t">הדגמה אינטראקטיבית - העברת התיק דרך WorldMutationAPI ושער הגאומטריה בלבד</div>
+ <button id="btnSeat">העברה למושב הכיסא</button>
+ <button id="btnLegal">מיקום חוקי: רצפה ליד הכיסא</button>
+ <button id="btnWall">ניסיון לא חוקי: בתוך הקיר (x2)</button>
+ <div id="demoOut"></div>
+</div>
 <div id="err"></div>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 <script type="module">
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import * as ENGINE from './engine-bundle.js';
+import {buildArticulatedLayout} from './articulated-layout.mjs';
+import {fitCameraToAabb,LIGHTING_RIGS} from './camera-lighting.mjs';
 const U=1e6, m=v=>v/U; // ED-P2-02 downstream-only conversion: microunits -> meters for display. Never feeds authoritative state.
-const bundle=await (await fetch('./scene-bundle.json')).json();
+// C1 scene-family registry: the requested family (?scene=<family>, default
+// school-treatment-room) resolves through scene-registry.json ONLY. UNAVAILABLE
+// or unknown families render an explicit UNAVAILABLE state - never a fallback,
+// substitution, or placeholder scene.
+const registry=await (await fetch('./scene-registry.json')).json();
+const family=new URLSearchParams(location.search).get('scene')||'school-treatment-room';
+const entry=registry.families[family];
+if(!entry||entry.status!=='AVAILABLE'){
+ const e=document.getElementById('err');e.style.display='flex';
+ e.setAttribute('dir','rtl');e.setAttribute('lang','he');
+ e.textContent=(entry&&entry.reasonHe)||registry.unknownReasonHe||'Scene unavailable: '+family;
+ e.title=family+': '+((entry&&entry.reason)||'unknown scene family (not in the registry)');
+ document.body.dataset.sceneUnavailable=family;
+ throw new Error('scene unavailable: '+family)}
+document.body.dataset.sceneFamily=family;document.body.dataset.sceneId=entry.sceneId;
+const bundle=await (await fetch('./'+entry.bundle)).json();
 if(bundle.status!=='READY'){const e=document.getElementById('err');e.style.display='block';e.textContent='Bundle not READY: '+JSON.stringify(bundle.reason||bundle.status);throw new Error('bundle not ready')}
 // B7 fail-closed engine gate: execute the UNMODIFIED clean-runtime instantiate
 // path in-browser and require every certified anchor before any rendering.
@@ -55,30 +92,103 @@ if(!liveEquipment||liveEquipment.status!=='DIMENSIONED_TO_CERTIFIED_BODIES'||liv
 document.body.dataset.engineDescriptor=live.descriptorDigest;
 document.getElementById('distinction').textContent=bundle.banner.distinction;
 document.getElementById('meta').innerHTML=`branch <code>${bundle.git.branch}</code> build commit (embedded at build time; deployed branch head differs) <code>${bundle.git.commit}</code> base <code>${bundle.git.base}</code> &middot; world <code>${bundle.inputs.worldStateDigest.slice(0,16)}&hellip;</code> package <code>${bundle.inputs.sourcePackageDigest.slice(0,16)}&hellip;</code>`;
-document.getElementById('engine').innerHTML=`engine: <code>instantiate(PACKAGE) &rarr; buildVisualSceneDescriptor</code> executed in-browser at page load (read-only) &middot; descriptor <code>${live.descriptorDigest.slice(0,16)}&hellip;</code> browser == Node &middot; casualty/chair/bag built live from this descriptor; room surfaces from the B2 lineage-evidenced set`;
+document.getElementById('engine').innerHTML=`engine: <code>instantiate(PACKAGE) &rarr; buildVisualSceneDescriptor</code> executed in-browser at page load (read-only) &middot; descriptor <code>${live.descriptorDigest.slice(0,16)}&hellip;</code> browser == Node &middot; casualty/chair/bag built live from this descriptor and articulated strictly inside certified envelopes (G13); room surfaces from the B2 lineage-evidenced set`;
 document.getElementById('caveats').innerHTML=
  `<p><b>Status caveats:</b><br>Casualty: ${bundle.statusCaveats.casualty.gate} ${bundle.statusCaveats.casualty.gateResult} &mdash; ${bundle.statusCaveats.casualty.caveat}<br>Chair: ${bundle.statusCaveats.chair.gate} ${bundle.statusCaveats.chair.gateResult} &mdash; ${bundle.statusCaveats.chair.caveat}</p>`+
  `<p><b>Gate D declared unknowns (not certified):</b> ${bundle.declaredUnknowns.join('; ')}</p>`+
  `<p><b>Input digests:</b><br>${Object.entries(bundle.inputs).map(([k,v])=>k+': <code>'+v+'</code>').join('<br>')}</p>`;
-const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;document.body.appendChild(renderer.domElement);
+const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;document.body.appendChild(renderer.domElement);
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x101a20);scene.fog=new THREE.Fog(0x101a20,18,42);
 const camera=new THREE.PerspectiveCamera(bundle.camera.fovDegrees,innerWidth/innerHeight,.05,120);
-camera.position.set(...bundle.camera.positionMicrounits.map(m));
-function frameForViewport(){const aspect=innerWidth/innerHeight,pull=Math.max(1,1.15/aspect);camera.position.set(...bundle.camera.positionMicrounits.map(m).map(v=>v*pull));camera.updateProjectionMatrix()}
+const envU=bundle.casualty.worldEnvelopeMicrounits; // casualty world envelope derived from the certified ScenePackage aggregates (data lineage; visuals are never certified physics)
+const casualtyEnv=Object.fromEntries(Object.entries(envU).map(([k,v])=>[k,m(v)])); // camera-fit input, meters
+const authoredPos=bundle.camera.positionMicrounits.map(m),lookAt=bundle.camera.lookAtMicrounits.map(m);
+function frameForViewport(){const fit=fitCameraToAabb(casualtyEnv,authoredPos,lookAt,bundle.camera.fovDegrees,innerWidth/innerHeight,0.08);camera.position.set(...fit.position);camera.updateProjectionMatrix()}
 frameForViewport();
+window.__c3={camera,casualtyEnv,lookAt,fov:bundle.camera.fovDegrees}; // read-only verification hook
 const controls=new OrbitControls(camera,renderer.domElement);controls.target.set(...bundle.camera.lookAtMicrounits.map(m));controls.update();
 function box(aabb,colorHex,opts={}){const sx=m(aabb.maxX-aabb.minX),sy=m(aabb.maxY-aabb.minY),sz=m(aabb.maxZ-aabb.minZ);const mesh=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),new THREE.MeshStandardMaterial({color:parseInt(colorHex),roughness:opts.roughness??.85,metalness:opts.metalness??.05}));mesh.position.set(m(aabb.minX)+sx/2,m(aabb.minY)+sy/2,m(aabb.minZ)+sz/2);mesh.castShadow=opts.cast??true;mesh.receiveShadow=true;return mesh}
 // Room surfaces (B2, lineage-evidenced against certified physical surfaces)
 for(const s of bundle.room)scene.add(box(s.geometryMicrounits,s.visualOnlyClaims.colorHex,{cast:false}));
+// C2 articulated visuals: every part is built from the shared layout module
+// (pure integer-microunit math) and is G13-verified to sit fully INSIDE its
+// certified component envelope. Certified colors stay dominant; accent parts
+// are presentation-only. Support/contact is geometry-derived, never eyeballed.
+function partMesh(part,colorHex,mat={}){
+ let g;
+ if(part.shape==='sphere')g=new THREE.SphereGeometry(m(part.radius),28,20);
+ else if(part.shape==='capsuleZ'||part.shape==='capsuleY')g=new THREE.CapsuleGeometry(m(part.radius),m(part.cylinderLength),8,20);
+ else g=new THREE.BoxGeometry(m(part.aabb.maxX-part.aabb.minX),m(part.aabb.maxY-part.aabb.minY),m(part.aabb.maxZ-part.aabb.minZ));
+ const mesh=new THREE.Mesh(g,new THREE.MeshStandardMaterial({color:parseInt(part.colorHex||colorHex),roughness:mat.roughness??.65,metalness:mat.metalness??.05}));
+ if(part.shape==='capsuleZ')mesh.rotation.x=Math.PI/2;
+ if(part.shape==='box')mesh.position.set(m((part.aabb.minX+part.aabb.maxX)/2),m((part.aabb.minY+part.aabb.maxY)/2),m((part.aabb.minZ+part.aabb.maxZ)/2));
+ else mesh.position.set(...part.center.map(m));
+ mesh.castShadow=true;mesh.receiveShadow=true;return mesh}
+const layout=buildArticulatedLayout(liveCasualty,liveEquipment);
 // Casualty (B3, static pose == certified SUPINE_FLOOR; Gate B caveat applies)
-for(const c of liveCasualty.components)scene.add(box(c.worldAabbMicrounits,c.visualOnlyAppearance.colorHex,{roughness:.7}));
+for(const g of layout.casualty)for(const part of g.parts)scene.add(partMesh(part,g.colorHex,{roughness:.6}));
 // Chair + bag (B4; chair Gate C caveat applies)
-for(const c of liveEquipment.chair.components)scene.add(box(c.worldAabbMicrounits,c.visualOnlyAppearance.colorHex,{roughness:.6}));
-for(const c of liveEquipment.bag.components)scene.add(box(c.worldAabbMicrounits,c.visualOnlyAppearance.colorHex,{roughness:.5}));
+for(const g of layout.chair)for(const part of g.parts)scene.add(partMesh(part,g.colorHex,{roughness:.55}));
+let bagMeshes=[];for(const g of layout.bag)for(const part of g.parts){const bm=partMesh(part,g.colorHex,{roughness:.5});bagMeshes.push(bm);scene.add(bm)}
+// Geometry-derived contact shadows (soft discs under floor-contacting parts)
+const csCanvas=document.createElement('canvas');csCanvas.width=csCanvas.height=128;
+{const ctx=csCanvas.getContext('2d'),g=ctx.createRadialGradient(64,64,6,64,64,64);g.addColorStop(0,'rgba(0,0,0,.40)');g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.fillRect(0,0,128,128)}
+const csTex=new THREE.CanvasTexture(csCanvas);
+for(const cs of layout.contactShadows){const f=cs.footprint;
+ const p=new THREE.Mesh(new THREE.PlaneGeometry(m(f.maxX-f.minX)*1.12,m(f.maxZ-f.minZ)*1.12),new THREE.MeshBasicMaterial({map:csTex,transparent:true,depthWrite:false}));
+ p.rotation.x=-Math.PI/2;p.position.set(m((f.minX+f.maxX)/2),.002,m((f.minZ+f.maxZ)/2));scene.add(p)}
 // Lighting (visual-only claims)
 scene.add(new THREE.AmbientLight(parseInt(bundle.lighting.ambient.colorHex),bundle.lighting.ambient.intensity));
-const key=new THREE.DirectionalLight(parseInt(bundle.lighting.key.colorHex),bundle.lighting.key.intensity);key.position.set(...bundle.lighting.key.positionMicrounits.map(m));key.castShadow=true;scene.add(key);
+const key=new THREE.DirectionalLight(parseInt(bundle.lighting.key.colorHex),bundle.lighting.key.intensity);key.position.set(...bundle.lighting.key.positionMicrounits.map(m));key.castShadow=true;
+key.shadow.mapSize.set(2048,2048);key.shadow.camera.left=-12;key.shadow.camera.right=12;key.shadow.camera.top=12;key.shadow.camera.bottom=-12;key.shadow.camera.far=40;key.shadow.bias=-.0005;scene.add(key);
 const fill=new THREE.DirectionalLight(parseInt(bundle.lighting.fill.colorHex),bundle.lighting.fill.intensity);fill.position.set(...bundle.lighting.fill.positionMicrounits.map(m));scene.add(fill);
+const ambient=scene.children.find(o=>o.isAmbientLight);
+document.querySelectorAll('#rigbar button').forEach(b=>b.addEventListener('click',()=>applyRig(b.dataset.rig)));
+function applyRig(name){const rig=LIGHTING_RIGS[name];if(!rig)return;
+ ambient.color.set(parseInt(rig.ambient.colorHex));ambient.intensity=rig.ambient.intensity;
+ key.color.set(parseInt(rig.key.colorHex));key.intensity=rig.key.intensity;key.position.set(...rig.key.positionMicrounits.map(m));
+ fill.color.set(parseInt(rig.fill.colorHex));fill.intensity=rig.fill.intensity;fill.position.set(...rig.fill.positionMicrounits.map(m));
+ key.shadow.mapSize.set(rig.shadow.mapSize,rig.shadow.mapSize);key.shadow.bias=rig.shadow.bias;
+ document.querySelectorAll('#rigbar button').forEach(b=>b.dataset.active=b.dataset.rig===name)}
+// C6 interactive demo (additive): bag placement proposals go ONLY through the
+// bundled runtime's sole placement path (the sole placement path through the geometry gate
+// -> adapter -> Phase 2 Geometry Gate). Sessions are in-memory; the certified
+// world on disk is never touched. Every COMMIT rebuilds the descriptor from
+// the new committed world with fail-closed package/world/replay asserts.
+const demoOut=document.getElementById('demoOut');
+const srcRel=live.supportRelations.find(r=>r.relationId==='school:bag:floor');
+const chairEntity=live.entities.find(e=>e.entityId==='school-treatment-chair');
+function reasonOf(r){const e=r.evidence&&r.evidence.detail&&r.evidence.detail.evidence;return (e&&e.phase2ReasonCode)||''}
+function seatRelation(){const ss=chairEntity.physicalState.supportSurface;
+ return {...structuredClone(srcRel),supportSourceKind:'ENTITY_OWNED',surfaceModelRef:undefined,surfaceId:undefined,expectedSurfaceType:undefined,
+ ownerEntityRef:{id:'school-treatment-chair',revision:chairEntity.revision},
+ ownerBodyRef:{id:chairEntity.physicalBodyRef.recordId,revision:chairEntity.physicalBodyRef.revision,digest:chairEntity.physicalBodyRef.digest},
+ supportSurfaceRef:{id:ss.supportSurfaceId,revision:ss.surfaceRevision,digest:ss.canonicalDigest},
+ capabilityId:'full-footprint-chair-seat',contactNormal:{x:0,y:1,z:0},evidenceRefs:['gate-c-chair-authoring-001','phase2-v1-full-body-contact']}}
+document.getElementById('btnSeat').onclick=()=>{
+ const s=ENGINE.createDemoSession();
+ const r=s.proposeBagPlacement({transactionId:'demo:bag-to-chair-seat:1',positionMicrounits:[-2000000,665000,1000000],relation:seatRelation()});
+ if(r.status==='COMMITTED'){demoOut.innerHTML='אושר (COMMITTED) - מצב עולם חדש: <code>'+r.stateDigest.slice(0,16)+'&hellip;</code>';return}
+ demoOut.innerHTML='נדחה על ידי שער הגאומטריה: <b>'+r.code+'</b>'+(reasonOf(r)?' / '+reasonOf(r):'')+'<br>האמת של המנוע: המושב אינו משטח שהשער מכיר בו בנתיב זה; התיק ימרחף 0.49 מטר מעל הרצפה (CONTACT_GAP_FLOATING).<br>מצב העולם לא השתנה: <code>'+r.priorStateDigest.slice(0,16)+'&hellip;</code> == <code>'+r.stateDigest.slice(0,16)+'&hellip;</code>'};
+document.getElementById('btnLegal').onclick=()=>{
+ const s=ENGINE.createDemoSession();
+ const r=s.proposeBagPlacement({transactionId:'demo:bag-to-floor-beside-chair:1',positionMicrounits:[-1200000,175000,1000000],relation:structuredClone(srcRel)});
+ if(r.status!=='COMMITTED'){demoOut.innerHTML='נדחה: <b>'+r.code+'</b>';return}
+ const nd=ENGINE.buildVisualSceneDescriptor({status:'COMMITTED',after:s.getWorldState(),replay:s.replayResult()});
+ if(!nd||nd.status!=='COMMITTED')fail('demo: descriptor not committed');
+ if(nd.sourcePackage.scenePackageDigest!==ENGINE.EXPECTED.packageDigest)fail('demo: package digest changed');
+ if(nd.worldRef.stateDigest!==r.stateDigest)fail('demo: descriptor world mismatch');
+ if(nd.worldRef.replayMatchesCommittedState!==true)fail('demo: replay mismatch');
+ const ne=ENGINE.buildVisualEquipment(nd);
+ if(!ne||ne.status!=='DIMENSIONED_TO_CERTIFIED_BODIES')fail('demo: equipment build failed');
+ for(const bm of bagMeshes)scene.remove(bm);bagMeshes=[];
+ const nl=buildArticulatedLayout(liveCasualty,ne);
+ for(const g of nl.bag)for(const part of g.parts){const bm=partMesh(part,g.colorHex,{roughness:.5});bagMeshes.push(bm);scene.add(bm)}
+ demoOut.innerHTML='אושר והופעל (COMMITTED): התיק הועבר לרצפה ליד הכיסא דרך שער הגאומטריה.<br>מצב עולם חדש: <code>'+r.stateDigest.slice(0,16)+'&hellip;</code> (קודם <code>'+live.worldRef.stateDigest.slice(0,16)+'&hellip;</code>) &middot; package ללא שינוי (<code>'+nd.sourcePackage.scenePackageDigest.slice(0,16)+'&hellip;</code>) &middot; replay תקין &middot; התצוגה נבנתה מחדש מהמצב המחויב'};
+document.getElementById('btnWall').onclick=()=>{
+ const run=()=>{const s=ENGINE.createDemoSession();return s.proposeBagPlacement({transactionId:'demo:bag-into-wall:1',positionMicrounits:[0,175000,-3900000],relation:structuredClone(srcRel)})};
+ const a=run(),b=run();
+ demoOut.innerHTML='נדחה על ידי שער הגאומטריה: <b>'+a.code+'</b>'+(reasonOf(a)?' / '+reasonOf(a):'')+'<br>מצב העולם לא השתנה: <code>'+a.priorStateDigest.slice(0,16)+'&hellip;</code> == <code>'+a.stateDigest.slice(0,16)+'&hellip;</code><br>הרצה חוזרת דטרמיניסטית: '+((a.code===b.code&&a.stateDigest===b.stateDigest&&a.priorStateDigest===b.priorStateDigest)?'תוצאה זהה בביט':'שונתה!')};
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;frameForViewport();renderer.setSize(innerWidth,innerHeight)});
 // FPS meter: real-hardware measurement surface for B6 (no emulated numbers are reported anywhere)
 let frames=0,t0=performance.now();const fpsEl=document.createElement('span');fpsEl.id='fps';document.getElementById('meta').appendChild(fpsEl);

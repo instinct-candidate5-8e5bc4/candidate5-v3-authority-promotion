@@ -33,8 +33,11 @@ const STATUS_CAVEATS=Object.freeze({
  chair:Object.freeze({entityId:'school-treatment-chair',gate:'GATE C',gateResult:'PASS_PENDING_USER_REVIEW_FOR_ADMISSION',verifiedForSlice:false,caveat:'Treatment chair is PASS_PENDING_USER_REVIEW_FOR_ADMISSION. Visual use is provisional pending user review.'})});
 function deepFreeze(v){if(v&&typeof v==='object'){for(const k of Object.keys(v))deepFreeze(v[k]);Object.freeze(v)}return v}
 function entityView(e){return {entityId:e.entityId,entityTypeId:e.entityTypeId,revision:e.revision,lifecycleState:e.lifecycleState,transform:structuredClone(e.transform),physicalBodyRef:structuredClone(e.physicalBodyRef),geometrySourceRef:structuredClone(e.geometrySourceRef),postureStateId:e.postureStateId,participatesIn:structuredClone(e.participatesIn||[]),physicalState:structuredClone(e.physicalState)}}
-function buildVisualSceneDescriptor(){
- const r=instantiate(PACKAGE);
+function buildVisualSceneDescriptor(committedResult){
+ // Optional: a caller-supplied COMMITTED instantiate-equivalent result (used by
+ // the Track B demo session to describe a world state advanced through
+ // WorldMutationAPI). Default path is byte-identical to the original behavior.
+ const r=committedResult||instantiate(PACKAGE);
  if(r.status!=='COMMITTED')return deepFreeze({descriptorVersion:'1.0.0',kind:'VISUAL_SCENE_DESCRIPTOR',status:'REJECTED',code:r.code||'INSTANTIATION_NOT_COMMITTED',sourcePackage:{scenePackageId:PACKAGE.scenePackageId,scenePackageDigest:PACKAGE.scenePackageDigest}});
  const s=r.after,entityIds=Object.keys(s.entities).sort();
  const descriptor={descriptorVersion:'1.0.0',kind:'VISUAL_SCENE_DESCRIPTOR',status:'COMMITTED',

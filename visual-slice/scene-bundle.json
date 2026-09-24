@@ -1,10 +1,10 @@
 {
  "bundleVersion": "1.0.0",
  "kind": "TRACK_B_VISUAL_SCENE_BUNDLE",
- "generatedAt": "2026-09-24T05:18:28.428Z",
+ "generatedAt": "2026-09-24T22:33:30.203Z",
  "git": {
   "branch": "candidate5-track-b-visual-slice",
-  "commit": "cc1f87baee05058f1c42603dd19c70390e635b15",
+  "commit": "ebc159aa8d443efd9e798ede7cb10fcf7b584e4a",
   "base": "7cd96d36"
  },
  "banner": {
@@ -28,18 +28,29 @@
   "casualty": {
    "entityId": "school-casualty-adult-v1",
    "gate": "GATE B",
-   "gateResult": "PASS_PENDING_LIFECYCLE_REVIEW",
-   "bodyLifecycle": "AUTHORED_NEW_DRAFT/VALIDATED/AWAITING_USER_GATE_REVIEW",
-   "verifiedForSlice": false,
-   "caveat": "Male casualty body is NOT VERIFIED_FOR_SLICE. Visual use is provisional pending lifecycle review."
+   "gateResult": "VERIFIED_FOR_SLICE",
+   "verifiedForSlice": true,
+   "reviewId": "gate-b-user-review-ee04481",
+   "reviewDecision": "APPROVED_FOR_SLICE",
+   "groundedRecord": "evidence/clean-runtime/gate-a2-admission/exact-review.json",
+   "caveat": "Male casualty body adult-v1 is VERIFIED_FOR_SLICE (reviewId gate-b-user-review-ee04481, APPROVED_FOR_SLICE within its recorded review scope; limitations per the grounded record). Uncertified areas remaining are the Gate D declared unknowns, including visual-physical lineage."
   },
   "chair": {
    "entityId": "school-treatment-chair",
    "gate": "GATE C",
-   "gateResult": "PASS_PENDING_USER_REVIEW_FOR_ADMISSION",
-   "verifiedForSlice": false,
-   "caveat": "Treatment chair is PASS_PENDING_USER_REVIEW_FOR_ADMISSION. Visual use is provisional pending user review."
+   "gateResult": "VERIFIED_FOR_SLICE",
+   "verifiedForSlice": true,
+   "reviewId": "gate-c-user-review-0c27c92",
+   "reviewDecision": "APPROVED_FOR_SLICE",
+   "groundedRecord": "evidence/clean-runtime/gate-c-admission/gate-result.json",
+   "caveat": "Treatment chair is VERIFIED_FOR_SLICE (reviewId gate-c-user-review-0c27c92, APPROVED_FOR_SLICE within its recorded review scope; limitations per the grounded record, including PHYSICAL_ONLY_NO_VISUAL_BINDING)."
   }
+ },
+ "statusCorrection": {
+  "kind": "TRACK_B_LIFECYCLE_STATUS_CORRECTION",
+  "record": "docs/track-b/lifecycle-status-correction.json",
+  "basis": "Track B coordinator current-head review correction (relayed by main), verified against the grounded lifecycle records in this repo. Status-only documentation correction: no canonical bytes, contracts, digests, or certification-candidate changes; anchors unchanged (package 187cf1a4..., world fa1bbaa9..., descriptor 5f6829b7..., raw pin 6e9878bd...).",
+  "hardStop": "docs/clean-runtime-school/gate-b-promotion/lifecycle-digest-hard-stop.md is HISTORICAL RECORD describing the state that led to the A.2 envelope fix - never an active blocker."
  },
  "declaredUnknowns": [
   "panorama-geometry lineage",

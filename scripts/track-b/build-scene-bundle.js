@@ -11,11 +11,21 @@ const fs=require('node:fs'),path=require('node:path'),{execSync}=require('node:c
 function git(cmd){try{return execSync('git '+cmd,{encoding:'utf8'}).trim()}catch{return 'UNKNOWN'}}
 const descriptor=buildVisualSceneDescriptor(),surfaces=buildVisualSurfaceSet(),casualty=buildVisualCasualty(descriptor),equipment=buildVisualEquipment(descriptor);
 const ok=descriptor.status==='COMMITTED'&&surfaces.status==='LINEAGE_EVIDENCED'&&casualty.status==='DIMENSIONED_TO_CERTIFIED_ENVELOPE'&&equipment.status==='DIMENSIONED_TO_CERTIFIED_BODIES';
+
+function c2basis(){return JSON.parse(fs.readFileSync(path.join(__dirname,'../../docs/track-b/lifecycle-status-correction.json'),'utf8')).basis}
+function c2hardStop(){return JSON.parse(fs.readFileSync(path.join(__dirname,'../../docs/track-b/lifecycle-status-correction.json'),'utf8')).hardStop}
 const bundle={bundleVersion:'1.0.0',kind:'TRACK_B_VISUAL_SCENE_BUNDLE',generatedAt:new Date().toISOString(),
  git:{branch:git('rev-parse --abbrev-ref HEAD'),commit:git('rev-parse HEAD'),base:'7cd96d36'},
  banner:{title:'SCHOOL TREATMENT ROOM - VISUAL PREVIEW',warning:'VISUALS ARE NOT CERTIFIED PHYSICS',distinction:'Everything drawn here is a presentation-only projection of certified authoritative state. No physical truth is derived from pixels. Renderer values never feed authoritative state (ED-P2-02 downstream-only).'},
  inputs:{descriptorStatus:descriptor.status,descriptorDigest:descriptor.descriptorDigest,surfaceSetStatus:surfaces.status,surfaceSetDigest:surfaces.setDigest,casualtyStatus:casualty.status,casualtyDigest:casualty.visualDigest,equipmentStatus:equipment.status,equipmentDigest:equipment.visualDigest,sourcePackageDigest:descriptor.sourcePackage.scenePackageDigest,worldStateDigest:descriptor.worldRef.stateDigest},
- statusCaveats:descriptor.statusCaveats,declaredUnknowns:descriptor.declaredUnknowns,boundary:descriptor.boundary,
+ statusCaveats:(()=>{const c=JSON.parse(fs.readFileSync(path.join(__dirname,'../../docs/track-b/lifecycle-status-correction.json'),'utf8'));
+  // STATUS-ONLY overlay (acceptance spec A): the separable lifecycle status
+  // correction rides in bundle status fields + page status text. Engine
+  // builders, anchors and digests stay byte-identical.
+  const mk=k=>({entityId:c[k].entityId,gate:c[k].gate,gateResult:c[k].gateResult,verifiedForSlice:c[k].verifiedForSlice,reviewId:c[k].reviewId,reviewDecision:c[k].reviewDecision,groundedRecord:c[k].groundedRecord,caveat:c[k].caveat});
+  return {casualty:mk('casualty'),chair:mk('chair')}})(),
+ statusCorrection:{kind:'TRACK_B_LIFECYCLE_STATUS_CORRECTION',record:'docs/track-b/lifecycle-status-correction.json',basis:c2basis(),hardStop:c2hardStop()},
+ declaredUnknowns:descriptor.declaredUnknowns,boundary:descriptor.boundary,
  microunitsPerWorldUnit:1000000,
  room:surfaces.surfaces,casualty,equipment,
  camera:{note:'Camera calibration formally belongs in the ScenePackage per the architecture decision; the certified ScenePackage has no camera field and was not modified. These are presentation-only defaults pending a future ScenePackage revision.',positionMicrounits:[4000000,3000000,6000000],lookAtMicrounits:[0,300000,0],fovDegrees:55},

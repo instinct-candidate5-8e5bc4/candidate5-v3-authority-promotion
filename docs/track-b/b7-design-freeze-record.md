@@ -57,3 +57,38 @@ raw-byte pin above.
   MUST diverge and the page MUST show the fail-closed error panel, no scene.
 - SHA-256 shim: known vectors (empty, "abc", 1M x 'a', UTF-8 multibyte,
   chunked updates).
+
+## AMENDMENT 2026-09-24/25 - status-caveat correction, final approach: separable overlay (anchors UNCHANGED)
+
+This replaces the earlier amendment draft, which described changing the
+scene-v2 visual builders in src/ to retire the provisional caveats. That
+in-src approach was SUPERSEDED and was never committed: the coordinator's
+final acceptance spec (relayed by main 2026-09-25 00:00 IDT) requires the
+lifecycle status correction to be a SEPARABLE byte diff confined to
+docs/track-b/*, the scene-bundle statusCaveats/status fields and page
+status text - with NO byte changes under src/clean-runtime/**, evidence/**,
+pins.json or Track A.
+
+Final state:
+- Builders in src/clean-runtime/school/scene-v2/ still emit their original
+  provisional status caveats; their bytes and all anchors are UNCHANGED:
+  package 187cf1a4c0af01ef12087879f44eeb88a355499a860665e29cdb2f5ab0d06aec,
+  world fa1bbaa985a63a8bfa30c2bbd7fbaf14b2c4972d985815a093bdd68f7fe954ea,
+  descriptor 5f6829b7b10bbbc91ff0bd7e66bd5de3c69473091d56af92f8decbc8cbecaa18,
+  casualty visual efe6bd00ebbc4aeb13cf219d3aa1a81258b6b2f6ae2f109eb5f4c44850a535d9,
+  equipment visual e97a9d885f0c431fe36fac51461d330ef20503b72ecbb2f8ca7fc27b8dcb1770,
+  school.json raw pin 6e9878bd1640b2747e8db52237843a8fd75f878e5dc6e162646c4971e85d99c5.
+- The correction record lives in docs/track-b/lifecycle-status-correction.json:
+  casualty adult-v1 VERIFIED_FOR_SLICE (reviewId gate-b-user-review-ee04481,
+  grounded in evidence/clean-runtime/gate-a2-admission/exact-review.json);
+  treatment chair VERIFIED_FOR_SLICE (reviewId gate-c-user-review-0c27c92,
+  grounded in evidence/clean-runtime/gate-c-admission/gate-result.json).
+- scripts/track-b/build-scene-bundle.js overlays the corrected
+  statusCaveats/statusCorrection into visual-slice/scene-bundle.json at
+  build time; the page renders the overlay, not the builder labels.
+- One additive optional parameter on buildVisualSceneDescriptor(committedResult)
+  belongs to the separately authorized C6 demo implementation; the default
+  call path is byte-identical (asserted by tests).
+- tests/clean-runtime-school-scene-v2/c0-lifecycle-status-correction.test.js
+  pins the reviewIds to the grounded evidence files and asserts every anchor
+  above is unchanged.
