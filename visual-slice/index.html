@@ -40,13 +40,13 @@
 </div>
 <div id="rigbar" dir="rtl" style="position:fixed;right:10px;bottom:10px;z-index:6;background:rgba(8,14,18,.85);border:1px solid #2a3f4a;border-radius:8px;padding:8px 10px;color:#cfe3ee;font:13px/1.5 system-ui">
 <b>תאורה בלבד (יום/לילה/חורף) - ללא שינוי גאומטריה או נתונים</b><br>
-<button data-rig="day" data-active="true">יום</button> <button data-rig="night">לילה</button> <button data-rig="winter">חורף</button>
+<button data-rig="day" data-active="true" disabled>יום</button> <button data-rig="night" disabled>לילה</button> <button data-rig="winter" disabled>חורף</button>
 </div>
 <div id="demo" dir="rtl" lang="he">
  <div class="t">הדגמה אינטראקטיבית - העברת התיק דרך WorldMutationAPI ושער הגאומטריה בלבד</div>
- <button id="btnSeat">העברה למושב הכיסא</button>
- <button id="btnLegal">מיקום חוקי: רצפה ליד הכיסא</button>
- <button id="btnWall">ניסיון לא חוקי: בתוך הקיר (x2)</button>
+ <button id="btnSeat" disabled>העברה למושב הכיסא</button>
+ <button id="btnLegal" disabled>מיקום חוקי: רצפה ליד הכיסא</button>
+ <button id="btnWall" disabled>ניסיון לא חוקי: בתוך הקיר (x2)</button>
  <div id="demoOut"></div>
 </div>
 <div id="err"></div>
@@ -143,7 +143,7 @@ const key=new THREE.DirectionalLight(parseInt(bundle.lighting.key.colorHex),bund
 key.shadow.mapSize.set(2048,2048);key.shadow.camera.left=-12;key.shadow.camera.right=12;key.shadow.camera.top=12;key.shadow.camera.bottom=-12;key.shadow.camera.far=40;key.shadow.bias=-.0005;scene.add(key);
 const fill=new THREE.DirectionalLight(parseInt(bundle.lighting.fill.colorHex),bundle.lighting.fill.intensity);fill.position.set(...bundle.lighting.fill.positionMicrounits.map(m));scene.add(fill);
 const ambient=scene.children.find(o=>o.isAmbientLight);
-document.querySelectorAll('#rigbar button').forEach(b=>b.addEventListener('click',()=>applyRig(b.dataset.rig)));
+document.querySelectorAll('#rigbar button').forEach(b=>{b.addEventListener('click',()=>applyRig(b.dataset.rig));b.disabled=false});
 function applyRig(name){const rig=LIGHTING_RIGS[name];if(!rig)return;
  ambient.color.set(parseInt(rig.ambient.colorHex));ambient.intensity=rig.ambient.intensity;
  key.color.set(parseInt(rig.key.colorHex));key.intensity=rig.key.intensity;key.position.set(...rig.key.positionMicrounits.map(m));
@@ -189,6 +189,7 @@ document.getElementById('btnWall').onclick=()=>{
  const run=()=>{const s=ENGINE.createDemoSession();return s.proposeBagPlacement({transactionId:'demo:bag-into-wall:1',positionMicrounits:[0,175000,-3900000],relation:structuredClone(srcRel)})};
  const a=run(),b=run();
  demoOut.innerHTML='נדחה על ידי שער הגאומטריה: <b>'+a.code+'</b>'+(reasonOf(a)?' / '+reasonOf(a):'')+'<br>מצב העולם לא השתנה: <code>'+a.priorStateDigest.slice(0,16)+'&hellip;</code> == <code>'+a.stateDigest.slice(0,16)+'&hellip;</code><br>הרצה חוזרת דטרמיניסטית: '+((a.code===b.code&&a.stateDigest===b.stateDigest&&a.priorStateDigest===b.priorStateDigest)?'תוצאה זהה בביט':'שונתה!')};
+for(const id of['btnSeat','btnLegal','btnWall'])document.getElementById(id).disabled=false; // wired: enable
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;frameForViewport();renderer.setSize(innerWidth,innerHeight)});
 // FPS meter: real-hardware measurement surface for B6 (no emulated numbers are reported anywhere)
 let frames=0,t0=performance.now();const fpsEl=document.createElement('span');fpsEl.id='fps';document.getElementById('meta').appendChild(fpsEl);
