@@ -14,6 +14,9 @@ on:
     branches: ['p3-scratch-*']
 permissions: {}
 env:
+  # #15 (run-14 verdict): importing the shared fetch_locked helper must never write
+  # __pycache__ into the frozen checkout; pairs with the end-of-job immutability gate.
+  PYTHONDONTWRITEBYTECODE: "1"
   PREFIX: NON_CERTIFYING_SCRATCH
   # peer adjudication (1): per-workflow singleton allowlist; scripts fail closed on mismatch.
   ALLOWED_PREFIX: NON_CERTIFYING_SCRATCH
@@ -884,6 +887,18 @@ jobs:
           retention-days: 90
           if-no-files-found: error
 
+      - name: checkout immutability gate (end of job, frozen SHA)
+        if: "!cancelled()"
+        run: |
+          set -euo pipefail
+          dirty=$(git status --porcelain)
+          if [ -n "$dirty" ]; then
+            echo "E_CHECKOUT_MUTATED frozen checkout changed during the job:"
+            printf '%s\n' "$dirty"
+            exit 97
+          fi
+          echo "checkout immutability OK: no writes under the frozen SHA"
+
   # Reviewer condition 4: reproduce once in a SECOND FRESH ENVIRONMENT (separate runner)
   # at the same canonical in-container path /build with identical pinned inputs. The FD
   # hash must equal the first runner's. The Build tree is kept and every module's
@@ -1131,3 +1146,14 @@ jobs:
           path: *env2_evidence_upload_paths
           retention-days: 90
           if-no-files-found: error
+      - name: env2 checkout immutability gate (end of job, frozen SHA)
+        if: "!cancelled()"
+        run: |
+          set -euo pipefail
+          dirty=$(git status --porcelain)
+          if [ -n "$dirty" ]; then
+            echo "E_CHECKOUT_MUTATED frozen checkout changed during the job:"
+            printf '%s\n' "$dirty"
+            exit 97
+          fi
+          echo "checkout immutability OK: no writes under the frozen SHA"

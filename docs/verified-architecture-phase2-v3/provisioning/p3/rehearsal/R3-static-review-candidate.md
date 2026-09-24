@@ -1171,3 +1171,30 @@ MINOR-2. urlopen redirects: integrity unaffected (bytes are lock-pinned), but th
 Local suite for the revision: F6 cases 0-4 (import path, transient-recover,
     wrong-sha first-attempt, 404 immediate, exhausted) + redirect + injector
     precondition + wrapper trap behavior - all green pre-commit.
+
+RUN-14 VERDICT FIXES + PEER S1-S4 CONDITIONS (#15, adopted via main 2026-09-24):
+S1. fetch_locked.py to mode 100755 (it also runs as a CLI); the checker's mode rule
+    is UNCHANGED. Local negative: chmod -x -> E_EXEC_BIT "not -x" rc=30.
+S2. E_PYTHON_IMPORTS resolved NARROWLY: preflight-check.py keeps PY_ALLOW as pure
+    stdlib; exactly one NAMED allowance - module "fetch_locked" (the reviewed local
+    helper, this directory, exec-pinned, stdlib-only itself) ONLY inside
+    stage-platform.sh heredocs. No wildcard, no other file, no other module. The
+    lockgen index loops live in workflow YAML (outside this scan), covered at
+    runtime by the staging import smokes + F6 case 0. Negatives: an unlisted
+    third-party import in a planted .py -> E_PYTHON_IMPORTS rc=30; a fetch_locked
+    import in a planted DIFFERENT .sh heredoc -> E_PYTHON_IMPORTS rc=30 (the
+    allowance does not leak). The checker's before/after diff is in the #15 packet.
+S3. preflight-check.py run LOCALLY against a REAL locally-staged tree (the full
+    stage-platform.sh run - 147 debs + pristine VARS + edk2 edc66812 + 9
+    submodules, all through the fetch_locked helper, every hash verified):
+    {"errors": [], "lane": "NON_CERTIFYING_REHEARSAL", "result": "PASS",
+     "schema": "NON_CERTIFYING_REHEARSAL-preflight/v1"} rc=0.
+S4. PYTHONDONTWRITEBYTECODE=1 set in the top-level env of all three lane workflows
+    (covers every job incl. future ones; job-level equivalent). New end-of-job
+    "checkout immutability gate (frozen SHA)" in rehearsal, rehearsal-env2,
+    certification and certification-env2 (scratch inherits via derive):
+    if: "!cancelled()", dirty `git status --porcelain` -> E_CHECKOUT_MUTATED exit
+    97. The certification-marker job is EXCLUDED deliberately: it has no
+    actions/checkout step, so there is no checkout to immutabilize (disclosed).
+    Step names carry no lane-token, so the 6e6 occurrence pins (44/78) are
+    untouched. Step placement: last step of each covered job.

@@ -392,6 +392,14 @@ for _p in _sh_files:
         if _re3.search(r"<<\s*['\"]?PY",_ln): _on=True; _body=[]; continue
         if _on and _ln in ("PY","PYEOF"):
             _bad=_py_mods("\n".join(_body))-PY_ALLOW
+            # #15 S2 (peer condition, run-14 verdict): NARROW named allowance - exactly
+            # the reviewed local fetch helper module "fetch_locked" (this directory,
+            # exec-bit pinned, stdlib-only itself), ONLY inside stage-platform.sh
+            # heredocs. No wildcard, no other file, no other module. The lockgen index
+            # loops live in the workflow YAML (outside this scan) and are covered by
+            # the staging import smoke + F6 case 0 at runtime.
+            if os.path.basename(_p)=="stage-platform.sh":
+                _bad-={"fetch_locked"}
             if _bad: fail("E_PYTHON_IMPORTS",_p+" heredoc "+",".join(sorted(_bad)))
             _on=False; continue
         if _on: _body.append(_ln)
