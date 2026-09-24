@@ -682,13 +682,23 @@ BLOCK_BYTECODE_GUARD_NEG = r'''      - name: NON_CERTIFYING_SCRATCH planted-faul
               print(open(sys.argv[1], errors="replace").read())
               sys.exit(90)
           errs = rep.get("errors")
-          ok = (isinstance(errs, list) and len(errs) == 1
-                and errs[0][0] == "E_BYTECODE_GUARD" and "zz_bytecode_probe.py" in str(errs[0][1]))
+          def _named(e, code):
+              return (isinstance(e, list) and len(e) == 2 and e[0] == code
+                      and "zz_bytecode_probe.py" in str(e[1]))
+          bg = [e for e in (errs or []) if _named(e, "E_BYTECODE_GUARD")]
+          pi = [e for e in (errs or []) if _named(e, "E_PYTHON_IMPORTS")]
+          pim = str(pi[0][1]) if pi else ""
+          # peer run-36004747396 ruling D2: BOTH guards correctly fire on the probe - the
+          # exact set is a PAIR, each naming zz_bytecode_probe.py, the imports entry with
+          # module set exactly {lane_resolve}. Any other code, extra entry, or non-probe
+          # attribution fails this gate.
+          ok = (isinstance(errs, list) and len(errs) == 2 and len(bg) == 1 and len(pi) == 1
+                and "," not in pim and pim.split()[-1:] == ["lane_resolve"])
           if not ok:
-              print("E_H5_PLANTED_ERRSET_MISMATCH errors=%r (want exactly {E_BYTECODE_GUARD naming zz_bytecode_probe.py})" % (errs,))
+              print("E_H5_PLANTED_ERRSET_MISMATCH errors=%r (want exactly {E_BYTECODE_GUARD naming zz_bytecode_probe.py, E_PYTHON_IMPORTS naming zz_bytecode_probe.py module set exactly {lane_resolve}})" % (errs,))
               print(json.dumps(rep, indent=1, sort_keys=True))
               sys.exit(90)
-          print("planted error set exactly {E_BYTECODE_GUARD naming zz_bytecode_probe.py}")
+          print("planted error set exactly {E_BYTECODE_GUARD + E_PYTHON_IMPORTS{lane_resolve}} both naming zz_bytecode_probe.py")
           PYT
           # (c) probe removed; the post-clean run must pass clean, else NAMED with JSON printed.
           _rc=0

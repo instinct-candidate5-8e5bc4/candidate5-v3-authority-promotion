@@ -9,18 +9,42 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 WF = os.path.normpath(os.path.join(HERE, "..", "..", "..", "..", "..", ".github", "workflows", "NON_CERTIFYING_REHEARSAL-workflow.yml"))
 SRC = open(WF).read()
 
-def extract(tag, argv_line):
-    i = SRC.index(argv_line)
-    j = SRC.index("\n          " + tag + "\n", i)
-    body = SRC[i + len(argv_line):j]
-    lines = [l[10:] if l.startswith("          ") else l for l in body.splitlines()]
-    return "\n".join(lines) + "\n"
+# peer run-36004747396 ruling (C1''''' item 4): bodies are extracted with the SAME
+# bash-rule parser the E_HEREDOC_STRUCTURE gate uses (heredoc_parse.py) - never marker
+# search (marker search extracted the swallowed PYK2F block and could not see the step-19
+# defect). sys.dont_write_bytecode BEFORE the sibling import (preflight check 6j).
+sys.dont_write_bytecode = True
+from heredoc_parse import iter_run_blocks, parse_heredocs, is_python
+
+def _find(tag, block, top):
+    closed, unclosed = parse_heredocs(block)
+    if top and unclosed:
+        raise SystemExit("unclosed heredoc in workflow (E_HEREDOC_STRUCTURE territory): %r" % (unclosed,))
+    for h in closed:
+        if h["tag"] == tag:
+            return "\n".join(l for _, l in h["body"]) + "\n"
+    # nested-generation heredocs: a shell body (e.g. the sudo/unshare CFIX/CSIGN scripts)
+    # is itself a bash script whose own heredocs bash parses at runtime - descend. Python
+    # bodies are data (and the 6l gate guarantees they contain no opener lines).
+    for h in closed:
+        if not is_python(h):
+            r = _find(tag, h["body"], False)
+            if r is not None:
+                return r
+    return None
+
+def extract(tag):
+    for _rk, blk in iter_run_blocks(SRC):
+        r = _find(tag, blk, True)
+        if r is not None:
+            return r
+    raise KeyError(tag)
 
 SWEEPS = {
-    "PYK2-fixture": extract("PYK2", "python3 - \"$F\" <<'PYK2'"),
-    "PYK2C-csign": extract("PYK2C", "python3 - <<'PYK2C'"),
-    "PYK2F-postcopy": extract("PYK2F", "python3 - <<'PYK2F'"),
-    "PYK-zerokkey": extract("PYK", "python3 - /tmp/$PREFIX-k2-paths.txt <<'PYK'"),
+    "PYK2-fixture": extract("PYK2"),
+    "PYK2C-csign": extract("PYK2C"),
+    "PYK2F-postcopy": extract("PYK2F"),
+    "PYK-zerokkey": extract("PYK"),
 }
 
 def run(name, code, argv, cwd):

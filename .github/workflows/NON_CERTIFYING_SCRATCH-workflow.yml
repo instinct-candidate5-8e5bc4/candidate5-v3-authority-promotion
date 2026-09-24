@@ -69,7 +69,7 @@ jobs:
           # D2 gate (reviewer ruling): every relative file/script argument used by later
           # steps must exist in the committed tree. Fixed list, fail-closed exit 88.
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
-          for f in             platform.lock.json             config.json             stage-platform.sh             make-shims.sh             test-c-sign-confinement.py             test-enroll-predicate-env.py             test-cert-positive-guard.py             test-k2-sweeps.py             test-stale-state-committed.py             preflight-check.py             build-ovmf-debug.sh             scan-pe-pdb-paths.py             build-enroll-app.sh             bwrap-argv.sh             enroll-predicate-check.py             rehearsal-enroll.sh             ../build-esp-image.sh             evidence/successor-signed.efi             run-ceremony.sh             qemu-smoke.sh; do
+          for f in             platform.lock.json             config.json             stage-platform.sh             make-shims.sh             test-c-sign-confinement.py             test-enroll-predicate-env.py             test-cert-positive-guard.py             test-k2-sweeps.py             test-stale-state-committed.py             test-heredoc-structure.py             test-h5-planted-errset.py             preflight-check.py             build-ovmf-debug.sh             scan-pe-pdb-paths.py             build-enroll-app.sh             bwrap-argv.sh             enroll-predicate-check.py             rehearsal-enroll.sh             ../build-esp-image.sh             evidence/successor-signed.efi             run-ceremony.sh             qemu-smoke.sh; do
             [ -e "$f" ] || { echo "E_WORKFLOW_ARG_MISSING $f"; exit 88; }
           done
       - name: NON_CERTIFYING_SCRATCH host inputs declared (B3)
@@ -244,6 +244,8 @@ jobs:
           python3 test-cert-positive-guard.py 2>&1 | tee /tmp/$PREFIX-out/$PREFIX-certpos-guard-negtests.log
           python3 test-k2-sweeps.py 2>&1 | tee /tmp/$PREFIX-out/$PREFIX-k2-sweeps-negtests.log
           python3 test-stale-state-committed.py 2>&1 | tee /tmp/$PREFIX-out/$PREFIX-stale-state-negtests.log
+          python3 test-heredoc-structure.py 2>&1 | tee /tmp/$PREFIX-out/$PREFIX-heredoc-structure-negtests.log
+          python3 test-h5-planted-errset.py 2>&1 | tee /tmp/$PREFIX-out/$PREFIX-h5-planted-errset-tests.log
 
       - name: NON_CERTIFYING_SCRATCH reproducible OVMF DEBUG dual build + accepted-firmware pins
         timeout-minutes: 150
@@ -541,6 +543,7 @@ jobs:
                         capture_output=True, text=True, cwd=fx, check=True).stdout
           open(fx + "/FIXTURE-SHASUMS", "w").write(shas)
           print("GENERATION-RECORD.json + FIXTURE-SHASUMS written; H/W/T/owner all distinct")
+          PREC
           # K2 over the checkout build-output tree after fixture copy-out (peer
           # 2026-09-24 BLOCKING 2): fixtures are public-only; no key-named file,
           # no private-key content may exist anywhere under build-output.
@@ -566,7 +569,6 @@ jobs:
               print("E_K2_SWEEP_EMPTY rehearsal/build-output"); sys.exit(95)
           print("K2 build-output sweep clean (post fixture copy-out, scanned=%d)" % scanned)
           PYK2F
-          PREC
       - name: zero-private-key evidence gate K2 before firmware-hash upload (peer run-12 K4)
         id: k2gate-fw
         if: '!cancelled()'
@@ -1157,13 +1159,23 @@ jobs:
               print(open(sys.argv[1], errors="replace").read())
               sys.exit(90)
           errs = rep.get("errors")
-          ok = (isinstance(errs, list) and len(errs) == 1
-                and errs[0][0] == "E_BYTECODE_GUARD" and "zz_bytecode_probe.py" in str(errs[0][1]))
+          def _named(e, code):
+              return (isinstance(e, list) and len(e) == 2 and e[0] == code
+                      and "zz_bytecode_probe.py" in str(e[1]))
+          bg = [e for e in (errs or []) if _named(e, "E_BYTECODE_GUARD")]
+          pi = [e for e in (errs or []) if _named(e, "E_PYTHON_IMPORTS")]
+          pim = str(pi[0][1]) if pi else ""
+          # peer run-36004747396 ruling D2: BOTH guards correctly fire on the probe - the
+          # exact set is a PAIR, each naming zz_bytecode_probe.py, the imports entry with
+          # module set exactly {lane_resolve}. Any other code, extra entry, or non-probe
+          # attribution fails this gate.
+          ok = (isinstance(errs, list) and len(errs) == 2 and len(bg) == 1 and len(pi) == 1
+                and "," not in pim and pim.split()[-1:] == ["lane_resolve"])
           if not ok:
-              print("E_H5_PLANTED_ERRSET_MISMATCH errors=%r (want exactly {E_BYTECODE_GUARD naming zz_bytecode_probe.py})" % (errs,))
+              print("E_H5_PLANTED_ERRSET_MISMATCH errors=%r (want exactly {E_BYTECODE_GUARD naming zz_bytecode_probe.py, E_PYTHON_IMPORTS naming zz_bytecode_probe.py module set exactly {lane_resolve}})" % (errs,))
               print(json.dumps(rep, indent=1, sort_keys=True))
               sys.exit(90)
-          print("planted error set exactly {E_BYTECODE_GUARD naming zz_bytecode_probe.py}")
+          print("planted error set exactly {E_BYTECODE_GUARD + E_PYTHON_IMPORTS{lane_resolve}} both naming zz_bytecode_probe.py")
           PYT
           # (c) probe removed; the post-clean run must pass clean, else NAMED with JSON printed.
           _rc=0

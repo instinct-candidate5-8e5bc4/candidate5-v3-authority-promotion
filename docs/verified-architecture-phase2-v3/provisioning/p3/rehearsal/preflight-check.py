@@ -651,6 +651,12 @@ for _p in _py_files:
     # ONLY in its two committed consumers. No wildcard, no other file, no other module.
     if os.path.basename(_p) in ("rehearsal-harness.py","preflight-check.py"):
         _bad-={"lane_resolve"}
+    # peer run-36004747396 ruling (C1''''' items 2+4): NARROW named allowance - exactly
+    # the reviewed bash-rule heredoc parser module "heredoc_parse" (this directory,
+    # stdlib-only, no sibling imports), ONLY in the E_HEREDOC_STRUCTURE gate and its two
+    # committed test/extraction consumers. No wildcard, no other file, no other module.
+    if os.path.basename(_p) in ("preflight-check.py","test-k2-sweeps.py","test-heredoc-structure.py"):
+        _bad-={"heredoc_parse"}
     # #18 (same shape): derive-scratch.py's REAL imports are re+sys; the generator embeds
     # the workflow step TEXT it injects, whose fetch-test heredoc carries an
     # "import http.server" line (stdlib, executed by the CI runner inside the step, never
@@ -710,6 +716,30 @@ for _f in sorted(os.listdir(here)):
 for _c in cfg.get("cases",[]):
     if _c["firmware"]!="build-output/ovmf-debug/OVMF_CODE.fd" and _c["expect"].get("kernel_exec") is not True:
         fail("E_CASE_BOOT_TARGET_UNPROVABLE",_c["id"]+" non-debug firmware without expect.kernel_exec=true")
+
+# 6l) peer run-36004747396 ruling (C1''''' item 2): E_HEREDOC_STRUCTURE over EVERY
+# workflow (including certification). Bash-rule heredoc parse of every run block via
+# heredoc_parse.py (the single source of truth shared with the test suites): every opener
+# must close inside the same step; every python heredoc body must py_compile; no python
+# body line may itself open a heredoc (the run-36004747396 step-19 shape: PREC swallowing
+# the python3 - <<'PYK2F' line). Committed planted negatives: test-heredoc-structure.py.
+import heredoc_parse as _hp
+for _fn in sorted(os.listdir(wf_dir)):
+    if not _fn.endswith((".yml",".yaml")): continue
+    _wt=open(os.path.join(wf_dir,_fn),errors="replace").read()
+    for _rk,_blk in _hp.iter_run_blocks(_wt):
+        _closed,_unclosed=_hp.parse_heredocs(_blk)
+        for _u in _unclosed:
+            fail("E_HEREDOC_STRUCTURE","%s:%d heredoc <<'%s' never closes inside its step"%(_fn,_u["opener_lineno"],_u["tag"]))
+        for _h in _closed:
+            if not _hp.is_python(_h): continue
+            for _ln,_l in _h["body"]:
+                if _hp.BODY_OPENER_RE.search(_l):
+                    fail("E_HEREDOC_STRUCTURE","%s:%d python heredoc <<'%s' body line itself opens a heredoc: %s"%(_fn,_ln,_h["tag"],_l.strip()[:80]))
+            try:
+                compile(_hp.body_text(_h),"%s:<<'%s'>"%(_fn,_h["tag"]),"exec")
+            except SyntaxError as _se:
+                fail("E_HEREDOC_STRUCTURE","%s:%d python heredoc <<'%s' body fails py_compile: %s"%(_fn,_h["opener_lineno"],_h["tag"],_se))
 
 # 7) KVM requirement is declarative here; runtime fail-closed check lives in the workflow
 report={"schema":"NON_CERTIFYING_REHEARSAL-preflight/v1","lane":PREFIX,"errors":E,

@@ -3,13 +3,13 @@
   "assets": [
     {
       "path": ".github/workflows/NON_CERTIFYING_REHEARSAL-workflow.yml",
-      "sha256": "306ebfd8081e044178a43e7fa39909ca447037e08b31d790d3c9d660402aba1e",
-      "bytes": 72021
+      "sha256": "1bab3bcd33ea72ccd2545553df40e0f8812e98c6dbf2f1d4461cd0160f67be6e",
+      "bytes": 72316
     },
     {
       "path": ".github/workflows/NON_CERTIFYING_SCRATCH-workflow.yml",
-      "sha256": "7c578c7254e851e16e45b7aec45ed595986dcddcb9aebe51951cd1bc3663586e",
-      "bytes": 119944
+      "sha256": "2b6e8fff3bce58dee593994e923161b7549e5155792a04e02f02bb91d0cc4b07",
+      "bytes": 121039
     },
     {
       "path": ".github/workflows/OVMF_CI_SECURE_BOOT_UKI-CERTIFICATION-workflow.yml",
@@ -43,8 +43,8 @@
     },
     {
       "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/R3-static-review-candidate.md",
-      "sha256": "d6494b17387d5563d94f3300765320a9143cc43ea647dcdc7863a6c4f5f10107",
-      "bytes": 157140
+      "sha256": "4532b7fe1be6bf7a73dc6f7e5686493e2025479692bd05c8c348978ac039e1f7",
+      "bytes": 163049
     },
     {
       "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/UKI-13309697-ROOT-CAUSE.md",
@@ -88,8 +88,8 @@
     },
     {
       "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/derive-scratch.py",
-      "sha256": "9ca1c29bc6c62345fb5cc08b5203c08a36897b639fd7d4d760133fcb6dde7eb3",
-      "bytes": 57272
+      "sha256": "288ac12344ba4d420888aa8f01620f08a13ac3b7f7148a451f8af1bccfbac559",
+      "bytes": 58072
     },
     {
       "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/enroll-app.c",
@@ -115,6 +115,11 @@
       "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/evidence/successor-signed.efi",
       "sha256": "133096976ee70a8c272cbcc8c28d369bfc65d93d994cbff4174b947df00239d1",
       "bytes": 21166416
+    },
+    {
+      "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/heredoc_parse.py",
+      "sha256": "de193cead21dd89721ba7cf8d4f467de62dc167b0185377a281c0cf476737a7c",
+      "bytes": 3120
     },
     {
       "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/lane_resolve.py",
@@ -143,8 +148,8 @@
     },
     {
       "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/preflight-check.py",
-      "sha256": "cf16cc9c6c02507db1db96cedc7ee5d9f0c5f16a9310a5ff0304aa9110cc275c",
-      "bytes": 46858
+      "sha256": "bad8b19bef267055e026107c34341d7e2ca345746c45032ac707847a42130cd2",
+      "bytes": 48892
     },
     {
       "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/rehearsal-enroll.sh",
@@ -187,9 +192,19 @@
       "bytes": 2565
     },
     {
+      "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/test-h5-planted-errset.py",
+      "sha256": "895cc5f3e6fcf43a61f5409934c75073ee0a410d443b012294ab8dc6e78669ca",
+      "bytes": 3125
+    },
+    {
+      "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/test-heredoc-structure.py",
+      "sha256": "21e4500e59c8aadc4947c42ae1c06f7c8235ed6870902885f3a01c1233b55bbe",
+      "bytes": 3127
+    },
+    {
       "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/test-k2-sweeps.py",
-      "sha256": "3eb54df2f62dbc67974e05615b184cd13ca05ff6f02ebce19f431b707fe0696a",
-      "bytes": 6271
+      "sha256": "73d31b9b4997fdc5a25c5a4f8c741afe880e34206534a138ee2b3aa2a5455178",
+      "bytes": 7236
     },
     {
       "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/test-stale-state-committed.py",
@@ -271,7 +286,7 @@
   "enrollment_predicates": "Requirement 5a/5b resolved pre-run as frozen predicates checked in-ceremony by enroll-predicate-check.py (E_ENROLL_*/E_TRUST_*, exit 92): SetupMode==0 && SecureBoot==1, EFI_SUCCESS, BS|RT attributes only; PK/KEK exactly one X509 ESL entry each (owner c501e570-0de0-0001-0000-000000000000, run throwaway DER); sole db exactly the production cert; widened db exactly production+hostile fixture; dbx/dbt/*Default absent; stored data byte-equals the enrolled ESL payloads; per-case VARS byte-equal the run's post-enrollment template (harness allowlist + byte-identity). Post-run VARS image hashes are observational evidence, not pre-frozen expectations. C1' route (ii): the hostile and wrong-signer DER hashes are supplied in-run via C5_HOSTILE_CERT_SHA256 / C5_WRONG_SIGNER_CERT_SHA256 from the per-run GENERATION-RECORD.json (R3 section 15e); the HOSTILE_CERT constant is deleted from enroll-predicate-check.py.",
   "ephemeral": "Throwaway PK/KEK private keys are generated per run inside the prep dir and plain-deleted by run-ceremony.sh (trap EXIT) the moment the enrollment window closes; they are never logged, uploaded or published. The enrolled VARS templates and the enroll FAT images are uploaded as ephemeral public CI artifacts (batch1r3 C7 correction: they are public run data, not secrets). Negative-control fixture keys are generated IN-RUN per ceremony (route (ii), R3 section 15), network-off under /tmp/$PREFIX-*, shredded end-of-step; the historical 2026-09-22 A4 fixture keys were plain-deleted after that regeneration, and the historical fixture BYTES were deleted from the tree in C1' after the 2026-09-24 C2 byte-loss event (R3 section 15d).",
   "manifest": "NON_CERTIFYING_REHEARSAL A3 publication manifest",
-  "manifest_self_declaration": "This manifest is one of the 36 paths in the C1'''' candidate commit's name-status vs 5f71b13478c5e8c317950703922dcfe3f33ebc7a (14 added, 17 modified, 5 deleted; C1'''' itself is a 9-path delta on its parent 27bfd5c3). It is deliberately EXCLUDED from the assets list above (which enumerates the other 45 review-relevant files, including unchanged continuity pins) because its own hash cannot be recorded inside itself; verify it via the commit tree (git ls-tree) instead.",
+  "manifest_self_declaration": "This manifest is one of the 39 paths in the C1''''' candidate commit's name-status vs 5f71b13478c5e8c317950703922dcfe3f33ebc7a (17 added, 17 modified, 5 deleted; C1''''' itself is a 9-path delta on its parent c839727e72c2c99296eeec41061251008018044a). It is deliberately EXCLUDED from the assets list above (which enumerates the other 48 review-relevant files, including unchanged continuity pins) because its own hash cannot be recorded inside itself; verify it via the commit tree (git ls-tree) instead.",
   "uki_source_commit": "92741cbdefaa78adc33bc3c74935a45f9558b88c",
   "version": "10+C1prime",
   "workflow_placement": "Both workflows live exactly once at .github/workflows/ on this commit (push-triggered; exact ref filters p3-rehearsal-3 / p3-rehearsal-4 for the rehearsal, p3-certification for the certification workflow; no wildcards, no other events). No docs/ copies; no default-branch write; no workflow_dispatch. p3-certification must not exist before STATIC ACCEPT; the certification run pushes the already-accepted SHA once."
