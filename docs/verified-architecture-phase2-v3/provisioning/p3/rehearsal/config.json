@@ -111,7 +111,7 @@
    },
    "firmware": "/tmp/NON_CERTIFYING_REHEARSAL-stage/root/usr/share/OVMF/OVMF_CODE_4M.secboot.fd",
    "id": "NON_CERTIFYING_REHEARSAL-R7-release-sibling-behavior-only",
-   "lanes": ["scratch", "rehearsal", "certification"],
+   "lanes": ["certification"],
    "settle_seconds": 45,
    "vars_template": "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-enroll-sole/vars-enrolled.fd"
   },

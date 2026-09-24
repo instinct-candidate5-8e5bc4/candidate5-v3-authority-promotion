@@ -855,6 +855,62 @@ for _f in sorted(os.listdir(here)):
                 fail("E_ENV_CONTRACT_UNWIRED",
                      "%s:%d reads %s with no committed export/assignment in rehearsal/p3 .sh or workflow"%(_f,_i,_v))
 
+# 6p) peer run-36024634796 ruling (c): NO scratch/rehearsal case may target the historical
+# ESP (build-output/esp/c5-root-admitter-uki-v3-esp.raw) while expecting kernel_exec=true.
+# That ESP carries the historical signed UKI 13309697, whose embedded Authenticode digest
+# does not match EDK2's computed digest (#19' root cause): NO correct Secure Boot firmware
+# can run it, so a positive boot expectation against it is stale by construction (R7's was -
+# superseded, R3 section 26). R1 keeps the same ESP with kernel_exec=false (reject
+# control). The certification lane is exempt here: R7 stays certification-only until
+# signed-slot item (g) retargets it. Planted negative: test-hist-esp-guard.py.
+_HIST_ESP="build-output/esp/c5-root-admitter-uki-v3-esp.raw"
+for _c in cfg.get("cases",[]):
+    if _c.get("esp")==_HIST_ESP and _c.get("expect",{}).get("kernel_exec") is True and set(_c.get("lanes",[]))&{"scratch","rehearsal"}:
+        fail("E_HIST_ESP_BOOT_EXPECT", _c.get("id","?")+" expects kernel_exec=true on the historical ESP "+_HIST_ESP+" in lanes "+repr(_c.get("lanes"))+" (stale positive - #19' root cause, R3 section 26)")
+
+# 6q) peer run-36024634796 ruling (d)+(e): E_WORKDIR_SIBLING_MISSING - every step that
+# copies .py files into a workdir must copy the FULL transitive sibling-import closure of
+# those files (run 36024634796 D2: the H3 negative copied rehearsal-harness.py +
+# lane_resolve.py but not config_schema.py; the injected harness died ModuleNotFoundError
+# and surfaced only as E_H3_CASES_MISSING). Scanned: derive-scratch.py and the two lane
+# workflows. A copy group is a maximal run of 'cp NAME.py ...' lines (blank/comment lines
+# do not break a run); sibling detection mirrors 6j (E_BYTECODE_GUARD): 'import X' /
+# 'from X import' with X.py present in this directory. Planted negative:
+# test-workdir-sibling.py (removes config_schema.py from the H3 copy).
+import re as _re_ws
+_WS_SCAN=(os.path.join(here,"derive-scratch.py"),
+          os.path.join(here,"../../../../../.github/workflows/NON_CERTIFYING_REHEARSAL-workflow.yml"),
+          os.path.join(here,"../../../../../.github/workflows/NON_CERTIFYING_SCRATCH-workflow.yml"))
+for _wsf in _WS_SCAN:
+    if not os.path.isfile(_wsf): fail("E_WORKDIR_SIBLING_MISSING","scan target missing: "+_wsf)
+    _wsgroups=[]; _wscur=None
+    for _wsln in open(_wsf,errors="replace").read().splitlines():
+        _wsm=_re_ws.match(r"\s*cp\s+([A-Za-z0-9_-]+\.py)\s+\S",_wsln)
+        if _wsm:
+            if _wscur is None: _wscur=[]
+            _wscur.append(_wsm.group(1))
+        elif _wsln.strip()=="" or _wsln.strip().startswith("#"):
+            continue
+        else:
+            if _wscur: _wsgroups.append(_wscur); _wscur=None
+    if _wscur: _wsgroups.append(_wscur)
+    for _wsg in _wsgroups:
+        _wscopied=set(_n[:-3] for _n in _wsg)   # module-name space, matching the closure
+        for _wsname in _wsg:
+            if not os.path.isfile(os.path.join(here,_wsname)): continue
+            _wsclosure=set(); _wsstack=[_wsname[:-3]]
+            while _wsstack:
+                _wsmod=_wsstack.pop()
+                for _wsml in open(os.path.join(here,_wsmod+".py"),errors="replace").read().splitlines():
+                    _wsim=_re_ws.match(r"\s*(?:from|import)\s+([A-Za-z_][A-Za-z0-9_]*)",_wsml)
+                    if _wsim and os.path.isfile(os.path.join(here,_wsim.group(1)+".py")):
+                        _wssib=_wsim.group(1)
+                        if _wssib not in _wsclosure and _wssib!=_wsname[:-3]:
+                            _wsclosure.add(_wssib); _wsstack.append(_wssib)
+            _wsmissing=_wsclosure-_wscopied
+            if _wsmissing:
+                fail("E_WORKDIR_SIBLING_MISSING","%s copies %s without sibling module(s) %s (full transitive closure required)"%(_wsf,_wsname,", ".join(sorted(s+".py" for s in _wsmissing))))
+
 # 7) KVM requirement is declarative here; runtime fail-closed check lives in the workflow
 report={"schema":"NON_CERTIFYING_REHEARSAL-preflight/v1","lane":PREFIX,"errors":E,
         "heredoc_coverage":_heredoc_coverage,

@@ -277,9 +277,26 @@ def run_case(cfg, case, idx):
     checks["vars_template_enroll_tie"]= True   # proven pre-guest by the F6 fatal gate above
     checks["pre_parse_trust_predicate"]= trust_ok
     if exp.get("no_reject_strings"): checks["no_reject_strings"]=(len(rejects_found)==0)
+    # peer run-36024634796 amendment (2): per-case VARS provenance in the harness
+    # evidence. Rehearsal-lane templates are produced by rehearsal-enroll.sh, whose pinned
+    # FW boots the enrollment under $BUILD/ovmf_code_debug (the reproducible DEBUG build;
+    # sha256 = config firmware_debug_sha256). Cross-build VARS reuse (debug-produced store
+    # consumed by the distro RELEASE firmware) is INTENDED - R3 section 26. In the
+    # certification lane the vars come from the certification ceremony enrollment; that
+    # ceremony's own evidence records their provenance - this harness makes no claim there.
+    if os.environ.get("CERTIFICATION_TARGET","")=="1":
+        _vars_prov={"template":case["vars_template"],"enrollment":os.path.basename(os.path.dirname(case["vars_template"])),
+                    "produced_by":"certification-ceremony enrollment (provenance recorded by the certification ceremony evidence, not by this harness)",
+                    "producer_fw_pin":None,"producer_fw_sha256":None}
+    else:
+        _vars_prov={"template":case["vars_template"],"enrollment":os.path.basename(os.path.dirname(case["vars_template"])),
+                    "produced_by":"rehearsal-enroll.sh",
+                    "producer_fw_pin":"$BUILD/ovmf_code_debug",
+                    "producer_fw_sha256":cfg["firmware_debug_sha256"]}
     det={"case":cid,"boot_target":boot_ev,
          "argv_sha256":hashlib.sha256("\0".join(argv).encode()).hexdigest(),
          "vars_template":case["vars_template"],
+         "vars_provenance":_vars_prov,
          "esp_sha256":sha(case["esp"]),
          "firmware_sha256":sha(case["firmware"]),
          "disk_free_margin_bytes":DISK_MARGIN,
@@ -327,6 +344,15 @@ if __name__=="__main__":
         if len(_sel)!=6 or frozenset(c["id"] for c in _sel)!=_CERT_IDS:
             fail("E_CERT_CASE_SET","certification lane cases=%s != frozen six"%sorted(c.get("id","?") for c in _sel))
         cfg["cases"]=_sel
+    else:
+        # peer run-36024634796 ruling (a): lanes drive case selection in the
+        # non-certification lanes too. R7 is certification-only (its positive expectation
+        # on the historical ESP is stale, superseded by the #19' root cause - R3 section
+        # 26); the scratch/rehearsal lanes run exactly the cases whose lanes name them.
+        _lane={"NON_CERTIFYING_REHEARSAL":"rehearsal","NON_CERTIFYING_SCRATCH":"scratch"}.get(PREFIX)
+        if _lane is None: fail("E_LANE_UNKNOWN","PREFIX="+repr(PREFIX))
+        cfg["cases"]=[c for c in cfg["cases"] if _lane in c.get("lanes",[])]
+        if not cfg["cases"]: fail("E_LANE_CASE_SET_EMPTY","lane="+_lane)
     cfg["work_root"]=sys.argv[2]
     ALLOWED_VARS_TEMPLATES.update(allowed_vars_templates(sys.argv[3],PREFIX))
     os.makedirs(cfg["work_root"],exist_ok=True)

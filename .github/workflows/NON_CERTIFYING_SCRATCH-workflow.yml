@@ -69,7 +69,7 @@ jobs:
           # D2 gate (reviewer ruling): every relative file/script argument used by later
           # steps must exist in the committed tree. Fixed list, fail-closed exit 88.
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
-          for f in             platform.lock.json             config.json             stage-platform.sh             make-shims.sh             test-c-sign-confinement.py             test-enroll-predicate-env.py             test-cert-positive-guard.py             test-k2-sweeps.py             test-inrun-writes.py             test-inrun-stale-path.py             test-inrun-allowlist.py             test-stale-state-committed.py             test-heredoc-structure.py             test-h5-planted-errset.py             preflight-check.py             build-ovmf-debug.sh             scan-pe-pdb-paths.py             build-enroll-app.sh             bwrap-argv.sh             enroll-predicate-check.py             rehearsal-enroll.sh             ../build-esp-image.sh             evidence/successor-signed.efi             run-ceremony.sh             qemu-smoke.sh             config_schema.py             bind-fixture-certs.sh             test-config-schema.py             test-fixture-cert-binding.py             test-env-contract.py; do
+          for f in             platform.lock.json             config.json             stage-platform.sh             make-shims.sh             test-c-sign-confinement.py             test-enroll-predicate-env.py             test-cert-positive-guard.py             test-k2-sweeps.py             test-inrun-writes.py             test-inrun-stale-path.py             test-inrun-allowlist.py             test-stale-state-committed.py             test-heredoc-structure.py             test-h5-planted-errset.py             preflight-check.py             build-ovmf-debug.sh             scan-pe-pdb-paths.py             build-enroll-app.sh             bwrap-argv.sh             enroll-predicate-check.py             rehearsal-enroll.sh             ../build-esp-image.sh             evidence/successor-signed.efi             run-ceremony.sh             qemu-smoke.sh             config_schema.py             bind-fixture-certs.sh             test-config-schema.py             test-fixture-cert-binding.py             test-env-contract.py             test-hist-esp-guard.py             test-workdir-sibling.py; do
             [ -e "$f" ] || { echo "E_WORKFLOW_ARG_MISSING $f"; exit 88; }
           done
       - name: NON_CERTIFYING_SCRATCH host inputs declared (B3)
@@ -253,6 +253,9 @@ jobs:
           python3 test-config-schema.py 2>&1 | tee /tmp/$PREFIX-out/$PREFIX-config-schema-tests.log
           python3 test-fixture-cert-binding.py 2>&1 | tee /tmp/$PREFIX-out/$PREFIX-fixture-cert-binding-tests.log
           python3 test-env-contract.py 2>&1 | tee /tmp/$PREFIX-out/$PREFIX-env-contract-tests.log
+          # peer run-36024634796 ruling: historical-ESP boot-expectation guard + workdir sibling-closure gate
+          python3 test-hist-esp-guard.py 2>&1 | tee /tmp/$PREFIX-out/$PREFIX-hist-esp-guard-tests.log
+          python3 test-workdir-sibling.py 2>&1 | tee /tmp/$PREFIX-out/$PREFIX-workdir-sibling-tests.log
 
       - name: NON_CERTIFYING_SCRATCH reproducible OVMF DEBUG dual build + accepted-firmware pins
         timeout-minutes: 150
@@ -1172,6 +1175,7 @@ jobs:
           # MUST kill it named E_CASE_BOOT_TARGET - never a generic EXPECTATIONS_VIOLATED.
           cp rehearsal-harness.py "$T/rehearsal-harness.py"
           cp lane_resolve.py "$T/lane_resolve.py"
+          cp config_schema.py "$T/config_schema.py"
           [ "$(grep -c -F ',bootindex=0' "$T/rehearsal-harness.py")" = "1" ] || { echo "E_H3_NEG_INJECTION ESP-device bootindex count != 1 in harness source"; exit 97; }
           sed -i 's/,bootindex=0//' "$T/rehearsal-harness.py"
           [ "$(grep -c -F ',bootindex=0' "$T/rehearsal-harness.py")" = "0" ] || { echo "E_H3_NEG_INJECTION bootindex removal failed"; exit 97; }

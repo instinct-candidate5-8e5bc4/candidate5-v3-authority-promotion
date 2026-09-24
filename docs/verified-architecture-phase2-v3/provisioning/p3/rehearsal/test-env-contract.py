@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # peer run-36017957182 ruling (c): committed test for gate 6o E_ENV_CONTRACT_UNWIRED.
-# Executes the EXACT gate block extracted from preflight-check.py (bounded by the 6o/7
+# Executes the EXACT gate block extracted from preflight-check.py (bounded by the 6o/6p
 # section markers - the same extraction discipline as test-inrun-writes/stale-path) against
 # synthetic layouts - never a reimplementation:
 #   1. read + export in a committed .sh        -> passes
@@ -13,7 +13,7 @@ sys.dont_write_bytecode = True
 HERE = os.path.dirname(os.path.abspath(__file__))
 PF = open(os.path.join(HERE, "preflight-check.py")).read()
 i = PF.index("# 6o) peer run-36017957182 ruling (c)")
-j = PF.index("# 7) KVM requirement", i)
+j = PF.index("# 6p) peer run-36024634796 ruling (c)", i)
 BLOCK = PF[i:j]
 
 

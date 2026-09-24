@@ -504,6 +504,7 @@ BLOCK_BOOT_TARGET_NEG = r'''      - name: NON_CERTIFYING_SCRATCH planted-fault H
           # MUST kill it named E_CASE_BOOT_TARGET - never a generic EXPECTATIONS_VIOLATED.
           cp rehearsal-harness.py "$T/rehearsal-harness.py"
           cp lane_resolve.py "$T/lane_resolve.py"
+          cp config_schema.py "$T/config_schema.py"
           [ "$(grep -c -F ',bootindex=0' "$T/rehearsal-harness.py")" = "1" ] || { echo "E_H3_NEG_INJECTION ESP-device bootindex count != 1 in harness source"; exit 97; }
           sed -i 's/,bootindex=0//' "$T/rehearsal-harness.py"
           [ "$(grep -c -F ',bootindex=0' "$T/rehearsal-harness.py")" = "0" ] || { echo "E_H3_NEG_INJECTION bootindex removal failed"; exit 97; }
