@@ -3,21 +3,17 @@
 # usage: preflight-check.py <config.json> <stage_dir>
 import sys, os, json, hashlib, subprocess
 
-# Lane prefix resolution (scratch-3 ruling): committed config bytes keep the canonical
-# NON_CERTIFYING_REHEARSAL prefix; at load time every /tmp/NON_CERTIFYING_REHEARSAL- path
-# prefix resolves to the running lane's /tmp/$PREFIX-. Identity in the rehearsal and
-# certification lanes (PREFIX defaults to NON_CERTIFYING_REHEARSAL); the scratch lane
-# exports PREFIX=NON_CERTIFYING_SCRATCH.
+# Lane prefix resolution (#18 F1, peer #17 final ruling): committed config bytes keep the
+# canonical NON_CERTIFYING_REHEARSAL prefix; at load time every absolute /tmp lane path
+# resolves to the running lane by the SINGLE resolver (lane_resolve.py, component-wise,
+# fail-closed). Identity in the rehearsal and certification lanes; the scratch lane exports
+# PREFIX=NON_CERTIFYING_SCRATCH. Non-/tmp config values pass through untouched.
 PREFIX=os.environ.get("PREFIX","")
 if not PREFIX: print("E_PREFIX_UNSET"); sys.exit(97)
 ALLOWED=os.environ.get("ALLOWED_PREFIX","")
 if PREFIX!=ALLOWED: print("E_PREFIX_MISMATCH prefix=%s allowed=%s"%(PREFIX,ALLOWED)); sys.exit(97)
-CANON_TMP="/tmp/NON_CERTIFYING_REHEARSAL-"; LANE_TMP="/tmp/%s-"%PREFIX
-def pref(x):
-    if isinstance(x,str): return x.replace(CANON_TMP,LANE_TMP)
-    if isinstance(x,list): return [pref(i) for i in x]
-    if isinstance(x,dict): return {k:pref(v) for k,v in x.items()}
-    return x
+LANE_TMP="/tmp/%s-"%PREFIX
+from lane_resolve import LaneError, resolve_config_value
 
 FORBIDDEN = "OVMF_CI_SECURE_BOOT_UKI_PASS"
 E = []
@@ -37,7 +33,8 @@ here = os.path.dirname(os.path.abspath(__file__))
 ALLOW_MARKER_REF={"preflight-check.py","NON_CERTIFYING_REHEARSAL-workflow.yml",
                   "OVMF_CI_SECURE_BOOT_UKI-CERTIFICATION-workflow.yml",
                   "R3-static-review-candidate.md","A3-publication-manifest.json",
-                  "certification-vs-rehearsal.diff"}
+                  "certification-vs-rehearsal.diff",
+                  "derive-scratch.py"}  # #18: the generator carries the derived workflow's banner, which names the marker inside its never-emit rule
 for root,_,files in os.walk(here):
     for f in files:
         p=os.path.join(root,f)
@@ -106,7 +103,8 @@ for fn,(h,sz) in EXPECT.items():
     if os.path.getsize(p)!=sz or sha(p)!=h: fail("E_EVIDENCE_HASH_MISMATCH", fn)
 
 # 5) config schema: no wildcards, exact values only
-cfg=pref(json.load(open(cfg_path)))
+try: cfg=resolve_config_value(json.load(open(cfg_path)),PREFIX)
+except LaneError as e: fail("E_CONFIG_LANE_RESOLVE", e.code+" "+e.detail); cfg={}
 def scan_wildcards(o, path=""):
     if isinstance(o, dict):
         for k,v in o.items(): scan_wildcards(v, path+"."+k)
@@ -297,6 +295,69 @@ else:
         if _n!=0:
             fail("E_DERIVED_CANON_LITERAL","scratch workflow carries "+str(_n)+" "+_tok+" occurrences (must be 0; resolve via resolve-lane-path.sh)")
 
+# 6e11) #18 F5 (peer #17 final ruling, extending 6e10 to RESOLVED config paths): after the
+# single resolver maps the committed config, no resolved absolute /tmp path may retain a
+# canonical component. Enforced in every lane whose prefix is NOT the canonical token (in
+# the rehearsal/certification lane the lane token IS the canonical token, so the check is
+# vacuous there by construction; it bites in the scratch lane, where any surviving
+# canonical component proves a resolution bypass). The ruled exemptions are structural,
+# never listed strings: relative build-output esp filenames, case IDs, and schema strings
+# do not start with /tmp and never enter this check (the esp_variant_sha256 assertion
+# site - run-ceremony.sh PINS[1..3] over build-output/esp-variant/ - is the writer/reader
+# agreement for those relative names).
+def _resolved_paths(o):
+    if isinstance(o,dict):
+        for v in o.values():
+            yield from _resolved_paths(v)
+    elif isinstance(o,list):
+        for v in o:
+            yield from _resolved_paths(v)
+    elif isinstance(o,str) and o.startswith("/tmp/"):
+        yield o
+if PREFIX!="NON_CERTIFYING_REHEARSAL":
+    for _rp in _resolved_paths(cfg):
+        for _comp in _rp.split("/")[2:]:
+            if _comp=="NON_CERTIFYING_REHEARSAL" or _comp.startswith("NON_CERTIFYING_REHEARSAL-"):
+                fail("E_RESOLVED_CANON_COMPONENT","resolved config path retains a canonical component: "+_rp)
+
+# 6e12) #18 (peer directive): DERIVATION BYTE-IDENTITY. Re-deriving the scratch workflow
+# from the committed NON_CERTIFYING_REHEARSAL workflow with the committed generator must
+# reproduce the committed NON_CERTIFYING_SCRATCH workflow BYTE-IDENTICALLY; any drift means
+# the generated file was hand-edited or the generator is stale.
+import tempfile as _tf
+_dfd,_dp=_tf.mkstemp(suffix=".yml"); os.close(_dfd)
+try:
+    _der=_sp.run([sys.executable,os.path.join(here,"derive-scratch.py"),
+                  os.path.join(wf_dir,"NON_CERTIFYING_REHEARSAL-workflow.yml"),_dp],
+                 capture_output=True)
+    if _der.returncode!=0:
+        fail("E_SCRATCH_DERIVE_DRIFT","derive-scratch.py rc=%s: %s"%(_der.returncode,(_der.stderr or _der.stdout)[:200]))
+    elif open(_dp,"rb").read()!=open(_scwf,"rb").read():
+        fail("E_SCRATCH_DERIVE_DRIFT","re-derived scratch workflow differs from the committed bytes")
+finally:
+    os.unlink(_dp)
+
+# 6e13) #18 F1 conformance: resolve-lane-path.sh (the bash caller) and lane_resolve.py (the
+# single definition) must agree on rc AND stdout over a corpus covering: nested canonical,
+# leading-only canonical, already-lane idempotence, the run-17 mixed lane/canonical shape,
+# foreign-lane, non-leading-token, and token-free /tmp (the last three must fail both).
+_CONFORM=("/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-enroll-sole/vars-enrolled.fd",
+          "/tmp/NON_CERTIFYING_REHEARSAL-stage/root/usr/share/OVMF/OVMF_VARS_4M.fd",
+          "/tmp/%s-out/%s-enroll-sole/vars-enrolled.fd"%(PREFIX,PREFIX),
+          "/tmp/%s-out/NON_CERTIFYING_REHEARSAL-enroll-sole/vars-enrolled.fd"%PREFIX,
+          "/tmp/NON_CERTIFYING_FOREIGN-x",
+          "/tmp/x-NON_CERTIFYING_REHEARSAL-y",
+          "/tmp/token-free")
+for _i,_cp in enumerate(_CONFORM):
+    _b=_sp.run([os.path.join(here,"resolve-lane-path.sh"),_cp,PREFIX],capture_output=True,text=True)
+    _y=_sp.run([sys.executable,os.path.join(here,"lane_resolve.py"),"resolve",_cp,PREFIX],capture_output=True,text=True)
+    if (_b.returncode,_b.stdout)!=(_y.returncode,_y.stdout):
+        fail("E_LANE_RESOLVER_CONFORMANCE","bash/python resolver disagree on %s: bash(rc=%s,out=%r) python(rc=%s,out=%r)"%(_cp,_b.returncode,_b.stdout.strip(),_y.returncode,_y.stdout.strip()))
+    if _i<4 and _b.returncode!=0:
+        fail("E_LANE_RESOLVER_CONFORMANCE","resolver rejected a valid lane path: "+_cp+" rc="+str(_b.returncode))
+    if _i>=4 and _b.returncode==0:
+        fail("E_LANE_RESOLVER_CONFORMANCE","resolver accepted an invalid lane path: "+_cp)
+
 # 6e7) peer N4: PREFIX==ALLOWED_PREFIX equality alone accepts any literal from the same
 # workflow - bind the literals to the LANE statically per workflow file.
 import re as _re
@@ -401,6 +462,18 @@ _py_files=[os.path.join(here,f) for f in sorted(os.listdir(here)) if f.endswith(
 _py_files+=[os.path.join(p3_root,f) for f in sorted(os.listdir(p3_root)) if f.endswith(".py")]
 for _p in _py_files:
     _bad=_py_mods(open(_p,errors="replace").read())-PY_ALLOW
+    # #18 F1 (peer #17 final ruling): NARROW named allowance - exactly the reviewed local
+    # resolver module "lane_resolve" (this directory, exec-bit pinned, stdlib-only itself),
+    # ONLY in its two committed consumers. No wildcard, no other file, no other module.
+    if os.path.basename(_p) in ("rehearsal-harness.py","preflight-check.py"):
+        _bad-={"lane_resolve"}
+    # #18 (same shape): derive-scratch.py's REAL imports are re+sys; the generator embeds
+    # the workflow step TEXT it injects, whose fetch-test heredoc carries an
+    # "import http.server" line (stdlib, executed by the CI runner inside the step, never
+    # by the generator). This line-regex scan cannot see the string boundary, so the one
+    # phantom module is allow-listed for this one file only.
+    if os.path.basename(_p)=="derive-scratch.py":
+        _bad-={"http"}
     if _bad: fail("E_PYTHON_IMPORTS",_p+" "+",".join(sorted(_bad)))
 _sh_files=[os.path.join(here,f) for f in sorted(os.listdir(here)) if f.endswith(".sh")]
 _sh_files.append(os.path.join(p3_root,"build-esp-image.sh"))

@@ -2,24 +2,20 @@
 # NON_CERTIFYING_REHEARSAL harness (WS1, pre-freeze rehearsal only).
 # Runs OVMF Secure Boot cases on QEMU/KVM and records structural evidence.
 # NEVER emits or references any certification marker. KVM-only, fail-closed.
-# usage: rehearsal-harness.py <config.json> <work_root>
+# usage: rehearsal-harness.py <config.json> <work_root> <out_dir>   (out_dir = the ceremony's $OUT, for the F4 allow-set construction)
 import sys, os, json, socket, hashlib, subprocess, time, shutil, signal
 
-# Lane prefix resolution (scratch-3 ruling): committed config bytes keep the canonical
-# NON_CERTIFYING_REHEARSAL prefix; at load time every /tmp/NON_CERTIFYING_REHEARSAL- path
-# prefix resolves to the running lane's /tmp/$PREFIX-. Identity in the rehearsal and
-# certification lanes (PREFIX defaults to NON_CERTIFYING_REHEARSAL); the scratch lane
-# exports PREFIX=NON_CERTIFYING_SCRATCH.
+# Lane prefix resolution (#18 F1, peer #17 final ruling): committed config bytes keep the
+# canonical NON_CERTIFYING_REHEARSAL prefix; at load time every absolute /tmp lane path
+# resolves to the running lane by the SINGLE resolver (lane_resolve.py, component-wise,
+# fail-closed). Identity in the rehearsal and certification lanes (PREFIX defaults to
+# NON_CERTIFYING_REHEARSAL); the scratch lane exports PREFIX=NON_CERTIFYING_SCRATCH.
+# Non-/tmp config values (relative paths, case IDs, schema strings) pass through untouched.
 PREFIX=os.environ.get("PREFIX","")
 if not PREFIX: print("E_PREFIX_UNSET"); sys.exit(97)
 ALLOWED=os.environ.get("ALLOWED_PREFIX","")
 if PREFIX!=ALLOWED: print("E_PREFIX_MISMATCH prefix=%s allowed=%s"%(PREFIX,ALLOWED)); sys.exit(97)
-CANON_TMP="/tmp/NON_CERTIFYING_REHEARSAL-"; LANE_TMP="/tmp/%s-"%PREFIX
-def pref(x):
-    if isinstance(x,str): return x.replace(CANON_TMP,LANE_TMP)
-    if isinstance(x,list): return [pref(i) for i in x]
-    if isinstance(x,dict): return {k:pref(v) for k,v in x.items()}
-    return x
+from lane_resolve import LaneError, resolve_config_value, resolve_path, allowed_vars_templates
 
 # C7 runtime-emission provenance: the signed cmdline (ro root=/dev/mapper/v3-root-admitter
 # rootfstype=ext4 v3.root_admitter_verity=533d6d61..) carries NO console= parameter, so the
@@ -43,11 +39,10 @@ ADAPTER_STRINGS = [s.encode() for s in ("E_PROVIDER_NAMESPACE","E_PROVIDER_LINK_
 
 # Frozen per-case VARS template binding (reviewer ruling): each case must draw its VARS from
 # exactly one of the three run-fresh post-enrollment templates, byte-identical, checked in-run.
-ALLOWED_VARS_TEMPLATES = {pref(t) for t in (
-    "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-enroll-sole/vars-enrolled.fd",
-    "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-enroll-widened/vars-enrolled.fd",
-    "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-enroll-sole-fresh/vars-enrolled.fd",
-)}
+# F4 (peer #17 final ruling): the allow set has ONE construction - lane_resolve
+# .allowed_vars_templates over THIS ceremony's out dir + lane prefix, the same source the
+# run-ceremony.sh pre-guest gate (F3) uses. Populated in __main__ from argv[3].
+ALLOWED_VARS_TEMPLATES = set()
 
 # C4 strict closed schema (T4 F6): unknown or missing keys fail.
 TOP_KEYS = {"cases","cpu_model","disk_dir","enroll_app","enroll_app_sha256","esp_sha256",
@@ -160,18 +155,34 @@ def build_argv(cfg, case_dir, vars_fd, esp, firmware, sock):
 def parse_vars(cfg, vars_fd, code):
     p=subprocess.run([cfg["vars_parser"],vars_fd],capture_output=True,text=True)
     if p.returncode!=0: fail(code, (p.stderr or p.stdout)[:200])
-    return json.loads(p.stdout)
+    v=json.loads(p.stdout)
+    # F7 (peer #17 audit): the parser exits 0 even on structural errors (its output then
+    # carries "error" and lacks the keys below) - a missing producer key must never
+    # surface as a bare KeyError.
+    for k in ("variables","summary"):
+        if k not in v: fail("E_VARS_PARSE_SCHEMA", code+" producer output missing key "+k)
+    return v
 
 def run_case(cfg, case, idx):
     cid=case["id"]; cdir=os.path.join(cfg["work_root"],cid)
     os.makedirs(cdir, exist_ok=False)
     # G1/T5 F3: short fresh per-case QMP socket path, asserted within the sun_path limit
-    sock=pref(f"/tmp/NON_CERTIFYING_REHEARSAL-q{idx}.sock")   # short, fresh; pref()-resolved per lane (scratch-8 grep-audit finding)
+    sock=resolve_path(f"/tmp/NON_CERTIFYING_REHEARSAL-q{idx}.sock",PREFIX)   # short, fresh; canonical literal resolved per lane by the single resolver (#18 F1)
     if len(sock)>QMP_SOCK_MAX: fail("E_QMP_PATH_TOO_LONG","%d>%d %s"%(len(sock),QMP_SOCK_MAX,sock))
     if os.path.exists(sock): os.unlink(sock)
     vars_fd=os.path.join(cdir,"vars.fd")
     shutil.copyfile(case["vars_template"], vars_fd)
     vars_template_sha=sha(case["vars_template"])
+    # F6 (peer #17 final ruling): the template<->enrollment byte tie is STATIC - verify it
+    # before anything else (pre-parse, guest). The producer record is enroll-predicate.json's
+    # enrolled_fd_sha256, which enroll-predicate-check.py computes with its one sha_f over
+    # the EXACT vars-enrolled.fd the ceremony keeps (its argv[4]). A missing/unreadable
+    # record or a mismatch dies named, never soft.
+    evd=os.path.join(os.path.dirname(case["vars_template"]),"evidence","enroll-predicate.json")
+    try: _tie=json.load(open(evd))
+    except Exception: fail("E_VARS_TEMPLATE_ENROLL_TIE", cid+" tie record unreadable: "+evd)
+    if _tie.get("enrolled_fd_sha256")!=vars_template_sha:
+        fail("E_VARS_TEMPLATE_ENROLL_TIE", cid+" template sha256 != enrolled_fd_sha256 in "+evd)
     prej=parse_vars(cfg,vars_fd,"E_VARS_PRE_PARSE")
     trust_ok={"PK","KEK","db"}<={x["name"] for x in prej.get("variables",[])}
     argv=build_argv(cfg,cdir,vars_fd,case["esp"],case["firmware"],sock)
@@ -209,12 +220,6 @@ def run_case(cfg, case, idx):
         return True
     rejects_found=[s for s in ALL_REJECT_STRINGS if match_template(s)]
     postj=parse_vars(cfg,vars_fd,"E_VARS_POST_PARSE")
-    # C4: tie vars_template_sha256 to the enrolled-fd hash in that run's enroll-predicate.json
-    evd=os.path.join(os.path.dirname(case["vars_template"]),"evidence","enroll-predicate.json")
-    tie_ok=False
-    if os.path.exists(evd):
-        try: tie_ok=(json.load(open(evd)).get("enrolled_fd_sha256")==vars_template_sha)
-        except Exception: tie_ok=False
     exp=case["expect"]; checks={}
     checks["kernel_exec"]= (kexec==exp["kernel_exec"])
     checks["exit_98"]= (e98==exp["exit_98"])
@@ -222,7 +227,9 @@ def run_case(cfg, case, idx):
     checks["reject_strings"]= (rejects_found==exp["reject_strings"])
     checks["vars_template_allowed"]= (case["vars_template"] in ALLOWED_VARS_TEMPLATES)
     checks["vars_template_byte_identity"]= (vars_template_sha==sha(case["vars_template"]))
-    checks["vars_template_enroll_tie"]= tie_ok
+    if not checks["vars_template_byte_identity"]:
+        fail("E_VARS_TEMPLATE_BYTE_IDENTITY", cid+" template bytes changed during the case")
+    checks["vars_template_enroll_tie"]= True   # proven pre-guest by the F6 fatal gate above
     checks["pre_parse_trust_predicate"]= trust_ok
     if exp.get("no_reject_strings"): checks["no_reject_strings"]=(len(rejects_found)==0)
     det={"case":cid,"argv_sha256":hashlib.sha256("\0".join(argv).encode()).hexdigest(),
@@ -256,9 +263,13 @@ def run_case(cfg, case, idx):
     return ok
 
 if __name__=="__main__":
-    cfg=pref(json.load(open(sys.argv[1])))
+    if len(sys.argv)!=4:
+        print("E_HARNESS_USAGE rehearsal-harness.py <config.json> <work_root> <out_dir>"); sys.exit(97)
+    try: cfg=resolve_config_value(json.load(open(sys.argv[1])),PREFIX)
+    except LaneError as e: print("%s %s"%(e.code,e.detail)); sys.exit(97)
     check_schema(cfg)
     cfg["work_root"]=sys.argv[2]
+    ALLOWED_VARS_TEMPLATES.update(allowed_vars_templates(sys.argv[3],PREFIX))
     os.makedirs(cfg["work_root"],exist_ok=True)
     results={}
     for idx,case in enumerate(cfg["cases"]):

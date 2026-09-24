@@ -154,8 +154,13 @@ sbe_note = None
 if sbe:
     sbe_note = {"attributes": sbe["attributes"], "data_size": sbe["data_size"],
                 "data_sha256": sbe["data_sha256"]}
+# #18 F6 (peer #17 final ruling): enrolled_fd_sha256 joins the normal-path report as an
+# ADDED NON-GATING provenance field - the same sha_f over the exact kept vars-enrolled.fd
+# (argv[4]) the decode-fail branch already records; the harness's F6 tie gate reads this ONE
+# record. Predicate check semantics byte-for-byte unchanged.
 report = {"schema": "NON_CERTIFYING_REHEARSAL-enroll-predicate/v1", "lane": PREFIX, "mode": mode,
           "widened": widened, "pk_der_sha256": pk_der, "kek_der_sha256": kek_der,
+          "enrolled_fd_sha256": sha_f(fd),
           "secure_boot_enable_observed": sbe_note, "errors": E,
           "result": "PASS" if not E else "FAIL"}
 print(json.dumps(report, indent=1, sort_keys=True))

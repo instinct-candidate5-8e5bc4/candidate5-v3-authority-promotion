@@ -126,6 +126,18 @@ assert_sha build-output/esp-variant/NON_CERTIFYING_REHEARSAL-esp-hostile.raw "${
 assert_sha build-output/ovmf-debug/OVMF_CODE.fd "${PINS[4]}"
 assert_sha "$STAGE/root/usr/share/OVMF/OVMF_CODE_4M.secboot.fd" "${PINS[5]}"
 assert_sha build-output/enroll-app/enroll-app.efi "${PINS[6]}"
+# #18 F3 (peer #17 final ruling): pre-guest static gate - every case vars_template must
+# resolve (component-wise, the ONE resolver) into THIS ceremony's constructed enrolled-
+# template set (F4 single source: lane_resolve.allowed_vars_templates); anything else dies
+# named BEFORE any guest runs. Named exit codes pass up unchanged (L6 pattern).
+_gate_rc=0
+python3 ./lane_resolve.py gate "$CONFIG" "$OUT" || _gate_rc=$?
+if [ "$_gate_rc" != 0 ]; then
+  if [ "$_gate_rc" -ge 128 ]; then
+    echo "E_BASH_ERRTRAP vars-template gate died on signal/trap rc=$_gate_rc"; exit 97
+  fi
+  exit "$_gate_rc"
+fi
 # enrollments (three independent pristine VARS derivations, each a single enrollment invocation)
 ./enroll-prep.sh "$STAGE/root" prep evidence/c5-signing-cert.der evidence/C5-HOSTILE-FIXTURE.cer
 trap '_repair_out; rm -rf prep' EXIT
@@ -153,8 +165,8 @@ done
 # the enrollment window closes; their DER hashes are already recorded in each enrollment's
 # enroll-predicate.json evidence. (trap EXIT above also covers failure paths.)
 rm -rf prep
-# case suite (harness CLI: config + work_root)
-python3 ./rehearsal-harness.py "$CONFIG" "$OUT/$PREFIX-cases"
+# case suite (harness CLI: config + work_root + out_dir for the F4 allow-set construction)
+python3 ./rehearsal-harness.py "$CONFIG" "$OUT/$PREFIX-cases" "$OUT"
 # canonical ceremony manifest (streamed reads: never loads a full dump into memory)
 python3 - "$OUT" <<'PYEOF'
 import json, hashlib, os, sys

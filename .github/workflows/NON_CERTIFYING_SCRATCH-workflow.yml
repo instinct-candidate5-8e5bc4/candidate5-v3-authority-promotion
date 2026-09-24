@@ -747,6 +747,60 @@ jobs:
             || { echo "E_PF_TRAP_MASKED E_BASH_ERRTRAP present - D13-1 regression" | tee -a "$PFD/pf6.log"; exit 97; }
           echo "PF_6_MUST_SHOW_OK predicate-failing evidence died with E_ENROLL_PREDICATE_FAIL exit 97, no E_BASH_ERRTRAP" | tee -a "$PFD/pf6.log"
           grep -F "PF_6_MUST_SHOW_OK" "$PFD/pf6.log" || { echo "E_PF_LOG_VERDICT_MISSING"; exit 97; }
+      - name: NON_CERTIFYING_SCRATCH planted-fault F3 out-of-set vars_template gate must-show (peer #17 F3)
+        run: |
+          set -euo pipefail
+          cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+          T=/tmp/$PREFIX-pf/f3gate; rm -rf "$T"; mkdir -p "$T"
+          # the planted input is DERIVED from the pinned config.json (never a canonical
+          # literal in this YAML): R1's real vars_template with the inner enrollment
+          # component staled to an old dir name - resolution succeeds, membership fails.
+          python3 - config.json "$T/planted.json" <<'PYT'
+          import json, sys
+          c = json.load(open(sys.argv[1]))
+          case = c["cases"][0]
+          case["vars_template"] = case["vars_template"].replace("enroll-sole", "enroll-widened-old")
+          c["cases"] = [case]
+          json.dump(c, open(sys.argv[2], "w"), indent=1, sort_keys=True)
+          PYT
+          _rc=0
+          PREFIX="$PREFIX" ALLOWED_PREFIX="$ALLOWED_PREFIX" python3 ./lane_resolve.py gate "$T/planted.json" "$T/out" > "$T/f3.log" 2>&1 || _rc=$?
+          [ "$_rc" = "97" ] || { echo "E_F3_GATE_NOT_FIRED rc=$_rc expected 97"; cat "$T/f3.log"; exit 97; }
+          grep -F "E_VARS_TEMPLATE_GATE" "$T/f3.log" || { echo "E_F3_NEG_CODE_ABSENT named gate code missing"; cat "$T/f3.log"; exit 97; }
+          echo "F3_GATE_MUST_SHOW_OK planted out-of-set vars_template died named (E_VARS_TEMPLATE_GATE rc=97)"
+      - name: NON_CERTIFYING_SCRATCH planted-fault F6 byte-flip enroll-tie must-show (peer #17 F6)
+        run: |
+          set -euo pipefail
+          cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+          SRC=/tmp/$PREFIX-out/$PREFIX-enroll-sole
+          [ -f "$SRC/vars-enrolled.fd" ] || { echo "E_F6_NEG_INPUT sole vars-enrolled.fd absent"; exit 97; }
+          [ -f "$SRC/evidence/enroll-predicate.json" ] || { echo "E_F6_NEG_INPUT sole enroll-predicate.json absent"; exit 97; }
+          T=/tmp/$PREFIX-pf/f6tie; rm -rf "$T"; mkdir -p "$T/$PREFIX-enroll-sole/evidence"
+          cp "$SRC/evidence/enroll-predicate.json" "$T/$PREFIX-enroll-sole/evidence/enroll-predicate.json"
+          cp "$SRC/vars-enrolled.fd" "$T/$PREFIX-enroll-sole/vars-enrolled.fd"
+          # flip one byte in the planted template copy: the predicate record now names
+          # different bytes, so the F6 tie gate must kill the case named BEFORE any guest.
+          python3 - "$T/$PREFIX-enroll-sole/vars-enrolled.fd" <<'PYT'
+          import sys
+          p = sys.argv[1]
+          b = bytearray(open(p, "rb").read())
+          b[0] ^= 1
+          open(p, "wb").write(bytes(b))
+          PYT
+          python3 - config.json "$T" <<'PYT'
+          import json, sys, os
+          c = json.load(open(sys.argv[1])); T = sys.argv[2]
+          case = c["cases"][0]
+          case["id"] = "NON_CERTIFYING_SCRATCH-F6NEG-planted"
+          case["vars_template"] = os.path.join(T, "NON_CERTIFYING_SCRATCH-enroll-sole", "vars-enrolled.fd")
+          c["cases"] = [case]
+          json.dump(c, open(os.path.join(T, "config.json"), "w"), indent=1, sort_keys=True)
+          PYT
+          _rc=0
+          PREFIX="$PREFIX" ALLOWED_PREFIX="$ALLOWED_PREFIX" python3 ./rehearsal-harness.py "$T/config.json" "$T/cases" "$T" > "$T/f6.log" 2>&1 || _rc=$?
+          [ "$_rc" = "90" ] || { echo "E_F6_TIE_NOT_FIRED rc=$_rc expected 90"; cat "$T/f6.log"; exit 97; }
+          grep -F "E_VARS_TEMPLATE_ENROLL_TIE" "$T/f6.log" || { echo "E_F6_NEG_CODE_ABSENT named tie code missing"; cat "$T/f6.log"; exit 97; }
+          echo "F6_TIE_MUST_SHOW_OK planted byte-flipped template died named (E_VARS_TEMPLATE_ENROLL_TIE rc=90)"
       - name: NON_CERTIFYING_SCRATCH evidence readability repair (ephemeral out tree only)
         if: always()
         run: |

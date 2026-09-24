@@ -1440,3 +1440,154 @@ to fail the predicate on DATA only - not patched around).
 Validation on this head: preflight PASS rc=0; yaml + bash -n clean x3;
 6e6 pins unchanged (cert 44, rehearsal 78); 6e9 0/0/4; scratch workflow 0
 canonical literals / 0 CANON_TMP; re-derive byte-identical.
+
+## 13. Run-17 follow-up (#18): single component-wise lane resolver, pre-guest template gates, enroll-tie producer fix, versioned generator
+
+Run 35954821835 (head 8871ef65) proved the app fix: all three guest modes
+enrolled, predicate PASS x3. One host-side defect remained: rehearsal-harness.py
+died FileNotFoundError on every case's vars_template because the config literal
+carries the canonical infix in TWO path components
+(/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-enroll-sole/...) and
+the ad-hoc pref() rewrote only the leading one, producing the mixed path
+/tmp/NON_CERTIFYING_SCRATCH-out/NON_CERTIFYING_REHEARSAL-enroll-sole/... (no such
+file). Steps 27/28 never ran; env2 skipped. Peer review of the exact pushed
+bytes (F1-F7 final ruling) is implemented on this head as follows.
+
+F1 (single resolver): NEW lane_resolve.py is the ONE resolver definition.
+Component-wise mapping ONLY for canonical absolute /tmp lane paths: a component
+equal to or starting with the canonical token maps to the running lane's
+prefix; a canonical token anywhere else in a component fails closed
+(E_LANE_PATH_COMPONENT, no substring rewrites anywhere); a different
+NON_CERTIFYING_ lane component fails closed (E_LANE_PATH_FOREIGN); already-lane
+paths are idempotent; token-free /tmp paths fail E_LANE_PATH_NOT_CANON.
+resolve-lane-path.sh is now a thin caller of this module (interface, stdout
+contract, named codes unchanged for its two existing callers). The pref()
+copies in rehearsal-harness.py and preflight-check.py are DELETED; both import
+the module (narrow named allowance in preflight 6h, fetch_locked precedent).
+Non-/tmp config values (relative paths, case IDs, schema strings) pass through
+untouched. Conformance: preflight 6e13 runs the bash caller and the python
+definition over a 7-entry corpus (nested canonical, leading-only, already-lane,
+the run-17 mixed shape, foreign, non-leading-token, token-free) and fails
+E_LANE_RESOLVER_CONFORMANCE on any rc/stdout disagreement.
+
+F2 (audit table): the literal->resolved->writer->match table travels in the
+review packet as F2-F7-key-contract-audit.md; it matched the reviewer's
+independent read. The esp_variant_sha256 assertion site is listed there
+(run-ceremony.sh PINS[1..3] over build-output/esp-variant/, writer/reader
+agree on the relative names).
+
+F3 (pre-ceremony static gate): run-ceremony.sh runs
+`python3 ./lane_resolve.py gate "$CONFIG" "$OUT"` after the input pins and
+BEFORE enroll-prep/any guest: every case vars_template must resolve into THIS
+ceremony's constructed enrolled-template set; anything else dies
+E_VARS_TEMPLATE_GATE (exit 97, offending literal+resolved printed, L6
+pass-up). Planted negative (scratch must-show step): a config derived from the
+pinned config.json with R1's inner enrollment component staled to
+"enroll-widened-old" - resolution succeeds, membership fails. Verbatim local
+outcome: rc=97, `E_VARS_TEMPLATE_GATE case NON_CERTIFYING_REHEARSAL-R1-positive
+vars_template resolves outside the enrolled-template set: literal=/tmp/
+NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-enroll-widened-old/
+vars-enrolled.fd resolved=/tmp/NON_CERTIFYING_SCRATCH-out/
+NON_CERTIFYING_SCRATCH-enroll-widened-old/vars-enrolled.fd`. Positive control:
+`VARS_TEMPLATE_GATE_OK cases=7 out=/tmp/NON_CERTIFYING_SCRATCH-out` rc=0.
+
+F4 (single-source allow set): ALLOWED_VARS_TEMPLATES has ONE construction,
+lane_resolve.allowed_vars_templates(out_dir, prefix), shared by the F3 gate and
+the harness membership check. The harness CLI gains <out_dir>
+(run-ceremony.sh passes "$OUT"); E_HARNESS_USAGE on wrong argc.
+
+F5 (preflight extension): 6e11 fails E_RESOLVED_CANON_COMPONENT if any
+resolved absolute /tmp config path retains a canonical component. The gate
+enforces in every lane whose prefix is not the canonical token (in the
+rehearsal/certification lane the lane token IS the canonical token, so the
+check is vacuous there by construction; it bites in the scratch lane, where a
+surviving canonical component proves a resolution bypass). The ruled
+exemptions are structural (relative build-output esp filenames, case IDs,
+schema strings never start with /tmp and never enter the check). Standalone
+scratch-lane run: 0 canonical components after resolution.
+
+F6 (enroll-tie producer fix): the harness's C4 tie read a key that the
+producer emitted ONLY on its decode-fail early-exit
+(enroll-predicate-check.py:57) - #17's three normal-path PASS JSONs omit it, so
+the tie would have evaluated False for every case (the reviewer's byte read was
+exactly right). Fix per the ruled shape: the normal-path report gains
+"enrolled_fd_sha256": sha_f(fd) - the SAME sha_f definition over the EXACT
+kept vars-enrolled.fd (the script's argv[4], the file rehearsal-enroll.sh
+copies to $OUT at :629 and passes at :637), an ADDED NON-GATING field;
+predicate check semantics byte-for-byte unchanged (6e4 schema+lane pin still
+holds, count 2). Carrier choice: the predicate JSON, because the only consumer
+is the harness tie (tolerant .get) and the F7 audit found NO strict key-set
+consumer (steps 27/28 read text records; env2 diffs host-inputs.txt and
+fw-hashes only). The harness now verifies the tie PRE-GUEST (static byte
+property) and fails E_VARS_TEMPLATE_ENROLL_TIE (missing/unreadable record or
+mismatch) and E_VARS_TEMPLATE_BYTE_IDENTITY (mid-case template mutation)
+NAMED, never soft. Verbatim local outcomes against the REAL run-17 sole
+evidence: correct record -> tie passes, harness proceeds to the guest-launch
+checks (dies E_NO_KVM only because the validation host has no KVM); byte-flip
+-> rc=90 `E_VARS_TEMPLATE_ENROLL_TIE ... template sha256 !=
+enrolled_fd_sha256 in ...`; missing record -> rc=90
+`E_VARS_TEMPLATE_ENROLL_TIE ... tie record unreadable: ...`. For the record:
+the run-17 sole vars-enrolled.fd hashes bba36a3ed558469cbd3648297df8755cb0eacc9342a3c02cd7b2510ca4642685
+- the value the fixed producer would have recorded.
+Planted negative (scratch must-show step): byte-flipped template copy against
+the untampered predicate record must die E_VARS_TEMPLATE_ENROLL_TIE rc=90
+before any guest.
+
+F7 (key-contract audit): every JSON key the harness reads from ceremony
+outputs is tabulated with its producer line in the packet file: config.json
+(committed, schema-pinned), parse-ovmf-vars.py output (variables/summary plus
+the per-variable key schema, including the consumer list for each), and
+enroll-predicate.json (above). One hardening from the audit: the vars parser
+exits 0 even on structural failure (its output then carries "error" and lacks
+variables/summary), so a missing key surfaced as a bare KeyError; the harness
+now fails E_VARS_PARSE_SCHEMA named instead. No other consumer gaps found.
+
+Versioned generator (peer directive): derive-scratch.py is now committed under
+this directory. Mandatory order was followed: FIRST the reconstructed generator
+re-derived the 8871ef65 scratch workflow BYTE-IDENTICALLY with NO other edits
+(derived sha256 == committed sha256 ==
+8e07462c49876a73b1674764855f27e9527d2295271b3c92cacfcba611a88f11; the
+reconstruction method and one tooling mishap - a non-raw triple-quoted literal
+eating backslash-newline continuations, caught by the byte compare and fixed
+with raw literals - are disclosed in the bundle notes); ONLY THEN the #18
+content landed: exactly ONE added injected block (BLOCK_TIE_NEGS, 54 lines: the
+F3 and F6 must-shows). The #18 scratch workflow is the 8871ef65 derivation plus
+that one block, produced by the committed generator, never hand-edited.
+Preflight 6e12 re-derives and fails E_SCRATCH_DERIVE_DRIFT on any byte drift.
+Preflight 1's marker whitelist names derive-scratch.py explicitly (the
+generator carries the derived banner, which names the closing marker inside
+its never-emit rule).
+
+Gate dogfooding disclosure: the FIRST preflight run over the new gates FAILED
+rc=30 and caught two defects in this batch's own new checks - (1) 6e11 as
+first written fired in the canonical lane too (there the lane token IS the
+canonical token, so identity resolution legitimately retains it); fixed to
+enforce only in non-canonical lanes, as documented above. (2) preflight 6h's
+line-regex import scan flagged a phantom "http" import in derive-scratch.py:
+the scan cannot see that the generator's embedded workflow-block TEXT (the
+fetch-test heredoc) is data, not generator code; fixed with a narrow named
+allowance for that one file and module, mirroring the fetch_locked precedent.
+Both fixes re-validated: preflight PASS rc=0 in BOTH lanes
+(NON_CERTIFYING_REHEARSAL and NON_CERTIFYING_SCRATCH) on a freshly staged
+platform (the 7:07 workspace wipe had taken the stage; stage-platform.sh
+rebuilt it: 147 debs hash-verified + edk2 edc6681206c1a8791981a2f911d2fb8b3d2f5768
++ 9 submodules pinned; download log preserved).
+
+Validation on this head: generator byte-proof as above; re-derive of the #18
+scratch workflow BYTE-IDENTICAL to the committed file; yaml parse clean x3
+lane workflows; bash -n clean on every .sh; ast parse clean on every .py; both
+new scratch steps extracted from the committed YAML and bash -n clean; F3
+negative + positive EXECUTED (verbatim above); F6 positive + 2 negatives
+EXECUTED against real run-17 evidence (verbatim above); dual-lane config
+resolution (canonical identity; scratch: all 7 vars_templates in the
+constructed set; R7 firmware + qemu resolve; relative esp / case IDs / schema
+untouched); F5 scan 0 canonical components; 6e13 corpus 7/7 AGREE with the
+correct accept/reject split; preflight PASS rc=0 both lanes (above, incl.
+6e12 derive byte-identity and the 6e13 conformance run); 6e6 pins unchanged
+(cert 44, rehearsal 78 - the rehearsal and certification workflow YAMLs are
+untouched); 6e9 0/0/4 unchanged; scratch workflow 0 canonical literals /
+0 CANON_TMP; app pin dccc1818... untouched; firmware/UKI/ESP pins untouched;
+A3 manifest untouched (X4: regenerated at the frozen r3 SHA). The #18 scratch run must
+show: every #17 checklist item, all 7 cases with ALL checks true (tie included
+this time), steps 27/28 green with a real comparison, both new must-shows OK,
+K2/guard/final gate green, and env2 with its cross-runner compare.
