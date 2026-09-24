@@ -1,0 +1,376 @@
+TAP version 13
+# Subtest: injected failure at exam:after-prepare leaves no partial state in any domain or the ledger
+ok 1 - injected failure at exam:after-prepare leaves no partial state in any domain or the ledger
+  ---
+  duration_ms: 9.445042
+  type: 'test'
+  ...
+# Subtest: injected failure at treatment-start:after-inventory leaves no partial state in any domain or the ledger
+ok 2 - injected failure at treatment-start:after-inventory leaves no partial state in any domain or the ledger
+  ---
+  duration_ms: 12.787939
+  type: 'test'
+  ...
+# Subtest: injected failure at treatment-complete:after-inventory leaves no partial state in any domain or the ledger
+ok 3 - injected failure at treatment-complete:after-inventory leaves no partial state in any domain or the ledger
+  ---
+  duration_ms: 6.011112
+  type: 'test'
+  ...
+# Subtest: injected failure at move-bag:before-physical leaves no partial state in any domain or the ledger
+ok 4 - injected failure at move-bag:before-physical leaves no partial state in any domain or the ledger
+  ---
+  duration_ms: 2.884544
+  type: 'test'
+  ...
+# Subtest: after an injected failure the session continues normally from the untouched state
+ok 5 - after an injected failure the session continues normally from the untouched state
+  ---
+  duration_ms: 4.898045
+  type: 'test'
+  ...
+# Subtest: cross-domain treatment completion commits inventory and clinical change in one step
+ok 6 - cross-domain treatment completion commits inventory and clinical change in one step
+  ---
+  duration_ms: 5.382814
+  type: 'test'
+  ...
+# Subtest: every certified file at 127f284 is byte-identical (SHA-256 manifest)
+ok 7 - every certified file at 127f284 is byte-identical (SHA-256 manifest)
+  ---
+  duration_ms: 19.678188
+  type: 'test'
+  ...
+# Subtest: engine never reads host clock or host randomness, and makes no network calls
+ok 8 - engine never reads host clock or host randomness, and makes no network calls
+  ---
+  duration_ms: 1.70867
+  type: 'test'
+  ...
+# Subtest: engine has no dependency on llm-worker, the legacy index.html or legacy nextgen modules
+ok 9 - engine has no dependency on llm-worker, the legacy index.html or legacy nextgen modules
+  ---
+  duration_ms: 0.932434
+  type: 'test'
+  ...
+# Subtest: engine imports certified modules read-only and never touches the world store writer
+ok 10 - engine imports certified modules read-only and never touches the world store writer
+  ---
+  duration_ms: 1.72365
+  type: 'test'
+  ...
+# Subtest: male-only: no female names, roles or legacy female arrays in engine code or content
+ok 11 - male-only: no female names, roles or legacy female arrays in engine code or content
+  ---
+  duration_ms: 0.810965
+  type: 'test'
+  ...
+# Subtest: no childbirth content and no paid or external service references
+ok 12 - no childbirth content and no paid or external service references
+  ---
+  duration_ms: 1.020955
+  type: 'test'
+  ...
+# Subtest: Stage 1 adds files only under the approved paths
+ok 13 - Stage 1 adds files only under the approved paths
+  ---
+  duration_ms: 2.773505
+  type: 'test'
+  ...
+# Subtest: Stage 1 protocol is sealed, synthetic, cites no source and denies clinical use
+ok 14 - Stage 1 protocol is sealed, synthetic, cites no source and denies clinical use
+  ---
+  duration_ms: 1.027003
+  type: 'test'
+  ...
+# Subtest: blanket "MDA ALS 2024" label is refused as a protocol source
+ok 15 - blanket "MDA ALS 2024" label is refused as a protocol source
+  ---
+  duration_ms: 0.605268
+  type: 'test'
+  ...
+# Subtest: clinical protocol requires source, version, validity and approval
+ok 16 - clinical protocol requires source, version, validity and approval
+  ---
+  duration_ms: 0.267508
+  type: 'test'
+  ...
+# Subtest: synthetic protocol may not cite a source or allow clinical use
+ok 17 - synthetic protocol may not cite a source or allow clinical use
+  ---
+  duration_ms: 0.223735
+  type: 'test'
+  ...
+# Subtest: protocol action levels and durations are validated
+ok 18 - protocol action levels and durations are validated
+  ---
+  duration_ms: 0.254601
+  type: 'test'
+  ...
+# Subtest: tampered protocol and scenario seals are detected
+ok 19 - tampered protocol and scenario seals are detected
+  ---
+  duration_ms: 0.421059
+  type: 'test'
+  ...
+# Subtest: scenario is male-only: female patient, NPC or casualty body is refused
+ok 20 - scenario is male-only: female patient, NPC or casualty body is refused
+  ---
+  duration_ms: 0.420916
+  type: 'test'
+  ...
+# Subtest: scenario refuses childbirth content and non-synthetic Stage 1 content
+ok 21 - scenario refuses childbirth content and non-synthetic Stage 1 content
+  ---
+  duration_ms: 0.309383
+  type: 'test'
+  ...
+# Subtest: scenario binds the exact certified scene package, male casualty body and protocol digest
+ok 22 - scenario binds the exact certified scene package, male casualty body and protocol digest
+  ---
+  duration_ms: 0.37304
+  type: 'test'
+  ...
+# Subtest: equipment, transfer, clock, clinical, intent and attempt contracts validate their inputs
+ok 23 - equipment, transfer, clock, clinical, intent and attempt contracts validate their inputs
+  ---
+  duration_ms: 0.975749
+  type: 'test'
+  ...
+# Subtest: result codes include every distinction the owner named
+ok 24 - result codes include every distinction the owner named
+  ---
+  duration_ms: 0.203319
+  type: 'test'
+  ...
+# Subtest: session binds scenario, protocol, level, seed and the certified world at start
+ok 25 - session binds scenario, protocol, level, seed and the certified world at start
+  ---
+  duration_ms: 7.529276
+  type: 'test'
+  ...
+# Subtest: session refuses mismatched protocol, bad level or missing seed
+ok 26 - session refuses mismatched protocol, bad level or missing seed
+  ---
+  duration_ms: 0.980247
+  type: 'test'
+  ...
+# Subtest: question: patient answers only from his knowledge map; answer reveals no exam finding
+ok 27 - question: patient answers only from his knowledge map; answer reveals no exam finding
+  ---
+  duration_ms: 12.586192
+  type: 'test'
+  ...
+# Subtest: no finding is exposed before the examination is performed
+ok 28 - no finding is exposed before the examination is performed
+  ---
+  duration_ms: 3.402781
+  type: 'test'
+  ...
+# Subtest: examining the other region finds nothing; observation binds the clinical revision
+ok 29 - examining the other region finds nothing; observation binds the clinical revision
+  ---
+  duration_ms: 3.271402
+  type: 'test'
+  ...
+# Subtest: REJECTED_NOT_PERMITTED_FOR_LEVEL: synthetic gate blocks first-responder dressing
+ok 30 - REJECTED_NOT_PERMITTED_FOR_LEVEL: synthetic gate blocks first-responder dressing
+  ---
+  duration_ms: 5.428923
+  type: 'test'
+  ...
+# Subtest: REJECTED_ILLEGAL_LOCATION: bag out of reach, state unchanged
+ok 31 - REJECTED_ILLEGAL_LOCATION: bag out of reach, state unchanged
+  ---
+  duration_ms: 3.511298
+  type: 'test'
+  ...
+# Subtest: REJECTED_ILLEGAL_LOCATION: certified physical gate rejects bag into the wall, world digest unchanged
+ok 32 - REJECTED_ILLEGAL_LOCATION: certified physical gate rejects bag into the wall, world digest unchanged
+  ---
+  duration_ms: 11.766474
+  type: 'test'
+  ...
+# Subtest: legal bag move commits through the certified runtime and physical replay matches
+ok 33 - legal bag move commits through the certified runtime and physical replay matches
+  ---
+  duration_ms: 5.527622
+  type: 'test'
+  ...
+# Subtest: REJECTED_INTENT_AMBIGUOUS returns a clarifying question and changes nothing
+ok 34 - REJECTED_INTENT_AMBIGUOUS returns a clarifying question and changes nothing
+  ---
+  duration_ms: 3.542951
+  type: 'test'
+  ...
+# Subtest: REJECTED_CAPABILITY_UNSUPPORTED for recognized-but-unbuilt actions, state unchanged
+ok 35 - REJECTED_CAPABILITY_UNSUPPORTED for recognized-but-unbuilt actions, state unchanged
+  ---
+  duration_ms: 2.605405
+  type: 'test'
+  ...
+# Subtest: treatment is a long action: accepted in progress, cannot finish early, completes exactly at duration
+ok 36 - treatment is a long action: accepted in progress, cannot finish early, completes exactly at duration
+  ---
+  duration_ms: 5.592749
+  type: 'test'
+  ...
+# Subtest: ACCEPTED_NEGATIVE_CLINICAL_OUTCOME: dressing the wrong arm consumes a unit, clinical state unchanged
+ok 37 - ACCEPTED_NEGATIVE_CLINICAL_OUTCOME: dressing the wrong arm consumes a unit, clinical state unchanged
+  ---
+  duration_ms: 4.298665
+  type: 'test'
+  ...
+# Subtest: REJECTED_ACTION_IN_PROGRESS: a parallel treatment cannot bypass the resource limit
+ok 38 - REJECTED_ACTION_IN_PROGRESS: a parallel treatment cannot bypass the resource limit
+  ---
+  duration_ms: 4.789456
+  type: 'test'
+  ...
+# Subtest: REJECTED_EQUIPMENT_MISSING once both dressings are used; no unit is ever duplicated
+ok 39 - REJECTED_EQUIPMENT_MISSING once both dressings are used; no unit is ever duplicated
+  ---
+  duration_ms: 5.75752
+  type: 'test'
+  ...
+# Subtest: inventory authority refuses to move a unit that is not at the stated source (no duplication path)
+ok 40 - inventory authority refuses to move a unit that is not at the stated source (no duplication path)
+  ---
+  duration_ms: 0.501993
+  type: 'test'
+  ...
+# Subtest: bag listing shows item name and quantity only
+ok 41 - bag listing shows item name and quantity only
+  ---
+  duration_ms: 1.967819
+  type: 'test'
+  ...
+# Subtest: pause freezes simulated time and long actions; actions are refused while paused
+ok 42 - pause freezes simulated time and long actions; actions are refused while paused
+  ---
+  duration_ms: 5.780865
+  type: 'test'
+  ...
+# Subtest: clock rejects non-positive or non-integer advances; host clock is never consulted
+ok 43 - clock rejects non-positive or non-integer advances; host clock is never consulted
+  ---
+  duration_ms: 7.963289
+  type: 'test'
+  ...
+# Subtest: every rejection type leaves all domain state (clinical, inventory, clock, world) unchanged
+ok 44 - every rejection type leaves all domain state (clinical, inventory, clock, world) unchanged
+  ---
+  duration_ms: 15.214046
+  type: 'test'
+  ...
+# Subtest: same command through text, voice and menu yields the same canonical intent
+ok 45 - same command through text, voice and menu yields the same canonical intent
+  ---
+  duration_ms: 3.609828
+  type: 'test'
+  ...
+# Subtest: three channels drive identical engine results and identical domain state
+ok 46 - three channels drive identical engine results and identical domain state
+  ---
+  duration_ms: 26.692958
+  type: 'test'
+  ...
+# Subtest: normalizer handles niqqud, final letters, punctuation and prefixes
+ok 47 - normalizer handles niqqud, final letters, punctuation and prefixes
+  ---
+  duration_ms: 0.521671
+  type: 'test'
+  ...
+# Subtest: one-letter typos in longer words are tolerated deterministically
+ok 48 - one-letter typos in longer words are tolerated deterministically
+  ---
+  duration_ms: 0.367185
+  type: 'test'
+  ...
+# Subtest: missing or conflicting parameter asks a short clarifying question instead of guessing
+ok 49 - missing or conflicting parameter asks a short clarifying question instead of guessing
+  ---
+  duration_ms: 0.52496
+  type: 'test'
+  ...
+# Subtest: multiple intents in one command are ambiguous, not executed
+ok 50 - multiple intents in one command are ambiguous, not executed
+  ---
+  duration_ms: 0.245107
+  type: 'test'
+  ...
+# Subtest: recognized but unimplemented capability is UNSUPPORTED, gibberish is AMBIGUOUS
+ok 51 - recognized but unimplemented capability is UNSUPPORTED, gibberish is AMBIGUOUS
+  ---
+  duration_ms: 0.355586
+  type: 'test'
+  ...
+# Subtest: menu input with an unknown intent or bad parameter is refused
+ok 52 - menu input with an unknown intent or bad parameter is refused
+  ---
+  duration_ms: 0.168446
+  type: 'test'
+  ...
+# Subtest: intent resolution is a pure function (repeatable output)
+ok 53 - intent resolution is a pure function (repeatable output)
+  ---
+  duration_ms: 3.319492
+  type: 'test'
+  ...
+# Subtest: ledger covers intents, questioning, exams, inventory, treatment, clock, clinical change and physical commits
+ok 54 - ledger covers intents, questioning, exams, inventory, treatment, clock, clinical change and physical commits
+  ---
+  duration_ms: 23.213767
+  type: 'test'
+  ...
+# Subtest: ledger is hash-chained and deeply frozen
+ok 55 - ledger is hash-chained and deeply frozen
+  ---
+  duration_ms: 10.775898
+  type: 'test'
+  ...
+# Subtest: tampered payload, reordered events and truncated head are detected
+ok 56 - tampered payload, reordered events and truncated head are detected
+  ---
+  duration_ms: 11.10915
+  type: 'test'
+  ...
+# Subtest: rejected actions are recorded as evidence with a sealed ActionAttempt
+ok 57 - rejected actions are recorded as evidence with a sealed ActionAttempt
+  ---
+  duration_ms: 11.784572
+  type: 'test'
+  ...
+# Subtest: same seed and same input sequence reproduce the identical ledger and state
+ok 58 - same seed and same input sequence reproduce the identical ledger and state
+  ---
+  duration_ms: 21.612313
+  type: 'test'
+  ...
+# Subtest: replay from the recorded run reproduces every event digest and the final state
+ok 59 - replay from the recorded run reproduces every event digest and the final state
+  ---
+  duration_ms: 28.007984
+  type: 'test'
+  ...
+# Subtest: replay refuses a tampered ledger, a different seed and wrong version bindings
+ok 60 - replay refuses a tampered ledger, a different seed and wrong version bindings
+  ---
+  duration_ms: 15.935458
+  type: 'test'
+  ...
+# Subtest: seeded randomness is resolved once at start and recorded
+ok 61 - seeded randomness is resolved once at start and recorded
+  ---
+  duration_ms: 54.926126
+  type: 'test'
+  ...
+1..61
+# tests 61
+# suites 0
+# pass 61
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 903.950202

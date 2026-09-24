@@ -1,0 +1,36 @@
+'use strict';
+// Canonical Stage 1 result codes (owner Stage 1 constraint 9).
+// Every submitted input resolves to exactly one of these codes.
+const RESULT_CODES = Object.freeze({
+  // Accepted
+  ACCEPTED_SUCCESS: 'ACCEPTED_SUCCESS',
+  ACCEPTED_NEGATIVE_CLINICAL_OUTCOME: 'ACCEPTED_NEGATIVE_CLINICAL_OUTCOME',
+  ACCEPTED_IN_PROGRESS: 'ACCEPTED_IN_PROGRESS',
+  // Rejected - the seven distinctions the owner named
+  REJECTED_NOT_PERMITTED_FOR_LEVEL: 'REJECTED_NOT_PERMITTED_FOR_LEVEL',
+  REJECTED_EQUIPMENT_MISSING: 'REJECTED_EQUIPMENT_MISSING',
+  REJECTED_ILLEGAL_LOCATION: 'REJECTED_ILLEGAL_LOCATION',
+  REJECTED_INTENT_AMBIGUOUS: 'REJECTED_INTENT_AMBIGUOUS',
+  REJECTED_CAPABILITY_UNSUPPORTED: 'REJECTED_CAPABILITY_UNSUPPORTED',
+  // Rejected - engine/time integrity
+  REJECTED_CLOCK_PAUSED: 'REJECTED_CLOCK_PAUSED',
+  REJECTED_ACTION_IN_PROGRESS: 'REJECTED_ACTION_IN_PROGRESS',
+  REJECTED_INVALID_INPUT: 'REJECTED_INVALID_INPUT',
+});
+
+const ACCEPTED = new Set([
+  RESULT_CODES.ACCEPTED_SUCCESS,
+  RESULT_CODES.ACCEPTED_NEGATIVE_CLINICAL_OUTCOME,
+  RESULT_CODES.ACCEPTED_IN_PROGRESS,
+]);
+
+function isAccepted(code) {
+  return ACCEPTED.has(code);
+}
+
+function assertCode(code) {
+  if (!Object.values(RESULT_CODES).includes(code)) throw new TypeError('UNKNOWN_RESULT_CODE:' + code);
+  return code;
+}
+
+module.exports = { RESULT_CODES, isAccepted, assertCode };

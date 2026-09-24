@@ -1,0 +1,1215 @@
+{
+ "transcript": [
+  {
+   "op": "submit",
+   "arg": {
+    "channel": "text",
+    "text": "מה קרה?"
+   },
+   "result": {
+    "code": "ACCEPTED_SUCCESS",
+    "attemptId": "attempt-1",
+    "answer": "נחתכתי ביד משבר זכוכית",
+    "speaker": "משה"
+   }
+  },
+  {
+   "op": "submit",
+   "arg": {
+    "channel": "voice",
+    "text": "תבדוק את היד השמאלית"
+   },
+   "result": {
+    "code": "ACCEPTED_SUCCESS",
+    "attemptId": "attempt-2",
+    "observation": {
+     "region": "left-forearm",
+     "finding": "SYNTHETIC_WOUND_PRESENT_UNCOVERED"
+    }
+   }
+  },
+  {
+   "op": "submit",
+   "arg": {
+    "channel": "text",
+    "text": "תחבוש את היד השמאלית"
+   },
+   "result": {
+    "code": "REJECTED_ILLEGAL_LOCATION",
+    "attemptId": "attempt-3",
+    "evidence": {
+     "reason": "BAG_OUT_OF_REACH",
+     "within": false,
+     "distanceSquaredMicrounits": "9000000000000",
+     "bag": [
+      -3000000,
+      175000,
+      1000000
+     ],
+     "casualty": [
+      0,
+      0,
+      1000000
+     ]
+    }
+   }
+  },
+  {
+   "op": "submit",
+   "arg": {
+    "channel": "text",
+    "text": "שים את התיק על הקיר"
+   },
+   "result": {
+    "code": "REJECTED_ILLEGAL_LOCATION",
+    "attemptId": "attempt-4",
+    "evidence": {
+     "authority": "CERTIFIED_PHYSICAL_RUNTIME",
+     "code": "LEGALITY_FAIL",
+     "gateReason": "OBSTACLE_PENETRATION",
+     "worldDigestUnchanged": true
+    }
+   }
+  },
+  {
+   "op": "submit",
+   "arg": {
+    "channel": "menu",
+    "intentId": "MOVE_BAG",
+    "params": {
+     "target": "NEAR_CASUALTY_FLOOR"
+    }
+   },
+   "result": {
+    "code": "ACCEPTED_SUCCESS",
+    "attemptId": "attempt-5"
+   }
+  },
+  {
+   "op": "submit",
+   "arg": {
+    "channel": "text",
+    "text": "תחבוש"
+   },
+   "result": {
+    "code": "REJECTED_INTENT_AMBIGUOUS",
+    "attemptId": "attempt-6",
+    "evidence": {
+     "reason": "MISSING_OR_CONFLICTING_PARAMETER",
+     "candidates": null
+    },
+    "clarification": "על איזו יד לחבוש - ימין או שמאל?"
+   }
+  },
+  {
+   "op": "submit",
+   "arg": {
+    "channel": "text",
+    "text": "תחבוש את היד השמאלית"
+   },
+   "result": {
+    "code": "ACCEPTED_IN_PROGRESS",
+    "attemptId": "attempt-7",
+    "endsAtSimTimeMs": 20000
+   }
+  },
+  {
+   "op": "submit",
+   "arg": {
+    "channel": "text",
+    "text": "תחבוש את היד הימנית"
+   },
+   "result": {
+    "code": "REJECTED_ACTION_IN_PROGRESS",
+    "attemptId": "attempt-8",
+    "evidence": {
+     "pending": [
+      "attempt-7"
+     ]
+    }
+   }
+  },
+  {
+   "op": "pause",
+   "arg": null,
+   "result": {
+    "code": "ACCEPTED_SUCCESS",
+    "attemptId": "attempt-9"
+   }
+  },
+  {
+   "op": "advance",
+   "arg": 30000,
+   "result": {
+    "code": "REJECTED_CLOCK_PAUSED",
+    "attemptId": "attempt-10",
+    "evidence": {
+     "reason": "CLOCK_PAUSED"
+    }
+   }
+  },
+  {
+   "op": "resume",
+   "arg": null,
+   "result": {
+    "code": "ACCEPTED_SUCCESS",
+    "attemptId": "attempt-11"
+   }
+  },
+  {
+   "op": "advance",
+   "arg": 19999,
+   "result": {
+    "code": "ACCEPTED_SUCCESS",
+    "attemptId": "attempt-12",
+    "completed": []
+   }
+  },
+  {
+   "op": "advance",
+   "arg": 1,
+   "result": {
+    "code": "ACCEPTED_SUCCESS",
+    "attemptId": "attempt-13",
+    "completed": [
+     {
+      "attemptId": "attempt-7",
+      "outcomeCode": "ACCEPTED_SUCCESS"
+     }
+    ]
+   }
+  },
+  {
+   "op": "submit",
+   "arg": {
+    "channel": "direct",
+    "intentId": "EXAM_INSPECT_FOREARM",
+    "params": {
+     "region": "left-forearm"
+    }
+   },
+   "result": {
+    "code": "ACCEPTED_SUCCESS",
+    "attemptId": "attempt-14",
+    "observation": {
+     "region": "left-forearm",
+     "finding": "SYNTHETIC_WOUND_COVERED"
+    }
+   }
+  },
+  {
+   "op": "submit",
+   "arg": {
+    "channel": "text",
+    "text": "תעשה החייאה"
+   },
+   "result": {
+    "code": "REJECTED_CAPABILITY_UNSUPPORTED",
+    "attemptId": "attempt-15",
+    "evidence": {
+     "capability": "CPR"
+    }
+   }
+  }
+ ],
+ "publicView": {
+  "simTimeMs": 20000,
+  "clockStatus": "RUNNING",
+  "patientName": "משה",
+  "dialogue": [
+   {
+    "speaker": "משה",
+    "answer": "נחתכתי ביד משבר זכוכית"
+   }
+  ],
+  "observations": [
+   {
+    "examId": "EXAM_INSPECT_FOREARM",
+    "region": "left-forearm",
+    "finding": "SYNTHETIC_WOUND_PRESENT_UNCOVERED",
+    "simTimeMs": 0
+   },
+   {
+    "examId": "EXAM_INSPECT_FOREARM",
+    "region": "left-forearm",
+    "finding": "SYNTHETIC_WOUND_COVERED",
+    "simTimeMs": 20000
+   }
+  ],
+  "bag": [
+   {
+    "name": "תחבושת אישית",
+    "quantity": 1
+   }
+  ],
+  "inProgress": []
+ },
+ "ledgerIntegrity": {
+  "ok": true,
+  "length": 42,
+  "head": "33836d1d292cee935ed82c83eaf49b956cba65b27cc9dea598d7da9c3782526f"
+ },
+ "replay": {
+  "ok": true,
+  "ledgerHead": "33836d1d292cee935ed82c83eaf49b956cba65b27cc9dea598d7da9c3782526f",
+  "finalDomainDigest": "f58d64675c548535dec87946a046cabc5fc6967b45d16d0bf2deb42ec4edd390",
+  "events": 42,
+  "physicalReplay": true
+ },
+ "run": {
+  "scenarioDigest": "2f9d82a4ab0f5c08bd651ed70946846faedd774700a084919eda6b8299b3f98b",
+  "protocolDigest": "3aa706e316d1d3e4a5f3ac9eb9f3e2e924d87040d9135d7af2b1b18e96ae3677",
+  "trainingLevel": "medic",
+  "seed": "stage1-demo",
+  "inputs": [
+   {
+    "op": "submit",
+    "input": {
+     "channel": "text",
+     "text": "מה קרה?"
+    }
+   },
+   {
+    "op": "submit",
+    "input": {
+     "channel": "voice",
+     "text": "תבדוק את היד השמאלית"
+    }
+   },
+   {
+    "op": "submit",
+    "input": {
+     "channel": "text",
+     "text": "תחבוש את היד השמאלית"
+    }
+   },
+   {
+    "op": "submit",
+    "input": {
+     "channel": "text",
+     "text": "שים את התיק על הקיר"
+    }
+   },
+   {
+    "op": "submit",
+    "input": {
+     "channel": "menu",
+     "intentId": "MOVE_BAG",
+     "params": {
+      "target": "NEAR_CASUALTY_FLOOR"
+     }
+    }
+   },
+   {
+    "op": "submit",
+    "input": {
+     "channel": "text",
+     "text": "תחבוש"
+    }
+   },
+   {
+    "op": "submit",
+    "input": {
+     "channel": "text",
+     "text": "תחבוש את היד השמאלית"
+    }
+   },
+   {
+    "op": "submit",
+    "input": {
+     "channel": "text",
+     "text": "תחבוש את היד הימנית"
+    }
+   },
+   {
+    "op": "pause"
+   },
+   {
+    "op": "advance",
+    "ms": 30000
+   },
+   {
+    "op": "resume"
+   },
+   {
+    "op": "advance",
+    "ms": 19999
+   },
+   {
+    "op": "advance",
+    "ms": 1
+   },
+   {
+    "op": "submit",
+    "input": {
+     "channel": "direct",
+     "intentId": "EXAM_INSPECT_FOREARM",
+     "params": {
+      "region": "left-forearm"
+     }
+    }
+   },
+   {
+    "op": "submit",
+    "input": {
+     "channel": "text",
+     "text": "תעשה החייאה"
+    }
+   }
+  ],
+  "ledger": [
+   {
+    "sequence": 1,
+    "type": "SESSION_STARTED",
+    "simTimeMs": 0,
+    "payload": {
+     "scenarioId": "stage1-school-treatment-room-synthetic-forearm",
+     "scenarioVersion": "1.0.0",
+     "scenarioDigest": "2f9d82a4ab0f5c08bd651ed70946846faedd774700a084919eda6b8299b3f98b",
+     "protocolId": "stage1-synthetic-mechanics",
+     "protocolVersion": "1.0.0",
+     "protocolDigest": "3aa706e316d1d3e4a5f3ac9eb9f3e2e924d87040d9135d7af2b1b18e96ae3677",
+     "protocolStatus": "SYNTHETIC_NOT_CLINICAL",
+     "trainingLevel": "medic",
+     "seed": "stage1-demo",
+     "patientName": "משה",
+     "worldRevision": 1,
+     "worldStateDigest": "fa1bbaa985a63a8bfa30c2bbd7fbaf14b2c4972d985815a093bdd68f7fe954ea",
+     "clinicalStateDigest": "ee697deb3405f47a95d2941b9c878cdd1321148a060343fdc83150381945bc50"
+    },
+    "priorEventDigest": "0000000000000000000000000000000000000000000000000000000000000000",
+    "eventDigest": "dfc8b81b68873ee6d026558ba96f0c1b8fdcf7c403aecd83cff7d22d3d1c6a9f"
+   },
+   {
+    "sequence": 2,
+    "type": "INPUT_RECEIVED",
+    "simTimeMs": 0,
+    "payload": {
+     "op": "submit",
+     "input": {
+      "channel": "text",
+      "text": "מה קרה?"
+     }
+    },
+    "priorEventDigest": "dfc8b81b68873ee6d026558ba96f0c1b8fdcf7c403aecd83cff7d22d3d1c6a9f",
+    "eventDigest": "d1d1a10946ae307867d2903db3ce38098bae5064407b2fc890738ac95bf7e5bd"
+   },
+   {
+    "sequence": 3,
+    "type": "INTENT_RESOLVED",
+    "simTimeMs": 0,
+    "payload": {
+     "intentId": "ASK_WHAT_HAPPENED",
+     "params": {},
+     "channel": "text",
+     "semanticKey": "33945faee18af2e314a3e168f1fdac722fa24bf1fc40a351d69361b12f058217",
+     "intentDigest": "65f6f7b858ef09504c818723e17159f61bb23fc832cf4f44f5bf42c5fd9ddf46"
+    },
+    "priorEventDigest": "d1d1a10946ae307867d2903db3ce38098bae5064407b2fc890738ac95bf7e5bd",
+    "eventDigest": "844e97cba99c7f3d6a11a7d9723fe0b1400ab61231f34feaa83b65ed1ca99d97"
+   },
+   {
+    "sequence": 4,
+    "type": "QUESTION_ANSWERED",
+    "simTimeMs": 0,
+    "payload": {
+     "speaker": "משה",
+     "questionId": "ASK_WHAT_HAPPENED",
+     "answer": "נחתכתי ביד משבר זכוכית",
+     "simTimeMs": 0,
+     "attempt": {
+      "attemptId": "attempt-1",
+      "sequence": 1,
+      "trainingLevel": "medic",
+      "intent": {
+       "intentId": "ASK_WHAT_HAPPENED",
+       "params": {},
+       "channel": "text",
+       "semanticKey": "33945faee18af2e314a3e168f1fdac722fa24bf1fc40a351d69361b12f058217"
+      },
+      "simTimeMs": 0,
+      "resultCode": "ACCEPTED_SUCCESS",
+      "evidence": {
+       "questionId": "ASK_WHAT_HAPPENED"
+      },
+      "attemptDigest": "d60fad4b6cd283980cfbd87e00a48c53d0c2f47d22c97e511591e11d0daf1c3e"
+     }
+    },
+    "priorEventDigest": "844e97cba99c7f3d6a11a7d9723fe0b1400ab61231f34feaa83b65ed1ca99d97",
+    "eventDigest": "2322e74783ced2528f69df9d81906b93b12df7a5b66fda6eeaed1b56a49da5e3"
+   },
+   {
+    "sequence": 5,
+    "type": "INPUT_RECEIVED",
+    "simTimeMs": 0,
+    "payload": {
+     "op": "submit",
+     "input": {
+      "channel": "voice",
+      "text": "תבדוק את היד השמאלית"
+     }
+    },
+    "priorEventDigest": "2322e74783ced2528f69df9d81906b93b12df7a5b66fda6eeaed1b56a49da5e3",
+    "eventDigest": "3e1c0c9d6ed8afba51e96905da422dc61c8d36c84f042ebf99a9b898b33babcf"
+   },
+   {
+    "sequence": 6,
+    "type": "INTENT_RESOLVED",
+    "simTimeMs": 0,
+    "payload": {
+     "intentId": "EXAM_INSPECT_FOREARM",
+     "params": {
+      "region": "left-forearm"
+     },
+     "channel": "voice",
+     "semanticKey": "a768e1d4a2c0a6eba2423e82ba5307a4a1a56f6eb817fb0ab570a380aaa1f23b",
+     "intentDigest": "f26076de51257bfd2df1f29af4d161a75e39c4196e0054ccdc0e40d3cb165cb3"
+    },
+    "priorEventDigest": "3e1c0c9d6ed8afba51e96905da422dc61c8d36c84f042ebf99a9b898b33babcf",
+    "eventDigest": "c1f36c010403eb4c2d9a07921d1e161ead49ba0a73f872ee2acc24410051c4d2"
+   },
+   {
+    "sequence": 7,
+    "type": "EXAM_PERFORMED",
+    "simTimeMs": 0,
+    "payload": {
+     "examId": "EXAM_INSPECT_FOREARM",
+     "region": "left-forearm"
+    },
+    "priorEventDigest": "c1f36c010403eb4c2d9a07921d1e161ead49ba0a73f872ee2acc24410051c4d2",
+    "eventDigest": "d50d0a016f63b82edb96ee015119e82de3bcdaeb3f0e86ce9b0d17c5b21602ff"
+   },
+   {
+    "sequence": 8,
+    "type": "OBSERVATION_RECORDED",
+    "simTimeMs": 0,
+    "payload": {
+     "observation": {
+      "observationId": "obs-2",
+      "patientId": "patient-1",
+      "examId": "EXAM_INSPECT_FOREARM",
+      "region": "left-forearm",
+      "finding": "SYNTHETIC_WOUND_PRESENT_UNCOVERED",
+      "simTimeMs": 0,
+      "sourceClinicalRevision": 1,
+      "sourceClinicalDigest": "ee697deb3405f47a95d2941b9c878cdd1321148a060343fdc83150381945bc50",
+      "observationDigest": "f5783805e1fa85e1cd9a084aa64090bc99a1538bdf6f53a1347044fdebbadcd3"
+     },
+     "attempt": {
+      "attemptId": "attempt-2",
+      "sequence": 2,
+      "trainingLevel": "medic",
+      "intent": {
+       "intentId": "EXAM_INSPECT_FOREARM",
+       "params": {
+        "region": "left-forearm"
+       },
+       "channel": "voice",
+       "semanticKey": "a768e1d4a2c0a6eba2423e82ba5307a4a1a56f6eb817fb0ab570a380aaa1f23b"
+      },
+      "simTimeMs": 0,
+      "resultCode": "ACCEPTED_SUCCESS",
+      "evidence": {
+       "observationId": "obs-2"
+      },
+      "attemptDigest": "9c47ee43c992039568e80384f5752b6fba41847ca16eebe54ef8e3ec42b68494"
+     }
+    },
+    "priorEventDigest": "d50d0a016f63b82edb96ee015119e82de3bcdaeb3f0e86ce9b0d17c5b21602ff",
+    "eventDigest": "010c7ba33117c1f95eceec2615f4a3553c92aad47741bcd211013cc14fbdbfc4"
+   },
+   {
+    "sequence": 9,
+    "type": "INPUT_RECEIVED",
+    "simTimeMs": 0,
+    "payload": {
+     "op": "submit",
+     "input": {
+      "channel": "text",
+      "text": "תחבוש את היד השמאלית"
+     }
+    },
+    "priorEventDigest": "010c7ba33117c1f95eceec2615f4a3553c92aad47741bcd211013cc14fbdbfc4",
+    "eventDigest": "85cf12213a8e867e78fba2fa926c0de7b1729531fb671b8b6bd1794f7bcbe9ed"
+   },
+   {
+    "sequence": 10,
+    "type": "ACTION_REJECTED",
+    "simTimeMs": 0,
+    "payload": {
+     "attempt": {
+      "attemptId": "attempt-3",
+      "sequence": 3,
+      "trainingLevel": "medic",
+      "intent": {
+       "intentId": "APPLY_SYNTHETIC_DRESSING",
+       "params": {
+        "region": "left-forearm"
+       },
+       "channel": "text",
+       "semanticKey": "78b039831731efb1341f306aafc1b560b5cfcd6169224229a6eb2e63d900f8a1"
+      },
+      "simTimeMs": 0,
+      "resultCode": "REJECTED_ILLEGAL_LOCATION",
+      "evidence": {
+       "reason": "BAG_OUT_OF_REACH",
+       "within": false,
+       "distanceSquaredMicrounits": "9000000000000",
+       "bag": [
+        -3000000,
+        175000,
+        1000000
+       ],
+       "casualty": [
+        0,
+        0,
+        1000000
+       ]
+      },
+      "attemptDigest": "e5aa2940364ed29b9e1ff892074524cb95396bb588f20947524e089af05f1266"
+     }
+    },
+    "priorEventDigest": "85cf12213a8e867e78fba2fa926c0de7b1729531fb671b8b6bd1794f7bcbe9ed",
+    "eventDigest": "d46a88a8844d75fdbec502690752437013e2ca1ac6f346944b2658aca16ab67e"
+   },
+   {
+    "sequence": 11,
+    "type": "INPUT_RECEIVED",
+    "simTimeMs": 0,
+    "payload": {
+     "op": "submit",
+     "input": {
+      "channel": "text",
+      "text": "שים את התיק על הקיר"
+     }
+    },
+    "priorEventDigest": "d46a88a8844d75fdbec502690752437013e2ca1ac6f346944b2658aca16ab67e",
+    "eventDigest": "71d80cd0b3290727c505a15deece421f6689874e798ae9630c9f78cb1764c4bc"
+   },
+   {
+    "sequence": 12,
+    "type": "ACTION_REJECTED",
+    "simTimeMs": 0,
+    "payload": {
+     "attempt": {
+      "attemptId": "attempt-4",
+      "sequence": 4,
+      "trainingLevel": "medic",
+      "intent": {
+       "intentId": "MOVE_BAG",
+       "params": {
+        "target": "WALL"
+       },
+       "channel": "text",
+       "semanticKey": "486dbfaf1c2ad99a4152a4f2d05457ab98aaf02aabaae602ddd86a9e132e25be"
+      },
+      "simTimeMs": 0,
+      "resultCode": "REJECTED_ILLEGAL_LOCATION",
+      "evidence": {
+       "authority": "CERTIFIED_PHYSICAL_RUNTIME",
+       "code": "LEGALITY_FAIL",
+       "gateReason": "OBSTACLE_PENETRATION",
+       "worldDigestUnchanged": true
+      },
+      "attemptDigest": "07f0021d43f189abb0b04601890b10176140f50b47a52cfba881586140d424f8"
+     }
+    },
+    "priorEventDigest": "71d80cd0b3290727c505a15deece421f6689874e798ae9630c9f78cb1764c4bc",
+    "eventDigest": "9e03122038435c8ae5c3894c94f3df76db8c5ed552b130658a6bb8d0e4cb607d"
+   },
+   {
+    "sequence": 13,
+    "type": "INPUT_RECEIVED",
+    "simTimeMs": 0,
+    "payload": {
+     "op": "submit",
+     "input": {
+      "channel": "menu",
+      "intentId": "MOVE_BAG",
+      "params": {
+       "target": "NEAR_CASUALTY_FLOOR"
+      }
+     }
+    },
+    "priorEventDigest": "9e03122038435c8ae5c3894c94f3df76db8c5ed552b130658a6bb8d0e4cb607d",
+    "eventDigest": "d5921226e49d9576ee2d54ecba64b69a7a9642b6026cbad75238c5808e69a64a"
+   },
+   {
+    "sequence": 14,
+    "type": "INTENT_RESOLVED",
+    "simTimeMs": 0,
+    "payload": {
+     "intentId": "MOVE_BAG",
+     "params": {
+      "target": "NEAR_CASUALTY_FLOOR"
+     },
+     "channel": "menu",
+     "semanticKey": "30f470389eeceac1440f9530f5448825eadb8edd9bd2ae5fe3485e2e506e91c8",
+     "intentDigest": "85145dd75dc15e5e4da8ccb09b388bbba2a4d13e1d4de33d9fd7f83576e1b716"
+    },
+    "priorEventDigest": "d5921226e49d9576ee2d54ecba64b69a7a9642b6026cbad75238c5808e69a64a",
+    "eventDigest": "24f3c81259ace4e4fbf360dfee6a6b483af3d621617ee5aa0262f17b267eab4b"
+   },
+   {
+    "sequence": 15,
+    "type": "PHYSICAL_MUTATION_COMMITTED",
+    "simTimeMs": 0,
+    "payload": {
+     "authority": "CERTIFIED_PHYSICAL_RUNTIME",
+     "target": "NEAR_CASUALTY_FLOOR",
+     "priorStateDigest": "fa1bbaa985a63a8bfa30c2bbd7fbaf14b2c4972d985815a093bdd68f7fe954ea",
+     "stateDigest": "0ff66dcebe2cdb310e08ee4b9d493e3360e6c3f2077dfe896716238a6f61066e",
+     "worldRevision": 2,
+     "physicalEventDigest": "64fb67065f81e7367a01146c3aa828eafeaf9db506f52e37760bcc26e562c763",
+     "attempt": {
+      "attemptId": "attempt-5",
+      "sequence": 5,
+      "trainingLevel": "medic",
+      "intent": {
+       "intentId": "MOVE_BAG",
+       "params": {
+        "target": "NEAR_CASUALTY_FLOOR"
+       },
+       "channel": "menu",
+       "semanticKey": "30f470389eeceac1440f9530f5448825eadb8edd9bd2ae5fe3485e2e506e91c8"
+      },
+      "simTimeMs": 0,
+      "resultCode": "ACCEPTED_SUCCESS",
+      "evidence": {
+       "worldRevision": 2
+      },
+      "attemptDigest": "7a41999ddf49d75010ee3a59491a418724f9fb3552ea1b1b781dec4498e5038f"
+     }
+    },
+    "priorEventDigest": "24f3c81259ace4e4fbf360dfee6a6b483af3d621617ee5aa0262f17b267eab4b",
+    "eventDigest": "5e3b95ca331ded3cc400a900ea8a6ee001df99a5102338c531489f36258905db"
+   },
+   {
+    "sequence": 16,
+    "type": "INPUT_RECEIVED",
+    "simTimeMs": 0,
+    "payload": {
+     "op": "submit",
+     "input": {
+      "channel": "text",
+      "text": "תחבוש"
+     }
+    },
+    "priorEventDigest": "5e3b95ca331ded3cc400a900ea8a6ee001df99a5102338c531489f36258905db",
+    "eventDigest": "8a3f3d36a1e077bc61acc86d98ddc902e3220242514ee035b5d50c7e04fcca39"
+   },
+   {
+    "sequence": 17,
+    "type": "ACTION_REJECTED",
+    "simTimeMs": 0,
+    "payload": {
+     "attempt": {
+      "attemptId": "attempt-6",
+      "sequence": 6,
+      "trainingLevel": "medic",
+      "intent": null,
+      "simTimeMs": 0,
+      "resultCode": "REJECTED_INTENT_AMBIGUOUS",
+      "evidence": {
+       "reason": "MISSING_OR_CONFLICTING_PARAMETER",
+       "candidates": null
+      },
+      "attemptDigest": "91c091d407a34e76406ec92b9f9edc20be5e357c859b62392940034380d8cf91"
+     }
+    },
+    "priorEventDigest": "8a3f3d36a1e077bc61acc86d98ddc902e3220242514ee035b5d50c7e04fcca39",
+    "eventDigest": "5690ea2146c66d71cc4dc3565b564fced07ce3ad975e5183062d311b806acf6e"
+   },
+   {
+    "sequence": 18,
+    "type": "INPUT_RECEIVED",
+    "simTimeMs": 0,
+    "payload": {
+     "op": "submit",
+     "input": {
+      "channel": "text",
+      "text": "תחבוש את היד השמאלית"
+     }
+    },
+    "priorEventDigest": "5690ea2146c66d71cc4dc3565b564fced07ce3ad975e5183062d311b806acf6e",
+    "eventDigest": "b60b43615bb4174f1bbb856e22b7cc37f546d9f7032094d0584ded670bcfd757"
+   },
+   {
+    "sequence": 19,
+    "type": "INTENT_RESOLVED",
+    "simTimeMs": 0,
+    "payload": {
+     "intentId": "APPLY_SYNTHETIC_DRESSING",
+     "params": {
+      "region": "left-forearm"
+     },
+     "channel": "text",
+     "semanticKey": "78b039831731efb1341f306aafc1b560b5cfcd6169224229a6eb2e63d900f8a1",
+     "intentDigest": "1a587a48ced0edeab4512119925a71df8780cff35f6bbeabbea7cc26505c030d"
+    },
+    "priorEventDigest": "b60b43615bb4174f1bbb856e22b7cc37f546d9f7032094d0584ded670bcfd757",
+    "eventDigest": "cfa327dda3f5e40efebda723317da257fabcaedf4254e048d8a7a2010753daf0"
+   },
+   {
+    "sequence": 20,
+    "type": "INVENTORY_TRANSFERRED",
+    "simTimeMs": 0,
+    "payload": {
+     "transfer": {
+      "transferId": "transfer-7-a",
+      "unitId": "personal-dressing-1",
+      "fromKind": "BAG",
+      "toKind": "RESPONDER_HANDS",
+      "toRef": "responder",
+      "reason": "TREATMENT_START",
+      "simTimeMs": 0,
+      "unitRevisionBefore": 1,
+      "transferDigest": "bb8c8cd857eb096ff70a3e2832c1e6556f4be7eb5e054c6092a38f9abc35af1b"
+     }
+    },
+    "priorEventDigest": "cfa327dda3f5e40efebda723317da257fabcaedf4254e048d8a7a2010753daf0",
+    "eventDigest": "6340ace9b3ace737ed6cc3910fc3b3fa993e0948d01055837d1ebfc4671d8d0a"
+   },
+   {
+    "sequence": 21,
+    "type": "TREATMENT_STARTED",
+    "simTimeMs": 0,
+    "payload": {
+     "job": {
+      "attemptId": "attempt-7",
+      "actionId": "APPLY_SYNTHETIC_DRESSING",
+      "unitId": "personal-dressing-1",
+      "region": "left-forearm",
+      "startMs": 0,
+      "endMs": 20000
+     },
+     "attempt": {
+      "attemptId": "attempt-7",
+      "sequence": 7,
+      "trainingLevel": "medic",
+      "intent": {
+       "intentId": "APPLY_SYNTHETIC_DRESSING",
+       "params": {
+        "region": "left-forearm"
+       },
+       "channel": "text",
+       "semanticKey": "78b039831731efb1341f306aafc1b560b5cfcd6169224229a6eb2e63d900f8a1"
+      },
+      "simTimeMs": 0,
+      "resultCode": "ACCEPTED_IN_PROGRESS",
+      "evidence": {
+       "unitId": "personal-dressing-1",
+       "endMs": 20000
+      },
+      "attemptDigest": "f605e2061bddef8d423f9f2cc53d37819d4d24287bb969c1ec2511534e66ba01"
+     }
+    },
+    "priorEventDigest": "6340ace9b3ace737ed6cc3910fc3b3fa993e0948d01055837d1ebfc4671d8d0a",
+    "eventDigest": "b01e2e21938c0522ebadd8c107d603bf81acb8bd5fec38d203297cd794df8434"
+   },
+   {
+    "sequence": 22,
+    "type": "INPUT_RECEIVED",
+    "simTimeMs": 0,
+    "payload": {
+     "op": "submit",
+     "input": {
+      "channel": "text",
+      "text": "תחבוש את היד הימנית"
+     }
+    },
+    "priorEventDigest": "b01e2e21938c0522ebadd8c107d603bf81acb8bd5fec38d203297cd794df8434",
+    "eventDigest": "46672b8a0225972df1b5f4290432ce74b98aa03965e39cdb5a8c88c5eebb6c6c"
+   },
+   {
+    "sequence": 23,
+    "type": "ACTION_REJECTED",
+    "simTimeMs": 0,
+    "payload": {
+     "attempt": {
+      "attemptId": "attempt-8",
+      "sequence": 8,
+      "trainingLevel": "medic",
+      "intent": {
+       "intentId": "APPLY_SYNTHETIC_DRESSING",
+       "params": {
+        "region": "right-forearm"
+       },
+       "channel": "text",
+       "semanticKey": "aba2b053d43b281dc222fb71387e812bf129b4ce96285857d771b2a9c9615fe9"
+      },
+      "simTimeMs": 0,
+      "resultCode": "REJECTED_ACTION_IN_PROGRESS",
+      "evidence": {
+       "pending": [
+        "attempt-7"
+       ]
+      },
+      "attemptDigest": "fbe93734ba709970500e19a3889390e589e396ca4fd7dbf00149efe164783c4a"
+     }
+    },
+    "priorEventDigest": "46672b8a0225972df1b5f4290432ce74b98aa03965e39cdb5a8c88c5eebb6c6c",
+    "eventDigest": "0c1ef90616a87c2527a22b84dbdb2edbd93f541843194f42a4b56533abe54cbf"
+   },
+   {
+    "sequence": 24,
+    "type": "INPUT_RECEIVED",
+    "simTimeMs": 0,
+    "payload": {
+     "op": "pause"
+    },
+    "priorEventDigest": "0c1ef90616a87c2527a22b84dbdb2edbd93f541843194f42a4b56533abe54cbf",
+    "eventDigest": "77f453b25d61b25ce0689ec78b5f77d6ce8f3440a172c78e7d0e4ca0bf689842"
+   },
+   {
+    "sequence": 25,
+    "type": "CLOCK_PAUSED",
+    "simTimeMs": 0,
+    "payload": {
+     "clock": {
+      "simTimeMs": 0,
+      "status": "PAUSED",
+      "revision": 2,
+      "clockDigest": "f75035910eedbf36d7b3a00987ad18599b93079a1404f23667269fa337bbf87d"
+     },
+     "attempt": {
+      "attemptId": "attempt-9",
+      "sequence": 9,
+      "trainingLevel": "medic",
+      "intent": null,
+      "simTimeMs": 0,
+      "resultCode": "ACCEPTED_SUCCESS",
+      "evidence": {},
+      "attemptDigest": "9aead89fbceb74ccacff8afdf8741af9d447aaf4a53dad01f0241aec43e764bd"
+     }
+    },
+    "priorEventDigest": "77f453b25d61b25ce0689ec78b5f77d6ce8f3440a172c78e7d0e4ca0bf689842",
+    "eventDigest": "749c183eff5d7e2fa742a676925855ad88af70ad24b1420b1ea8f87a63daa1f1"
+   },
+   {
+    "sequence": 26,
+    "type": "INPUT_RECEIVED",
+    "simTimeMs": 0,
+    "payload": {
+     "op": "advance",
+     "ms": 30000
+    },
+    "priorEventDigest": "749c183eff5d7e2fa742a676925855ad88af70ad24b1420b1ea8f87a63daa1f1",
+    "eventDigest": "919e6213a453a11f1549468de3df22dc1ca747b61251a05eee21f76d0710eff2"
+   },
+   {
+    "sequence": 27,
+    "type": "ACTION_REJECTED",
+    "simTimeMs": 0,
+    "payload": {
+     "attempt": {
+      "attemptId": "attempt-10",
+      "sequence": 10,
+      "trainingLevel": "medic",
+      "intent": null,
+      "simTimeMs": 0,
+      "resultCode": "REJECTED_CLOCK_PAUSED",
+      "evidence": {
+       "reason": "CLOCK_PAUSED"
+      },
+      "attemptDigest": "7fcc6c93f0d95a8e025008a16e8fb8de28f0d7031e1df5491272161407b29181"
+     }
+    },
+    "priorEventDigest": "919e6213a453a11f1549468de3df22dc1ca747b61251a05eee21f76d0710eff2",
+    "eventDigest": "88bd1145bc21ddf476789c70f3c47ee96b5c6513ed2bf2b1805283372d41fa05"
+   },
+   {
+    "sequence": 28,
+    "type": "INPUT_RECEIVED",
+    "simTimeMs": 0,
+    "payload": {
+     "op": "resume"
+    },
+    "priorEventDigest": "88bd1145bc21ddf476789c70f3c47ee96b5c6513ed2bf2b1805283372d41fa05",
+    "eventDigest": "e3be97a5c7d5d2eddbe855525f01a6d18f0d5d09a2b4ebbd63acf9ae94479a4d"
+   },
+   {
+    "sequence": 29,
+    "type": "CLOCK_RESUMED",
+    "simTimeMs": 0,
+    "payload": {
+     "clock": {
+      "simTimeMs": 0,
+      "status": "RUNNING",
+      "revision": 3,
+      "clockDigest": "4b836d7f82ca061ec2fc0db5ea1475d9824672e60e971edf6b8ea32c3067d56c"
+     },
+     "attempt": {
+      "attemptId": "attempt-11",
+      "sequence": 11,
+      "trainingLevel": "medic",
+      "intent": null,
+      "simTimeMs": 0,
+      "resultCode": "ACCEPTED_SUCCESS",
+      "evidence": {},
+      "attemptDigest": "89cbd857dbaf7c353d5b9cee7f4cd823f6968b0539ceaebe578b894c23a6056d"
+     }
+    },
+    "priorEventDigest": "e3be97a5c7d5d2eddbe855525f01a6d18f0d5d09a2b4ebbd63acf9ae94479a4d",
+    "eventDigest": "f3f9a3a9a8b584637f50d70e083ff2de340b12503ec3d8ca1ec3faf08515bd45"
+   },
+   {
+    "sequence": 30,
+    "type": "INPUT_RECEIVED",
+    "simTimeMs": 19999,
+    "payload": {
+     "op": "advance",
+     "ms": 19999
+    },
+    "priorEventDigest": "f3f9a3a9a8b584637f50d70e083ff2de340b12503ec3d8ca1ec3faf08515bd45",
+    "eventDigest": "36565eb8a1c47edc284e9aafce4a278a4ebb088314af32be0199b1203d5b64fb"
+   },
+   {
+    "sequence": 31,
+    "type": "CLOCK_ADVANCED",
+    "simTimeMs": 19999,
+    "payload": {
+     "fromMs": 0,
+     "toMs": 19999,
+     "completed": [],
+     "attempt": {
+      "attemptId": "attempt-12",
+      "sequence": 12,
+      "trainingLevel": "medic",
+      "intent": null,
+      "simTimeMs": 0,
+      "resultCode": "ACCEPTED_SUCCESS",
+      "evidence": {
+       "completed": []
+      },
+      "attemptDigest": "6ca9fde12bb80139d6c36ab32e2237ed0b368f2a66646987ae6d5a2c8a951c91"
+     }
+    },
+    "priorEventDigest": "36565eb8a1c47edc284e9aafce4a278a4ebb088314af32be0199b1203d5b64fb",
+    "eventDigest": "4e1cd8870bb3d8443f6b25808a42451689fd76126fe65b05949989db929ec6c9"
+   },
+   {
+    "sequence": 32,
+    "type": "INPUT_RECEIVED",
+    "simTimeMs": 20000,
+    "payload": {
+     "op": "advance",
+     "ms": 1
+    },
+    "priorEventDigest": "4e1cd8870bb3d8443f6b25808a42451689fd76126fe65b05949989db929ec6c9",
+    "eventDigest": "4589b6521df4414d0f6304fad225a95a4e0f3e78023d1666a8b3ec259418c1ba"
+   },
+   {
+    "sequence": 33,
+    "type": "INVENTORY_TRANSFERRED",
+    "simTimeMs": 20000,
+    "payload": {
+     "transfer": {
+      "transferId": "transfer-attempt-7-b",
+      "unitId": "personal-dressing-1",
+      "fromKind": "RESPONDER_HANDS",
+      "toKind": "APPLIED_TO_PATIENT",
+      "toRef": "patient-1",
+      "reason": "TREATMENT_COMPLETE",
+      "simTimeMs": 20000,
+      "unitRevisionBefore": 2,
+      "transferDigest": "b8331e49a54de658df1126004cdb91fbae6ff98b0b20b1a5f153fef5aade9661"
+     }
+    },
+    "priorEventDigest": "4589b6521df4414d0f6304fad225a95a4e0f3e78023d1666a8b3ec259418c1ba",
+    "eventDigest": "788d1a00df869093caee3b6adbd01b273c8a6c99ef4f0475cc6ddc6f9479da5d"
+   },
+   {
+    "sequence": 34,
+    "type": "CLINICAL_STATE_CHANGED",
+    "simTimeMs": 20000,
+    "payload": {
+     "patientId": "patient-1",
+     "before": {
+      "revision": 1,
+      "digest": "ee697deb3405f47a95d2941b9c878cdd1321148a060343fdc83150381945bc50"
+     },
+     "after": {
+      "revision": 2,
+      "digest": "b76641a5544727cd0d193af5be8c9b05f5e121e25faaedd97eafadec3ca928ba"
+     },
+     "cause": "attempt-7"
+    },
+    "priorEventDigest": "788d1a00df869093caee3b6adbd01b273c8a6c99ef4f0475cc6ddc6f9479da5d",
+    "eventDigest": "ac29e8a0a0dfa40af8b0bf30c7ad249d9ca2b5fcfdea92a0507621f86572e377"
+   },
+   {
+    "sequence": 35,
+    "type": "TREATMENT_COMPLETED",
+    "simTimeMs": 20000,
+    "payload": {
+     "job": {
+      "attemptId": "attempt-7",
+      "actionId": "APPLY_SYNTHETIC_DRESSING",
+      "unitId": "personal-dressing-1",
+      "region": "left-forearm",
+      "startMs": 0,
+      "endMs": 20000
+     },
+     "outcomeCode": "ACCEPTED_SUCCESS"
+    },
+    "priorEventDigest": "ac29e8a0a0dfa40af8b0bf30c7ad249d9ca2b5fcfdea92a0507621f86572e377",
+    "eventDigest": "a4533fc58fb1fa57a95f4a6c030cd1f9fa533ec491562b4ef91a71f0f81e8345"
+   },
+   {
+    "sequence": 36,
+    "type": "CLOCK_ADVANCED",
+    "simTimeMs": 20000,
+    "payload": {
+     "fromMs": 19999,
+     "toMs": 20000,
+     "completed": [
+      {
+       "attemptId": "attempt-7",
+       "outcomeCode": "ACCEPTED_SUCCESS"
+      }
+     ],
+     "attempt": {
+      "attemptId": "attempt-13",
+      "sequence": 13,
+      "trainingLevel": "medic",
+      "intent": null,
+      "simTimeMs": 19999,
+      "resultCode": "ACCEPTED_SUCCESS",
+      "evidence": {
+       "completed": [
+        {
+         "attemptId": "attempt-7",
+         "outcomeCode": "ACCEPTED_SUCCESS"
+        }
+       ]
+      },
+      "attemptDigest": "b454a6fede606b4aa5da8a41ff7698f4e8fe66c8fcfb1f7b7de8b49475c90510"
+     }
+    },
+    "priorEventDigest": "a4533fc58fb1fa57a95f4a6c030cd1f9fa533ec491562b4ef91a71f0f81e8345",
+    "eventDigest": "f05a68533e6efb3f5ef574d38a191821805e491800de29c60b94ad7b81eb41bd"
+   },
+   {
+    "sequence": 37,
+    "type": "INPUT_RECEIVED",
+    "simTimeMs": 20000,
+    "payload": {
+     "op": "submit",
+     "input": {
+      "channel": "direct",
+      "intentId": "EXAM_INSPECT_FOREARM",
+      "params": {
+       "region": "left-forearm"
+      }
+     }
+    },
+    "priorEventDigest": "f05a68533e6efb3f5ef574d38a191821805e491800de29c60b94ad7b81eb41bd",
+    "eventDigest": "6ab163f505b6baa3a1e981c4eecd2ecb88b928f62d0bdb8a62a82371cb6527d1"
+   },
+   {
+    "sequence": 38,
+    "type": "INTENT_RESOLVED",
+    "simTimeMs": 20000,
+    "payload": {
+     "intentId": "EXAM_INSPECT_FOREARM",
+     "params": {
+      "region": "left-forearm"
+     },
+     "channel": "direct",
+     "semanticKey": "a768e1d4a2c0a6eba2423e82ba5307a4a1a56f6eb817fb0ab570a380aaa1f23b",
+     "intentDigest": "274f498460f28824b5efda7b5d4bbefcc144d08ce282c86def07f71e8e1233b2"
+    },
+    "priorEventDigest": "6ab163f505b6baa3a1e981c4eecd2ecb88b928f62d0bdb8a62a82371cb6527d1",
+    "eventDigest": "7c20ea6449c6f9f0713abdfcc6a020f1a0be171c2d37ced3d457e83bf2d91cf2"
+   },
+   {
+    "sequence": 39,
+    "type": "EXAM_PERFORMED",
+    "simTimeMs": 20000,
+    "payload": {
+     "examId": "EXAM_INSPECT_FOREARM",
+     "region": "left-forearm"
+    },
+    "priorEventDigest": "7c20ea6449c6f9f0713abdfcc6a020f1a0be171c2d37ced3d457e83bf2d91cf2",
+    "eventDigest": "38531d6d66790ad67ab984388d0ac62c7c531354d3b41a3dfab5ab937bee340b"
+   },
+   {
+    "sequence": 40,
+    "type": "OBSERVATION_RECORDED",
+    "simTimeMs": 20000,
+    "payload": {
+     "observation": {
+      "observationId": "obs-14",
+      "patientId": "patient-1",
+      "examId": "EXAM_INSPECT_FOREARM",
+      "region": "left-forearm",
+      "finding": "SYNTHETIC_WOUND_COVERED",
+      "simTimeMs": 20000,
+      "sourceClinicalRevision": 2,
+      "sourceClinicalDigest": "b76641a5544727cd0d193af5be8c9b05f5e121e25faaedd97eafadec3ca928ba",
+      "observationDigest": "8e540533746d0a1476792310c6f8b5519c050673fa85ae233fb587eb10cf197d"
+     },
+     "attempt": {
+      "attemptId": "attempt-14",
+      "sequence": 14,
+      "trainingLevel": "medic",
+      "intent": {
+       "intentId": "EXAM_INSPECT_FOREARM",
+       "params": {
+        "region": "left-forearm"
+       },
+       "channel": "direct",
+       "semanticKey": "a768e1d4a2c0a6eba2423e82ba5307a4a1a56f6eb817fb0ab570a380aaa1f23b"
+      },
+      "simTimeMs": 20000,
+      "resultCode": "ACCEPTED_SUCCESS",
+      "evidence": {
+       "observationId": "obs-14"
+      },
+      "attemptDigest": "1f0cec7cbebc3389fdcf80957da7209f4a3e36f348b7583fa5bcf2ed43fa9505"
+     }
+    },
+    "priorEventDigest": "38531d6d66790ad67ab984388d0ac62c7c531354d3b41a3dfab5ab937bee340b",
+    "eventDigest": "41ca6e4a2a507db9bea731c2b1286edd34a95de0ce5bb1e93fad9651df957e08"
+   },
+   {
+    "sequence": 41,
+    "type": "INPUT_RECEIVED",
+    "simTimeMs": 20000,
+    "payload": {
+     "op": "submit",
+     "input": {
+      "channel": "text",
+      "text": "תעשה החייאה"
+     }
+    },
+    "priorEventDigest": "41ca6e4a2a507db9bea731c2b1286edd34a95de0ce5bb1e93fad9651df957e08",
+    "eventDigest": "48ce897816f23814a0d2e4465f3336b3ea96e0b71ff70119bef339bd0b1a530e"
+   },
+   {
+    "sequence": 42,
+    "type": "ACTION_REJECTED",
+    "simTimeMs": 20000,
+    "payload": {
+     "attempt": {
+      "attemptId": "attempt-15",
+      "sequence": 15,
+      "trainingLevel": "medic",
+      "intent": null,
+      "simTimeMs": 20000,
+      "resultCode": "REJECTED_CAPABILITY_UNSUPPORTED",
+      "evidence": {
+       "capability": "CPR"
+      },
+      "attemptDigest": "4cc1038a19dd838110783864c956b15fd869634a7c4c8354c3d7c9e2db2e8d7e"
+     }
+    },
+    "priorEventDigest": "48ce897816f23814a0d2e4465f3336b3ea96e0b71ff70119bef339bd0b1a530e",
+    "eventDigest": "33836d1d292cee935ed82c83eaf49b956cba65b27cc9dea598d7da9c3782526f"
+   }
+  ],
+  "ledgerHead": "33836d1d292cee935ed82c83eaf49b956cba65b27cc9dea598d7da9c3782526f",
+  "finalDomainDigest": "f58d64675c548535dec87946a046cabc5fc6967b45d16d0bf2deb42ec4edd390"
+ }
+}

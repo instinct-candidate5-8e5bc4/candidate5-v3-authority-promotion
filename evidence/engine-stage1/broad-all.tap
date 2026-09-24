@@ -1,0 +1,3743 @@
+TAP version 13
+# Subtest: PROFILE definition bytes/digest unchanged through all envelope states
+ok 1 - PROFILE definition bytes/digest unchanged through all envelope states
+  ---
+  duration_ms: 2.12757
+  type: 'test'
+  ...
+# Subtest: POSTURE definition bytes/digest unchanged through all envelope states
+ok 2 - POSTURE definition bytes/digest unchanged through all envelope states
+  ---
+  duration_ms: 0.422695
+  type: 'test'
+  ...
+# Subtest: PHYSICAL_BODY definition bytes/digest unchanged through all envelope states
+ok 3 - PHYSICAL_BODY definition bytes/digest unchanged through all envelope states
+  ---
+  duration_ms: 0.709197
+  type: 'test'
+  ...
+# Subtest: exact Gate B refs and review admission succeed
+ok 4 - exact Gate B refs and review admission succeed
+  ---
+  duration_ms: 0.53994
+  type: 'test'
+  ...
+# Subtest: wrong digest rejects closed
+ok 5 - wrong digest rejects closed
+  ---
+  duration_ms: 0.301714
+  type: 'test'
+  ...
+# Subtest: wrong revision rejects closed
+ok 6 - wrong revision rejects closed
+  ---
+  duration_ms: 0.134103
+  type: 'test'
+  ...
+# Subtest: review other digest rejects closed
+ok 7 - review other digest rejects closed
+  ---
+  duration_ms: 0.216238
+  type: 'test'
+  ...
+# Subtest: review other revision rejects closed
+ok 8 - review other revision rejects closed
+  ---
+  duration_ms: 0.123402
+  type: 'test'
+  ...
+# Subtest: scope mismatch rejects closed
+ok 9 - scope mismatch rejects closed
+  ---
+  duration_ms: 0.380315
+  type: 'test'
+  ...
+# Subtest: missing review rejects closed
+ok 10 - missing review rejects closed
+  ---
+  duration_ms: 1.457109
+  type: 'test'
+  ...
+# Subtest: unknown state rejects closed
+ok 11 - unknown state rejects closed
+  ---
+  duration_ms: 0.210194
+  type: 'test'
+  ...
+# Subtest: envelope digest mismatch and malformed reject
+ok 12 - envelope digest mismatch and malformed reject
+  ---
+  duration_ms: 0.297
+  type: 'test'
+  ...
+# Subtest: invalid transitions and unverified admission reject
+ok 13 - invalid transitions and unverified admission reject
+  ---
+  duration_ms: 1.302508
+  type: 'test'
+  ...
+# Subtest: review is not transitive to same ID new revision or other definition
+ok 14 - review is not transitive to same ID new revision or other definition
+  ---
+  duration_ms: 0.344962
+  type: 'test'
+  ...
+# Subtest: supersession preserves prior immutable history
+ok 15 - supersession preserves prior immutable history
+  ---
+  duration_ms: 0.426785
+  type: 'test'
+  ...
+# Subtest: logical envelope insertion order canonicalizes identically
+ok 16 - logical envelope insertion order canonicalizes identically
+  ---
+  duration_ms: 0.285093
+  type: 'test'
+  ...
+# Subtest: old embedded lifecycle mutator cannot create second truth
+ok 17 - old embedded lifecycle mutator cannot create second truth
+  ---
+  duration_ms: 0.140845
+  type: 'test'
+  ...
+# Subtest: valid synthetic compound derives conservative aggregate and digest
+ok 18 - valid synthetic compound derives conservative aggregate and digest
+  ---
+  duration_ms: 4.387858
+  type: 'test'
+  ...
+# Subtest: malformed rejects closed
+ok 19 - malformed rejects closed
+  ---
+  duration_ms: 0.342011
+  type: 'test'
+  ...
+# Subtest: unknown primitive rejects closed
+ok 20 - unknown primitive rejects closed
+  ---
+  duration_ms: 0.205867
+  type: 'test'
+  ...
+# Subtest: nonfinite rejects closed
+ok 21 - nonfinite rejects closed
+  ---
+  duration_ms: 0.254272
+  type: 'test'
+  ...
+# Subtest: overflow rejects closed
+ok 22 - overflow rejects closed
+  ---
+  duration_ms: 0.171524
+  type: 'test'
+  ...
+# Subtest: zero dimension rejects closed
+ok 23 - zero dimension rejects closed
+  ---
+  duration_ms: 0.188974
+  type: 'test'
+  ...
+# Subtest: negative dimension rejects closed
+ok 24 - negative dimension rejects closed
+  ---
+  duration_ms: 0.217865
+  type: 'test'
+  ...
+# Subtest: bad frame rejects closed
+ok 25 - bad frame rejects closed
+  ---
+  duration_ms: 0.137741
+  type: 'test'
+  ...
+# Subtest: bad origin rejects closed
+ok 26 - bad origin rejects closed
+  ---
+  duration_ms: 0.463366
+  type: 'test'
+  ...
+# Subtest: duplicate component rejects closed
+ok 27 - duplicate component rejects closed
+  ---
+  duration_ms: 0.484089
+  type: 'test'
+  ...
+# Subtest: aggregate mismatch rejects closed
+ok 28 - aggregate mismatch rejects closed
+  ---
+  duration_ms: 0.238248
+  type: 'test'
+  ...
+# Subtest: bad footprint rejects closed
+ok 29 - bad footprint rejects closed
+  ---
+  duration_ms: 0.230575
+  type: 'test'
+  ...
+# Subtest: bad contact rejects closed
+ok 30 - bad contact rejects closed
+  ---
+  duration_ms: 0.153945
+  type: 'test'
+  ...
+# Subtest: unknown support rejects closed
+ok 31 - unknown support rejects closed
+  ---
+  duration_ms: 0.212781
+  type: 'test'
+  ...
+# Subtest: rotated body rejects closed
+ok 32 - rotated body rejects closed
+  ---
+  duration_ms: 0.108415
+  type: 'test'
+  ...
+# Subtest: digest mismatch rejects closed
+ok 33 - digest mismatch rejects closed
+  ---
+  duration_ms: 0.358157
+  type: 'test'
+  ...
+# Subtest: valid posture binds exact body revision
+ok 34 - valid posture binds exact body revision
+  ---
+  duration_ms: 1.715947
+  type: 'test'
+  ...
+# Subtest: meaningful change requires new revision and invalidates old proof
+ok 35 - meaningful change requires new revision and invalidates old proof
+  ---
+  duration_ms: 1.029998
+  type: 'test'
+  ...
+# Subtest: logical object insertion order is canonical byte identical
+ok 36 - logical object insertion order is canonical byte identical
+  ---
+  duration_ms: 0.999643
+  type: 'test'
+  ...
+# Subtest: real School floor is a general FLOOR with separate scene ID and provenance
+ok 37 - real School floor is a general FLOOR with separate scene ID and provenance
+  ---
+  duration_ms: 1.771628
+  type: 'test'
+  ...
+# Subtest: synthetic fixture floor remains explicitly fixture-only UNKNOWN provenance
+ok 38 - synthetic fixture floor remains explicitly fixture-only UNKNOWN provenance
+  ---
+  duration_ms: 0.443058
+  type: 'test'
+  ...
+# Subtest: unknown semantic rejects
+ok 39 - unknown semantic rejects
+  ---
+  duration_ms: 0.160417
+  type: 'test'
+  ...
+# Subtest: semantic/provenance confusion rejects
+ok 40 - semantic/provenance confusion rejects
+  ---
+  duration_ms: 0.176315
+  type: 'test'
+  ...
+# Subtest: malformed category rejects
+ok 41 - malformed category rejects
+  ---
+  duration_ms: 1.119073
+  type: 'test'
+  ...
+# Subtest: fallback attempt rejects
+ok 42 - fallback attempt rejects
+  ---
+  duration_ms: 0.140114
+  type: 'test'
+  ...
+# Subtest: SUPINE_FLOOR semantic is exact and machine ID remains lowercase
+ok 43 - SUPINE_FLOOR semantic is exact and machine ID remains lowercase
+  ---
+  duration_ms: 1.490424
+  type: 'test'
+  ...
+# Subtest: invalid definition ID, unknown/missing semantic, and aliases fail closed
+ok 44 - invalid definition ID, unknown/missing semantic, and aliases fail closed
+  ---
+  duration_ms: 0.438678
+  type: 'test'
+  ...
+# Subtest: posture validator rejects semantic/body ambiguity
+ok 45 - posture validator rejects semantic/body ambiguity
+  ---
+  duration_ms: 1.09113
+  type: 'test'
+  ...
+# Subtest: support and posture semantic changes change canonical body digest and stale old proof
+ok 46 - support and posture semantic changes change canonical body digest and stale old proof
+  ---
+  duration_ms: 2.392069
+  type: 'test'
+  ...
+# Subtest: male-only Gate B requirement is explicit profile semantics, not body geometry
+ok 47 - male-only Gate B requirement is explicit profile semantics, not body geometry
+  ---
+  duration_ms: 0.28575
+  type: 'test'
+  ...
+# Subtest: unknown or inferred subject sex fails closed
+ok 48 - unknown or inferred subject sex fails closed
+  ---
+  duration_ms: 0.116012
+  type: 'test'
+  ...
+# Subtest: new semantic fields are insertion-order independent
+ok 49 - new semantic fields are insertion-order independent
+  ---
+  duration_ms: 0.212074
+  type: 'test'
+  ...
+# Subtest: valid synthetic support entity and horizontal surface materialize deterministically
+ok 50 - valid synthetic support entity and horizontal surface materialize deterministically
+  ---
+  duration_ms: 5.118154
+  type: 'test'
+  ...
+# Subtest: rotated support rejects
+ok 51 - rotated support rejects
+  ---
+  duration_ms: 0.87874
+  type: 'test'
+  ...
+# Subtest: non-horizontal support rejects
+ok 52 - non-horizontal support rejects
+  ---
+  duration_ms: 0.710278
+  type: 'test'
+  ...
+# Subtest: stale owner/body references reject
+ok 53 - stale owner/body references reject
+  ---
+  duration_ms: 0.713208
+  type: 'test'
+  ...
+# Subtest: legacy embedded lifecycle transition is disabled to leave envelope as sole truth
+ok 54 - legacy embedded lifecycle transition is disabled to leave envelope as sole truth
+  ---
+  duration_ms: 1.974913
+  type: 'test'
+  ...
+# Subtest: legacy embedded review record is disabled to leave envelope as sole truth
+ok 55 - legacy embedded review record is disabled to leave envelope as sole truth
+  ---
+  duration_ms: 0.150704
+  type: 'test'
+  ...
+# Subtest: validator cannot accept pre-claimed VERIFIED status
+ok 56 - validator cannot accept pre-claimed VERIFIED status
+  ---
+  duration_ms: 0.288302
+  type: 'test'
+  ...
+# {"environment":{"node":"v22.23.2","platform":"linux","arch":"x64","cpu":"Intel(R) Xeon(R) Processor @ 2.60GHz"},"threshold":null,"validateOneTwoThree":[{"unit":"microseconds","count":30,"min":27.567,"p50":38.596,"p95":520.941,"max":1000.036},{"unit":"microseconds","count":30,"min":48.505,"p50":60.814,"p95":3274.014,"max":7827.459},{"unit":"microseconds","count":30,"min":63.653,"p50":99.905,"p95":138.362,"max":6663.765}],"indexRebuild":{"unit":"microseconds","count":30,"min":22.754,"p50":23.765,"p95":143.531,"max":237.953},"transaction":{"unit":"microseconds","count":30,"min":479.146,"p50":685.751,"p95":2894.639,"max":12082.857}}
+# Subtest: measurement-only multi-support costs
+ok 57 - measurement-only multi-support costs
+  ---
+  duration_ms: 66.501677
+  type: 'test'
+  ...
+# Subtest: one static FLOOR relation commits
+ok 58 - one static FLOOR relation commits
+  ---
+  duration_ms: 12.348713
+  type: 'test'
+  ...
+# Subtest: one ENTITY_OWNED seat relation commits
+ok 59 - one ENTITY_OWNED seat relation commits
+  ---
+  duration_ms: 2.439875
+  type: 'test'
+  ...
+# Subtest: floor plus elevated seat and floor plus wall commit
+ok 60 - floor plus elevated seat and floor plus wall commit
+  ---
+  duration_ms: 3.562839
+  type: 'test'
+  ...
+# Subtest: three supports commit canonically
+ok 61 - three supports commit canonically
+  ---
+  duration_ms: 2.678861
+  type: 'test'
+  ...
+# Subtest: attach B preserves A; detach and replace B preserve A byte-identically
+ok 62 - attach B preserves A; detach and replace B preserve A byte-identically
+  ---
+  duration_ms: 8.201061
+  type: 'test'
+  ...
+# Subtest: insertion order gives same state digest and index
+ok 63 - insertion order gives same state digest and index
+  ---
+  duration_ms: 9.359685
+  type: 'test'
+  ...
+# Subtest: derived index deterministic and divergence detected
+ok 64 - derived index deterministic and divergence detected
+  ---
+  duration_ms: 0.626462
+  type: 'test'
+  ...
+# Subtest: explicit one-way migration converts one valid singular relation and rejects ambiguity
+ok 65 - explicit one-way migration converts one valid singular relation and rejects ambiguity
+  ---
+  duration_ms: 0.603642
+  type: 'test'
+  ...
+# Subtest: event replay reconstructs exact multi-support digest; tamper/reorder fail
+ok 66 - event replay reconstructs exact multi-support digest; tamper/reorder fail
+  ---
+  duration_ms: 3.191084
+  type: 'test'
+  ...
+# Subtest: duplicate relationId rejects atomically
+ok 67 - duplicate relationId rejects atomically
+  ---
+  duration_ms: 0.976747
+  type: 'test'
+  ...
+# Subtest: missing relationId rejects atomically
+ok 68 - missing relationId rejects atomically
+  ---
+  duration_ms: 3.159456
+  type: 'test'
+  ...
+# Subtest: stale supported body rejects atomically
+ok 69 - stale supported body rejects atomically
+  ---
+  duration_ms: 0.471611
+  type: 'test'
+  ...
+# Subtest: wrong body digest rejects atomically
+ok 70 - wrong body digest rejects atomically
+  ---
+  duration_ms: 0.306069
+  type: 'test'
+  ...
+# Subtest: missing contactRegionRef rejects atomically
+ok 71 - missing contactRegionRef rejects atomically
+  ---
+  duration_ms: 0.275415
+  type: 'test'
+  ...
+# Subtest: stale contact digest rejects atomically
+ok 72 - stale contact digest rejects atomically
+  ---
+  duration_ms: 0.519119
+  type: 'test'
+  ...
+# Subtest: missing static surface rejects atomically
+ok 73 - missing static surface rejects atomically
+  ---
+  duration_ms: 0.294584
+  type: 'test'
+  ...
+# Subtest: stale SurfaceModel rejects atomically
+ok 74 - stale SurfaceModel rejects atomically
+  ---
+  duration_ms: 1.183139
+  type: 'test'
+  ...
+# Subtest: unsupported wall capability rejects atomically
+ok 75 - unsupported wall capability rejects atomically
+  ---
+  duration_ms: 0.564271
+  type: 'test'
+  ...
+# Subtest: missing owner rejects atomically
+ok 76 - missing owner rejects atomically
+  ---
+  duration_ms: 0.343554
+  type: 'test'
+  ...
+# Subtest: stale owner revision rejects atomically
+ok 77 - stale owner revision rejects atomically
+  ---
+  duration_ms: 0.259481
+  type: 'test'
+  ...
+# Subtest: stale owner body rejects atomically
+ok 78 - stale owner body rejects atomically
+  ---
+  duration_ms: 0.272653
+  type: 'test'
+  ...
+# Subtest: stale SupportSurface rejects atomically
+ok 79 - stale SupportSurface rejects atomically
+  ---
+  duration_ms: 0.249925
+  type: 'test'
+  ...
+# Subtest: wrong SupportSurface owner rejects atomically
+ok 80 - wrong SupportSurface owner rejects atomically
+  ---
+  duration_ms: 0.216784
+  type: 'test'
+  ...
+# Subtest: one valid one invalid rejects atomically
+ok 81 - one valid one invalid rejects atomically
+  ---
+  duration_ms: 0.68049
+  type: 'test'
+  ...
+# Subtest: detach nonexistent rejects atomically
+ok 82 - detach nonexistent rejects atomically
+  ---
+  duration_ms: 0.30507
+  type: 'test'
+  ...
+# Subtest: replace nonexistent rejects atomically
+ok 83 - replace nonexistent rejects atomically
+  ---
+  duration_ms: 0.223763
+  type: 'test'
+  ...
+# Subtest: owner removal with dependent rejects atomically
+ok 84 - owner removal with dependent rejects atomically
+  ---
+  duration_ms: 0.379704
+  type: 'test'
+  ...
+# Subtest: owner move without refreshed proof rejects atomically
+ok 85 - owner move without refreshed proof rejects atomically
+  ---
+  duration_ms: 0.314887
+  type: 'test'
+  ...
+# Subtest: body replacement carrying stale relations rejects atomically
+ok 86 - body replacement carrying stale relations rejects atomically
+  ---
+  duration_ms: 0.305314
+  type: 'test'
+  ...
+# Subtest: posture change carrying stale world proof rejects atomically
+ok 87 - posture change carrying stale world proof rejects atomically
+  ---
+  duration_ms: 0.335047
+  type: 'test'
+  ...
+# Subtest: explicit male profile and exact posture
+ok 88 - explicit male profile and exact posture
+  ---
+  duration_ms: 0.975257
+  type: 'test'
+  ...
+# Subtest: compound derives aggregate footprint and contact
+ok 89 - compound derives aggregate footprint and contact
+  ---
+  duration_ms: 0.875396
+  type: 'test'
+  ...
+# Subtest: lifecycle remains draft definition validated pending review
+ok 90 - lifecycle remains draft definition validated pending review
+  ---
+  duration_ms: 0.114704
+  type: 'test'
+  ...
+# Subtest: legal School floor placement commits exact transform
+ok 91 - legal School floor placement commits exact transform
+  ---
+  duration_ms: 4.247184
+  type: 'test'
+  ...
+# Subtest: floating rejects atomically
+ok 92 - floating rejects atomically
+  ---
+  duration_ms: 1.865509
+  type: 'test'
+  ...
+# Subtest: wall rejects atomically
+ok 93 - wall rejects atomically
+  ---
+  duration_ms: 1.281002
+  type: 'test'
+  ...
+# Subtest: door rejects atomically
+ok 94 - door rejects atomically
+  ---
+  duration_ms: 1.94886
+  type: 'test'
+  ...
+# Subtest: partial-door rejects atomically
+ok 95 - partial-door rejects atomically
+  ---
+  duration_ms: 1.299386
+  type: 'test'
+  ...
+# Subtest: locker rejects atomically
+ok 96 - locker rejects atomically
+  ---
+  duration_ms: 1.29944
+  type: 'test'
+  ...
+# Subtest: partial-outside rejects atomically
+ok 97 - partial-outside rejects atomically
+  ---
+  duration_ms: 1.515185
+  type: 'test'
+  ...
+# Subtest: full-outside rejects atomically
+ok 98 - full-outside rejects atomically
+  ---
+  duration_ms: 1.225408
+  type: 'test'
+  ...
+# Subtest: stale body revision and digest reject
+ok 99 - stale body revision and digest reject
+  ---
+  duration_ms: 2.685675
+  type: 'test'
+  ...
+# Subtest: sex profile posture and body mismatches fail closed
+ok 100 - sex profile posture and body mismatches fail closed
+  ---
+  duration_ms: 9.408944
+  type: 'test'
+  ...
+# Subtest: sex semantics do not scale body geometry
+ok 101 - sex semantics do not scale body geometry
+  ---
+  duration_ms: 3.986227
+  type: 'test'
+  ...
+# Subtest: complete fixture is byte deterministic
+ok 102 - complete fixture is byte deterministic
+  ---
+  duration_ms: 5.590833
+  type: 'test'
+  ...
+# Subtest: Gate C exact chair and surface review envelopes admit only reviewed refs
+ok 103 - Gate C exact chair and surface review envelopes admit only reviewed refs
+  ---
+  duration_ms: 1.121384
+  type: 'test'
+  ...
+# Subtest: Gate C promotion changes envelopes only, not definition bytes/digests
+ok 104 - Gate C promotion changes envelopes only, not definition bytes/digests
+  ---
+  duration_ms: 0.438401
+  type: 'test'
+  ...
+# Subtest: one AUTHORED_NEW chair body validates and aggregate is derived
+ok 105 - one AUTHORED_NEW chair body validates and aggregate is derived
+  ---
+  duration_ms: 2.042982
+  type: 'test'
+  ...
+# Subtest: entity-owned seat validates and is not whole chair AABB
+ok 106 - entity-owned seat validates and is not whole chair AABB
+  ---
+  duration_ms: 0.34191
+  type: 'test'
+  ...
+# Subtest: local seat materialization is deterministic
+ok 107 - local seat materialization is deterministic
+  ---
+  duration_ms: 1.18596
+  type: 'test'
+  ...
+# Subtest: chair lifecycle remains separate VALIDATED pending USER_GATE_REVIEW
+ok 108 - chair lifecycle remains separate VALIDATED pending USER_GATE_REVIEW
+  ---
+  duration_ms: 0.319398
+  type: 'test'
+  ...
+# Subtest: legal chair placement passes Phase 2 and commits
+ok 109 - legal chair placement passes Phase 2 and commits
+  ---
+  duration_ms: 3.52203
+  type: 'test'
+  ...
+# Subtest: chair floating rejects atomically
+ok 110 - chair floating rejects atomically
+  ---
+  duration_ms: 1.360763
+  type: 'test'
+  ...
+# Subtest: chair wall rejects atomically
+ok 111 - chair wall rejects atomically
+  ---
+  duration_ms: 1.250134
+  type: 'test'
+  ...
+# Subtest: chair door rejects atomically
+ok 112 - chair door rejects atomically
+  ---
+  duration_ms: 1.302508
+  type: 'test'
+  ...
+# Subtest: chair partial-door rejects atomically
+ok 113 - chair partial-door rejects atomically
+  ---
+  duration_ms: 2.217276
+  type: 'test'
+  ...
+# Subtest: chair obstacle rejects atomically
+ok 114 - chair obstacle rejects atomically
+  ---
+  duration_ms: 1.380834
+  type: 'test'
+  ...
+# Subtest: chair partial-outside rejects atomically
+ok 115 - chair partial-outside rejects atomically
+  ---
+  duration_ms: 1.160952
+  type: 'test'
+  ...
+# Subtest: chair full-outside rejects atomically
+ok 116 - chair full-outside rejects atomically
+  ---
+  duration_ms: 1.545568
+  type: 'test'
+  ...
+# Subtest: stale chair body proof rejects closed
+ok 117 - stale chair body proof rejects closed
+  ---
+  duration_ms: 1.66312
+  type: 'test'
+  ...
+# Subtest: wrong-owner dependency rejects with no partial commit
+ok 118 - wrong-owner dependency rejects with no partial commit
+  ---
+  duration_ms: 1.377112
+  type: 'test'
+  ...
+# Subtest: wrong-surface-revision dependency rejects with no partial commit
+ok 119 - wrong-surface-revision dependency rejects with no partial commit
+  ---
+  duration_ms: 5.900707
+  type: 'test'
+  ...
+# Subtest: wrong-surface-digest dependency rejects with no partial commit
+ok 120 - wrong-surface-digest dependency rejects with no partial commit
+  ---
+  duration_ms: 0.880968
+  type: 'test'
+  ...
+# Subtest: wrong-owner-body dependency rejects with no partial commit
+ok 121 - wrong-owner-body dependency rejects with no partial commit
+  ---
+  duration_ms: 0.823062
+  type: 'test'
+  ...
+# Subtest: stale dependency world revision rejects
+ok 122 - stale dependency world revision rejects
+  ---
+  duration_ms: 0.9106
+  type: 'test'
+  ...
+# Subtest: missing owner surface and dangling relation reject
+ok 123 - missing owner surface and dangling relation reject
+  ---
+  duration_ms: 0.763809
+  type: 'test'
+  ...
+# Subtest: support-surface mutation with stale dependent fails closed
+ok 124 - support-surface mutation with stale dependent fails closed
+  ---
+  duration_ms: 1.005899
+  type: 'test'
+  ...
+# Subtest: ReplacePhysicalBody with dependent rejects atomically
+ok 125 - ReplacePhysicalBody with dependent rejects atomically
+  ---
+  duration_ms: 0.892525
+  type: 'test'
+  ...
+# Subtest: remove chair with dependent fails closed
+ok 126 - remove chair with dependent fails closed
+  ---
+  duration_ms: 1.323095
+  type: 'test'
+  ...
+# Subtest: move chair without dependent update fails closed, no auto-drop
+ok 127 - move chair without dependent update fails closed, no auto-drop
+  ---
+  duration_ms: 0.885202
+  type: 'test'
+  ...
+# Subtest: atomic legal chair + dependent transaction commits together
+ok 128 - atomic legal chair + dependent transaction commits together
+  ---
+  duration_ms: 10.622311
+  type: 'test'
+  ...
+# Subtest: atomic invalid pair rejects with exact unchanged state
+ok 129 - atomic invalid pair rejects with exact unchanged state
+  ---
+  duration_ms: 1.794627
+  type: 'test'
+  ...
+# Subtest: successful support transaction replays exact and event tamper/reorder fails
+ok 130 - successful support transaction replays exact and event tamper/reorder fails
+  ---
+  duration_ms: 3.251607
+  type: 'test'
+  ...
+# Subtest: transaction command insertion order gives same candidate state digest
+ok 131 - transaction command insertion order gives same candidate state digest
+  ---
+  duration_ms: 9.733327
+  type: 'test'
+  ...
+# {"environment":{"node":"v22.23.2","platform":"linux","arch":"x64","cpu":"Intel(R) Xeon(R) Processor @ 2.60GHz"},"threshold":null,"materialize":{"unit":"microseconds","count":30,"min":27.445,"p50":36.644,"p95":117.41,"max":252.011},"placement":{"unit":"microseconds","count":30,"min":599.7,"p50":821.146,"p95":3423.667,"max":8108.216},"transaction":{"unit":"microseconds","count":30,"min":1229.753,"p50":1509.093,"p95":8619.671,"max":9876.845},"replay":{"unit":"microseconds","count":30,"min":225.65,"p50":270.039,"p95":536.54,"max":569.173},"finalDigest":"359405d1a407a0560459b6081f1b3adb6f507c7ae9e1f927135f062fe0a6415f"}
+# Subtest: Gate C performance measurements have no threshold
+ok 132 - Gate C performance measurements have no threshold
+  ---
+  duration_ms: 112.709112
+  type: 'test'
+  ...
+# Subtest: canonical package validates and complete scene commits atomically
+ok 133 - canonical package validates and complete scene commits atomically
+  ---
+  duration_ms: 10.340219
+  type: 'test'
+  ...
+# Subtest: exact approved refs and MALE SUPINE locks preserved
+ok 134 - exact approved refs and MALE SUPINE locks preserved
+  ---
+  duration_ms: 0.236413
+  type: 'test'
+  ...
+# Subtest: seat materialization remains deterministic
+ok 135 - seat materialization remains deterministic
+  ---
+  duration_ms: 1.394881
+  type: 'test'
+  ...
+# Subtest: malformed rejects atomically
+ok 136 - malformed rejects atomically
+  ---
+  duration_ms: 1.055822
+  type: 'test'
+  ...
+# Subtest: wrong version rejects atomically
+ok 137 - wrong version rejects atomically
+  ---
+  duration_ms: 0.735556
+  type: 'test'
+  ...
+# Subtest: missing SurfaceModel rejects atomically
+ok 138 - missing SurfaceModel rejects atomically
+  ---
+  duration_ms: 1.659963
+  type: 'test'
+  ...
+# Subtest: stale SurfaceModel rejects atomically
+ok 139 - stale SurfaceModel rejects atomically
+  ---
+  duration_ms: 1.008012
+  type: 'test'
+  ...
+# Subtest: wrong SurfaceModel digest rejects atomically
+ok 140 - wrong SurfaceModel digest rejects atomically
+  ---
+  duration_ms: 1.236876
+  type: 'test'
+  ...
+# Subtest: missing surface rejects atomically
+ok 141 - missing surface rejects atomically
+  ---
+  duration_ms: 1.644286
+  type: 'test'
+  ...
+# Subtest: missing entity rejects atomically
+ok 142 - missing entity rejects atomically
+  ---
+  duration_ms: 2.501391
+  type: 'test'
+  ...
+# Subtest: duplicate entity rejects atomically
+ok 143 - duplicate entity rejects atomically
+  ---
+  duration_ms: 1.266063
+  type: 'test'
+  ...
+# Subtest: wrong bag body rejects atomically
+ok 144 - wrong bag body rejects atomically
+  ---
+  duration_ms: 1.415884
+  type: 'test'
+  ...
+# Subtest: wrong casualty body rejects atomically
+ok 145 - wrong casualty body rejects atomically
+  ---
+  duration_ms: 0.956996
+  type: 'test'
+  ...
+# Subtest: wrong profile rejects atomically
+ok 146 - wrong profile rejects atomically
+  ---
+  duration_ms: 0.909413
+  type: 'test'
+  ...
+# Subtest: wrong sex rejects atomically
+ok 147 - wrong sex rejects atomically
+  ---
+  duration_ms: 1.401513
+  type: 'test'
+  ...
+# Subtest: wrong posture rejects atomically
+ok 148 - wrong posture rejects atomically
+  ---
+  duration_ms: 0.874781
+  type: 'test'
+  ...
+# Subtest: missing chair rejects atomically
+ok 149 - missing chair rejects atomically
+  ---
+  duration_ms: 0.610018
+  type: 'test'
+  ...
+# Subtest: stale chair revision rejects atomically
+ok 150 - stale chair revision rejects atomically
+  ---
+  duration_ms: 0.619399
+  type: 'test'
+  ...
+# Subtest: wrong chair digest rejects atomically
+ok 151 - wrong chair digest rejects atomically
+  ---
+  duration_ms: 0.613583
+  type: 'test'
+  ...
+# Subtest: missing seat rejects atomically
+ok 152 - missing seat rejects atomically
+  ---
+  duration_ms: 0.521257
+  type: 'test'
+  ...
+# Subtest: stale seat rejects atomically
+ok 153 - stale seat rejects atomically
+  ---
+  duration_ms: 0.999478
+  type: 'test'
+  ...
+# Subtest: wrong seat owner rejects atomically
+ok 154 - wrong seat owner rejects atomically
+  ---
+  duration_ms: 0.615934
+  type: 'test'
+  ...
+# Subtest: dangling relation rejects atomically
+ok 155 - dangling relation rejects atomically
+  ---
+  duration_ms: 0.626969
+  type: 'test'
+  ...
+# Subtest: stale relation rejects atomically
+ok 156 - stale relation rejects atomically
+  ---
+  duration_ms: 0.74862
+  type: 'test'
+  ...
+# Subtest: omitted relation rejects atomically
+ok 157 - omitted relation rejects atomically
+  ---
+  duration_ms: 0.53253
+  type: 'test'
+  ...
+# Subtest: tampered package without reseal rejects digest
+ok 158 - tampered package without reseal rejects digest
+  ---
+  duration_ms: 0.825555
+  type: 'test'
+  ...
+# Subtest: geometry placement negative injections reject atomically
+ok 159 - geometry placement negative injections reject atomically
+  ---
+  duration_ms: 37.226652
+  type: 'test'
+  ...
+# Subtest: tampered event and reordered replay reject
+ok 160 - tampered event and reordered replay reject
+  ---
+  duration_ms: 4.733565
+  type: 'test'
+  ...
+# {"environment":{"node":"v22.23.2","platform":"linux","arch":"x64","cpu":"Intel(R) Xeon(R) Processor @ 2.60GHz"},"threshold":null,"packageValidation":{"unit":"microseconds","count":20,"min":401.788,"p50":830.786,"p95":9002.252,"max":9002.252},"fullAtomicInstantiationTransactionEventReplay":{"unit":"microseconds","count":20,"min":2062.245,"p50":3181.245,"p95":11016.458,"max":11016.458},"dependencyIndex":{"unit":"microseconds","count":20,"min":24.823,"p50":42.319,"p95":133.921,"max":133.921}}
+# Subtest: Gate D measurements only
+ok 161 - Gate D measurements only
+  ---
+  duration_ms: 102.624843
+  type: 'test'
+  ...
+# Subtest: same School state, mutation and pinned proofs are byte-identical
+ok 162 - same School state, mutation and pinned proofs are byte-identical
+  ---
+  duration_ms: 5.904178
+  type: 'test'
+  ...
+# Subtest: raw mutation path latency distribution is recorded without a pass threshold
+ok 163 - raw mutation path latency distribution is recorded without a pass threshold
+  ---
+  duration_ms: 78.662454
+  type: 'test'
+  ...
+# {"unit":"microseconds","count":100,"min":195.94599999999218,"p50":299.31700000000205,"p95":818.3970000000045,"max":3982.8509999999965,"raw":[195.94599999999218,197.90199999999913,198.27499999999532,198.3199999999954,202.82000000000266,204.31999999999562,211.14800000000855,211.465000000004,211.85199999999327,212.30499999998642,213.78499999998724,213.8180000000034,218.7940000000026,220.341000000019,222.15100000002508,224.4630000000143,224.70400000000268,230.1300000000026,231.34099999998625,231.34999999999195,233.51600000000872,237.20099999999888,241.00399999998956,243.16999999999211,243.72099999999364,245.49899999999525,246.85800000000313,247.59799999998222,249.0269999999981,250.12899999998695,250.13699999999517,255.2180000000135,255.96100000001343,256.33200000000045,257.94399999999484,259.32399999999234,263.0670000000066,263.11300000000415,269.3299999999965,269.5190000000025,270.02200000001153,272.2320000000025,275.1999999999981,278.9810000000017,281.53700000001436,286.11000000000786,287.943999999996,288.3900000000068,290.5399999999929,299.31700000000205,301.67800000000966,304.26699999999585,306.56199999998535,307.0900000000023,315.2160000000066,315.2539999999959,328.05299999999704,330.7350000000042,335.5179999999791,351.36900000000537,355.3359999999941,364.18299999999704,377.2950000000037,380.8080000000018,383.22100000000603,385.0779999999929,388.66899999999305,394.06599999999514,397.03099999999836,409.53700000000026,410.49199999999075,412.96300000000485,417.7079999999904,426.04800000000864,432.15900000001284,435.3540000000038,440.16099999998914,455.23899999999173,490.2609999999754,495.3490000000045,509.42499999999313,535.6120000000004,543.6859999999797,549.7019999999964,557.7619999999968,558.3269999999914,605.8559999999886,613.4599999999892,641.8019999999984,651.6720000000049,657.3799999999892,711.5739999999988,766.7950000000019,778.5870000000017,818.3970000000045,819.2860000000053,824.8009999999937,1027.8790000000129,1118.6859999999967,3982.8509999999965]}
+# Subtest: real school legal bag placement commits exact transform through Phase 2
+ok 164 - real school legal bag placement commits exact transform through Phase 2
+  ---
+  duration_ms: 4.731063
+  type: 'test'
+  ...
+# Subtest: floating fails closed with exact Phase 2 evidence
+ok 165 - floating fails closed with exact Phase 2 evidence
+  ---
+  duration_ms: 2.25106
+  type: 'test'
+  ...
+# Subtest: door fails closed with exact Phase 2 evidence
+ok 166 - door fails closed with exact Phase 2 evidence
+  ---
+  duration_ms: 1.130813
+  type: 'test'
+  ...
+# Subtest: partial-door fails closed with exact Phase 2 evidence
+ok 167 - partial-door fails closed with exact Phase 2 evidence
+  ---
+  duration_ms: 1.113701
+  type: 'test'
+  ...
+# Subtest: locker fails closed with exact Phase 2 evidence
+ok 168 - locker fails closed with exact Phase 2 evidence
+  ---
+  duration_ms: 1.630813
+  type: 'test'
+  ...
+# Subtest: partial-outside fails closed with exact Phase 2 evidence
+ok 169 - partial-outside fails closed with exact Phase 2 evidence
+  ---
+  duration_ms: 1.129771
+  type: 'test'
+  ...
+# Subtest: full-outside fails closed with exact Phase 2 evidence
+ok 170 - full-outside fails closed with exact Phase 2 evidence
+  ---
+  duration_ms: 1.108241
+  type: 'test'
+  ...
+# Subtest: wrong surface id and type preserve Phase 2 reasons
+ok 171 - wrong surface id and type preserve Phase 2 reasons
+  ---
+  duration_ms: 2.21329
+  type: 'test'
+  ...
+# Subtest: stale surface revision and digest are rejected by real Phase 2
+ok 172 - stale surface revision and digest are rejected by real Phase 2
+  ---
+  duration_ms: 3.32494
+  type: 'test'
+  ...
+# Subtest: stale body revision and geometry proof reject without gate reinterpretation
+ok 173 - stale body revision and geometry proof reject without gate reinterpretation
+  ---
+  duration_ms: 2.068488
+  type: 'test'
+  ...
+# Subtest: unsupported scene is UNKNOWN and cannot commit
+ok 174 - unsupported scene is UNKNOWN and cannot commit
+  ---
+  duration_ms: 1.407646
+  type: 'test'
+  ...
+# Subtest: stale WorldState revision rejects before Phase 2 and changes no state
+ok 175 - stale WorldState revision rejects before Phase 2 and changes no state
+  ---
+  duration_ms: 0.708065
+  type: 'test'
+  ...
+# Subtest: missing surface proof/evidence is UNKNOWN and cannot commit
+ok 176 - missing surface proof/evidence is UNKNOWN and cannot commit
+  ---
+  duration_ms: 0.783868
+  type: 'test'
+  ...
+# Subtest: adapter records RECOVERED source lineage without visual authority upgrade
+ok 177 - adapter records RECOVERED source lineage without visual authority upgrade
+  ---
+  duration_ms: 2.670472
+  type: 'test'
+  ...
+# Subtest: public exports exclude store/reducer/mutation capability
+ok 178 - public exports exclude store/reducer/mutation capability
+  ---
+  duration_ms: 1.165208
+  type: 'test'
+  ...
+# Subtest: forged capability and reflective public misuse fail structurally
+ok 179 - forged capability and reflective public misuse fail structurally
+  ---
+  duration_ms: 2.063573
+  type: 'test'
+  ...
+# Subtest: direct public state writes cannot change authority
+ok 180 - direct public state writes cannot change authority
+  ---
+  duration_ms: 2.458862
+  type: 'test'
+  ...
+# Subtest: structural sharing keeps unchanged entity and revises changed entity
+ok 181 - structural sharing keeps unchanged entity and revises changed entity
+  ---
+  duration_ms: 11.003277
+  type: 'test'
+  ...
+# Subtest: same fixture repeated is byte identical
+ok 182 - same fixture repeated is byte identical
+  ---
+  duration_ms: 4.620039
+  type: 'test'
+  ...
+# Subtest: initial plus committed events exactly replay final digest; rejected event changes no state
+ok 183 - initial plus committed events exactly replay final digest; rejected event changes no state
+  ---
+  duration_ms: 4.077109
+  type: 'test'
+  ...
+# Subtest: event log failure prevents commit
+ok 184 - event log failure prevents commit
+  ---
+  duration_ms: 1.761295
+  type: 'test'
+  ...
+# Subtest: tamper reorder and changed state digest fail replay
+ok 185 - tamper reorder and changed state digest fail replay
+  ---
+  duration_ms: 1.777358
+  type: 'test'
+  ...
+# Subtest: spawn commits immutable revision and event
+ok 186 - spawn commits immutable revision and event
+  ---
+  duration_ms: 3.485591
+  type: 'test'
+  ...
+# Subtest: legality FAIL cannot commit
+ok 187 - legality FAIL cannot commit
+  ---
+  duration_ms: 1.130754
+  type: 'test'
+  ...
+# Subtest: legality UNKNOWN cannot commit
+ok 188 - legality UNKNOWN cannot commit
+  ---
+  duration_ms: 1.745843
+  type: 'test'
+  ...
+# Subtest: invalid command and stale revision reject
+ok 189 - invalid command and stale revision reject
+  ---
+  duration_ms: 1.440439
+  type: 'test'
+  ...
+# Subtest: invalid entity rejects atomically
+ok 190 - invalid entity rejects atomically
+  ---
+  duration_ms: 0.485881
+  type: 'test'
+  ...
+# Subtest: multi-command one failure rejects all
+ok 191 - multi-command one failure rejects all
+  ---
+  duration_ms: 8.69907
+  type: 'test'
+  ...
+# Subtest: duplicate command identity rejects
+ok 192 - duplicate command identity rejects
+  ---
+  duration_ms: 1.1551
+  type: 'test'
+  ...
+# Subtest: legality validates the proposed candidate rather than pre-command state
+ok 193 - legality validates the proposed candidate rather than pre-command state
+  ---
+  duration_ms: 0.869061
+  type: 'test'
+  ...
+# Subtest: transaction rejects command with mismatched expected revision atomically
+ok 194 - transaction rejects command with mismatched expected revision atomically
+  ---
+  duration_ms: 0.665908
+  type: 'test'
+  ...
+# Subtest: foundation route table is exactly 3 promoted + 3 non-promoted
+ok 195 - foundation route table is exactly 3 promoted + 3 non-promoted
+  ---
+  duration_ms: 0.801108
+  type: 'test'
+  ...
+# Subtest: promoted routes require exact capability version query tuple
+ok 196 - promoted routes require exact capability version query tuple
+  ---
+  duration_ms: 0.687956
+  type: 'test'
+  ...
+# Subtest: locked collision routes are explicit NON_PROMOTED
+ok 197 - locked collision routes are explicit NON_PROMOTED
+  ---
+  duration_ms: 0.25929
+  type: 'test'
+  ...
+# Subtest: OFFSET_PLANE_Y10 coplanar support at offset plane y=10 commits with VALID evaluator evidence
+ok 198 - OFFSET_PLANE_Y10 coplanar support at offset plane y=10 commits with VALID evaluator evidence
+  ---
+  duration_ms: 49.489031
+  type: 'test'
+  ...
+# Subtest: OFFSET_PLANE_Y11 floating above offset plane y=10 fails closed through the full path
+ok 199 - OFFSET_PLANE_Y11 floating above offset plane y=10 fails closed through the full path
+  ---
+  duration_ms: 24.394917
+  type: 'test'
+  ...
+# Subtest: OFFSET_PLANE_Y9 penetrating the offset plane fails closed through the full path
+ok 200 - OFFSET_PLANE_Y9 penetrating the offset plane fails closed through the full path
+  ---
+  duration_ms: 16.788461
+  type: 'test'
+  ...
+# Subtest: MISSING_BOUNDARY_PROTRUSION_1000 forged affirmative owner pin with protrusion 1000 is INVALID/STALE_EVIDENCE before geometry through the real chain
+ok 201 - MISSING_BOUNDARY_PROTRUSION_1000 forged affirmative owner pin with protrusion 1000 is INVALID/STALE_EVIDENCE before geometry through the real chain
+  ---
+  duration_ms: 18.580348
+  type: 'test'
+  ...
+# Subtest: FORGED_CONTAINMENT_BODY tampered body authority pin rejects at envelope build
+ok 202 - FORGED_CONTAINMENT_BODY tampered body authority pin rejects at envelope build
+  ---
+  duration_ms: 2.08612
+  type: 'test'
+  ...
+# Subtest: FORGED_CONTAINMENT_TARGET tampered target authority pin rejects at envelope build
+ok 203 - FORGED_CONTAINMENT_TARGET tampered target authority pin rejects at envelope build
+  ---
+  duration_ms: 1.490512
+  type: 'test'
+  ...
+# Subtest: MISSING_OPENING_BODY opening body absent from the registry fails closed before the evaluator
+ok 204 - MISSING_OPENING_BODY opening body absent from the registry fails closed before the evaluator
+  ---
+  duration_ms: 13.298458
+  type: 'test'
+  ...
+# Subtest: FORGED_OPENING_BODY forged opening body reference is stale evidence at the evaluator
+ok 205 - FORGED_OPENING_BODY forged opening body reference is stale evidence at the evaluator
+  ---
+  duration_ms: 16.638867
+  type: 'test'
+  ...
+# Subtest: MISSING_OPENING_SOLID owner solid reference absent from the registry rejects at envelope build
+ok 206 - MISSING_OPENING_SOLID owner solid reference absent from the registry rejects at envelope build
+  ---
+  duration_ms: 2.82766
+  type: 'test'
+  ...
+# Subtest: FORGED_OPENING_SOLID tampered owner solid reference is stale at envelope build
+ok 207 - FORGED_OPENING_SOLID tampered owner solid reference is stale at envelope build
+  ---
+  duration_ms: 3.402558
+  type: 'test'
+  ...
+# Subtest: COMPOUND_ILLEGAL_SIBLING compound containment with an illegal sibling fails closed
+ok 208 - COMPOUND_ILLEGAL_SIBLING compound containment with an illegal sibling fails closed
+  ---
+  duration_ms: 31.341825
+  type: 'test'
+  ...
+# Subtest: QUANTIZATION_AMBIGUITY exact opening edge cannot PASS and stays UNKNOWN
+ok 209 - QUANTIZATION_AMBIGUITY exact opening edge cannot PASS and stays UNKNOWN
+  ---
+  duration_ms: 20.55925
+  type: 'test'
+  ...
+# Subtest: AGGREGATE_PASS_PASS two passing obligations aggregate to COMMIT_ALLOWED
+ok 210 - AGGREGATE_PASS_PASS two passing obligations aggregate to COMMIT_ALLOWED
+  ---
+  duration_ms: 20.910793
+  type: 'test'
+  ...
+# Subtest: AGGREGATE_PASS_FAIL one passing and one failing obligation aggregates to FAIL and no commit
+ok 211 - AGGREGATE_PASS_FAIL one passing and one failing obligation aggregates to FAIL and no commit
+  ---
+  duration_ms: 24.882738
+  type: 'test'
+  ...
+# Subtest: AGGREGATE_PASS_UNKNOWN one passing and one ambiguous obligation aggregates to UNKNOWN and no commit
+ok 212 - AGGREGATE_PASS_UNKNOWN one passing and one ambiguous obligation aggregates to UNKNOWN and no commit
+  ---
+  duration_ms: 20.802978
+  type: 'test'
+  ...
+# Subtest: AGGREGATE_PASS_INVALID one passing and one invalid obligation aggregates to UNKNOWN and no commit
+ok 213 - AGGREGATE_PASS_INVALID one passing and one invalid obligation aggregates to UNKNOWN and no commit
+  ---
+  duration_ms: 13.452977
+  type: 'test'
+  ...
+# Subtest: AGGREGATE_PASS_NON_PROMOTED locked collision capability stays NON_PROMOTED inside a mixed decision
+ok 214 - AGGREGATE_PASS_NON_PROMOTED locked collision capability stays NON_PROMOTED inside a mixed decision
+  ---
+  duration_ms: 13.581287
+  type: 'test'
+  ...
+# Subtest: FAIL_CLOSED_PRECEDENCE_UNKNOWN_OVER_FAIL ambiguity outranks definite failure and blocks commit
+ok 215 - FAIL_CLOSED_PRECEDENCE_UNKNOWN_OVER_FAIL ambiguity outranks definite failure and blocks commit
+  ---
+  duration_ms: 22.658003
+  type: 'test'
+  ...
+# Subtest: FAIL_CLOSED_PRECEDENCE_INVALID_OVER_FAIL invalid authority outranks definite failure and blocks commit
+ok 216 - FAIL_CLOSED_PRECEDENCE_INVALID_OVER_FAIL invalid authority outranks definite failure and blocks commit
+  ---
+  duration_ms: 14.238171
+  type: 'test'
+  ...
+# Subtest: EVALUATOR_THROW throwing evaluator converts to bounded UNKNOWN/MALFORMED_V3_RESULT through a real aggregate decision
+ok 217 - EVALUATOR_THROW throwing evaluator converts to bounded UNKNOWN/MALFORMED_V3_RESULT through a real aggregate decision
+  ---
+  duration_ms: 6.500545
+  type: 'test'
+  ...
+# Subtest: EVALUATOR_MALFORMED_RETURN malformed evaluator result converts to bounded UNKNOWN/MALFORMED_V3_RESULT through a real aggregate decision
+ok 218 - EVALUATOR_MALFORMED_RETURN malformed evaluator result converts to bounded UNKNOWN/MALFORMED_V3_RESULT through a real aggregate decision
+  ---
+  duration_ms: 8.635542
+  type: 'test'
+  ...
+# Subtest: CALLER_EVALUATOR_BYPASS caller-supplied evaluator input cannot override the closed evaluator on a y=11 floating contact
+ok 219 - CALLER_EVALUATOR_BYPASS caller-supplied evaluator input cannot override the closed evaluator on a y=11 floating contact
+  ---
+  duration_ms: 23.316504
+  type: 'test'
+  ...
+# Subtest: PRODUCTION_EXPORTS_CLOSED production Foundation modules export no evaluator or coordinator factory, and the real chain still commits a valid y=10 transaction
+ok 220 - PRODUCTION_EXPORTS_CLOSED production Foundation modules export no evaluator or coordinator factory, and the real chain still commits a valid y=10 transaction
+  ---
+  duration_ms: 12.232556
+  type: 'test'
+  ...
+# Subtest: GLOBAL_CORRUPTION_OUTSIDE_IMPACT tampering an unrelated registry record rejects the whole decision
+ok 221 - GLOBAL_CORRUPTION_OUTSIDE_IMPACT tampering an unrelated registry record rejects the whole decision
+  ---
+  duration_ms: 1.912142
+  type: 'test'
+  ...
+# Subtest: VALID_UNRELATED_CONTROL a valid unrelated registry record does not block a clean commit
+ok 222 - VALID_UNRELATED_CONTROL a valid unrelated registry record does not block a clean commit
+  ---
+  duration_ms: 11.371239
+  type: 'test'
+  ...
+# Subtest: MANIFEST_MODIFIED_MODULE modifying a foundation module trips MANIFEST_SHA_MISMATCH
+ok 223 - MANIFEST_MODIFIED_MODULE modifying a foundation module trips MANIFEST_SHA_MISMATCH
+  ---
+  duration_ms: 125.58247
+  type: 'test'
+  ...
+# Subtest: MANIFEST_UNAPPROVED_MODULE creating an unapproved module trips the audit set mismatch
+ok 224 - MANIFEST_UNAPPROVED_MODULE creating an unapproved module trips the audit set mismatch
+  ---
+  duration_ms: 121.652734
+  type: 'test'
+  ...
+# Subtest: all command permutations produce identical canonical plan bytes
+ok 225 - all command permutations produce identical canonical plan bytes
+  ---
+  duration_ms: 4.162794
+  type: 'test'
+  ...
+# Subtest: shared containment target closes impact over siblings
+ok 226 - shared containment target closes impact over siblings
+  ---
+  duration_ms: 0.610411
+  type: 'test'
+  ...
+# Subtest: shared boundary closes impact over siblings
+ok 227 - shared boundary closes impact over siblings
+  ---
+  duration_ms: 0.439232
+  type: 'test'
+  ...
+# Subtest: mixed-envelope context projection rejects before evaluator
+ok 228 - mixed-envelope context projection rejects before evaluator
+  ---
+  duration_ms: 1.629751
+  type: 'test'
+  ...
+# Subtest: context projection rejects envelope missing authoritySnapshotRef
+ok 229 - context projection rejects envelope missing authoritySnapshotRef
+  ---
+  duration_ms: 0.474904
+  type: 'test'
+  ...
+# Subtest: context projection rejects envelope missing canonical worldBinding
+ok 230 - context projection rejects envelope missing canonical worldBinding
+  ---
+  duration_ms: 0.285919
+  type: 'test'
+  ...
+# Subtest: A3 context binds sourceEnvelopeDigest, full authoritySnapshotRef and canonical worldBinding
+ok 231 - A3 context binds sourceEnvelopeDigest, full authoritySnapshotRef and canonical worldBinding
+  ---
+  duration_ms: 1.097015
+  type: 'test'
+  ...
+# Subtest: adapter rejects context rebound to another envelope with zero evaluator calls
+ok 232 - adapter rejects context rebound to another envelope with zero evaluator calls
+  ---
+  duration_ms: 0.969115
+  type: 'test'
+  ...
+# Subtest: adapter rejects honestly re-signed context with tampered authoritySnapshotRef
+ok 233 - adapter rejects honestly re-signed context with tampered authoritySnapshotRef
+  ---
+  duration_ms: 1.731347
+  type: 'test'
+  ...
+# Subtest: adapter rejects honestly re-signed context with tampered worldBinding
+ok 234 - adapter rejects honestly re-signed context with tampered worldBinding
+  ---
+  duration_ms: 0.8644
+  type: 'test'
+  ...
+# Subtest: real Foundation output append+commit is atomic and replay exact under external proof root
+ok 235 - real Foundation output append+commit is atomic and replay exact under external proof root
+  ---
+  duration_ms: 50.075442
+  type: 'test'
+  ...
+# Subtest: replay requires the EXTERNAL proof root and never trusts the event-carried root
+ok 236 - replay requires the EXTERNAL proof root and never trusts the event-carried root
+  ---
+  duration_ms: 16.432532
+  type: 'test'
+  ...
+# Subtest: real event append failure leaves state and log byte-identical
+ok 237 - real event append failure leaves state and log byte-identical
+  ---
+  duration_ms: 14.85631
+  type: 'test'
+  ...
+# Subtest: real commit failure rolls back staged event and state
+ok 238 - real commit failure rolls back staged event and state
+  ---
+  duration_ms: 13.169123
+  type: 'test'
+  ...
+# Subtest: replay rejects tampered sequence
+ok 239 - replay rejects tampered sequence
+  ---
+  duration_ms: 13.228335
+  type: 'test'
+  ...
+# Subtest: replay rejects tampered transactionId
+ok 240 - replay rejects tampered transactionId
+  ---
+  duration_ms: 15.485498
+  type: 'test'
+  ...
+# Subtest: replay rejects tampered beforeStateDigest
+ok 241 - replay rejects tampered beforeStateDigest
+  ---
+  duration_ms: 12.380305
+  type: 'test'
+  ...
+# Subtest: replay rejects tampered afterStateDigest
+ok 242 - replay rejects tampered afterStateDigest
+  ---
+  duration_ms: 14.03374
+  type: 'test'
+  ...
+# Subtest: replay rejects tampered physicalProof
+ok 243 - replay rejects tampered physicalProof
+  ---
+  duration_ms: 12.79075
+  type: 'test'
+  ...
+# Subtest: replay rejects a re-signed forged proof (honest payload and event re-digest)
+ok 244 - replay rejects a re-signed forged proof (honest payload and event re-digest)
+  ---
+  duration_ms: 12.615591
+  type: 'test'
+  ...
+# Subtest: replay rejects arbitrary honestly sealed state at revision 99
+ok 245 - replay rejects arbitrary honestly sealed state at revision 99
+  ---
+  duration_ms: 12.535233
+  type: 'test'
+  ...
+# Subtest: replay rejects arbitrary honestly sealed state at revision+1 under a re-signed event
+ok 246 - replay rejects arbitrary honestly sealed state at revision+1 under a re-signed event
+  ---
+  duration_ms: 13.536105
+  type: 'test'
+  ...
+# Subtest: execute rejects an honestly re-signed decision proposing revision 99
+ok 247 - execute rejects an honestly re-signed decision proposing revision 99
+  ---
+  duration_ms: 16.912107
+  type: 'test'
+  ...
+# Subtest: replay rejects missing duplicate and reordered events
+ok 248 - replay rejects missing duplicate and reordered events
+  ---
+  duration_ms: 13.081745
+  type: 'test'
+  ...
+# Subtest: real Foundation evidence is deterministic byte-for-byte
+ok 249 - real Foundation evidence is deterministic byte-for-byte
+  ---
+  duration_ms: 31.328106
+  type: 'test'
+  ...
+# Subtest: route exact V3_SUPPORT
+ok 250 - route exact V3_SUPPORT
+  ---
+  duration_ms: 2.395035
+  type: 'test'
+  ...
+# Subtest: route exact V3_CONTAINMENT
+ok 251 - route exact V3_CONTAINMENT
+  ---
+  duration_ms: 0.259003
+  type: 'test'
+  ...
+# Subtest: route exact V3_OPENING
+ok 252 - route exact V3_OPENING
+  ---
+  duration_ms: 0.294754
+  type: 'test'
+  ...
+# Subtest: route exact V3_BODY_VS_BODY
+ok 253 - route exact V3_BODY_VS_BODY
+  ---
+  duration_ms: 0.219497
+  type: 'test'
+  ...
+# Subtest: route exact V3_WORLD_SOLID
+ok 254 - route exact V3_WORLD_SOLID
+  ---
+  duration_ms: 0.169468
+  type: 'test'
+  ...
+# Subtest: route exact V3_OBSTACLE
+ok 255 - route exact V3_OBSTACLE
+  ---
+  duration_ms: 0.248308
+  type: 'test'
+  ...
+# Subtest: route rejects wrong query V3_SUPPORT
+ok 256 - route rejects wrong query V3_SUPPORT
+  ---
+  duration_ms: 0.248354
+  type: 'test'
+  ...
+# Subtest: route rejects wrong query V3_CONTAINMENT
+ok 257 - route rejects wrong query V3_CONTAINMENT
+  ---
+  duration_ms: 0.146457
+  type: 'test'
+  ...
+# Subtest: route rejects wrong query V3_OPENING
+ok 258 - route rejects wrong query V3_OPENING
+  ---
+  duration_ms: 0.47114
+  type: 'test'
+  ...
+# Subtest: route rejects wrong query V3_BODY_VS_BODY
+ok 259 - route rejects wrong query V3_BODY_VS_BODY
+  ---
+  duration_ms: 0.595519
+  type: 'test'
+  ...
+# Subtest: route rejects wrong query V3_WORLD_SOLID
+ok 260 - route rejects wrong query V3_WORLD_SOLID
+  ---
+  duration_ms: 0.288261
+  type: 'test'
+  ...
+# Subtest: route rejects wrong query V3_OBSTACLE
+ok 261 - route rejects wrong query V3_OBSTACLE
+  ---
+  duration_ms: 0.146334
+  type: 'test'
+  ...
+# Subtest: route table exact six
+ok 262 - route table exact six
+  ---
+  duration_ms: 0.124259
+  type: 'test'
+  ...
+# Subtest: route table exact promoted three
+ok 263 - route table exact promoted three
+  ---
+  duration_ms: 1.027769
+  type: 'test'
+  ...
+# Subtest: route digest sealed
+ok 264 - route digest sealed
+  ---
+  duration_ms: 0.194108
+  type: 'test'
+  ...
+# Subtest: unknown version is never routed 3.0.0 
+ok 265 - unknown version is never routed 3.0.0 
+  ---
+  duration_ms: 0.212908
+  type: 'test'
+  ...
+# Subtest: unknown version is never routed 03.0.0
+ok 266 - unknown version is never routed 03.0.0
+  ---
+  duration_ms: 0.108912
+  type: 'test'
+  ...
+# Subtest: unknown version is never routed 4.0.0
+ok 267 - unknown version is never routed 4.0.0
+  ---
+  duration_ms: 0.099031
+  type: 'test'
+  ...
+# Subtest: unknown version is never routed 
+ok 268 - unknown version is never routed 
+  ---
+  duration_ms: 0.086667
+  type: 'test'
+  ...
+# Subtest: unknown version is never routed null
+ok 269 - unknown version is never routed null
+  ---
+  duration_ms: 0.09793
+  type: 'test'
+  ...
+# Subtest: unknown version is never routed undefined
+ok 270 - unknown version is never routed undefined
+  ---
+  duration_ms: 0.084708
+  type: 'test'
+  ...
+# Subtest: permutation canonical 1
+ok 271 - permutation canonical 1
+  ---
+  duration_ms: 0.118018
+  type: 'test'
+  ...
+# Subtest: permutation canonical 2
+ok 272 - permutation canonical 2
+  ---
+  duration_ms: 0.285575
+  type: 'test'
+  ...
+# Subtest: permutation canonical 3
+ok 273 - permutation canonical 3
+  ---
+  duration_ms: 0.134542
+  type: 'test'
+  ...
+# Subtest: permutation canonical 4
+ok 274 - permutation canonical 4
+  ---
+  duration_ms: 0.0935
+  type: 'test'
+  ...
+# Subtest: permutation canonical 5
+ok 275 - permutation canonical 5
+  ---
+  duration_ms: 0.085791
+  type: 'test'
+  ...
+# Subtest: permutation canonical 6
+ok 276 - permutation canonical 6
+  ---
+  duration_ms: 0.217843
+  type: 'test'
+  ...
+# Subtest: impact shared target includes initiator
+ok 277 - impact shared target includes initiator
+  ---
+  duration_ms: 0.236445
+  type: 'test'
+  ...
+# Subtest: impact shared target includes sibling
+ok 278 - impact shared target includes sibling
+  ---
+  duration_ms: 0.09479
+  type: 'test'
+  ...
+# Subtest: impact shared target records target
+ok 279 - impact shared target records target
+  ---
+  duration_ms: 0.127063
+  type: 'test'
+  ...
+# Subtest: impact direct set canonical
+ok 280 - impact direct set canonical
+  ---
+  duration_ms: 0.09295
+  type: 'test'
+  ...
+# Subtest: impact digest sealed
+ok 281 - impact digest sealed
+  ---
+  duration_ms: 0.135236
+  type: 'test'
+  ...
+# Subtest: boundary closure includes sibling
+ok 282 - boundary closure includes sibling
+  ---
+  duration_ms: 0.094141
+  type: 'test'
+  ...
+# Subtest: boundary closure records boundary
+ok 283 - boundary closure records boundary
+  ---
+  duration_ms: 0.084747
+  type: 'test'
+  ...
+# Subtest: context exact envelope is READY
+ok 284 - context exact envelope is READY
+  ---
+  duration_ms: 1.38153
+  type: 'test'
+  ...
+# Subtest: context mixed envelope rejects
+ok 285 - context mixed envelope rejects
+  ---
+  duration_ms: 0.351834
+  type: 'test'
+  ...
+# Subtest: locked collision remains NON_PROMOTED V3_BODY_VS_BODY
+ok 286 - locked collision remains NON_PROMOTED V3_BODY_VS_BODY
+  ---
+  duration_ms: 0.206085
+  type: 'test'
+  ...
+# Subtest: locked collision remains NON_PROMOTED V3_WORLD_SOLID
+ok 287 - locked collision remains NON_PROMOTED V3_WORLD_SOLID
+  ---
+  duration_ms: 0.176773
+  type: 'test'
+  ...
+# Subtest: locked collision remains NON_PROMOTED V3_OBSTACLE
+ok 288 - locked collision remains NON_PROMOTED V3_OBSTACLE
+  ---
+  duration_ms: 0.114239
+  type: 'test'
+  ...
+# Subtest: unknown capability fails closed
+ok 289 - unknown capability fails closed
+  ---
+  duration_ms: 0.16291
+  type: 'test'
+  ...
+# Subtest: missing route request fails closed
+ok 290 - missing route request fails closed
+  ---
+  duration_ms: 0.139172
+  type: 'test'
+  ...
+# Subtest: FULL-PATH-CONTAINMENT envelope -> plan -> route -> context -> adapter -> aggregate PASS
+ok 291 - FULL-PATH-CONTAINMENT envelope -> plan -> route -> context -> adapter -> aggregate PASS
+  ---
+  duration_ms: 51.495072
+  type: 'test'
+  ...
+# Subtest: FULL-PATH-OPENING envelope -> plan -> route -> context -> adapter -> aggregate PASS
+ok 292 - FULL-PATH-OPENING envelope -> plan -> route -> context -> adapter -> aggregate PASS
+  ---
+  duration_ms: 34.215209
+  type: 'test'
+  ...
+# Subtest: FULL-PATH-SUPPORT envelope -> plan -> route -> context -> adapter -> aggregate PASS
+ok 293 - FULL-PATH-SUPPORT envelope -> plan -> route -> context -> adapter -> aggregate PASS
+  ---
+  duration_ms: 62.132034
+  type: 'test'
+  ...
+# Subtest: ADV-01 missing opening membership target is rejected before READY
+ok 294 - ADV-01 missing opening membership target is rejected before READY
+  ---
+  duration_ms: 3.106948
+  type: 'test'
+  ...
+# Subtest: ADV-02 exact promoted identities cannot be swapped
+ok 295 - ADV-02 exact promoted identities cannot be swapped
+  ---
+  duration_ms: 0.586239
+  type: 'test'
+  ...
+# Subtest: ADV-03 caller requirements cannot create an obligation
+ok 296 - ADV-03 caller requirements cannot create an obligation
+  ---
+  duration_ms: 2.065842
+  type: 'test'
+  ...
+# Subtest: ADV-04 physical zero obligations fail closed
+ok 297 - ADV-04 physical zero obligations fail closed
+  ---
+  duration_ms: 2.192602
+  type: 'test'
+  ...
+# Subtest: ADV-05 forged registry digest rejects
+ok 298 - ADV-05 forged registry digest rejects
+  ---
+  duration_ms: 0.421388
+  type: 'test'
+  ...
+# Subtest: ADV-06 missing geometry pin rejects
+ok 299 - ADV-06 missing geometry pin rejects
+  ---
+  duration_ms: 0.524193
+  type: 'test'
+  ...
+# Subtest: ADV-07 missing frame pin rejects
+ok 300 - ADV-07 missing frame pin rejects
+  ---
+  duration_ms: 0.532998
+  type: 'test'
+  ...
+# Subtest: ADV-08 wrong query does not route
+ok 301 - ADV-08 wrong query does not route
+  ---
+  duration_ms: 0.291887
+  type: 'test'
+  ...
+# Subtest: ADV locked V3_BODY_VS_BODY
+ok 302 - ADV locked V3_BODY_VS_BODY
+  ---
+  duration_ms: 0.391345
+  type: 'test'
+  ...
+# Subtest: ADV locked V3_WORLD_SOLID
+ok 303 - ADV locked V3_WORLD_SOLID
+  ---
+  duration_ms: 0.371639
+  type: 'test'
+  ...
+# Subtest: ADV locked V3_OBSTACLE
+ok 304 - ADV locked V3_OBSTACLE
+  ---
+  duration_ms: 0.166088
+  type: 'test'
+  ...
+# Subtest: ADV version 3.0.0 
+ok 305 - ADV version 3.0.0 
+  ---
+  duration_ms: 0.172421
+  type: 'test'
+  ...
+# Subtest: ADV version 03.0.0
+ok 306 - ADV version 03.0.0
+  ---
+  duration_ms: 0.080639
+  type: 'test'
+  ...
+# Subtest: ADV version 4.0.0
+ok 307 - ADV version 4.0.0
+  ---
+  duration_ms: 0.070363
+  type: 'test'
+  ...
+# Subtest: ADV version null
+ok 308 - ADV version null
+  ---
+  duration_ms: 0.0699
+  type: 'test'
+  ...
+# Subtest: ADV version undefined
+ok 309 - ADV version undefined
+  ---
+  duration_ms: 0.07018
+  type: 'test'
+  ...
+# Subtest: ADV-09 envelope bound to a foreign transaction digest rejects at planning
+ok 310 - ADV-09 envelope bound to a foreign transaction digest rejects at planning
+  ---
+  duration_ms: 0.481804
+  type: 'test'
+  ...
+# Subtest: ADV-10 opening backref mismatch rejects before READY
+ok 311 - ADV-10 opening backref mismatch rejects before READY
+  ---
+  duration_ms: 0.83443
+  type: 'test'
+  ...
+# Subtest: ADV-11 stale compound child digest rejects before READY
+ok 312 - ADV-11 stale compound child digest rejects before READY
+  ---
+  duration_ms: 1.404932
+  type: 'test'
+  ...
+# Subtest: ADV-12 context projection and adapter enforce the full authority requirement set
+ok 313 - ADV-12 context projection and adapter enforce the full authority requirement set
+  ---
+  duration_ms: 7.395368
+  type: 'test'
+  ...
+# Subtest: ADV-13 obligation identity is content-bound and requestId equals obligationId
+ok 314 - ADV-13 obligation identity is content-bound and requestId equals obligationId
+  ---
+  duration_ms: 1.061819
+  type: 'test'
+  ...
+# Subtest: same logical insertion order gives identical bytes and digest
+ok 315 - same logical insertion order gives identical bytes and digest
+  ---
+  duration_ms: 2.070363
+  type: 'test'
+  ...
+# Subtest: world entity collection relation and nested values are deeply immutable
+ok 316 - world entity collection relation and nested values are deeply immutable
+  ---
+  duration_ms: 0.986591
+  type: 'test'
+  ...
+# Subtest: injected failure at exam:after-prepare leaves no partial state in any domain or the ledger
+ok 317 - injected failure at exam:after-prepare leaves no partial state in any domain or the ledger
+  ---
+  duration_ms: 11.184119
+  type: 'test'
+  ...
+# Subtest: injected failure at treatment-start:after-inventory leaves no partial state in any domain or the ledger
+ok 318 - injected failure at treatment-start:after-inventory leaves no partial state in any domain or the ledger
+  ---
+  duration_ms: 15.514447
+  type: 'test'
+  ...
+# Subtest: injected failure at treatment-complete:after-inventory leaves no partial state in any domain or the ledger
+ok 319 - injected failure at treatment-complete:after-inventory leaves no partial state in any domain or the ledger
+  ---
+  duration_ms: 6.07736
+  type: 'test'
+  ...
+# Subtest: injected failure at move-bag:before-physical leaves no partial state in any domain or the ledger
+ok 320 - injected failure at move-bag:before-physical leaves no partial state in any domain or the ledger
+  ---
+  duration_ms: 3.330845
+  type: 'test'
+  ...
+# Subtest: after an injected failure the session continues normally from the untouched state
+ok 321 - after an injected failure the session continues normally from the untouched state
+  ---
+  duration_ms: 5.884461
+  type: 'test'
+  ...
+# Subtest: cross-domain treatment completion commits inventory and clinical change in one step
+ok 322 - cross-domain treatment completion commits inventory and clinical change in one step
+  ---
+  duration_ms: 5.391222
+  type: 'test'
+  ...
+# Subtest: every certified file at 127f284 is byte-identical (SHA-256 manifest)
+ok 323 - every certified file at 127f284 is byte-identical (SHA-256 manifest)
+  ---
+  duration_ms: 20.735416
+  type: 'test'
+  ...
+# Subtest: engine never reads host clock or host randomness, and makes no network calls
+ok 324 - engine never reads host clock or host randomness, and makes no network calls
+  ---
+  duration_ms: 1.897708
+  type: 'test'
+  ...
+# Subtest: engine has no dependency on llm-worker, the legacy index.html or legacy nextgen modules
+ok 325 - engine has no dependency on llm-worker, the legacy index.html or legacy nextgen modules
+  ---
+  duration_ms: 0.885513
+  type: 'test'
+  ...
+# Subtest: engine imports certified modules read-only and never touches the world store writer
+ok 326 - engine imports certified modules read-only and never touches the world store writer
+  ---
+  duration_ms: 1.34228
+  type: 'test'
+  ...
+# Subtest: male-only: no female names, roles or legacy female arrays in engine code or content
+ok 327 - male-only: no female names, roles or legacy female arrays in engine code or content
+  ---
+  duration_ms: 1.044127
+  type: 'test'
+  ...
+# Subtest: no childbirth content and no paid or external service references
+ok 328 - no childbirth content and no paid or external service references
+  ---
+  duration_ms: 0.877331
+  type: 'test'
+  ...
+# Subtest: Stage 1 adds files only under the approved paths
+ok 329 - Stage 1 adds files only under the approved paths
+  ---
+  duration_ms: 3.035658
+  type: 'test'
+  ...
+# Subtest: Stage 1 protocol is sealed, synthetic, cites no source and denies clinical use
+ok 330 - Stage 1 protocol is sealed, synthetic, cites no source and denies clinical use
+  ---
+  duration_ms: 1.174377
+  type: 'test'
+  ...
+# Subtest: blanket "MDA ALS 2024" label is refused as a protocol source
+ok 331 - blanket "MDA ALS 2024" label is refused as a protocol source
+  ---
+  duration_ms: 0.550369
+  type: 'test'
+  ...
+# Subtest: clinical protocol requires source, version, validity and approval
+ok 332 - clinical protocol requires source, version, validity and approval
+  ---
+  duration_ms: 0.340947
+  type: 'test'
+  ...
+# Subtest: synthetic protocol may not cite a source or allow clinical use
+ok 333 - synthetic protocol may not cite a source or allow clinical use
+  ---
+  duration_ms: 0.207735
+  type: 'test'
+  ...
+# Subtest: protocol action levels and durations are validated
+ok 334 - protocol action levels and durations are validated
+  ---
+  duration_ms: 0.38316
+  type: 'test'
+  ...
+# Subtest: tampered protocol and scenario seals are detected
+ok 335 - tampered protocol and scenario seals are detected
+  ---
+  duration_ms: 0.408555
+  type: 'test'
+  ...
+# Subtest: scenario is male-only: female patient, NPC or casualty body is refused
+ok 336 - scenario is male-only: female patient, NPC or casualty body is refused
+  ---
+  duration_ms: 0.656682
+  type: 'test'
+  ...
+# Subtest: scenario refuses childbirth content and non-synthetic Stage 1 content
+ok 337 - scenario refuses childbirth content and non-synthetic Stage 1 content
+  ---
+  duration_ms: 0.453713
+  type: 'test'
+  ...
+# Subtest: scenario binds the exact certified scene package, male casualty body and protocol digest
+ok 338 - scenario binds the exact certified scene package, male casualty body and protocol digest
+  ---
+  duration_ms: 0.518331
+  type: 'test'
+  ...
+# Subtest: equipment, transfer, clock, clinical, intent and attempt contracts validate their inputs
+ok 339 - equipment, transfer, clock, clinical, intent and attempt contracts validate their inputs
+  ---
+  duration_ms: 0.98747
+  type: 'test'
+  ...
+# Subtest: result codes include every distinction the owner named
+ok 340 - result codes include every distinction the owner named
+  ---
+  duration_ms: 0.179094
+  type: 'test'
+  ...
+# Subtest: session binds scenario, protocol, level, seed and the certified world at start
+ok 341 - session binds scenario, protocol, level, seed and the certified world at start
+  ---
+  duration_ms: 7.933331
+  type: 'test'
+  ...
+# Subtest: session refuses mismatched protocol, bad level or missing seed
+ok 342 - session refuses mismatched protocol, bad level or missing seed
+  ---
+  duration_ms: 1.000365
+  type: 'test'
+  ...
+# Subtest: question: patient answers only from his knowledge map; answer reveals no exam finding
+ok 343 - question: patient answers only from his knowledge map; answer reveals no exam finding
+  ---
+  duration_ms: 11.868861
+  type: 'test'
+  ...
+# Subtest: no finding is exposed before the examination is performed
+ok 344 - no finding is exposed before the examination is performed
+  ---
+  duration_ms: 3.829951
+  type: 'test'
+  ...
+# Subtest: examining the other region finds nothing; observation binds the clinical revision
+ok 345 - examining the other region finds nothing; observation binds the clinical revision
+  ---
+  duration_ms: 3.498218
+  type: 'test'
+  ...
+# Subtest: REJECTED_NOT_PERMITTED_FOR_LEVEL: synthetic gate blocks first-responder dressing
+ok 346 - REJECTED_NOT_PERMITTED_FOR_LEVEL: synthetic gate blocks first-responder dressing
+  ---
+  duration_ms: 5.714999
+  type: 'test'
+  ...
+# Subtest: REJECTED_ILLEGAL_LOCATION: bag out of reach, state unchanged
+ok 347 - REJECTED_ILLEGAL_LOCATION: bag out of reach, state unchanged
+  ---
+  duration_ms: 3.631454
+  type: 'test'
+  ...
+# Subtest: REJECTED_ILLEGAL_LOCATION: certified physical gate rejects bag into the wall, world digest unchanged
+ok 348 - REJECTED_ILLEGAL_LOCATION: certified physical gate rejects bag into the wall, world digest unchanged
+  ---
+  duration_ms: 5.720307
+  type: 'test'
+  ...
+# Subtest: legal bag move commits through the certified runtime and physical replay matches
+ok 349 - legal bag move commits through the certified runtime and physical replay matches
+  ---
+  duration_ms: 8.13571
+  type: 'test'
+  ...
+# Subtest: REJECTED_INTENT_AMBIGUOUS returns a clarifying question and changes nothing
+ok 350 - REJECTED_INTENT_AMBIGUOUS returns a clarifying question and changes nothing
+  ---
+  duration_ms: 6.119087
+  type: 'test'
+  ...
+# Subtest: REJECTED_CAPABILITY_UNSUPPORTED for recognized-but-unbuilt actions, state unchanged
+ok 351 - REJECTED_CAPABILITY_UNSUPPORTED for recognized-but-unbuilt actions, state unchanged
+  ---
+  duration_ms: 2.740303
+  type: 'test'
+  ...
+# Subtest: treatment is a long action: accepted in progress, cannot finish early, completes exactly at duration
+ok 352 - treatment is a long action: accepted in progress, cannot finish early, completes exactly at duration
+  ---
+  duration_ms: 6.24916
+  type: 'test'
+  ...
+# Subtest: ACCEPTED_NEGATIVE_CLINICAL_OUTCOME: dressing the wrong arm consumes a unit, clinical state unchanged
+ok 353 - ACCEPTED_NEGATIVE_CLINICAL_OUTCOME: dressing the wrong arm consumes a unit, clinical state unchanged
+  ---
+  duration_ms: 4.940893
+  type: 'test'
+  ...
+# Subtest: REJECTED_ACTION_IN_PROGRESS: a parallel treatment cannot bypass the resource limit
+ok 354 - REJECTED_ACTION_IN_PROGRESS: a parallel treatment cannot bypass the resource limit
+  ---
+  duration_ms: 5.450188
+  type: 'test'
+  ...
+# Subtest: REJECTED_EQUIPMENT_MISSING once both dressings are used; no unit is ever duplicated
+ok 355 - REJECTED_EQUIPMENT_MISSING once both dressings are used; no unit is ever duplicated
+  ---
+  duration_ms: 5.75129
+  type: 'test'
+  ...
+# Subtest: inventory authority refuses to move a unit that is not at the stated source (no duplication path)
+ok 356 - inventory authority refuses to move a unit that is not at the stated source (no duplication path)
+  ---
+  duration_ms: 0.544264
+  type: 'test'
+  ...
+# Subtest: bag listing shows item name and quantity only
+ok 357 - bag listing shows item name and quantity only
+  ---
+  duration_ms: 2.077083
+  type: 'test'
+  ...
+# Subtest: pause freezes simulated time and long actions; actions are refused while paused
+ok 358 - pause freezes simulated time and long actions; actions are refused while paused
+  ---
+  duration_ms: 5.961234
+  type: 'test'
+  ...
+# Subtest: clock rejects non-positive or non-integer advances; host clock is never consulted
+ok 359 - clock rejects non-positive or non-integer advances; host clock is never consulted
+  ---
+  duration_ms: 9.2513
+  type: 'test'
+  ...
+# Subtest: every rejection type leaves all domain state (clinical, inventory, clock, world) unchanged
+ok 360 - every rejection type leaves all domain state (clinical, inventory, clock, world) unchanged
+  ---
+  duration_ms: 17.144521
+  type: 'test'
+  ...
+# Subtest: same command through text, voice and menu yields the same canonical intent
+ok 361 - same command through text, voice and menu yields the same canonical intent
+  ---
+  duration_ms: 2.769675
+  type: 'test'
+  ...
+# Subtest: three channels drive identical engine results and identical domain state
+ok 362 - three channels drive identical engine results and identical domain state
+  ---
+  duration_ms: 26.005854
+  type: 'test'
+  ...
+# Subtest: normalizer handles niqqud, final letters, punctuation and prefixes
+ok 363 - normalizer handles niqqud, final letters, punctuation and prefixes
+  ---
+  duration_ms: 0.560081
+  type: 'test'
+  ...
+# Subtest: one-letter typos in longer words are tolerated deterministically
+ok 364 - one-letter typos in longer words are tolerated deterministically
+  ---
+  duration_ms: 0.386295
+  type: 'test'
+  ...
+# Subtest: missing or conflicting parameter asks a short clarifying question instead of guessing
+ok 365 - missing or conflicting parameter asks a short clarifying question instead of guessing
+  ---
+  duration_ms: 0.52939
+  type: 'test'
+  ...
+# Subtest: multiple intents in one command are ambiguous, not executed
+ok 366 - multiple intents in one command are ambiguous, not executed
+  ---
+  duration_ms: 0.252922
+  type: 'test'
+  ...
+# Subtest: recognized but unimplemented capability is UNSUPPORTED, gibberish is AMBIGUOUS
+ok 367 - recognized but unimplemented capability is UNSUPPORTED, gibberish is AMBIGUOUS
+  ---
+  duration_ms: 0.459386
+  type: 'test'
+  ...
+# Subtest: menu input with an unknown intent or bad parameter is refused
+ok 368 - menu input with an unknown intent or bad parameter is refused
+  ---
+  duration_ms: 0.212134
+  type: 'test'
+  ...
+# Subtest: intent resolution is a pure function (repeatable output)
+ok 369 - intent resolution is a pure function (repeatable output)
+  ---
+  duration_ms: 3.389352
+  type: 'test'
+  ...
+# Subtest: ledger covers intents, questioning, exams, inventory, treatment, clock, clinical change and physical commits
+ok 370 - ledger covers intents, questioning, exams, inventory, treatment, clock, clinical change and physical commits
+  ---
+  duration_ms: 32.431262
+  type: 'test'
+  ...
+# Subtest: ledger is hash-chained and deeply frozen
+ok 371 - ledger is hash-chained and deeply frozen
+  ---
+  duration_ms: 15.273591
+  type: 'test'
+  ...
+# Subtest: tampered payload, reordered events and truncated head are detected
+ok 372 - tampered payload, reordered events and truncated head are detected
+  ---
+  duration_ms: 8.420392
+  type: 'test'
+  ...
+# Subtest: rejected actions are recorded as evidence with a sealed ActionAttempt
+ok 373 - rejected actions are recorded as evidence with a sealed ActionAttempt
+  ---
+  duration_ms: 9.024435
+  type: 'test'
+  ...
+# Subtest: same seed and same input sequence reproduce the identical ledger and state
+ok 374 - same seed and same input sequence reproduce the identical ledger and state
+  ---
+  duration_ms: 17.887237
+  type: 'test'
+  ...
+# Subtest: replay from the recorded run reproduces every event digest and the final state
+ok 375 - replay from the recorded run reproduces every event digest and the final state
+  ---
+  duration_ms: 23.667464
+  type: 'test'
+  ...
+# Subtest: replay refuses a tampered ledger, a different seed and wrong version bindings
+ok 376 - replay refuses a tampered ledger, a different seed and wrong version bindings
+  ---
+  duration_ms: 18.976144
+  type: 'test'
+  ...
+# Subtest: seeded randomness is resolved once at start and recorded
+ok 377 - seeded randomness is resolved once at start and recorded
+  ---
+  duration_ms: 67.592263
+  type: 'test'
+  ...
+# Subtest: microunit scale and integer bounds are locked
+ok 378 - microunit scale and integer bounds are locked
+  ---
+  duration_ms: 1.434989
+  type: 'test'
+  ...
+# Subtest: quaternion equivalence has one canonical encoding and digest
+ok 379 - quaternion equivalence has one canonical encoding and digest
+  ---
+  duration_ms: 1.634072
+  type: 'test'
+  ...
+# Subtest: strict quaternion rejects noncanonical and malformed forms
+ok 380 - strict quaternion rejects noncanonical and malformed forms
+  ---
+  duration_ms: 0.224692
+  type: 'test'
+  ...
+# Subtest: exact matrices cover identity, 90 and 180 axes, non-axis
+ok 381 - exact matrices cover identity, 90 and 180 axes, non-axis
+  ---
+  duration_ms: 0.627218
+  type: 'test'
+  ...
+# Subtest: rotation composition is canonical and exact
+ok 382 - rotation composition is canonical and exact
+  ---
+  duration_ms: 0.208411
+  type: 'test'
+  ...
+# Subtest: rounding ties-to-even exact positive negative symmetry
+ok 383 - rounding ties-to-even exact positive negative symmetry
+  ---
+  duration_ms: 0.16175
+  type: 'test'
+  ...
+# Subtest: materialization exposes exact errors and bound
+ok 384 - materialization exposes exact errors and bound
+  ---
+  duration_ms: 0.532119
+  type: 'test'
+  ...
+# Subtest: materialization overflow fails closed
+ok 385 - materialization overflow fails closed
+  ---
+  duration_ms: 0.152132
+  type: 'test'
+  ...
+# Subtest: frame graph validates one world and all frame kinds
+ok 386 - frame graph validates one world and all frame kinds
+  ---
+  duration_ms: 11.408384
+  type: 'test'
+  ...
+# Subtest: same graph insertion order and repeated resolve are byte identical
+ok 387 - same graph insertion order and repeated resolve are byte identical
+  ---
+  duration_ms: 1.908906
+  type: 'test'
+  ...
+# Subtest: exact mixed chain preserves local parent and world spaces
+ok 388 - exact mixed chain preserves local parent and world spaces
+  ---
+  duration_ms: 2.008742
+  type: 'test'
+  ...
+# Subtest: composition is exactly associative before quantization
+ok 389 - composition is exactly associative before quantization
+  ---
+  duration_ms: 0.681041
+  type: 'test'
+  ...
+# Subtest: oriented surface readiness representations
+ok 390 - oriented surface readiness representations
+  ---
+  duration_ms: 0.457807
+  type: 'test'
+  ...
+# Subtest: parent revision invalidates cached descendant snapshot
+ok 391 - parent revision invalidates cached descendant snapshot
+  ---
+  duration_ms: 1.456257
+  type: 'test'
+  ...
+# Subtest: graph negative matrix fails closed
+ok 392 - graph negative matrix fails closed
+  ---
+  duration_ms: 1.038203
+  type: 'test'
+  ...
+# Subtest: self direct and indirect cycles reject before digest interpretation
+ok 393 - self direct and indirect cycles reject before digest interpretation
+  ---
+  duration_ms: 0.505672
+  type: 'test'
+  ...
+# Subtest: unsafe number and malformed translation rejected
+ok 394 - unsafe number and malformed translation rejected
+  ---
+  duration_ms: 0.466335
+  type: 'test'
+  ...
+# Subtest: different transforms have different snapshot digests
+ok 395 - different transforms have different snapshot digests
+  ---
+  duration_ms: 0.868368
+  type: 'test'
+  ...
+# {"environment":{"node":"v22.23.2","platform":"linux","arch":"x64","cpu":"Intel(R) Xeon(R) Processor @ 2.60GHz"},"threshold":null,"limits":{"translationBits":63,"quaternionComponentBits":256,"intermediateBits":4096,"frameDepth":64,"frameCount":4096,"fixedScale":"1000000"},"canonicalize":{"unit":"microseconds","count":200,"p50":1.603,"p95":1.832,"max":50.254,"value":["41","152","263","337"]},"matrix":{"unit":"microseconds","count":200,"p50":3.997,"p95":4.918,"max":130.029,"value":{"numerators":[["-157953","52318","124014"],["107586","-65823","164798"],["80882","189726","22977"]],"denominator":"207523"}},"validateDepth64":{"unit":"microseconds","count":20,"p50":1700.864,"p95":9283.8,"max":9283.8,"value":{"frames":[{"frameId":"f1","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"w","revision":1,"digest":"734ee0f3e9f3061522acebb7290683b3aa73b82c27e0c766d0be42b220dd9555"},"translationMicrounits":["1","-1","1"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"09dc9a0be8b04034b85ab9d98a79bb2bf3b5b2eb377ab459fa3314c1dfb2a8ad"},{"frameId":"f10","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f9","revision":1,"digest":"e93b9ff5588b8e2a4d9868709183f358d717715d341a79576d81d1c5b632652e"},"translationMicrounits":["10","-10","1"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"fb4734de4550728d00ca979d05f0ea083ec778776c8ec34011894b957d62b872"},{"frameId":"f11","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f10","revision":1,"digest":"fb4734de4550728d00ca979d05f0ea083ec778776c8ec34011894b957d62b872"},"translationMicrounits":["11","-11","2"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"984b9c17f0740e9412417e649013b9ae59cea212de80f8f2167f6cc82ed2ce08"},{"frameId":"f12","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f11","revision":1,"digest":"984b9c17f0740e9412417e649013b9ae59cea212de80f8f2167f6cc82ed2ce08"},"translationMicrounits":["12","-12","0"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"1c053b41cc65ad77ff3ef436b919a56b0eed3f525e6680c1dda7d97cfe1d2821"},{"frameId":"f13","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f12","revision":1,"digest":"1c053b41cc65ad77ff3ef436b919a56b0eed3f525e6680c1dda7d97cfe1d2821"},"translationMicrounits":["13","-13","1"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"1f5750cc31d19fe24df7a81cb11000fe6048e53ebb29a99230ff0ce1e6a5c9d2"},{"frameId":"f14","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f13","revision":1,"digest":"1f5750cc31d19fe24df7a81cb11000fe6048e53ebb29a99230ff0ce1e6a5c9d2"},"translationMicrounits":["14","-14","2"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"7a53fdb6fd7860acc71c9c436b185feff1e76c8397e6d2d38d0ad74924e7c276"},{"frameId":"f15","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f14","revision":1,"digest":"7a53fdb6fd7860acc71c9c436b185feff1e76c8397e6d2d38d0ad74924e7c276"},"translationMicrounits":["15","-15","0"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"b76a2fb2cccab934d89bb90a6341b24642d4a890d9f585c4c1e1cea77faea254"},{"frameId":"f16","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f15","revision":1,"digest":"b76a2fb2cccab934d89bb90a6341b24642d4a890d9f585c4c1e1cea77faea254"},"translationMicrounits":["16","-16","1"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"551e8c0d9104b26637c08087552a63a1c40287f43bb6807a4384d153446d0ed0"},{"frameId":"f17","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f16","revision":1,"digest":"551e8c0d9104b26637c08087552a63a1c40287f43bb6807a4384d153446d0ed0"},"translationMicrounits":["17","-17","2"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"01809a2188dea42d80e2be13805eeb2b4168fdb340645fc768ffed3dac88770d"},{"frameId":"f18","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f17","revision":1,"digest":"01809a2188dea42d80e2be13805eeb2b4168fdb340645fc768ffed3dac88770d"},"translationMicrounits":["18","-18","0"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"3b5e72b0ecc7d930a9083f723bafa4e9d34bdf9d4513d33b87b8ff2f539620a5"},{"frameId":"f19","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f18","revision":1,"digest":"3b5e72b0ecc7d930a9083f723bafa4e9d34bdf9d4513d33b87b8ff2f539620a5"},"translationMicrounits":["19","-19","1"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"ecdabfd1e67ad2c59761f1e5908ca7b7b9049a2c66683db7d4ea7c379f551198"},{"frameId":"f2","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f1","revision":1,"digest":"09dc9a0be8b04034b85ab9d98a79bb2bf3b5b2eb377ab459fa3314c1dfb2a8ad"},"translationMicrounits":["2","-2","2"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"543e0603baeb447d09e0ad5112d31875d5693a5845e4b58a5164e44b8dd58708"},{"frameId":"f20","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f19","revision":1,"digest":"ecdabfd1e67ad2c59761f1e5908ca7b7b9049a2c66683db7d4ea7c379f551198"},"translationMicrounits":["20","-20","2"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"28cf13f0993d7a1af15cff5579de247a371bf704e1b226034072a899752af31c"},{"frameId":"f21","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f20","revision":1,"digest":"28cf13f0993d7a1af15cff5579de247a371bf704e1b226034072a899752af31c"},"translationMicrounits":["21","-21","0"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"0a3af1ee77cb316c11492f8480733f301e224229531b82e927b57dc92af0882e"},{"frameId":"f22","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f21","revision":1,"digest":"0a3af1ee77cb316c11492f8480733f301e224229531b82e927b57dc92af0882e"},"translationMicrounits":["22","-22","1"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"11ed65bc37fadf1da2ae77e90de027ca0ca21e166c2c26168616939b458953eb"},{"frameId":"f23","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f22","revision":1,"digest":"11ed65bc37fadf1da2ae77e90de027ca0ca21e166c2c26168616939b458953eb"},"translationMicrounits":["23","-23","2"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"244be709244d31b1c5f48cf864efc9cfbab05ac295d753b15562f885837c80db"},{"frameId":"f24","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f23","revision":1,"digest":"244be709244d31b1c5f48cf864efc9cfbab05ac295d753b15562f885837c80db"},"translationMicrounits":["24","-24","0"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"e24c6c4072d0d18285ad060c4cf465cfe07f9aec8464ba7cf9275caa30f443ea"},{"frameId":"f25","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f24","revision":1,"digest":"e24c6c4072d0d18285ad060c4cf465cfe07f9aec8464ba7cf9275caa30f443ea"},"translationMicrounits":["25","-25","1"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"948e855ff04b2248a8f40dbf9bda4edd32d20674e4327679f99ccc3e3052d395"},{"frameId":"f26","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f25","revision":1,"digest":"948e855ff04b2248a8f40dbf9bda4edd32d20674e4327679f99ccc3e3052d395"},"translationMicrounits":["26","-26","2"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"72cd0fd9dc0c273ad947d4cb72588ee55edd5a8fea4372255b0a617d8bc3810a"},{"frameId":"f27","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f26","revision":1,"digest":"72cd0fd9dc0c273ad947d4cb72588ee55edd5a8fea4372255b0a617d8bc3810a"},"translationMicrounits":["27","-27","0"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"629eb4f1642b0e950c8a9150f2f07bab9b0150fa2a925ab39ef6d6edc60f19a2"},{"frameId":"f28","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f27","revision":1,"digest":"629eb4f1642b0e950c8a9150f2f07bab9b0150fa2a925ab39ef6d6edc60f19a2"},"translationMicrounits":["28","-28","1"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"ab291492e69cfff223c1bf0aa642a4f960de9afb0563c83de8398f589da62bae"},{"frameId":"f29","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f28","revision":1,"digest":"ab291492e69cfff223c1bf0aa642a4f960de9afb0563c83de8398f589da62bae"},"translationMicrounits":["29","-29","2"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"b3bc11bd70a99f94c1a3673a231da87ca05e6431f6bfd5901c0ea24da6c45d5d"},{"frameId":"f3","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f2","revision":1,"digest":"543e0603baeb447d09e0ad5112d31875d5693a5845e4b58a5164e44b8dd58708"},"translationMicrounits":["3","-3","0"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"d6d429605745ae822dd1c55d8bd4c47917b8b385a986563cdc2c19407f7e96c2"},{"frameId":"f30","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f29","revision":1,"digest":"b3bc11bd70a99f94c1a3673a231da87ca05e6431f6bfd5901c0ea24da6c45d5d"},"translationMicrounits":["30","-30","0"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"94beb7d2f490e338767f9894b1978ec89d49455229fc63364b184ba68a226d58"},{"frameId":"f31","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f30","revision":1,"digest":"94beb7d2f490e338767f9894b1978ec89d49455229fc63364b184ba68a226d58"},"translationMicrounits":["31","-31","1"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"0b43b7e28360f4c8f42d5a66c030b02ceec5e17736e9808d37c09f5a562549ff"},{"frameId":"f32","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f31","revision":1,"digest":"0b43b7e28360f4c8f42d5a66c030b02ceec5e17736e9808d37c09f5a562549ff"},"translationMicrounits":["32","-32","2"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"b8786a2441799f3f2195f8846fe2ef519b951ff66137fab055efca242d70a1db"},{"frameId":"f33","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f32","revision":1,"digest":"b8786a2441799f3f2195f8846fe2ef519b951ff66137fab055efca242d70a1db"},"translationMicrounits":["33","-33","0"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"1ff88af59e084036004686e70cf35525ad3eb7960f137b973295438bdafe8854"},{"frameId":"f34","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f33","revision":1,"digest":"1ff88af59e084036004686e70cf35525ad3eb7960f137b973295438bdafe8854"},"translationMicrounits":["34","-34","1"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"755a7270661a14b0ce5580e7fbb4846465439a3588629d2a7cdd55075bb72d21"},{"frameId":"f35","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f34","revision":1,"digest":"755a7270661a14b0ce5580e7fbb4846465439a3588629d2a7cdd55075bb72d21"},"translationMicrounits":["35","-35","2"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"9006789a088def1115871a6c1216f041323fabc24eee61ea3c8185f11121df53"},{"frameId":"f36","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f35","revision":1,"digest":"9006789a088def1115871a6c1216f041323fabc24eee61ea3c8185f11121df53"},"translationMicrounits":["36","-36","0"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"953be3586641e0d4a6974bb9981aa42186cb5e84521f3bcabf6158f75a5dfd95"},{"frameId":"f37","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f36","revision":1,"digest":"953be3586641e0d4a6974bb9981aa42186cb5e84521f3bcabf6158f75a5dfd95"},"translationMicrounits":["37","-37","1"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"1da56612da8938ea6e83e8cf9551b6ff995cb5859557ae1bfe8d8d6f15512aba"},{"frameId":"f38","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f37","revision":1,"digest":"1da56612da8938ea6e83e8cf9551b6ff995cb5859557ae1bfe8d8d6f15512aba"},"translationMicrounits":["38","-38","2"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"9b7372b2ad9bfb579315c176e1a7636b474b2104833da3f927ad9e92e1e94da2"},{"frameId":"f39","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f38","revision":1,"digest":"9b7372b2ad9bfb579315c176e1a7636b474b2104833da3f927ad9e92e1e94da2"},"translationMicrounits":["39","-39","0"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"23b63d27a8454edc125ab71e1e1c40e880f6074b11839becf8bd77738e737998"},{"frameId":"f4","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f3","revision":1,"digest":"d6d429605745ae822dd1c55d8bd4c47917b8b385a986563cdc2c19407f7e96c2"},"translationMicrounits":["4","-4","1"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"337502d745aa5aefafce858e2f38011238e9fad034cb41c93b85fd289038c212"},{"frameId":"f40","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f39","revision":1,"digest":"23b63d27a8454edc125ab71e1e1c40e880f6074b11839becf8bd77738e737998"},"translationMicrounits":["40","-40","1"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"1cf737e8ede50eadbbcbc2d480317ab47214ee70bca45dff3dfe62a926f813c9"},{"frameId":"f41","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f40","revision":1,"digest":"1cf737e8ede50eadbbcbc2d480317ab47214ee70bca45dff3dfe62a926f813c9"},"translationMicrounits":["41","-41","2"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"e593bedbebbc3a716ea017c503e44c49488613919da82f33bf58f76683f54b38"},{"frameId":"f42","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f41","revision":1,"digest":"e593bedbebbc3a716ea017c503e44c49488613919da82f33bf58f76683f54b38"},"translationMicrounits":["42","-42","0"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"0c30e5266942f2d90fbf41d59e7a155933bbaf7f365a8f747b3ffc912340d9e3"},{"frameId":"f43","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f42","revision":1,"digest":"0c30e5266942f2d90fbf41d59e7a155933bbaf7f365a8f747b3ffc912340d9e3"},"translationMicrounits":["43","-43","1"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"0567eb3a2ab545228fb7c2710942241caa06e61d3993007aa4230fbe280a8729"},{"frameId":"f44","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f43","revision":1,"digest":"0567eb3a2ab545228fb7c2710942241caa06e61d3993007aa4230fbe280a8729"},"translationMicrounits":["44","-44","2"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"f40f00068997fad71fc14763be41aa3d29b96730e2d804cb0131234cd7f8f9d4"},{"frameId":"f45","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f44","revision":1,"digest":"f40f00068997fad71fc14763be41aa3d29b96730e2d804cb0131234cd7f8f9d4"},"translationMicrounits":["45","-45","0"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"2684727dec5f6dc0e87bdeee6843ab18301f2067cd4b6e1f864d2de0e7c0338f"},{"frameId":"f46","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f45","revision":1,"digest":"2684727dec5f6dc0e87bdeee6843ab18301f2067cd4b6e1f864d2de0e7c0338f"},"translationMicrounits":["46","-46","1"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"c0051cadae5c01481916c74b7396ce25b81bc4bbb961e49226d0f2f027a1aeb3"},{"frameId":"f47","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f46","revision":1,"digest":"c0051cadae5c01481916c74b7396ce25b81bc4bbb961e49226d0f2f027a1aeb3"},"translationMicrounits":["47","-47","2"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"e031c5370d03f5f6cf0472e0bc478eb9732458878a290e807c35e27565a56072"},{"frameId":"f48","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f47","revision":1,"digest":"e031c5370d03f5f6cf0472e0bc478eb9732458878a290e807c35e27565a56072"},"translationMicrounits":["48","-48","0"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"908e43f4f81a18aa6fc9fa31f142225584bd25292c54e8e474458e7818ad7b23"},{"frameId":"f49","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f48","revision":1,"digest":"908e43f4f81a18aa6fc9fa31f142225584bd25292c54e8e474458e7818ad7b23"},"translationMicrounits":["49","-49","1"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"3149424e638255bb6687ecf611565d5d216277bf7d491b74e82d184a75bb0c09"},{"frameId":"f5","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f4","revision":1,"digest":"337502d745aa5aefafce858e2f38011238e9fad034cb41c93b85fd289038c212"},"translationMicrounits":["5","-5","2"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"3ddc17c4817ba2d9f74aac23e01931052b9e5d6769e171a0e6b3bab6dcb35dfc"},{"frameId":"f50","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f49","revision":1,"digest":"3149424e638255bb6687ecf611565d5d216277bf7d491b74e82d184a75bb0c09"},"translationMicrounits":["50","-50","2"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"bb5950cdfec0acb4fa2ffb83f41e9e18260fd57e217ed4468149192ce1bd2789"},{"frameId":"f51","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f50","revision":1,"digest":"bb5950cdfec0acb4fa2ffb83f41e9e18260fd57e217ed4468149192ce1bd2789"},"translationMicrounits":["51","-51","0"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"6d35bb9b1a60379f9b83771c3e1f07fd60a5b7a49a02074cc16faed5ed4aa94f"},{"frameId":"f52","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f51","revision":1,"digest":"6d35bb9b1a60379f9b83771c3e1f07fd60a5b7a49a02074cc16faed5ed4aa94f"},"translationMicrounits":["52","-52","1"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"134e1f48679c6fd4fdca8b1bfa40d8fa47922eea7d52317c4dda710592aacfcb"},{"frameId":"f53","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f52","revision":1,"digest":"134e1f48679c6fd4fdca8b1bfa40d8fa47922eea7d52317c4dda710592aacfcb"},"translationMicrounits":["53","-53","2"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"a62db7e8f421fb18d66cb6365c10d72cd93283527741042162f12bf79848da19"},{"frameId":"f54","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f53","revision":1,"digest":"a62db7e8f421fb18d66cb6365c10d72cd93283527741042162f12bf79848da19"},"translationMicrounits":["54","-54","0"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"f38d9d61b520de19d663940cfeb1e328577272903b4c776365870a1d8748a504"},{"frameId":"f55","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f54","revision":1,"digest":"f38d9d61b520de19d663940cfeb1e328577272903b4c776365870a1d8748a504"},"translationMicrounits":["55","-55","1"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"01bbd2f66056f64ff77c5a7ca323872a5b94323ef8259bb86f1d3988c00e2148"},{"frameId":"f56","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f55","revision":1,"digest":"01bbd2f66056f64ff77c5a7ca323872a5b94323ef8259bb86f1d3988c00e2148"},"translationMicrounits":["56","-56","2"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"e72a6e48b3f07700c26de77a2fab37d39097c1cb3d8ffceb5c51946dee53da8c"},{"frameId":"f57","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f56","revision":1,"digest":"e72a6e48b3f07700c26de77a2fab37d39097c1cb3d8ffceb5c51946dee53da8c"},"translationMicrounits":["57","-57","0"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"53d9e6f4776676a8fed9258f82d41a8aec2c37b385312ae2a9252f19b671bdda"},{"frameId":"f58","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f57","revision":1,"digest":"53d9e6f4776676a8fed9258f82d41a8aec2c37b385312ae2a9252f19b671bdda"},"translationMicrounits":["58","-58","1"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"2351e9d837dc5ea5fb4abf36a42532d48bc6565b607f491d0fd9ddc926fb7d40"},{"frameId":"f59","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f58","revision":1,"digest":"2351e9d837dc5ea5fb4abf36a42532d48bc6565b607f491d0fd9ddc926fb7d40"},"translationMicrounits":["59","-59","2"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"cdef2665897ab7b32642d96a764faf52070c84bbcbecdcc90eafefc032130fb3"},{"frameId":"f6","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f5","revision":1,"digest":"3ddc17c4817ba2d9f74aac23e01931052b9e5d6769e171a0e6b3bab6dcb35dfc"},"translationMicrounits":["6","-6","0"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"aa1336e21931fc3711007dcc86875757f0415d458eca8470171e262dd6b80c0f"},{"frameId":"f60","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f59","revision":1,"digest":"cdef2665897ab7b32642d96a764faf52070c84bbcbecdcc90eafefc032130fb3"},"translationMicrounits":["60","-60","0"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"5aebb57d7d768171b02a40d2a25f95d41436b3535066f2a6d78a17f76e0ad172"},{"frameId":"f61","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f60","revision":1,"digest":"5aebb57d7d768171b02a40d2a25f95d41436b3535066f2a6d78a17f76e0ad172"},"translationMicrounits":["61","-61","1"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"3eb1154fca801c1fefbe3671fa6a31928c02afc6bd7ca2407f4a7e1e28a9d94a"},{"frameId":"f62","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f61","revision":1,"digest":"3eb1154fca801c1fefbe3671fa6a31928c02afc6bd7ca2407f4a7e1e28a9d94a"},"translationMicrounits":["62","-62","2"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"f8d035fea5d277d53acf5ae865f6e8659a2b47e6ca721dac756e17726f7ae63c"},{"frameId":"f63","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f62","revision":1,"digest":"f8d035fea5d277d53acf5ae865f6e8659a2b47e6ca721dac756e17726f7ae63c"},"translationMicrounits":["63","-63","0"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"ce79ff3a4eb6083a7eb90219ba093441f0de9492372fb9d13dca338354d82972"},{"frameId":"f64","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f63","revision":1,"digest":"ce79ff3a4eb6083a7eb90219ba093441f0de9492372fb9d13dca338354d82972"},"translationMicrounits":["64","-64","1"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"3671cf5875afd317336958ec2ea1899a54845a08ca481229f398b0dbda217831"},{"frameId":"f7","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f6","revision":1,"digest":"aa1336e21931fc3711007dcc86875757f0415d458eca8470171e262dd6b80c0f"},"translationMicrounits":["7","-7","1"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"9e322d4b3bdcbe3241ad9ca06aa2cbfe1dae3e7fafb7f42e84e6397a732ed899"},{"frameId":"f8","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f7","revision":1,"digest":"9e322d4b3bdcbe3241ad9ca06aa2cbfe1dae3e7fafb7f42e84e6397a732ed899"},"translationMicrounits":["8","-8","2"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"8a8ca8722c3aab31a875f929817f6ceafa5c06fd71231208316d798bf7e0860b"},{"frameId":"f9","frameKind":"ENTITY_LOCAL","parentFrameRef":{"frameId":"f8","revision":1,"digest":"8a8ca8722c3aab31a875f929817f6ceafa5c06fd71231208316d798bf7e0860b"},"translationMicrounits":["9","-9","0"],"rotationQuaternionRatio":["1","2","3","4"],"revision":1,"provenance":"SYNTHETIC","digest":"e93b9ff5588b8e2a4d9868709183f358d717715d341a79576d81d1c5b632652e"},{"frameId":"w","frameKind":"WORLD","parentFrameRef":null,"translationMicrounits":["0","0","0"],"rotationQuaternionRatio":["1","0","0","0"],"revision":1,"provenance":"SYNTHETIC","digest":"734ee0f3e9f3061522acebb7290683b3aa73b82c27e0c766d0be42b220dd9555"}],"graphDigest":"c4faceef5c6199bbd14ab01cceb5e482b641b4cda04430fe1d8d0e1441ad4c3b"}},"reduction":{"unit":"microseconds","count":200,"p50":3.079,"p95":4.029,"max":79.718,"value":{"numerators":["1234567","-7654321","3141592"],"denominator":"2718281"}},"materialization":{"unit":"microseconds","count":200,"p50":10.939,"p95":23.782,"max":418.032,"value":{"scale":"1000000","rounding":"NEAREST_TIES_TO_EVEN","fixedMicrounits":["454172","-2815868","1155727"],"exactSource":{"numerators":["1234567","-7654321","3141592"],"denominator":"2718281"},"errors":[{"numerators":["29583"],"denominator":"679570250000"},{"numerators":["129273"],"denominator":"679570250000"},{"numerators":["-1254713"],"denominator":"2718281000000"}],"maxAbsoluteErrorWorldUnits":{"numerator":"1","denominator":"2000000"}}},"digest":{"unit":"microseconds","count":200,"p50":3.322,"p95":5.737,"max":63.696,"value":"a8c597599bb0403effddb6267df0d8e024254d08f2b759ef0027b6ee63cf30d4"},"growth":[{"depth":1,"maxNumeratorBits":1,"denominatorBits":1,"quaternionComponentBits":3,"approxCanonicalBytes":436,"resolve":{"unit":"microseconds","count":20,"p50":260.162,"p95":8851.267,"max":8851.267,"value":{"translation":{"numerators":["1","-1","1"],"denominator":"1"},"rotationQuaternionRatio":["1","2","3","4"],"frameId":"f1","dependencyRefs":[{"frameId":"w","revision":1,"digest":"734ee0f3e9f3061522acebb7290683b3aa73b82c27e0c766d0be42b220dd9555"},{"frameId":"f1","revision":1,"digest":"09dc9a0be8b04034b85ab9d98a79bb2bf3b5b2eb377ab459fa3314c1dfb2a8ad"}],"snapshotDigest":"2118241198f486e3ccd829dc721f251866999d04fbfc002ce4a4f4d82bb41560"}}},{"depth":2,"maxNumeratorBits":6,"denominatorBits":4,"quaternionComponentBits":4,"approxCanonicalBytes":548,"resolve":{"unit":"microseconds","count":20,"p50":214.978,"p95":2686.653,"max":2686.653,"value":{"translation":{"numerators":["13","35","1"],"denominator":"15"},"rotationQuaternionRatio":["14","-2","-3","-4"],"frameId":"f2","dependencyRefs":[{"frameId":"w","revision":1,"digest":"734ee0f3e9f3061522acebb7290683b3aa73b82c27e0c766d0be42b220dd9555"},{"frameId":"f1","revision":1,"digest":"09dc9a0be8b04034b85ab9d98a79bb2bf3b5b2eb377ab459fa3314c1dfb2a8ad"},{"frameId":"f2","revision":1,"digest":"543e0603baeb447d09e0ad5112d31875d5693a5845e4b58a5164e44b8dd58708"}],"snapshotDigest":"bce2fc315831773c24898b6a562ce956bbd0133972dd6f5cb0c6530f708623ef"}}},{"depth":4,"maxNumeratorBits":14,"denominatorBits":12,"quaternionComponentBits":8,"approxCanonicalBytes":775,"resolve":{"unit":"microseconds","count":20,"p50":394.097,"p95":2941.29,"max":2941.29,"value":{"translation":{"numerators":["9737","8980","-6541"],"denominator":"3375"},"rotationQuaternionRatio":["167","-56","-84","-112"],"frameId":"f4","dependencyRefs":[{"frameId":"w","revision":1,"digest":"734ee0f3e9f3061522acebb7290683b3aa73b82c27e0c766d0be42b220dd9555"},{"frameId":"f1","revision":1,"digest":"09dc9a0be8b04034b85ab9d98a79bb2bf3b5b2eb377ab459fa3314c1dfb2a8ad"},{"frameId":"f2","revision":1,"digest":"543e0603baeb447d09e0ad5112d31875d5693a5845e4b58a5164e44b8dd58708"},{"frameId":"f3","revision":1,"digest":"d6d429605745ae822dd1c55d8bd4c47917b8b385a986563cdc2c19407f7e96c2"},{"frameId":"f4","revision":1,"digest":"337502d745aa5aefafce858e2f38011238e9fad034cb41c93b85fd289038c212"}],"snapshotDigest":"5f692d1f9bf74d085821394899281a283151df738dd996bac805070f7ab2a987"}}},{"depth":8,"maxNumeratorBits":30,"denominatorBits":28,"quaternionComponentBits":16,"approxCanonicalBytes":1229,"resolve":{"unit":"microseconds","count":20,"p50":507.436,"p95":1672.654,"max":1672.654,"value":{"translation":{"numerators":["987552589","-414306190","-183046652"],"denominator":"170859375"},"rotationQuaternionRatio":["5153","-18704","-28056","-37408"],"frameId":"f8","dependencyRefs":[{"frameId":"w","revision":1,"digest":"734ee0f3e9f3061522acebb7290683b3aa73b82c27e0c766d0be42b220dd9555"},{"frameId":"f1","revision":1,"digest":"09dc9a0be8b04034b85ab9d98a79bb2bf3b5b2eb377ab459fa3314c1dfb2a8ad"},{"frameId":"f2","revision":1,"digest":"543e0603baeb447d09e0ad5112d31875d5693a5845e4b58a5164e44b8dd58708"},{"frameId":"f3","revision":1,"digest":"d6d429605745ae822dd1c55d8bd4c47917b8b385a986563cdc2c19407f7e96c2"},{"frameId":"f4","revision":1,"digest":"337502d745aa5aefafce858e2f38011238e9fad034cb41c93b85fd289038c212"},{"frameId":"f5","revision":1,"digest":"3ddc17c4817ba2d9f74aac23e01931052b9e5d6769e171a0e6b3bab6dcb35dfc"},{"frameId":"f6","revision":1,"digest":"aa1336e21931fc3711007dcc86875757f0415d458eca8470171e262dd6b80c0f"},{"frameId":"f7","revision":1,"digest":"9e322d4b3bdcbe3241ad9ca06aa2cbfe1dae3e7fafb7f42e84e6397a732ed899"},{"frameId":"f8","revision":1,"digest":"8a8ca8722c3aab31a875f929817f6ceafa5c06fd71231208316d798bf7e0860b"}],"snapshotDigest":"9e2611c30731f8f65783f02b0b913e8d42168d5948578580ee25387e774cefbe"}}},{"depth":16,"maxNumeratorBits":63,"denominatorBits":59,"quaternionComponentBits":32,"approxCanonicalBytes":2140,"resolve":{"unit":"microseconds","count":20,"p50":1256.093,"p95":5348.907,"max":5348.907,"value":{"translation":{"numerators":["-6827874164197007329","-1629653946516010910","-3245912484869956903"],"denominator":"437893890380859375"},"rotationQuaternionRatio":["2509783807","192763424","289145136","385526848"],"frameId":"f16","dependencyRefs":[{"frameId":"w","revision":1,"digest":"734ee0f3e9f3061522acebb7290683b3aa73b82c27e0c766d0be42b220dd9555"},{"frameId":"f1","revision":1,"digest":"09dc9a0be8b04034b85ab9d98a79bb2bf3b5b2eb377ab459fa3314c1dfb2a8ad"},{"frameId":"f2","revision":1,"digest":"543e0603baeb447d09e0ad5112d31875d5693a5845e4b58a5164e44b8dd58708"},{"frameId":"f3","revision":1,"digest":"d6d429605745ae822dd1c55d8bd4c47917b8b385a986563cdc2c19407f7e96c2"},{"frameId":"f4","revision":1,"digest":"337502d745aa5aefafce858e2f38011238e9fad034cb41c93b85fd289038c212"},{"frameId":"f5","revision":1,"digest":"3ddc17c4817ba2d9f74aac23e01931052b9e5d6769e171a0e6b3bab6dcb35dfc"},{"frameId":"f6","revision":1,"digest":"aa1336e21931fc3711007dcc86875757f0415d458eca8470171e262dd6b80c0f"},{"frameId":"f7","revision":1,"digest":"9e322d4b3bdcbe3241ad9ca06aa2cbfe1dae3e7fafb7f42e84e6397a732ed899"},{"frameId":"f8","revision":1,"digest":"8a8ca8722c3aab31a875f929817f6ceafa5c06fd71231208316d798bf7e0860b"},{"frameId":"f9","revision":1,"digest":"e93b9ff5588b8e2a4d9868709183f358d717715d341a79576d81d1c5b632652e"},{"frameId":"f10","revision":1,"digest":"fb4734de4550728d00ca979d05f0ea083ec778776c8ec34011894b957d62b872"},{"frameId":"f11","revision":1,"digest":"984b9c17f0740e9412417e649013b9ae59cea212de80f8f2167f6cc82ed2ce08"},{"frameId":"f12","revision":1,"digest":"1c053b41cc65ad77ff3ef436b919a56b0eed3f525e6680c1dda7d97cfe1d2821"},{"frameId":"f13","revision":1,"digest":"1f5750cc31d19fe24df7a81cb11000fe6048e53ebb29a99230ff0ce1e6a5c9d2"},{"frameId":"f14","revision":1,"digest":"7a53fdb6fd7860acc71c9c436b185feff1e76c8397e6d2d38d0ad74924e7c276"},{"frameId":"f15","revision":1,"digest":"b76a2fb2cccab934d89bb90a6341b24642d4a890d9f585c4c1e1cea77faea254"},{"frameId":"f16","revision":1,"digest":"551e8c0d9104b26637c08087552a63a1c40287f43bb6807a4384d153446d0ed0"}],"snapshotDigest":"3907e0546a82da257e2fe962eb8087ca75ca93ae7164fcb8fb2f28462d714ec2"}}},{"depth":32,"maxNumeratorBits":127,"denominatorBits":122,"quaternionComponentBits":63,"approxCanonicalBytes":3969,"resolve":{"unit":"microseconds","count":20,"p50":2829.807,"p95":7003.62,"max":7003.62,"value":{"translation":{"numerators":["-133882427477305952366972680509057619223","-123414502060961125915752458827418063170","-125248232676459048082408990460112721136"],"denominator":"2876265888493261300027370452880859375"},"rotationQuaternionRatio":["6029621160045935873","967589040274150336","1451383560411225504","1935178080548300672"],"frameId":"f32","dependencyRefs":[{"frameId":"w","revision":1,"digest":"734ee0f3e9f3061522acebb7290683b3aa73b82c27e0c766d0be42b220dd9555"},{"frameId":"f1","revision":1,"digest":"09dc9a0be8b04034b85ab9d98a79bb2bf3b5b2eb377ab459fa3314c1dfb2a8ad"},{"frameId":"f2","revision":1,"digest":"543e0603baeb447d09e0ad5112d31875d5693a5845e4b58a5164e44b8dd58708"},{"frameId":"f3","revision":1,"digest":"d6d429605745ae822dd1c55d8bd4c47917b8b385a986563cdc2c19407f7e96c2"},{"frameId":"f4","revision":1,"digest":"337502d745aa5aefafce858e2f38011238e9fad034cb41c93b85fd289038c212"},{"frameId":"f5","revision":1,"digest":"3ddc17c4817ba2d9f74aac23e01931052b9e5d6769e171a0e6b3bab6dcb35dfc"},{"frameId":"f6","revision":1,"digest":"aa1336e21931fc3711007dcc86875757f0415d458eca8470171e262dd6b80c0f"},{"frameId":"f7","revision":1,"digest":"9e322d4b3bdcbe3241ad9ca06aa2cbfe1dae3e7fafb7f42e84e6397a732ed899"},{"frameId":"f8","revision":1,"digest":"8a8ca8722c3aab31a875f929817f6ceafa5c06fd71231208316d798bf7e0860b"},{"frameId":"f9","revision":1,"digest":"e93b9ff5588b8e2a4d9868709183f358d717715d341a79576d81d1c5b632652e"},{"frameId":"f10","revision":1,"digest":"fb4734de4550728d00ca979d05f0ea083ec778776c8ec34011894b957d62b872"},{"frameId":"f11","revision":1,"digest":"984b9c17f0740e9412417e649013b9ae59cea212de80f8f2167f6cc82ed2ce08"},{"frameId":"f12","revision":1,"digest":"1c053b41cc65ad77ff3ef436b919a56b0eed3f525e6680c1dda7d97cfe1d2821"},{"frameId":"f13","revision":1,"digest":"1f5750cc31d19fe24df7a81cb11000fe6048e53ebb29a99230ff0ce1e6a5c9d2"},{"frameId":"f14","revision":1,"digest":"7a53fdb6fd7860acc71c9c436b185feff1e76c8397e6d2d38d0ad74924e7c276"},{"frameId":"f15","revision":1,"digest":"b76a2fb2cccab934d89bb90a6341b24642d4a890d9f585c4c1e1cea77faea254"},{"frameId":"f16","revision":1,"digest":"551e8c0d9104b26637c08087552a63a1c40287f43bb6807a4384d153446d0ed0"},{"frameId":"f17","revision":1,"digest":"01809a2188dea42d80e2be13805eeb2b4168fdb340645fc768ffed3dac88770d"},{"frameId":"f18","revision":1,"digest":"3b5e72b0ecc7d930a9083f723bafa4e9d34bdf9d4513d33b87b8ff2f539620a5"},{"frameId":"f19","revision":1,"digest":"ecdabfd1e67ad2c59761f1e5908ca7b7b9049a2c66683db7d4ea7c379f551198"},{"frameId":"f20","revision":1,"digest":"28cf13f0993d7a1af15cff5579de247a371bf704e1b226034072a899752af31c"},{"frameId":"f21","revision":1,"digest":"0a3af1ee77cb316c11492f8480733f301e224229531b82e927b57dc92af0882e"},{"frameId":"f22","revision":1,"digest":"11ed65bc37fadf1da2ae77e90de027ca0ca21e166c2c26168616939b458953eb"},{"frameId":"f23","revision":1,"digest":"244be709244d31b1c5f48cf864efc9cfbab05ac295d753b15562f885837c80db"},{"frameId":"f24","revision":1,"digest":"e24c6c4072d0d18285ad060c4cf465cfe07f9aec8464ba7cf9275caa30f443ea"},{"frameId":"f25","revision":1,"digest":"948e855ff04b2248a8f40dbf9bda4edd32d20674e4327679f99ccc3e3052d395"},{"frameId":"f26","revision":1,"digest":"72cd0fd9dc0c273ad947d4cb72588ee55edd5a8fea4372255b0a617d8bc3810a"},{"frameId":"f27","revision":1,"digest":"629eb4f1642b0e950c8a9150f2f07bab9b0150fa2a925ab39ef6d6edc60f19a2"},{"frameId":"f28","revision":1,"digest":"ab291492e69cfff223c1bf0aa642a4f960de9afb0563c83de8398f589da62bae"},{"frameId":"f29","revision":1,"digest":"b3bc11bd70a99f94c1a3673a231da87ca05e6431f6bfd5901c0ea24da6c45d5d"},{"frameId":"f30","revision":1,"digest":"94beb7d2f490e338767f9894b1978ec89d49455229fc63364b184ba68a226d58"},{"frameId":"f31","revision":1,"digest":"0b43b7e28360f4c8f42d5a66c030b02ceec5e17736e9808d37c09f5a562549ff"},{"frameId":"f32","revision":1,"digest":"b8786a2441799f3f2195f8846fe2ef519b951ff66137fab055efca242d70a1db"}],"snapshotDigest":"95bb060fa1c474cc06d991fe738f9ee597696c87a8f7798ba6e9b4a78f0d3bce"}}},{"depth":64,"maxNumeratorBits":254,"denominatorBits":247,"quaternionComponentBits":125,"approxCanonicalBytes":7622,"resolve":{"unit":"microseconds","count":20,"p50":7450.76,"p95":8342.548,"max":8342.548,"value":{"translation":{"numerators":["-17542436424377266978602295470477524991855590493633677450148575992535404024393","-27184173816732160427429076248961170047196480059608681089321822383586475102470","-27427324780622166340336327462613725700425116542720554325834716767556113535951"],"denominator":"124093581919648947697827373650380188008224280338254175148904323577880859375"},"rotationQuaternionRatio":["29568674339948475346969154135643653633","11668390702931112228473870030034806656","17502586054396668342710805045052209984","23336781405862224456947740060069613312"],"frameId":"f64","dependencyRefs":[{"frameId":"w","revision":1,"digest":"734ee0f3e9f3061522acebb7290683b3aa73b82c27e0c766d0be42b220dd9555"},{"frameId":"f1","revision":1,"digest":"09dc9a0be8b04034b85ab9d98a79bb2bf3b5b2eb377ab459fa3314c1dfb2a8ad"},{"frameId":"f2","revision":1,"digest":"543e0603baeb447d09e0ad5112d31875d5693a5845e4b58a5164e44b8dd58708"},{"frameId":"f3","revision":1,"digest":"d6d429605745ae822dd1c55d8bd4c47917b8b385a986563cdc2c19407f7e96c2"},{"frameId":"f4","revision":1,"digest":"337502d745aa5aefafce858e2f38011238e9fad034cb41c93b85fd289038c212"},{"frameId":"f5","revision":1,"digest":"3ddc17c4817ba2d9f74aac23e01931052b9e5d6769e171a0e6b3bab6dcb35dfc"},{"frameId":"f6","revision":1,"digest":"aa1336e21931fc3711007dcc86875757f0415d458eca8470171e262dd6b80c0f"},{"frameId":"f7","revision":1,"digest":"9e322d4b3bdcbe3241ad9ca06aa2cbfe1dae3e7fafb7f42e84e6397a732ed899"},{"frameId":"f8","revision":1,"digest":"8a8ca8722c3aab31a875f929817f6ceafa5c06fd71231208316d798bf7e0860b"},{"frameId":"f9","revision":1,"digest":"e93b9ff5588b8e2a4d9868709183f358d717715d341a79576d81d1c5b632652e"},{"frameId":"f10","revision":1,"digest":"fb4734de4550728d00ca979d05f0ea083ec778776c8ec34011894b957d62b872"},{"frameId":"f11","revision":1,"digest":"984b9c17f0740e9412417e649013b9ae59cea212de80f8f2167f6cc82ed2ce08"},{"frameId":"f12","revision":1,"digest":"1c053b41cc65ad77ff3ef436b919a56b0eed3f525e6680c1dda7d97cfe1d2821"},{"frameId":"f13","revision":1,"digest":"1f5750cc31d19fe24df7a81cb11000fe6048e53ebb29a99230ff0ce1e6a5c9d2"},{"frameId":"f14","revision":1,"digest":"7a53fdb6fd7860acc71c9c436b185feff1e76c8397e6d2d38d0ad74924e7c276"},{"frameId":"f15","revision":1,"digest":"b76a2fb2cccab934d89bb90a6341b24642d4a890d9f585c4c1e1cea77faea254"},{"frameId":"f16","revision":1,"digest":"551e8c0d9104b26637c08087552a63a1c40287f43bb6807a4384d153446d0ed0"},{"frameId":"f17","revision":1,"digest":"01809a2188dea42d80e2be13805eeb2b4168fdb340645fc768ffed3dac88770d"},{"frameId":"f18","revision":1,"digest":"3b5e72b0ecc7d930a9083f723bafa4e9d34bdf9d4513d33b87b8ff2f539620a5"},{"frameId":"f19","revision":1,"digest":"ecdabfd1e67ad2c59761f1e5908ca7b7b9049a2c66683db7d4ea7c379f551198"},{"frameId":"f20","revision":1,"digest":"28cf13f0993d7a1af15cff5579de247a371bf704e1b226034072a899752af31c"},{"frameId":"f21","revision":1,"digest":"0a3af1ee77cb316c11492f8480733f301e224229531b82e927b57dc92af0882e"},{"frameId":"f22","revision":1,"digest":"11ed65bc37fadf1da2ae77e90de027ca0ca21e166c2c26168616939b458953eb"},{"frameId":"f23","revision":1,"digest":"244be709244d31b1c5f48cf864efc9cfbab05ac295d753b15562f885837c80db"},{"frameId":"f24","revision":1,"digest":"e24c6c4072d0d18285ad060c4cf465cfe07f9aec8464ba7cf9275caa30f443ea"},{"frameId":"f25","revision":1,"digest":"948e855ff04b2248a8f40dbf9bda4edd32d20674e4327679f99ccc3e3052d395"},{"frameId":"f26","revision":1,"digest":"72cd0fd9dc0c273ad947d4cb72588ee55edd5a8fea4372255b0a617d8bc3810a"},{"frameId":"f27","revision":1,"digest":"629eb4f1642b0e950c8a9150f2f07bab9b0150fa2a925ab39ef6d6edc60f19a2"},{"frameId":"f28","revision":1,"digest":"ab291492e69cfff223c1bf0aa642a4f960de9afb0563c83de8398f589da62bae"},{"frameId":"f29","revision":1,"digest":"b3bc11bd70a99f94c1a3673a231da87ca05e6431f6bfd5901c0ea24da6c45d5d"},{"frameId":"f30","revision":1,"digest":"94beb7d2f490e338767f9894b1978ec89d49455229fc63364b184ba68a226d58"},{"frameId":"f31","revision":1,"digest":"0b43b7e28360f4c8f42d5a66c030b02ceec5e17736e9808d37c09f5a562549ff"},{"frameId":"f32","revision":1,"digest":"b8786a2441799f3f2195f8846fe2ef519b951ff66137fab055efca242d70a1db"},{"frameId":"f33","revision":1,"digest":"1ff88af59e084036004686e70cf35525ad3eb7960f137b973295438bdafe8854"},{"frameId":"f34","revision":1,"digest":"755a7270661a14b0ce5580e7fbb4846465439a3588629d2a7cdd55075bb72d21"},{"frameId":"f35","revision":1,"digest":"9006789a088def1115871a6c1216f041323fabc24eee61ea3c8185f11121df53"},{"frameId":"f36","revision":1,"digest":"953be3586641e0d4a6974bb9981aa42186cb5e84521f3bcabf6158f75a5dfd95"},{"frameId":"f37","revision":1,"digest":"1da56612da8938ea6e83e8cf9551b6ff995cb5859557ae1bfe8d8d6f15512aba"},{"frameId":"f38","revision":1,"digest":"9b7372b2ad9bfb579315c176e1a7636b474b2104833da3f927ad9e92e1e94da2"},{"frameId":"f39","revision":1,"digest":"23b63d27a8454edc125ab71e1e1c40e880f6074b11839becf8bd77738e737998"},{"frameId":"f40","revision":1,"digest":"1cf737e8ede50eadbbcbc2d480317ab47214ee70bca45dff3dfe62a926f813c9"},{"frameId":"f41","revision":1,"digest":"e593bedbebbc3a716ea017c503e44c49488613919da82f33bf58f76683f54b38"},{"frameId":"f42","revision":1,"digest":"0c30e5266942f2d90fbf41d59e7a155933bbaf7f365a8f747b3ffc912340d9e3"},{"frameId":"f43","revision":1,"digest":"0567eb3a2ab545228fb7c2710942241caa06e61d3993007aa4230fbe280a8729"},{"frameId":"f44","revision":1,"digest":"f40f00068997fad71fc14763be41aa3d29b96730e2d804cb0131234cd7f8f9d4"},{"frameId":"f45","revision":1,"digest":"2684727dec5f6dc0e87bdeee6843ab18301f2067cd4b6e1f864d2de0e7c0338f"},{"frameId":"f46","revision":1,"digest":"c0051cadae5c01481916c74b7396ce25b81bc4bbb961e49226d0f2f027a1aeb3"},{"frameId":"f47","revision":1,"digest":"e031c5370d03f5f6cf0472e0bc478eb9732458878a290e807c35e27565a56072"},{"frameId":"f48","revision":1,"digest":"908e43f4f81a18aa6fc9fa31f142225584bd25292c54e8e474458e7818ad7b23"},{"frameId":"f49","revision":1,"digest":"3149424e638255bb6687ecf611565d5d216277bf7d491b74e82d184a75bb0c09"},{"frameId":"f50","revision":1,"digest":"bb5950cdfec0acb4fa2ffb83f41e9e18260fd57e217ed4468149192ce1bd2789"},{"frameId":"f51","revision":1,"digest":"6d35bb9b1a60379f9b83771c3e1f07fd60a5b7a49a02074cc16faed5ed4aa94f"},{"frameId":"f52","revision":1,"digest":"134e1f48679c6fd4fdca8b1bfa40d8fa47922eea7d52317c4dda710592aacfcb"},{"frameId":"f53","revision":1,"digest":"a62db7e8f421fb18d66cb6365c10d72cd93283527741042162f12bf79848da19"},{"frameId":"f54","revision":1,"digest":"f38d9d61b520de19d663940cfeb1e328577272903b4c776365870a1d8748a504"},{"frameId":"f55","revision":1,"digest":"01bbd2f66056f64ff77c5a7ca323872a5b94323ef8259bb86f1d3988c00e2148"},{"frameId":"f56","revision":1,"digest":"e72a6e48b3f07700c26de77a2fab37d39097c1cb3d8ffceb5c51946dee53da8c"},{"frameId":"f57","revision":1,"digest":"53d9e6f4776676a8fed9258f82d41a8aec2c37b385312ae2a9252f19b671bdda"},{"frameId":"f58","revision":1,"digest":"2351e9d837dc5ea5fb4abf36a42532d48bc6565b607f491d0fd9ddc926fb7d40"},{"frameId":"f59","revision":1,"digest":"cdef2665897ab7b32642d96a764faf52070c84bbcbecdcc90eafefc032130fb3"},{"frameId":"f60","revision":1,"digest":"5aebb57d7d768171b02a40d2a25f95d41436b3535066f2a6d78a17f76e0ad172"},{"frameId":"f61","revision":1,"digest":"3eb1154fca801c1fefbe3671fa6a31928c02afc6bd7ca2407f4a7e1e28a9d94a"},{"frameId":"f62","revision":1,"digest":"f8d035fea5d277d53acf5ae865f6e8659a2b47e6ca721dac756e17726f7ae63c"},{"frameId":"f63","revision":1,"digest":"ce79ff3a4eb6083a7eb90219ba093441f0de9492372fb9d13dca338354d82972"},{"frameId":"f64","revision":1,"digest":"3671cf5875afd317336958ec2ea1899a54845a08ca481229f398b0dbda217831"}],"snapshotDigest":"9c9d2758770644d26bec0da2821054d29e5416ed31e6ea0a0da3e10ce466db83"}}}]}
+# Subtest: measurement-only numeric substrate costs and rational growth
+ok 396 - measurement-only numeric substrate costs and rational growth
+  ---
+  duration_ms: 343.995884
+  type: 'test'
+  ...
+# Subtest: physical identity is independent from visual identity
+ok 397 - physical identity is independent from visual identity
+  ---
+  duration_ms: 2.73794
+  type: 'test'
+  ...
+# Subtest: compound canonical order preserves child gaps and digest
+ok 398 - compound canonical order preserves child gaps and digest
+  ---
+  duration_ms: 9.186412
+  type: 'test'
+  ...
+# Subtest: query taxonomy is explicit
+ok 399 - query taxonomy is explicit
+  ---
+  duration_ms: 0.158812
+  type: 'test'
+  ...
+# Subtest: broad phase cannot produce final PASS
+ok 400 - broad phase cannot produce final PASS
+  ---
+  duration_ms: 0.144519
+  type: 'test'
+  ...
+# Subtest: error interval policy never turns ambiguity into PASS
+ok 401 - error interval policy never turns ambiguity into PASS
+  ---
+  duration_ms: 0.17039
+  type: 'test'
+  ...
+# Subtest: opening is explicit, not absence of solid
+ok 402 - opening is explicit, not absence of solid
+  ---
+  duration_ms: 0.203512
+  type: 'test'
+  ...
+# Subtest: finite surface separates normal geometry and semantic role
+ok 403 - finite surface separates normal geometry and semantic role
+  ---
+  duration_ms: 0.294777
+  type: 'test'
+  ...
+# Subtest: stale parent evidence invalidates materialization proof
+ok 404 - stale parent evidence invalidates materialization proof
+  ---
+  duration_ms: 0.230212
+  type: 'test'
+  ...
+# Subtest: externally specified 30 degrees remains unsupported without policy
+ok 405 - externally specified 30 degrees remains unsupported without policy
+  ---
+  duration_ms: 0.277728
+  type: 'test'
+  ...
+# Subtest: water/stability/constraint are not inferred from contact
+ok 406 - water/stability/constraint are not inferred from contact
+  ---
+  duration_ms: 0.397299
+  type: 'test'
+  ...
+# Subtest: discrete query declares continuous path unsupported
+ok 407 - discrete query declares continuous path unsupported
+  ---
+  duration_ms: 0.165411
+  type: 'test'
+  ...
+# Subtest: canonical refs are exact and stale ref fails closed
+ok 408 - canonical refs are exact and stale ref fails closed
+  ---
+  duration_ms: 2.308243
+  type: 'test'
+  ...
+# Subtest: independent authoritative roots preserve identity and authority
+ok 409 - independent authoritative roots preserve identity and authority
+  ---
+  duration_ms: 0.631339
+  type: 'test'
+  ...
+# Subtest: domain descriptor locks writers dependencies events and evidence
+ok 410 - domain descriptor locks writers dependencies events and evidence
+  ---
+  duration_ms: 0.84417
+  type: 'test'
+  ...
+# Subtest: exact School capability accepted
+ok 411 - exact School capability accepted
+  ---
+  duration_ms: 0.42242
+  type: 'test'
+  ...
+# Subtest: synagogue does not fall back to School
+ok 412 - synagogue does not fall back to School
+  ---
+  duration_ms: 0.839847
+  type: 'test'
+  ...
+# Subtest: road collision fails without road and vehicle capabilities
+ok 413 - road collision fails without road and vehicle capabilities
+  ---
+  duration_ms: 7.791263
+  type: 'test'
+  ...
+# Subtest: water scenario fails without implemented water volume
+ok 414 - water scenario fails without implemented water volume
+  ---
+  duration_ms: 0.385363
+  type: 'test'
+  ...
+# Subtest: contract-only rotation cannot satisfy implementation requirement
+ok 415 - contract-only rotation cannot satisfy implementation requirement
+  ---
+  duration_ms: 0.229368
+  type: 'test'
+  ...
+# Subtest: open semantic IDs and typed components do not infer capabilities
+ok 416 - open semantic IDs and typed components do not infer capabilities
+  ---
+  duration_ms: 0.694934
+  type: 'test'
+  ...
+# Subtest: entity components separate semantic and physical identity
+ok 417 - entity components separate semantic and physical identity
+  ---
+  duration_ms: 0.861999
+  type: 'test'
+  ...
+# Subtest: 0..N casualty manifests and independent refs are valid
+ok 418 - 0..N casualty manifests and independent refs are valid
+  ---
+  duration_ms: 1.097335
+  type: 'test'
+  ...
+# Subtest: actor role is independent from geometry
+ok 419 - actor role is independent from geometry
+  ---
+  duration_ms: 0.53431
+  type: 'test'
+  ...
+# Subtest: canonical quaternion removes scale and sign ambiguity exactly
+ok 420 - canonical quaternion removes scale and sign ambiguity exactly
+  ---
+  duration_ms: 0.773476
+  type: 'test'
+  ...
+# Subtest: rigid frame composition is exact and deterministic
+ok 421 - rigid frame composition is exact and deterministic
+  ---
+  duration_ms: 0.546498
+  type: 'test'
+  ...
+# Subtest: frame hierarchy is explicit and deterministic
+ok 422 - frame hierarchy is explicit and deterministic
+  ---
+  duration_ms: 0.36415
+  type: 'test'
+  ...
+# Subtest: ConstraintRelation is not SupportRelation and includes release lifecycle
+ok 423 - ConstraintRelation is not SupportRelation and includes release lifecycle
+  ---
+  duration_ms: 0.317891
+  type: 'test'
+  ...
+# Subtest: AccessibilityAssessment captures actor target objective region and blockers
+ok 424 - AccessibilityAssessment captures actor target objective region and blockers
+  ---
+  duration_ms: 0.282295
+  type: 'test'
+  ...
+# Subtest: hazard separates source truth and four potential effect bindings
+ok 425 - hazard separates source truth and four potential effect bindings
+  ---
+  duration_ms: 0.318258
+  type: 'test'
+  ...
+# Subtest: clinical hidden state is separate from exposed presentation
+ok 426 - clinical hidden state is separate from exposed presentation
+  ---
+  duration_ms: 0.242586
+  type: 'test'
+  ...
+# Subtest: progression emits typed intent to owning authority
+ok 427 - progression emits typed intent to owning authority
+  ---
+  duration_ms: 0.184653
+  type: 'test'
+  ...
+# Subtest: VisualBinding variant preserves exact semantic and physical identity
+ok 428 - VisualBinding variant preserves exact semantic and physical identity
+  ---
+  duration_ms: 0.331439
+  type: 'test'
+  ...
+# Subtest: dependency invalidation is deterministic and stale fails closed
+ok 429 - dependency invalidation is deterministic and stale fails closed
+  ---
+  duration_ms: 0.407508
+  type: 'test'
+  ...
+# Subtest: provenance never upgrades across domains
+ok 430 - provenance never upgrades across domains
+  ---
+  duration_ms: 0.190038
+  type: 'test'
+  ...
+# {"environment":{"node":"v22.23.2","platform":"linux","arch":"x64","cpu":"Intel(R) Xeon(R) Processor @ 2.60GHz"},"threshold":null,"evaluateThreeContacts":{"unit":"microseconds","count":100,"min":140.869,"p50":180.727,"p95":556.245,"max":6782.66}}
+# Subtest: V2 measurement only, no threshold
+ok 431 - V2 measurement only, no threshold
+  ---
+  duration_ms: 42.408729
+  type: 'test'
+  ...
+# Subtest: single required floor contact passes with global and per-relation evidence
+ok 432 - single required floor contact passes with global and per-relation evidence
+  ---
+  duration_ms: 12.94172
+  type: 'test'
+  ...
+# Subtest: floor plus elevated support at different height passes
+ok 433 - floor plus elevated support at different height passes
+  ---
+  duration_ms: 1.946443
+  type: 'test'
+  ...
+# Subtest: floor plus support-capable WALL passes without relabeling wall
+ok 434 - floor plus support-capable WALL passes without relabeling wall
+  ---
+  duration_ms: 2.908427
+  type: 'test'
+  ...
+# Subtest: three independent contacts pass with independent evidence
+ok 435 - three independent contacts pass with independent evidence
+  ---
+  duration_ms: 6.891939
+  type: 'test'
+  ...
+# Subtest: contact insertion order changes neither request identity nor result evidence
+ok 436 - contact insertion order changes neither request identity nor result evidence
+  ---
+  duration_ms: 3.32118
+  type: 'test'
+  ...
+# Subtest: V1 sent to V2 fails deterministically
+ok 437 - V1 sent to V2 fails deterministically
+  ---
+  duration_ms: 0.960515
+  type: 'test'
+  ...
+# Subtest: malformed fails deterministically
+ok 438 - malformed fails deterministically
+  ---
+  duration_ms: 0.721369
+  type: 'test'
+  ...
+# Subtest: missing body geometry fails deterministically
+ok 439 - missing body geometry fails deterministically
+  ---
+  duration_ms: 0.846122
+  type: 'test'
+  ...
+# Subtest: wrong body geometry digest fails deterministically
+ok 440 - wrong body geometry digest fails deterministically
+  ---
+  duration_ms: 1.177923
+  type: 'test'
+  ...
+# Subtest: stale body contact ref fails deterministically
+ok 441 - stale body contact ref fails deterministically
+  ---
+  duration_ms: 1.691174
+  type: 'test'
+  ...
+# Subtest: missing contact region fails deterministically
+ok 442 - missing contact region fails deterministically
+  ---
+  duration_ms: 0.821527
+  type: 'test'
+  ...
+# Subtest: wrong region digest fails deterministically
+ok 443 - wrong region digest fails deterministically
+  ---
+  duration_ms: 0.683723
+  type: 'test'
+  ...
+# Subtest: duplicate relation id fails deterministically
+ok 444 - duplicate relation id fails deterministically
+  ---
+  duration_ms: 0.79667
+  type: 'test'
+  ...
+# Subtest: zero required contacts fails deterministically
+ok 445 - zero required contacts fails deterministically
+  ---
+  duration_ms: 0.568585
+  type: 'test'
+  ...
+# Subtest: stale SurfaceModel ref fails deterministically
+ok 446 - stale SurfaceModel ref fails deterministically
+  ---
+  duration_ms: 0.952178
+  type: 'test'
+  ...
+# Subtest: stale contact SurfaceModel fails deterministically
+ok 447 - stale contact SurfaceModel fails deterministically
+  ---
+  duration_ms: 0.695131
+  type: 'test'
+  ...
+# Subtest: missing surface fails deterministically
+ok 448 - missing surface fails deterministically
+  ---
+  duration_ms: 0.661833
+  type: 'test'
+  ...
+# Subtest: wrong semantic type fails deterministically
+ok 449 - wrong semantic type fails deterministically
+  ---
+  duration_ms: 0.746879
+  type: 'test'
+  ...
+# Subtest: unsupported wall capability fails deterministically
+ok 450 - unsupported wall capability fails deterministically
+  ---
+  duration_ms: 0.77075
+  type: 'test'
+  ...
+# Subtest: wrong normal fails deterministically
+ok 451 - wrong normal fails deterministically
+  ---
+  duration_ms: 1.004625
+  type: 'test'
+  ...
+# Subtest: floating contact fails deterministically
+ok 452 - floating contact fails deterministically
+  ---
+  duration_ms: 0.729901
+  type: 'test'
+  ...
+# Subtest: excessive penetration fails deterministically
+ok 453 - excessive penetration fails deterministically
+  ---
+  duration_ms: 0.908377
+  type: 'test'
+  ...
+# Subtest: contact outside support region fails deterministically
+ok 454 - contact outside support region fails deterministically
+  ---
+  duration_ms: 1.196755
+  type: 'test'
+  ...
+# Subtest: V2 sent to V1 cannot be interpreted as V1 PASS
+ok 455 - V2 sent to V1 cannot be interpreted as V1 PASS
+  ---
+  duration_ms: 1.112591
+  type: 'test'
+  ...
+# Subtest: legal contact cannot hide illegal wall penetration
+ok 456 - legal contact cannot hide illegal wall penetration
+  ---
+  duration_ms: 0.61003
+  type: 'test'
+  ...
+# Subtest: legal contact cannot hide door penetration
+ok 457 - legal contact cannot hide door penetration
+  ---
+  duration_ms: 0.759429
+  type: 'test'
+  ...
+# Subtest: legal contact cannot hide obstacle penetration
+ok 458 - legal contact cannot hide obstacle penetration
+  ---
+  duration_ms: 0.618534
+  type: 'test'
+  ...
+# Subtest: one valid plus one invalid contact fails whole request and preserves completed evidence
+ok 459 - one valid plus one invalid contact fails whole request and preserves completed evidence
+  ---
+  duration_ms: 0.819001
+  type: 'test'
+  ...
+# Subtest: three contacts middle invalid fails by canonical relation order
+ok 460 - three contacts middle invalid fails by canonical relation order
+  ---
+  duration_ms: 1.311507
+  type: 'test'
+  ...
+# Subtest: tampered result evidence does not verify
+ok 461 - tampered result evidence does not verify
+  ---
+  duration_ms: 0.728821
+  type: 'test'
+  ...
+# Subtest: geometry mutation after proof rejects
+ok 462 - geometry mutation after proof rejects
+  ---
+  duration_ms: 0.688372
+  type: 'test'
+  ...
+# Subtest: floor FAIL plus chair PASS rejects whole request
+ok 463 - floor FAIL plus chair PASS rejects whole request
+  ---
+  duration_ms: 0.924603
+  type: 'test'
+  ...
+# Subtest: floor PASS plus wall UNKNOWN capability rejects whole request
+ok 464 - floor PASS plus wall UNKNOWN capability rejects whole request
+  ---
+  duration_ms: 0.792108
+  type: 'test'
+  ...
+# Subtest: wall gap and penetration have exact deterministic reasons
+ok 465 - wall gap and penetration have exact deterministic reasons
+  ---
+  duration_ms: 1.7287
+  type: 'test'
+  ...
+# Subtest: stale wall surface-model ref and wrong wall region fail
+ok 466 - stale wall surface-model ref and wrong wall region fail
+  ---
+  duration_ms: 1.509374
+  type: 'test'
+  ...
+# Subtest: AUDIT-OPENING-VALID fully pinned opening can reach PASS
+ok 467 - AUDIT-OPENING-VALID fully pinned opening can reach PASS
+  ---
+  duration_ms: 43.889782
+  type: 'test'
+  ...
+# Subtest: AUDIT-OPENING-BODY-PIN-MISSING cannot reach geometry
+ok 468 - AUDIT-OPENING-BODY-PIN-MISSING cannot reach geometry
+  ---
+  duration_ms: 0.818936
+  type: 'test'
+  ...
+# Subtest: AUDIT-OPENING-BODY-DIGEST-FORGED is stale before geometry
+ok 469 - AUDIT-OPENING-BODY-DIGEST-FORGED is stale before geometry
+  ---
+  duration_ms: 1.062183
+  type: 'test'
+  ...
+# Subtest: AUDIT-OPENING-SOLID-AUTHORITY-PIN-MISSING cannot reach SAT
+ok 470 - AUDIT-OPENING-SOLID-AUTHORITY-PIN-MISSING cannot reach SAT
+  ---
+  duration_ms: 0.660978
+  type: 'test'
+  ...
+# Subtest: AUDIT-OPENING-SOLID-DIGEST-FORGED is stale before SAT
+ok 471 - AUDIT-OPENING-SOLID-DIGEST-FORGED is stale before SAT
+  ---
+  duration_ms: 0.660497
+  type: 'test'
+  ...
+# Subtest: AUDIT-CONTAINMENT-VALID independent body and target pins can reach PASS
+ok 472 - AUDIT-CONTAINMENT-VALID independent body and target pins can reach PASS
+  ---
+  duration_ms: 9.955827
+  type: 'test'
+  ...
+# Subtest: AUDIT-CONTAINMENT-BODY-PIN-MISSING is unsupported before geometry
+ok 473 - AUDIT-CONTAINMENT-BODY-PIN-MISSING is unsupported before geometry
+  ---
+  duration_ms: 0.349174
+  type: 'test'
+  ...
+# Subtest: AUDIT-CONTAINMENT-TARGET-PIN-MISSING is unsupported before geometry
+ok 474 - AUDIT-CONTAINMENT-TARGET-PIN-MISSING is unsupported before geometry
+  ---
+  duration_ms: 0.259145
+  type: 'test'
+  ...
+# Subtest: AUDIT-CONTAINMENT-FORGED-BODY is stale before geometry
+ok 475 - AUDIT-CONTAINMENT-FORGED-BODY is stale before geometry
+  ---
+  duration_ms: 0.633965
+  type: 'test'
+  ...
+# Subtest: AUDIT-CONTAINMENT-FORGED-TARGET is stale before geometry
+ok 476 - AUDIT-CONTAINMENT-FORGED-TARGET is stale before geometry
+  ---
+  duration_ms: 0.625145
+  type: 'test'
+  ...
+# Subtest: AUDIT-SUPPORT-VALID independently pinned frames can reach PASS
+ok 477 - AUDIT-SUPPORT-VALID independently pinned frames can reach PASS
+  ---
+  duration_ms: 8.213401
+  type: 'test'
+  ...
+# Subtest: AUDIT-SUPPORT-EMBEDDED-PINS-ARE-NOT-INDEPENDENT embedded localFrameRef without authority is unsupported
+ok 478 - AUDIT-SUPPORT-EMBEDDED-PINS-ARE-NOT-INDEPENDENT embedded localFrameRef without authority is unsupported
+  ---
+  duration_ms: 0.542475
+  type: 'test'
+  ...
+# Subtest: AUDIT-SUPPORT-NO-PINS is unsupported
+ok 479 - AUDIT-SUPPORT-NO-PINS is unsupported
+  ---
+  duration_ms: 0.465547
+  type: 'test'
+  ...
+# Subtest: AUDIT-SUPPORT-FORGED-INDEPENDENT-FRAME-PIN is stale before proof
+ok 480 - AUDIT-SUPPORT-FORGED-INDEPENDENT-FRAME-PIN is stale before proof
+  ---
+  duration_ms: 0.445193
+  type: 'test'
+  ...
+# Subtest: REG-V3-SUPPORT-COMPOUND-001 compound ContactRegion retains child proofs and illegal child fails
+ok 481 - REG-V3-SUPPORT-COMPOUND-001 compound ContactRegion retains child proofs and illegal child fails
+  ---
+  duration_ms: 39.032124
+  type: 'test'
+  ...
+# Subtest: REG-V3-CONTAINMENT-FORGED-BODY-DIGEST stops before axisContainment
+ok 482 - REG-V3-CONTAINMENT-FORGED-BODY-DIGEST stops before axisContainment
+  ---
+  duration_ms: 2.892239
+  type: 'test'
+  ...
+# Subtest: REG-V3-CONTAINMENT-FORGED-TARGET-DIGEST stops before axisContainment
+ok 483 - REG-V3-CONTAINMENT-FORGED-TARGET-DIGEST stops before axisContainment
+  ---
+  duration_ms: 0.745047
+  type: 'test'
+  ...
+# Subtest: REG-V3-CONTAINMENT-STALE-TARGET-FRAME stops before axisContainment
+ok 484 - REG-V3-CONTAINMENT-STALE-TARGET-FRAME stops before axisContainment
+  ---
+  duration_ms: 1.464757
+  type: 'test'
+  ...
+# Subtest: REG-V3-CONTAINMENT-STALE-BODY-FRAME stops before axisContainment
+ok 485 - REG-V3-CONTAINMENT-STALE-BODY-FRAME stops before axisContainment
+  ---
+  duration_ms: 0.544877
+  type: 'test'
+  ...
+# Subtest: REG-V3-CONTAINMENT-FORGED-COMPOUND-CHILD-REF stops before axisContainment
+ok 486 - REG-V3-CONTAINMENT-FORGED-COMPOUND-CHILD-REF stops before axisContainment
+  ---
+  duration_ms: 0.785768
+  type: 'test'
+  ...
+# Subtest: REG-V3-CONTAINMENT-MISSING-INDEPENDENT-PIN is unsupported and never PASS
+ok 487 - REG-V3-CONTAINMENT-MISSING-INDEPENDENT-PIN is unsupported and never PASS
+  ---
+  duration_ms: 0.363889
+  type: 'test'
+  ...
+# Subtest: determinism polygon cyclic start and permitted reversal canonicalize before digest
+ok 488 - determinism polygon cyclic start and permitted reversal canonicalize before digest
+  ---
+  duration_ms: 10.259478
+  type: 'test'
+  ...
+# Subtest: polygon validation matrix rejects duplicate/degenerate/non-convex/zero-normal and unsupported sidedness
+ok 489 - polygon validation matrix rejects duplicate/degenerate/non-convex/zero-normal and unsupported sidedness
+  ---
+  duration_ms: 2.910495
+  type: 'test'
+  ...
+# Subtest: missing SUPPORT capability is unsupported before contact materialization
+ok 490 - missing SUPPORT capability is unsupported before contact materialization
+  ---
+  duration_ms: 0.439955
+  type: 'test'
+  ...
+# Subtest: forged stored geometry digest is STALE_EVIDENCE before geometry
+ok 491 - forged stored geometry digest is STALE_EVIDENCE before geometry
+  ---
+  duration_ms: 3.050709
+  type: 'test'
+  ...
+# Subtest: oversized contact coordinate returns NUMERIC_OVERFLOW, never PASS
+ok 492 - oversized contact coordinate returns NUMERIC_OVERFLOW, never PASS
+  ---
+  duration_ms: 11.515252
+  type: 'test'
+  ...
+# Subtest: opening body inside but accepted SAT collision with owner solid fails SOLID_BOUNDARY_COLLISION
+ok 493 - opening body inside but accepted SAT collision with owner solid fails SOLID_BOUNDARY_COLLISION
+  ---
+  duration_ms: 44.931776
+  type: 'test'
+  ...
+# Subtest: exact opening edge is stable non-PASS
+ok 494 - exact opening edge is stable non-PASS
+  ---
+  duration_ms: 16.294269
+  type: 'test'
+  ...
+# Subtest: compound opening: colliding child beats clear sibling; ambiguous child remains UNKNOWN
+ok 495 - compound opening: colliding child beats clear sibling; ambiguous child remains UNKNOWN
+  ---
+  duration_ms: 68.428874
+  type: 'test'
+  ...
+# Subtest: REG-V3-SUPPORT-AMBIGUITY-001 interval crosses support edge while contact and normal are valid
+ok 496 - REG-V3-SUPPORT-AMBIGUITY-001 interval crosses support edge while contact and normal are valid
+  ---
+  duration_ms: 28.487372
+  type: 'test'
+  ...
+# Subtest: REG-V3-OPENING-AMBIGUITY-001 representative center inside cannot hide interval edge crossing
+ok 497 - REG-V3-OPENING-AMBIGUITY-001 representative center inside cannot hide interval edge crossing
+  ---
+  duration_ms: 14.964888
+  type: 'test'
+  ...
+# Subtest: REG-V3-CONTAINMENT-COMPOUND-001 ambiguous child remains UNKNOWN and order is canonical
+ok 498 - REG-V3-CONTAINMENT-COMPOUND-001 ambiguous child remains UNKNOWN and order is canonical
+  ---
+  duration_ms: 29.724216
+  type: 'test'
+  ...
+# Subtest: REG-V3-SUPPORT-COMPOUND-001 ambiguous required relation cannot be hidden by PASS sibling
+ok 499 - REG-V3-SUPPORT-COMPOUND-001 ambiguous required relation cannot be hidden by PASS sibling
+  ---
+  duration_ms: 29.197445
+  type: 'test'
+  ...
+# Subtest: REG-V3-STALE-SURFACE-001 stale body/contact/surface/frame stop before geometry
+ok 500 - REG-V3-STALE-SURFACE-001 stale body/contact/surface/frame stop before geometry
+  ---
+  duration_ms: 1.613445
+  type: 'test'
+  ...
+# Subtest: R2 OLD_REVISION_REPLAY and owner pin tamper stop before geometry
+ok 501 - R2 OLD_REVISION_REPLAY and owner pin tamper stop before geometry
+  ---
+  duration_ms: 0.532215
+  type: 'test'
+  ...
+# Subtest: tamper/precedence matrix: duplicate relation invalid; optional unsupported; definite sibling failure dominates ambiguity
+ok 502 - tamper/precedence matrix: duplicate relation invalid; optional unsupported; definite sibling failure dominates ambiguity
+  ---
+  duration_ms: 13.499708
+  type: 'test'
+  ...
+# Subtest: REG-V3-SUPPORT-OFFSET-PLANE-001 coplanar support at local y=10 is VALID and evidence pins a physical polygon vertex
+ok 503 - REG-V3-SUPPORT-OFFSET-PLANE-001 coplanar support at local y=10 is VALID and evidence pins a physical polygon vertex
+  ---
+  duration_ms: 20.301593
+  type: 'test'
+  ...
+# Subtest: REG-V3-SUPPORT-OFFSET-PLANE-002 floating sign is relative to offset plane
+ok 504 - REG-V3-SUPPORT-OFFSET-PLANE-002 floating sign is relative to offset plane
+  ---
+  duration_ms: 8.050148
+  type: 'test'
+  ...
+# Subtest: REG-V3-SUPPORT-OFFSET-PLANE-003 penetrating sign is relative to offset plane
+ok 505 - REG-V3-SUPPORT-OFFSET-PLANE-003 penetrating sign is relative to offset plane
+  ---
+  duration_ms: 10.3468
+  type: 'test'
+  ...
+# Subtest: interval canonical validation
+ok 506 - interval canonical validation
+  ---
+  duration_ms: 1.772263
+  type: 'test'
+  ...
+# Subtest: interval add subtract negate multiply scalar exact
+ok 507 - interval add subtract negate multiply scalar exact
+  ---
+  duration_ms: 0.574684
+  type: 'test'
+  ...
+# Subtest: interval zero and comparisons
+ok 508 - interval zero and comparisons
+  ---
+  duration_ms: 0.346937
+  type: 'test'
+  ...
+# Subtest: interval dot and projection propagate uncertainty
+ok 509 - interval dot and projection propagate uncertainty
+  ---
+  duration_ms: 1.254402
+  type: 'test'
+  ...
+# Subtest: REG-V3-QI-SAT-001 uncertainty crossing cannot pass
+ok 510 - REG-V3-QI-SAT-001 uncertainty crossing cannot pass
+  ---
+  duration_ms: 0.176356
+  type: 'test'
+  ...
+# Subtest: REG-V3-DATAFLOW-001 MaterializedVertex retains exact fixed error interval lineage
+ok 511 - REG-V3-DATAFLOW-001 MaterializedVertex retains exact fixed error interval lineage
+  ---
+  duration_ms: 13.358079
+  type: 'test'
+  ...
+# Subtest: identity exact coordinate materialization has contained source
+ok 512 - identity exact coordinate materialization has contained source
+  ---
+  duration_ms: 0.904298
+  type: 'test'
+  ...
+# Subtest: REG-V3-STALE-001 parent mutation invalidates vertex and downstream bound
+ok 513 - REG-V3-STALE-001 parent mutation invalidates vertex and downstream bound
+  ---
+  duration_ms: 1.598996
+  type: 'test'
+  ...
+# Subtest: REG-V3-BROAD-001 interval broad bound encloses every component interval
+ok 514 - REG-V3-BROAD-001 interval broad bound encloses every component interval
+  ---
+  duration_ms: 2.339684
+  type: 'test'
+  ...
+# Subtest: REG-V3-EDGESET-001 complete canonical undirected edge extraction
+ok 515 - REG-V3-EDGESET-001 complete canonical undirected edge extraction
+  ---
+  duration_ms: 1.155386
+  type: 'test'
+  ...
+# Subtest: REG-V3-BASIS-001 physical basis deterministic and no visual input
+ok 516 - REG-V3-BASIS-001 physical basis deterministic and no visual input
+  ---
+  duration_ms: 1.087458
+  type: 'test'
+  ...
+# Subtest: REG-V3-PROJECTION-001 3D to target-local 2D retains uncertainty
+ok 517 - REG-V3-PROJECTION-001 3D to target-local 2D retains uncertainty
+  ---
+  duration_ms: 1.485948
+  type: 'test'
+  ...
+# Subtest: opening region data uses target-local projected interval vertices
+ok 518 - opening region data uses target-local projected interval vertices
+  ---
+  duration_ms: 3.147615
+  type: 'test'
+  ...
+# Subtest: REG-V3-NORMAL-DATA-001 exact normal provenance survives frame binding
+ok 519 - REG-V3-NORMAL-DATA-001 exact normal provenance survives frame binding
+  ---
+  duration_ms: 1.14764
+  type: 'test'
+  ...
+# Subtest: correlation matrix allows conservative ambiguity never naked points
+ok 520 - correlation matrix allows conservative ambiguity never naked points
+  ---
+  duration_ms: 2.107488
+  type: 'test'
+  ...
+# {"environment":{"node":"v22.23.2","platform":"linux","arch":"x64","cpu":"Intel(R) Xeon(R) Processor @ 2.60GHz"},"threshold":null,"obbBodyVsBody":{"unit":"microseconds","count":50,"p50":9465.219,"p95":16791.043,"max":32479.028,"status":"PASS","evidenceBytes":12974,"candidatePairs":0,"satAxisCount":0},"primitiveCounts":{"bodies":2,"children":2},"cache":{"implemented":false,"hits":0,"misses":0},"bigInt":"bounded by accepted Numeric Frame Gate"}
+# Subtest: V3 measurement only
+ok 521 - V3 measurement only
+  ---
+  duration_ms: 543.248854
+  type: 'test'
+  ...
+# Subtest: REG-V3-CONVEX-AXIS-001 actual edge-cross is sole separating family
+ok 522 - REG-V3-CONVEX-AXIS-001 actual edge-cross is sole separating family
+  ---
+  duration_ms: 60.917719
+  type: 'test'
+  ...
+# Subtest: REG-V3-COMPOUND-BODY-001 colliding child beats clear sibling
+ok 523 - REG-V3-COMPOUND-BODY-001 colliding child beats clear sibling
+  ---
+  duration_ms: 18.642593
+  type: 'test'
+  ...
+# Subtest: REG-V3-COMPOUND-CLEAR-001 all pairs clear only then PASS
+ok 524 - REG-V3-COMPOUND-CLEAR-001 all pairs clear only then PASS
+  ---
+  duration_ms: 13.628043
+  type: 'test'
+  ...
+# Subtest: compound exact contact preserved richer than clear
+ok 525 - compound exact contact preserved richer than clear
+  ---
+  duration_ms: 16.594291
+  type: 'test'
+  ...
+# Subtest: REG-V3-COMPOUND-AMBIGUITY-001 ambiguity is contagious unless a stronger collision exists
+ok 526 - REG-V3-COMPOUND-AMBIGUITY-001 ambiguity is contagious unless a stronger collision exists
+  ---
+  duration_ms: 0.282226
+  type: 'test'
+  ...
+# Subtest: compound exceptional matrix fails closed with deterministic precedence
+ok 527 - compound exceptional matrix fails closed with deterministic precedence
+  ---
+  duration_ms: 0.706011
+  type: 'test'
+  ...
+# Subtest: compound child insertion order yields identical candidate/evidence
+ok 528 - compound child insertion order yields identical candidate/evidence
+  ---
+  duration_ms: 27.797367
+  type: 'test'
+  ...
+# Subtest: REG-V3-SAT-DATAFLOW-001 OBB SAT vertices all interval-bearing
+ok 529 - REG-V3-SAT-DATAFLOW-001 OBB SAT vertices all interval-bearing
+  ---
+  duration_ms: 19.693395
+  type: 'test'
+  ...
+# Subtest: REG-V3-SAT-AXIS-001 complete canonical OBB axis family deduplicates parallels
+ok 530 - REG-V3-SAT-AXIS-001 complete canonical OBB axis family deduplicates parallels
+  ---
+  duration_ms: 11.976128
+  type: 'test'
+  ...
+# Subtest: OBB separated, touching and overlapping result model
+ok 531 - OBB separated, touching and overlapping result model
+  ---
+  duration_ms: 27.365573
+  type: 'test'
+  ...
+# Subtest: rotated, 90, upside-down and nested candidates deterministic
+ok 532 - rotated, 90, upside-down and nested candidates deterministic
+  ---
+  duration_ms: 14.450334
+  type: 'test'
+  ...
+# Subtest: REG-V3-SAT-INTERVAL-001 uncertain projections cannot PASS
+ok 533 - REG-V3-SAT-INTERVAL-001 uncertain projections cannot PASS
+  ---
+  duration_ms: 0.521933
+  type: 'test'
+  ...
+# Subtest: REG-V3-SAT-CORRELATION-001 widened shared uncertainty remains ambiguity
+ok 534 - REG-V3-SAT-CORRELATION-001 widened shared uncertainty remains ambiguity
+  ---
+  duration_ms: 0.502495
+  type: 'test'
+  ...
+# Subtest: convex topology and full face plus edge-cross axes
+ok 535 - convex topology and full face plus edge-cross axes
+  ---
+  duration_ms: 26.20003
+  type: 'test'
+  ...
+# Subtest: REG-V3-BODY-BODY-001 order deterministic for clear rotated pair
+ok 536 - REG-V3-BODY-BODY-001 order deterministic for clear rotated pair
+  ---
+  duration_ms: 23.544774
+  type: 'test'
+  ...
+# Subtest: REG-V3-SUPPORT-POLY-001 full explicit ContactRegion outside finite support fails
+ok 537 - REG-V3-SUPPORT-POLY-001 full explicit ContactRegion outside finite support fails
+  ---
+  duration_ms: 34.525509
+  type: 'test'
+  ...
+# Subtest: REG-V3-NORMAL-001 exact physical normal mismatch fails
+ok 538 - REG-V3-NORMAL-001 exact physical normal mismatch fails
+  ---
+  duration_ms: 14.082223
+  type: 'test'
+  ...
+# Subtest: REG-V3-SUPPORT-COMPOUND-001 required relations aggregate canonically and bad sibling cannot hide
+ok 539 - REG-V3-SUPPORT-COMPOUND-001 required relations aggregate canonically and bad sibling cannot hide
+  ---
+  duration_ms: 42.12605
+  type: 'test'
+  ...
+# Subtest: REG-V3-SUPPORT-FRAME-PIN-MISSING contact/surface geometry frames are authority prerequisites
+ok 540 - REG-V3-SUPPORT-FRAME-PIN-MISSING contact/surface geometry frames are authority prerequisites
+  ---
+  duration_ms: 0.787721
+  type: 'test'
+  ...
+# Subtest: REG-V3-SUPPORT-EMBEDDED-FRAME-PINS-NOT-AUTHORITY self-carried localFrameRef cannot replace independent authority
+ok 541 - REG-V3-SUPPORT-EMBEDDED-FRAME-PINS-NOT-AUTHORITY self-carried localFrameRef cannot replace independent authority
+  ---
+  duration_ms: 0.684919
+  type: 'test'
+  ...
+# Subtest: REG-V3-CONTAINMENT-AABB-001 oriented containment remains non-AABB authority
+ok 542 - REG-V3-CONTAINMENT-AABB-001 oriented containment remains non-AABB authority
+  ---
+  duration_ms: 8.824405
+  type: 'test'
+  ...
+# Subtest: REG-V3-CONTAINMENT-COMPOUND-001 outside child fails independent of insertion order
+ok 543 - REG-V3-CONTAINMENT-COMPOUND-001 outside child fails independent of insertion order
+  ---
+  duration_ms: 28.981541
+  type: 'test'
+  ...
+# Subtest: REG-V3-OPENING-AABB-001 valid opening requires independently pinned owner
+ok 544 - REG-V3-OPENING-AABB-001 valid opening requires independently pinned owner
+  ---
+  duration_ms: 10.218756
+  type: 'test'
+  ...
+# Subtest: MISSING-BOUNDARY hostile regression: unresolved affirmative owner stops before geometry
+ok 545 - MISSING-BOUNDARY hostile regression: unresolved affirmative owner stops before geometry
+  ---
+  duration_ms: 0.770193
+  type: 'test'
+  ...
+# Subtest: REG-V3-STALE-SURFACE-001 / OWNER_PIN_MISSING self-consistent owner cannot PASS without independent pin
+ok 546 - REG-V3-STALE-SURFACE-001 / OWNER_PIN_MISSING self-consistent owner cannot PASS without independent pin
+  ---
+  duration_ms: 0.814133
+  type: 'test'
+  ...
+# Subtest: REG-V3-STALE-SURFACE-001 / BOUNDARY_OWNER_PIN_TAMPER altered owner with old pin is stale
+ok 547 - REG-V3-STALE-SURFACE-001 / BOUNDARY_OWNER_PIN_TAMPER altered owner with old pin is stale
+  ---
+  duration_ms: 0.553398
+  type: 'test'
+  ...
+# Subtest: REG-V3-STALE-SURFACE-001 / OPENING_MEMBERSHIP_TAMPER and OPENING_BACKREF_TAMPER are stale
+ok 548 - REG-V3-STALE-SURFACE-001 / OPENING_MEMBERSHIP_TAMPER and OPENING_BACKREF_TAMPER are stale
+  ---
+  duration_ms: 0.7372
+  type: 'test'
+  ...
+# Subtest: REG-V3-STALE-SURFACE-001 / OWNER_REF_ORDER canonical owner digest is order invariant
+ok 549 - REG-V3-STALE-SURFACE-001 / OWNER_REF_ORDER canonical owner digest is order invariant
+  ---
+  duration_ms: 0.753649
+  type: 'test'
+  ...
+# Subtest: REG-V3-STALE-SURFACE-001 / missing solid ref is stale before SAT
+ok 550 - REG-V3-STALE-SURFACE-001 / missing solid ref is stale before SAT
+  ---
+  duration_ms: 0.627701
+  type: 'test'
+  ...
+# Subtest: oriented body-vs-body separated touching penetrating rotated
+ok 551 - oriented body-vs-body separated touching penetrating rotated
+  ---
+  duration_ms: 65.307947
+  type: 'test'
+  ...
+# Subtest: compound children canonical and child-only collision fails
+ok 552 - compound children canonical and child-only collision fails
+  ---
+  duration_ms: 21.825212
+  type: 'test'
+  ...
+# Subtest: containment fully inside and outside
+ok 553 - containment fully inside and outside
+  ---
+  duration_ms: 16.305111
+  type: 'test'
+  ...
+# Subtest: legacy anonymous opening shortcut is retired fail-closed
+ok 554 - legacy anonymous opening shortcut is retired fail-closed
+  ---
+  duration_ms: 1.01419
+  type: 'test'
+  ...
+# Subtest: legacy anonymous support shortcut is retired fail-closed
+ok 555 - legacy anonymous support shortcut is retired fail-closed
+  ---
+  duration_ms: 0.635986
+  type: 'test'
+  ...
+# Subtest: broad tamper and swept fail closed with evidence limitations
+ok 556 - broad tamper and swept fail closed with evidence limitations
+  ---
+  duration_ms: 0.389767
+  type: 'test'
+  ...
+# Subtest: convex definitions validate topology and SAT
+ok 557 - convex definitions validate topology and SAT
+  ---
+  duration_ms: 8.271666
+  type: 'test'
+  ...
+# Subtest: synthetic local-world parent rotation invalidates old evidence
+ok 558 - synthetic local-world parent rotation invalidates old evidence
+  ---
+  duration_ms: 8.679963
+  type: 'test'
+  ...
+# Subtest: synthetic topology kinds cover tread riser landing levels only
+ok 559 - synthetic topology kinds cover tread riser landing levels only
+  ---
+  duration_ms: 0.440197
+  type: 'test'
+  ...
+# Subtest: contract uses one million integer microunits per authored unit
+ok 560 - contract uses one million integer microunits per authored unit
+  ---
+  duration_ms: 0.783315
+  type: 'test'
+  ...
+# Subtest: identical decimal 0.08 has exact identical representation
+ok 561 - identical decimal 0.08 has exact identical representation
+  ---
+  duration_ms: 0.286172
+  type: 'test'
+  ...
+# Subtest: rounds nearest microunit with half away from zero
+ok 562 - rounds nearest microunit with half away from zero
+  ---
+  duration_ms: 0.137311
+  type: 'test'
+  ...
+# Subtest: negative authored values preserve sign
+ok 563 - negative authored values preserve sign
+  ---
+  duration_ms: 0.140065
+  type: 'test'
+  ...
+# Subtest: near contract magnitude limit remains safe integer
+ok 564 - near contract magnitude limit remains safe integer
+  ---
+  duration_ms: 0.168559
+  type: 'test'
+  ...
+# Subtest: overflow and non-finite coordinates fail closed
+ok 565 - overflow and non-finite coordinates fail closed
+  ---
+  duration_ms: 0.419878
+  type: 'test'
+  ...
+# Subtest: partial footprint outside deterministically fails
+ok 566 - partial footprint outside deterministically fails
+  ---
+  duration_ms: 3.262082
+  type: 'test'
+  ...
+# Subtest: full footprint outside deterministically fails
+ok 567 - full footprint outside deterministically fails
+  ---
+  duration_ms: 1.942078
+  type: 'test'
+  ...
+# Subtest: wall penetration deterministically fails
+ok 568 - wall penetration deterministically fails
+  ---
+  duration_ms: 0.544315
+  type: 'test'
+  ...
+# Subtest: door penetration deterministically fails
+ok 569 - door penetration deterministically fails
+  ---
+  duration_ms: 0.488047
+  type: 'test'
+  ...
+# Subtest: obstacle penetration deterministically fails
+ok 570 - obstacle penetration deterministically fails
+  ---
+  duration_ms: 0.508786
+  type: 'test'
+  ...
+# Subtest: floating deterministically fails
+ok 571 - floating deterministically fails
+  ---
+  duration_ms: 0.458928
+  type: 'test'
+  ...
+# Subtest: support penetration deterministically fails
+ok 572 - support penetration deterministically fails
+  ---
+  duration_ms: 1.617583
+  type: 'test'
+  ...
+# Subtest: wrong surface id deterministically fails
+ok 573 - wrong surface id deterministically fails
+  ---
+  duration_ms: 0.452465
+  type: 'test'
+  ...
+# Subtest: forbidden surface type deterministically fails
+ok 574 - forbidden surface type deterministically fails
+  ---
+  duration_ms: 0.682269
+  type: 'test'
+  ...
+# Subtest: bad orientation deterministically fails
+ok 575 - bad orientation deterministically fails
+  ---
+  duration_ms: 0.677494
+  type: 'test'
+  ...
+# Subtest: UNKNOWN surface fails closed
+ok 576 - UNKNOWN surface fails closed
+  ---
+  duration_ms: 0.400953
+  type: 'test'
+  ...
+# Subtest: stale mismatched proof fails
+ok 577 - stale mismatched proof fails
+  ---
+  duration_ms: 0.395202
+  type: 'test'
+  ...
+# Subtest: missing evidence fails
+ok 578 - missing evidence fails
+  ---
+  duration_ms: 1.137235
+  type: 'test'
+  ...
+# Subtest: mismatched geometry digest fails
+ok 579 - mismatched geometry digest fails
+  ---
+  duration_ms: 0.4697
+  type: 'test'
+  ...
+# Subtest: geometry changed after proof fails
+ok 580 - geometry changed after proof fails
+  ---
+  duration_ms: 0.487747
+  type: 'test'
+  ...
+# Subtest: multi-failure precedence is evidence before stale/contact/collision/containment and stable across runs
+ok 581 - multi-failure precedence is evidence before stale/contact/collision/containment and stable across runs
+  ---
+  duration_ms: 0.595437
+  type: 'test'
+  ...
+# Subtest: multi-failure precedence is stale before contact/collision/containment
+ok 582 - multi-failure precedence is stale before contact/collision/containment
+  ---
+  duration_ms: 0.687191
+  type: 'test'
+  ...
+# Subtest: multi-failure precedence is contact before door collision and containment
+ok 583 - multi-failure precedence is contact before door collision and containment
+  ---
+  duration_ms: 4.275124
+  type: 'test'
+  ...
+# Subtest: multi-failure precedence is door collision before containment
+ok 584 - multi-failure precedence is door collision before containment
+  ---
+  duration_ms: 0.810093
+  type: 'test'
+  ...
+# Subtest: pixel evidence cannot rescue illegal geometry
+ok 585 - pixel evidence cannot rescue illegal geometry
+  ---
+  duration_ms: 2.350848
+  type: 'test'
+  ...
+# Subtest: Geometry PASS makes no visual correctness claim
+ok 586 - Geometry PASS makes no visual correctness claim
+  ---
+  duration_ms: 0.7864
+  type: 'test'
+  ...
+# Subtest: all three Surface Models carry required explicit chain and provenance
+ok 587 - all three Surface Models carry required explicit chain and provenance
+  ---
+  duration_ms: 2.510477
+  type: 'test'
+  ...
+# Subtest: canonical proof reruns are byte-identical
+ok 588 - canonical proof reruns are byte-identical
+  ---
+  duration_ms: 2.812027
+  type: 'test'
+  ...
+# Subtest: provenance ledger excludes industrial and keeps synagogue UNKNOWN
+ok 589 - provenance ledger excludes industrial and keeps synagogue UNKNOWN
+  ---
+  duration_ms: 0.432021
+  type: 'test'
+  ...
+# Subtest: school real-source legal positive
+ok 590 - school real-source legal positive
+  ---
+  duration_ms: 2.410475
+  type: 'test'
+  ...
+# Subtest: clinic real-source legal positive
+ok 591 - clinic real-source legal positive
+  ---
+  duration_ms: 0.568717
+  type: 'test'
+  ...
+# Subtest: urban real-source legal positive
+ok 592 - urban real-source legal positive
+  ---
+  duration_ms: 0.579806
+  type: 'test'
+  ...
+# Subtest: original authored School bag y=.18 is rejected as floating, not moved
+ok 593 - original authored School bag y=.18 is rejected as floating, not moved
+  ---
+  duration_ms: 1.726042
+  type: 'test'
+  ...
+# Subtest: bag in door region is rejected by Geometry Gate
+ok 594 - bag in door region is rejected by Geometry Gate
+  ---
+  duration_ms: 0.506892
+  type: 'test'
+  ...
+# Subtest: clinic cart penetration is rejected
+ok 595 - clinic cart penetration is rejected
+  ---
+  duration_ms: 0.433595
+  type: 'test'
+  ...
+# Subtest: Phase 2 has no fallback, clamp, snap, runtime adapter or promotion API
+ok 596 - Phase 2 has no fallback, clamp, snap, runtime adapter or promotion API
+  ---
+  duration_ms: 1.566288
+  type: 'test'
+  ...
+# Subtest: Phase 1 immutable boundary remains byte unchanged from reviewed Phase 1
+ok 597 - Phase 1 immutable boundary remains byte unchanged from reviewed Phase 1
+  ---
+  duration_ms: 5.086297
+  type: 'test'
+  ...
+# Subtest: V1/V2 and closed V3 implementation boundaries remain byte unchanged by foundation
+ok 598 - V1/V2 and closed V3 implementation boundaries remain byte unchanged by foundation
+  ---
+  duration_ms: 4.753861
+  type: 'test'
+  ...
+# Subtest: foundation production set is exact immutable manifest and has no unapproved inbound production imports
+ok 599 - foundation production set is exact immutable manifest and has no unapproved inbound production imports
+  ---
+  duration_ms: 23.762134
+  type: 'test'
+  ...
+# Subtest: assignment evaluates receiver key value once in order and returns value
+ok 600 - assignment evaluates receiver key value once in order and returns value
+  ---
+  duration_ms: 1.519442
+  type: 'test'
+  ...
+# Subtest: assignment setter runs once and is not reread
+ok 601 - assignment setter runs once and is not reread
+  ---
+  duration_ms: 0.264105
+  type: 'test'
+  ...
+# Subtest: compound receiver key rhs getter setter and coercion preserve single evaluation order
+ok 602 - compound receiver key rhs getter setter and coercion preserve single evaluation order
+  ---
+  duration_ms: 0.239048
+  type: 'test'
+  ...
+# Subtest: postfix and prefix preserve result
+ok 603 - postfix and prefix preserve result
+  ---
+  duration_ms: 0.168363
+  type: 'test'
+  ...
+# Subtest: mutator receiver and args evaluate once and this/result preserved
+ok 604 - mutator receiver and args evaluate once and this/result preserved
+  ---
+  duration_ms: 0.267694
+  type: 'test'
+  ...
+# Subtest: mutator thrown exception identity preserved
+ok 605 - mutator thrown exception identity preserved
+  ---
+  duration_ms: 0.443791
+  type: 'test'
+  ...
+# Subtest: unsafe contexts reject deterministically
+ok 606 - unsafe contexts reject deterministically
+  ---
+  duration_ms: 0.189005
+  type: 'test'
+  ...
+# Subtest: receiver arguments single call return and order preserved
+ok 607 - receiver arguments single call return and order preserved
+  ---
+  duration_ms: 1.616107
+  type: 'test'
+  ...
+# Subtest: thrown exception identity preserved
+ok 608 - thrown exception identity preserved
+  ---
+  duration_ms: 0.448039
+  type: 'test'
+  ...
+# Subtest: clinic fail-5930234b remains fail-closed before render without auto-fix
+ok 609 - clinic fail-5930234b remains fail-closed before render without auto-fix
+  ---
+  duration_ms: 1.918792
+  type: 'test'
+  ...
+# Subtest: closed Phase 1 enums and scene contract
+ok 610 - closed Phase 1 enums and scene contract
+  ---
+  duration_ms: 1.726919
+  type: 'test'
+  ...
+# Subtest: P1-G01 through P1-G18 have deterministic categories
+ok 611 - P1-G01 through P1-G18 have deterministic categories
+  ---
+  duration_ms: 1.144976
+  type: 'test'
+  ...
+# Subtest: existing runtime has no verified architecture connection
+ok 612 - existing runtime has no verified architecture connection
+  ---
+  duration_ms: 3.04463
+  type: 'test'
+  ...
+# Subtest: readiness cannot be promoted
+ok 613 - readiness cannot be promoted
+  ---
+  duration_ms: 2.910778
+  type: 'test'
+  ...
+# Subtest: immutable idempotent deterministic registry and import revalidation
+ok 614 - immutable idempotent deterministic registry and import revalidation
+  ---
+  duration_ms: 5.264625
+  type: 'test'
+  ...
+# Subtest: three scene shapes use one exact query path without fallback
+ok 615 - three scene shapes use one exact query path without fallback
+  ---
+  duration_ms: 12.495792
+  type: 'test'
+  ...
+# Subtest: architecture has no fixture identities, renderer types, placement constants or fallback methods
+ok 616 - architecture has no fixture identities, renderer types, placement constants or fallback methods
+  ---
+  duration_ms: 1.876483
+  type: 'test'
+  ...
+# Subtest: valid synthetic full-footprint shape
+ok 617 - valid synthetic full-footprint shape
+  ---
+  duration_ms: 1.046072
+  type: 'test'
+  ...
+# Subtest: origin legal but chair footprint intersects locker fails
+ok 618 - origin legal but chair footprint intersects locker fails
+  ---
+  duration_ms: 0.591878
+  type: 'test'
+  ...
+# Subtest: origin-only proof fails
+ok 619 - origin-only proof fails
+  ---
+  duration_ms: 0.173892
+  type: 'test'
+  ...
+# Subtest: absence of forbidden hit is not positive permission
+ok 620 - absence of forbidden hit is not positive permission
+  ---
+  duration_ms: 0.164253
+  type: 'test'
+  ...
+# Subtest: stale surface proof fails G18
+ok 621 - stale surface proof fails G18
+  ---
+  duration_ms: 0.202461
+  type: 'test'
+  ...
+1..621
+# tests 621
+# suites 0
+# pass 621
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 9004.82418
