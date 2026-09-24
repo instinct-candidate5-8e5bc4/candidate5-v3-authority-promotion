@@ -1303,6 +1303,67 @@ jobs:
           grep -m1 '^\[Bds\]Booting ' "$_cdir/ovmf-debug.log" | sed 's/^/H3 observed first Booting line: /' >> "$T/h3.log"
           ! grep -F "EXPECTATIONS_VIOLATED" "$T/h3.log" || { echo "E_H3_NEG_GENERIC death must be the named gate, never EXPECTATIONS_VIOLATED"; cat "$T/h3.log"; exit 97; }
           echo "H3_BOOT_TARGET_MUST_SHOW_OK planted bootindex-removed case died named (E_CASE_BOOT_TARGET rc=90, no EXPECTATIONS_VIOLATED)"
+          # peer run-36048129342 ruling (v): the H3 must-show proof must be verifiable from
+          # ARTIFACT BYTES. Copy the proof set into the evidence tree - /tmp/$PREFIX-out is
+          # on the shared EVIDENCE_UPLOAD_PATHS list and expands at manifest time, so these
+          # land in the evidence manifest automatically. The dead case writes NO
+          # manifest-*.json by design (fail() exit 90 precedes manifest emission): the byte
+          # proof is h3.log (the parsed death code + rc + the observed Booting line), the
+          # planted freeze (the pin the gate passed against), and the case's own argv.txt +
+          # ovmf-debug.log (the taxonomy's asserted files; the log carries the Booting
+          # line). A step-side record ties the set together with its hashes and re-proves
+          # canonicalized executed argv == the planted entry.
+          _H3EV=/tmp/$PREFIX-out/$PREFIX-h3-evidence
+          mkdir -p "$_H3EV"
+          cp "$T/h3.log" "$_H3EV/h3.log"
+          cp "$T/argv-freeze.json" "$_H3EV/planted-argv-freeze.json"
+          cp "$_cdir/argv.txt" "$_H3EV/case-argv.txt"
+          cp "$_cdir/ovmf-debug.log" "$_H3EV/case-ovmf-debug.log"
+          python3 - "$_H3EV" "$T" <<'PYT' || { echo "E_H3_EVIDENCE_RECORD H3 evidence record generation failed"; exit 97; }
+          import hashlib, json, os, sys
+          sys.dont_write_bytecode = True
+          ev, T = sys.argv[1], sys.argv[2]
+          sys.path.insert(0, T)
+          from lane_resolve import canonize_element
+          PREFIX = os.environ["PREFIX"]
+          def _sh(p):
+              return hashlib.sha256(open(p, "rb").read()).hexdigest()
+          fz = json.load(open(T + "/argv-freeze.json"))
+          assert len(fz["cases"]) == 1, "planted freeze case count != 1"
+          e = fz["cases"][0]
+          argv = open(os.path.join(ev, "case-argv.txt"), "rb").read().decode().split("\0")
+          ex = hashlib.sha256("\0".join(canonize_element(t, PREFIX) for t in argv).encode()).hexdigest()
+          assert ex == e["argv_sha256"], "canonicalized executed argv != planted entry"
+          codes = set()
+          for line in open(os.path.join(ev, "h3.log")):
+              line = line.strip()
+              if not line.startswith("{"):
+                  continue
+              try:
+                  d = json.loads(line)
+              except Exception:
+                  continue
+              if isinstance(d, dict) and d.get("result") == "FAIL" and isinstance(d.get("code"), str):
+                  codes.add(d["code"])
+          assert codes == {"E_CASE_BOOT_TARGET"}, "h3.log codes != {E_CASE_BOOT_TARGET}: %r" % sorted(codes)
+          boot = None
+          for line in open(os.path.join(ev, "case-ovmf-debug.log"), errors="replace"):
+              if line.startswith("[Bds]Booting "):
+                  boot = line.rstrip("\n")
+                  break
+          assert boot, "no Booting line in the copied debug log"
+          rec = {"case": e["id"], "death_codes": sorted(codes), "rc": 90,
+                 "boot_line": boot,
+                 "planted_freeze_sha256": _sh(T + "/argv-freeze.json"),
+                 "planted_entry_argv_sha256": e["argv_sha256"],
+                 "canonicalized_executed_sha256": ex,
+                 "h3_log_sha256": _sh(os.path.join(ev, "h3.log")),
+                 "case_argv_sha256": _sh(os.path.join(ev, "case-argv.txt")),
+                 "case_ovmf_debug_log_sha256": _sh(os.path.join(ev, "case-ovmf-debug.log")),
+                 "note": "the dead case writes no manifest-*.json by design (fail() exit 90 precedes manifest emission)"}
+          json.dump(rec, open(os.path.join(ev, "h3-must-show-record.json"), "w"), indent=1, sort_keys=True)
+          PYT
+          echo "H3 evidence set: 5 files under $_H3EV (manifest expands /tmp/$PREFIX-out at manifest time)"
       - name: NON_CERTIFYING_SCRATCH planted-fault H5 bytecode-guard must-show (peer run-35963407323 redesign)
         # run-35999960747 D3: the three re-preflights below run mid-ceremony (build-output legitimately
         # exists by then); PREFLIGHT_MID_CEREMONY=1 switches E_STALE_STATE_COMMITTED to tracked-path semantics.

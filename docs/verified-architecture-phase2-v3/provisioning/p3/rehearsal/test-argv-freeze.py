@@ -211,7 +211,7 @@ finally:
 
 # --- E3-E6. preflight 6e3d (qmp_sock consistency, run-36042868066 ruling 18) ---
 i = PF.index("# 6e3d)")
-j = PF.index("# 6e6)", i)
+j = PF.index("# 6e3e)", i)
 BLOCK = PF[i:j]
 
 
@@ -235,6 +235,46 @@ dupq["cases"][1]["argv"][dupq["cases"][1]["argv"].index("-qmp") + 1] = \
     "unix:%s,server,nowait" % dupq["cases"][0]["qmp_sock"]
 expect_fail("E6 shared qmp_sock dies E_ARGV_FREEZE_QMP_SOCK",
             lambda: run_6e3d(dupq), "E_ARGV_FREEZE_QMP_SOCK", "shares qmp_sock")
+
+# --- E7-E11. preflight 6e3e (config enrollments == predicate mode map, run-36048129342
+# ruling (d)) ---
+i = PF.index("# 6e3e)")
+j = PF.index("# 6e6)", i)
+BLOCK = PF[i:j]
+
+
+def run_6e3e(here, cfg):
+    gg = {"os": os, "here": here, "_re": re, "cfg": cfg, "fail": fail}
+    exec(compile(BLOCK, "block6e3e", "exec"), gg)
+
+
+report("E7 real config enrollments pass 6e3e", run_6e3e(HERE, CFG) is None)
+dropped = json.loads(json.dumps(CFG))
+dropped["enrollments"]["NON_CERTIFYING_REHEARSAL-enroll-widened"]["db_der_sha256"] = \
+    dropped["enrollments"]["NON_CERTIFYING_REHEARSAL-enroll-widened"]["db_der_sha256"][:1]
+expect_fail("E8 widened declaration missing the hostile entry dies E_ENROLL_MODE_MAP_DRIFT",
+            lambda: run_6e3e(HERE, dropped), "E_ENROLL_MODE_MAP_DRIFT",
+            "NON_CERTIFYING_REHEARSAL-enroll-widened")
+grown = json.loads(json.dumps(CFG))
+grown["enrollments"]["NON_CERTIFYING_REHEARSAL-enroll-sole"]["db_der_sha256"].append("0" * 64)
+expect_fail("E9 sole declaration gaining a second entry dies E_ENROLL_MODE_MAP_DRIFT",
+            lambda: run_6e3e(HERE, grown), "E_ENROLL_MODE_MAP_DRIFT",
+            "NON_CERTIFYING_REHEARSAL-enroll-sole")
+nokey = json.loads(json.dumps(CFG))
+del nokey["enrollments"]["NON_CERTIFYING_REHEARSAL-enroll-throwaway"]
+expect_fail("E10 a missing enrollment template key dies E_ENROLL_MODE_MAP_DRIFT",
+            lambda: run_6e3e(HERE, nokey), "E_ENROLL_MODE_MAP_DRIFT", "keys")
+tmp = tempfile.mkdtemp(prefix="c5-aftest-")
+try:
+    EPC = open(os.path.join(HERE, "enroll-predicate-check.py")).read()
+    tampered = EPC.replace("db_expected = [PROD_CERT, HOSTILE_CERT] if widened else [PROD_CERT]",
+                           "db_expected = [PROD_CERT]")
+    assert tampered != EPC
+    open(os.path.join(tmp, "enroll-predicate-check.py"), "w").write(tampered)
+    expect_fail("E11 checker-side mode-map edit dies E_ENROLL_MODE_MAP_DRIFT",
+                lambda: run_6e3e(tmp, CFG), "E_ENROLL_MODE_MAP_DRIFT", "mode-map line missing")
+finally:
+    shutil.rmtree(tmp, ignore_errors=True)
 
 # --- G. full-lane dry-run (run-36042868066 ruling 19) ---
 def lane_cases(lane):

@@ -16,14 +16,27 @@ SRC = open(WF).read()
 sys.dont_write_bytecode = True
 from heredoc_parse import iter_run_blocks, walk
 
-def extract(tag):
-    for _rk, blk in iter_run_blocks(SRC):
+def extract_from(src, tag):
+    for _rk, blk in iter_run_blocks(src):
         for kind, path, rec in walk(blk):
             if kind == "unclosed":
                 raise SystemExit("unclosed heredoc in workflow (E_HEREDOC_STRUCTURE territory): %r" % (rec,))
             if kind == "heredoc" and rec["tag"] == tag:
                 return "\n".join(l for _, l in rec["body"]) + "\n"
     raise KeyError(tag)
+
+def extract(tag):
+    return extract_from(SRC, tag)
+
+# peer run-36048129342 signed-slot ruling (e): the certification lane's four K2 sweeps
+# carry the SAME fail-closed treatment (onerror raises, non-zero scanned count) - the body
+# is EXTRACTED from the certification workflow, never reimplemented, and the static counts
+# prove all four sweeps carry the treatment (zero unhardened walks remain).
+CERTWF = os.path.normpath(os.path.join(HERE, "..", "..", "..", "..", "..", ".github", "workflows", "OVMF_CI_SECURE_BOOT_UKI-CERTIFICATION-workflow.yml"))
+CERTSRC = open(CERTWF).read()
+CERT_SWEEP = extract_from(CERTSRC, "PYK")
+assert CERTSRC.count("os.walk(p, onerror=_k2raise)") == 4, CERTSRC.count("os.walk(p, onerror=_k2raise)")
+assert "os.walk(p):" not in CERTSRC
 
 SWEEPS = {
     "PYK2-fixture": extract("PYK2"),
@@ -175,6 +188,25 @@ shutil.rmtree(d)
 d = mktree(lambda d: (os.makedirs(os.path.join(d, "scan")), open(os.path.join(d, "scan", "evidence.log"), "wb").write(b"log"), open(os.path.join(d, "scan", "k.pem"), "wb").write(b"x")))
 rc, out = run("zerokkey-planted-pem", SWEEPS["PYK-zerokkey"], pyk_args(d), d)
 expect("zerokkey-planted-pem", rc, out, 94, "E_PRIVATE_KEY_IN_EVIDENCE")
+shutil.rmtree(d)
+
+# 7) certification-lane zero-private-key sweeps (ruling (e)): clean / unreadable / empty /
+# planted pem - the SAME four planted negatives as the rehearsal-lane PYK gate.
+d = mktree(lambda d: (os.makedirs(os.path.join(d, "scan")), open(os.path.join(d, "scan", "evidence.log"), "wb").write(b"log")))
+rc, out = run("cert-zerokkey-clean", CERT_SWEEP, pyk_args(d), d)
+expect("cert-zerokkey-clean", rc, out, 0, "(scanned=")
+shutil.rmtree(d)
+d = mktree(lambda d: (os.makedirs(os.path.join(d, "scan")), open(os.path.join(d, "scan", "evidence.log"), "wb").write(b"log"), unreadable(d, os.path.join("scan", "locked"))))
+rc, out = run("cert-zerokkey-unreadable", CERT_SWEEP, pyk_args(d), d)
+expect("cert-zerokkey-unreadable", rc, out, 94, "E_K2_SWEEP_UNREADABLE")
+os.chmod(os.path.join(d, "scan", "locked"), 0o700); shutil.rmtree(d)
+d = mktree(lambda d: os.makedirs(os.path.join(d, "scan")))
+rc, out = run("cert-zerokkey-empty", CERT_SWEEP, pyk_args(d), d)
+expect("cert-zerokkey-empty", rc, out, 94, "E_K2_SWEEP_EMPTY")
+shutil.rmtree(d)
+d = mktree(lambda d: (os.makedirs(os.path.join(d, "scan")), open(os.path.join(d, "scan", "evidence.log"), "wb").write(b"log"), open(os.path.join(d, "scan", "k.pem"), "wb").write(b"x")))
+rc, out = run("cert-zerokkey-planted-pem", CERT_SWEEP, pyk_args(d), d)
+expect("cert-zerokkey-planted-pem", rc, out, 94, "E_PRIVATE_KEY_IN_EVIDENCE")
 shutil.rmtree(d)
 
 if all(results):

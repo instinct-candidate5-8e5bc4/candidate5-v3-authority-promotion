@@ -259,6 +259,191 @@ jobs:
           # env2 cross-runner comparison, and log the artifact digest tied to this run.
           sha256sum /tmp/$PREFIX-esp-a/c5-root-admitter-uki-v3-esp.raw >> /tmp/$PREFIX-fw-hashes.txt
           echo "ARTIFACT-DIGEST path=/tmp/$PREFIX-fw-hashes.txt sha256=$(sha256sum /tmp/$PREFIX-fw-hashes.txt | cut -d' ' -f1) run_id=$GITHUB_RUN_ID run_attempt=$GITHUB_RUN_ATTEMPT run_number=$GITHUB_RUN_NUMBER workflow=$GITHUB_WORKFLOW commit=$GITHUB_SHA ref=$GITHUB_REF"
+      - name: OVMF_CI_SECURE_BOOT_UKI unsigned UKI in-run build (reviewed gapless builder)
+        if: ${{ !cancelled() }}
+        timeout-minutes: 10
+        run: |
+          set -eEuo pipefail
+          trap '_rc=$?; echo "E_BASH_ERRTRAP uki-build line $LINENO rc=$_rc cmd: $BASH_COMMAND" >&2; exit 97' ERR
+          # peer run-36048129342 signed-slot ruling (f): the certification lane builds the
+          # unsigned UKI IN-RUN with the same committed builder and the same drift gate as
+          # the rehearsal lane (byte-identity == 4cda9c3e.. proved on BOTH sides).
+          # peer 2026-09-24 route-(ii): the unsigned UKI is built IN-RUN by the committed
+          # reviewed builder (successor-uki-candidate/build-successor-gapless.py), never
+          # committed; the output MUST equal 4cda9c3e.. or this step dies named. This exact
+          # file is the later owner signing packet's input, reproducible from committed inputs.
+          cd docs/verified-architecture-phase2-v3
+          sudo unshare -n env PATH="$PATH" PREFIX="$PREFIX" bash -se <<'UKIB'
+          set -eEuo pipefail
+          trap '_rc=$?; echo "E_BASH_ERRTRAP uki-build-inner line $LINENO rc=$_rc cmd: $BASH_COMMAND" >&2; exit 97' ERR
+          rm -rf "/tmp/$PREFIX-uki"; mkdir -p "/tmp/$PREFIX-uki"
+          python3 successor-uki-candidate/build-successor-gapless.py . "/tmp/$PREFIX-uki/successor-unsigned.efi"
+          got=$(sha256sum "/tmp/$PREFIX-uki/successor-unsigned.efi" | cut -d' ' -f1)
+          [ "$got" = "4cda9c3e285b5b639364234400bf0b121178f12447cc88d896cd2623e07d18e1" ] || { echo "E_UNSIGNED_UKI_DRIFT got=$got"; exit 91; }
+          echo "unsigned UKI in-run build == 4cda9c3e (E_UNSIGNED_UKI_DRIFT gate clean)"
+          UKIB
+          mkdir -p "/tmp/$PREFIX-inrun/uki"
+          cp "/tmp/$PREFIX-uki/successor-unsigned.efi" "/tmp/$PREFIX-inrun/uki/successor-unsigned.efi"
+      - name: OVMF_CI_SECURE_BOOT_UKI fixture generation (in-run ephemeral keys, no c-sign)
+        if: ${{ !cancelled() }}
+        timeout-minutes: 20
+        run: |
+          set -eEuo pipefail
+          trap '_rc=$?; echo "E_BASH_ERRTRAP c-fixtures line $LINENO rc=$_rc cmd: $BASH_COMMAND" >&2; exit 97' ERR
+          cd docs/verified-architecture-phase2-v3/provisioning/p3
+          export PATH="/tmp/$PREFIX-stage/shims:$PATH"
+          [ -x "/tmp/$PREFIX-stage/root/usr/bin/sbsign" ] || { echo "E_TOOL_MISSING staged sbsign"; exit 92; }
+          [ -x "/tmp/$PREFIX-stage/root/usr/bin/sbverify" ] || { echo "E_TOOL_MISSING staged sbverify"; exit 92; }
+          # peer run-36048129342 signed-slot ruling (f): fixture generation runs with NO
+          # c-sign/throwaway step in this lane; it consumes ONLY the in-run unsigned UKI from
+          # the preceding build step, and produces run-ceremony.sh's required paths
+          # ($INRUN/uki/successor-unsigned.efi, $INRUN/c-sign/fixtures + FIXTURE-SHASUMS).
+          # The throwaway signing record is absent by design; nothing may require it.
+          [ -f "/tmp/$PREFIX-inrun/uki/successor-unsigned.efi" ] || { echo "E_UNSIGNED_UKI_MISSING /tmp/$PREFIX-inrun/uki/successor-unsigned.efi"; exit 94; }
+          # peer 2026-09-24 route-(ii) key lifecycle: fixtures are generated network-off
+          # under /tmp/$PREFIX-*; private keys exist only inside fixture-generate.sh's own
+          # mktemp workdir and are shred -u'd by its EXIT trap and explicit cleanup;
+          # nothing key-bearing is ever written under an upload path.
+          F=/tmp/$PREFIX-fixtures
+          RUNNER_UID=$(id -u); RUNNER_GID=$(id -g)
+          mkdir -p "/tmp/$PREFIX-inrun/c-sign/fixtures"
+          sudo unshare -n env PATH="$PATH" PREFIX="$PREFIX" F="$F" RUNNER_UID="$RUNNER_UID" RUNNER_GID="$RUNNER_GID" bash -se <<'CFIX'
+          set -eEuo pipefail
+          trap '_rc=$?; echo "E_BASH_ERRTRAP c-fixtures-inner line $LINENO rc=$_rc cmd: $BASH_COMMAND" >&2; exit 97' ERR
+          rm -rf "$F"; mkdir -p "$F"
+          bash fixture-generate.sh "/tmp/$PREFIX-inrun/uki/successor-unsigned.efi" "/tmp/$PREFIX-stage/root" "$F/gen"
+          # run-35999960747 D4: the K2 sweep runs HERE, as root, over the WHOLE $F tree.
+          # The old runner-user sweep was VACUOUS (umask 077 root-owned gen + os.walk's
+          # silent onerror=None skip): it scanned nothing and printed clean. os.walk now
+          # gets an onerror that RAISES, the scanned-file count and the four named public
+          # outputs are asserted, and only then are the artifacts installed out.
+          python3 - "$F" <<'PYK2'
+          import sys, os, re
+          root = sys.argv[1]
+          def _raise(e):
+              print("E_FIXTURE_TREE_UNREADABLE %s" % e); sys.exit(94)
+          pem = b"PRIVATE KEY"
+          der_rsa = re.compile(rb"\x30\x82..\x02\x01\x00\x02\x82", re.S)
+          der_p8 = re.compile(rb"\x30\x82..\x02\x01\x00\x30", re.S)
+          hits = []; scanned = 0
+          for base, dirs, files in os.walk(root, onerror=_raise):
+              for fn in files:
+                  scanned += 1
+                  p = os.path.join(base, fn)
+                  if os.path.islink(p): hits.append(("symlink", p)); continue
+                  if re.search(r"\.(key|pem|p12|pfx)$", fn, re.I): hits.append(("name", p)); continue
+                  b = open(p, "rb").read()
+                  if pem in b or der_rsa.search(b) or der_p8.search(b): hits.append(("content", p))
+          if hits:
+              print("E_PRIVATE_KEY_IN_FIXTURE_TREE %r" % hits[:3]); sys.exit(94)
+          want = ["F-WRONGSIG.efi", "F-HOSTILEUKI.efi", "C5-WRONG-SIGNER-FIXTURE.cer", "C5-HOSTILE-FIXTURE.cer"]
+          gdir = os.path.join(root, "gen")
+          have = os.listdir(gdir) if os.path.isdir(gdir) else []
+          missing = [w for w in want if w not in have]
+          if missing or scanned < len(want):
+              print("E_FIXTURE_PAYLOAD_INCOMPLETE missing=%r scanned=%d" % (missing, scanned)); sys.exit(94)
+          print("fixture generation tree clean (no key material); scanned=%d; four public outputs present" % scanned)
+          PYK2
+          # copy ONLY the four public artifacts out, runner-owned from birth via install
+          # (NEVER chown; the key workdir stays 0700 root and is shredded by the script).
+          install -m 0644 -o "$RUNNER_UID" -g "$RUNNER_GID" "$F/gen/F-WRONGSIG.efi" "$F/gen/F-HOSTILEUKI.efi" "$F/gen/C5-WRONG-SIGNER-FIXTURE.cer" "$F/gen/C5-HOSTILE-FIXTURE.cer" "/tmp/$PREFIX-inrun/c-sign/fixtures/"
+          rm -rf "$F"
+          CFIX
+          python3 - <<'PREC'
+          import json, hashlib, os, subprocess, sys
+          def sha(p):
+              return hashlib.sha256(open(p, "rb").read()).hexdigest()
+          inrun = "/tmp/%s-inrun" % os.environ["PREFIX"]
+          fx = inrun + "/c-sign/fixtures"
+          OWNER = "7cda4ddc149849cc61191d4b5b3d218d14770c0401e9e66dd9617b82ba1ae441"
+          H = sha(fx + "/C5-HOSTILE-FIXTURE.cer")
+          W = sha(fx + "/C5-WRONG-SIGNER-FIXTURE.cer")
+          seen = {}
+          for label, v in (("H", H), ("W", W), ("owner", OWNER)):
+              if v in seen:
+                  print("E_FIXTURE_CERT_DISTINCT %s DER sha256 collides with %s (%s)" % (label, seen[v], v)); sys.exit(91)
+              seen[v] = label
+          U = sha(inrun + "/uki/successor-unsigned.efi")
+          if U != "4cda9c3e285b5b639364234400bf0b121178f12447cc88d896cd2623e07d18e1":
+              print("E_UNSIGNED_UKI_DRIFT got=" + U); sys.exit(91)
+          def ver(cmd):
+              try:
+                  return subprocess.run(cmd, capture_output=True, text=True).stdout.split("\n")[0].strip()
+              except Exception as e:
+                  return "unavailable: %s" % e
+          rec = {
+              "schema": "OVMF_CI_SECURE_BOOT_UKI-c-fixture-generation/v1",
+              "note": "public DER hashes and tool versions ONLY (peer 2026-09-24 route-ii); private keys were shredded by fixture-generate.sh in-run",
+              "unsigned_uki_sha256": U,
+              "hostile_cert_der_sha256": H,
+              "wrong_signer_cert_der_sha256": W,
+              "tool_versions": {"openssl": ver(["openssl", "version"]),
+                                "sbsign": ver(["/tmp/" + __import__("os").environ["PREFIX"] + "-stage/root/usr/bin/sbsign", "--version"])},
+          }
+          json.dump(rec, open(fx + "/GENERATION-RECORD.json", "w"), indent=1, sort_keys=True)
+          import subprocess as sp
+          shas = sp.run(["sha256sum", "F-WRONGSIG.efi", "F-HOSTILEUKI.efi", "C5-WRONG-SIGNER-FIXTURE.cer", "C5-HOSTILE-FIXTURE.cer"],
+                        capture_output=True, text=True, cwd=fx, check=True).stdout
+          open(fx + "/FIXTURE-SHASUMS", "w").write(shas)
+          print("GENERATION-RECORD.json + FIXTURE-SHASUMS written; H/W/owner all distinct")
+          PREC
+          # K2 after fixture copy-out (peer run-36009604654 ruling (d)): fixtures are
+          # public-only; no key-named file and no private-key content under
+          # /tmp/$PREFIX-inrun or (if present) the checkout rehearsal/build-output.
+          python3 - <<'PYK2F'
+          import os, sys, re
+          def _raise(e):
+              print("E_K2_SWEEP_UNREADABLE %s" % e); sys.exit(95)
+          roots = ["/tmp/%s-inrun" % os.environ["PREFIX"]]
+          if os.path.isdir("rehearsal/build-output"):
+              roots.append("rehearsal/build-output")
+          # run-36014385477 ruling (b): SAME name set as the zero-private-key gates
+          # (.key/.pem/.p12/.pfx extension PLUS the 'key' substring) and SAME content
+          # patterns (PEM "PRIVATE KEY" + PKCS#8/RSA DER key headers).
+          name_re = re.compile(r"\.(key|pem|p12|pfx)$", re.I)
+          der_rsa = re.compile(rb"\x30\x82..\x02\x01\x00\x02\x82", re.S)
+          der_p8 = re.compile(rb"\x30\x82..\x02\x01\x00\x30", re.S)
+          bad = []; scanned = 0
+          for path in roots:
+              for root, dirs, files in os.walk(path, onerror=_raise):
+                  for f in files:
+                      scanned += 1
+                      fp = os.path.join(root, f)
+                      if name_re.search(f) or "key" in f.lower():
+                          bad.append(fp + " (key-suspect name)")
+                          continue
+                      with open(fp, "rb") as h:
+                          d = h.read()
+                      if b"PRIVATE KEY" in d or der_rsa.search(d) or der_p8.search(d):
+                          bad.append(fp + " (private-key content)")
+          if bad:
+              print("E_PRIVATE_KEY_IN_BUILD_TREE", bad); sys.exit(95)
+          if scanned == 0:
+              print("E_K2_SWEEP_EMPTY %s" % roots); sys.exit(95)
+          print("K2 inrun sweep clean (post fixture copy-out, scanned=%d roots=%s)" % (scanned, roots))
+          PYK2F
+          # run-36014385477 ruling (c), adapted for this lane per run-36048129342 ruling (f):
+          # positive allowlist - at the END of the fixture step /tmp/$PREFIX-inrun must contain
+          # EXACTLY this file set (the rehearsal set MINUS every c-sign/throwaway output, listed
+          # in R3 section 30); any extra OR missing file fails E_INRUN_UNEXPECTED_FILE.
+          python3 - <<'PYALLOW'
+          import os, sys
+          base = "/tmp/%s-inrun" % os.environ["PREFIX"]
+          want = {
+              "uki/successor-unsigned.efi",
+              "c-sign/fixtures/F-WRONGSIG.efi", "c-sign/fixtures/F-HOSTILEUKI.efi",
+              "c-sign/fixtures/C5-WRONG-SIGNER-FIXTURE.cer", "c-sign/fixtures/C5-HOSTILE-FIXTURE.cer",
+              "c-sign/fixtures/GENERATION-RECORD.json", "c-sign/fixtures/FIXTURE-SHASUMS",
+          }
+          got = set()
+          for root, dirs, files in os.walk(base):
+              for f in files:
+                  got.add(os.path.relpath(os.path.join(root, f), base))
+          extra = sorted(got - want); missing = sorted(want - got)
+          if extra or missing:
+              print("E_INRUN_UNEXPECTED_FILE extra=%r missing=%r" % (extra, missing)); sys.exit(97)
+          print("inrun exact-set OK (%d files)" % len(want))
+          PYALLOW
       - name: zero-private-key evidence gate K2 before firmware-hash upload (peer run-12 K4)
         id: k2gate-fw
         if: '!cancelled()'
@@ -277,7 +462,11 @@ jobs:
           pem = b"PRIVATE KEY"
           der_rsa = re.compile(rb"\x30\x82..\x02\x01\x00\x02\x82", re.S)
           der_p8 = re.compile(rb"\x30\x82..\x02\x01\x00\x30", re.S)
+          scanned = [0]
+          def _k2raise(e):
+              print("E_K2_SWEEP_UNREADABLE %s" % e); sys.exit(94)
           def scan_file(p):
+              scanned[0] += 1
               if re.search(r"\.(key|pem|p12|pfx)$", os.path.basename(p), re.I):
                   namehit.append(p); return
               b = open(p, "rb").read()
@@ -289,7 +478,7 @@ jobs:
               if os.path.isfile(p):
                   scan_file(p)
               elif os.path.isdir(p):
-                  for base, dirs, files in os.walk(p):
+                  for base, dirs, files in os.walk(p, onerror=_k2raise):
                       for dn in dirs:
                           if os.path.islink(os.path.join(base, dn)):
                               linkhit.append(os.path.join(base, dn))
@@ -304,7 +493,9 @@ jobs:
           if namehit or conthit:
               print("E_PRIVATE_KEY_IN_EVIDENCE names=%r content=%r" % (namehit[:3], conthit[:3]))
               sys.exit(94)
-          print("zero-private-key gate: clean across %d upload paths" % len(paths))
+          if scanned[0] == 0:
+              print("E_K2_SWEEP_EMPTY no files scanned across %d upload paths" % len(paths)); sys.exit(94)
+          print("zero-private-key gate: clean across %d upload paths (scanned=%d)" % (len(paths), scanned[0]))
           PYK
       - name: OVMF_CI_SECURE_BOOT_UKI firmware hash upload (env2 comparison input)
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
@@ -483,7 +674,11 @@ jobs:
           pem = b"PRIVATE KEY"
           der_rsa = re.compile(rb"\x30\x82..\x02\x01\x00\x02\x82", re.S)
           der_p8 = re.compile(rb"\x30\x82..\x02\x01\x00\x30", re.S)
+          scanned = [0]
+          def _k2raise(e):
+              print("E_K2_SWEEP_UNREADABLE %s" % e); sys.exit(94)
           def scan_file(p):
+              scanned[0] += 1
               if re.search(r"\.(key|pem|p12|pfx)$", os.path.basename(p), re.I):
                   namehit.append(p); return
               b = open(p, "rb").read()
@@ -495,7 +690,7 @@ jobs:
               if os.path.isfile(p):
                   scan_file(p)
               elif os.path.isdir(p):
-                  for base, dirs, files in os.walk(p):
+                  for base, dirs, files in os.walk(p, onerror=_k2raise):
                       for dn in dirs:
                           if os.path.islink(os.path.join(base, dn)):
                               linkhit.append(os.path.join(base, dn))
@@ -510,7 +705,9 @@ jobs:
           if namehit or conthit:
               print("E_PRIVATE_KEY_IN_EVIDENCE names=%r content=%r" % (namehit[:3], conthit[:3]))
               sys.exit(94)
-          print("zero-private-key gate: clean across %d upload paths" % len(paths))
+          if scanned[0] == 0:
+              print("E_K2_SWEEP_EMPTY no files scanned across %d upload paths" % len(paths)); sys.exit(94)
+          print("zero-private-key gate: clean across %d upload paths (scanned=%d)" % (len(paths), scanned[0]))
           PYK
       - name: OVMF_CI_SECURE_BOOT_UKI evidence upload (ephemeral CI artifact only)
         if: always() && steps.k2gate-evidence.outcome == 'success'
@@ -738,7 +935,11 @@ jobs:
           pem = b"PRIVATE KEY"
           der_rsa = re.compile(rb"\x30\x82..\x02\x01\x00\x02\x82", re.S)
           der_p8 = re.compile(rb"\x30\x82..\x02\x01\x00\x30", re.S)
+          scanned = [0]
+          def _k2raise(e):
+              print("E_K2_SWEEP_UNREADABLE %s" % e); sys.exit(94)
           def scan_file(p):
+              scanned[0] += 1
               if re.search(r"\.(key|pem|p12|pfx)$", os.path.basename(p), re.I):
                   namehit.append(p); return
               b = open(p, "rb").read()
@@ -750,7 +951,7 @@ jobs:
               if os.path.isfile(p):
                   scan_file(p)
               elif os.path.isdir(p):
-                  for base, dirs, files in os.walk(p):
+                  for base, dirs, files in os.walk(p, onerror=_k2raise):
                       for dn in dirs:
                           if os.path.islink(os.path.join(base, dn)):
                               linkhit.append(os.path.join(base, dn))
@@ -765,7 +966,9 @@ jobs:
           if namehit or conthit:
               print("E_PRIVATE_KEY_IN_EVIDENCE names=%r content=%r" % (namehit[:3], conthit[:3]))
               sys.exit(94)
-          print("zero-private-key gate: clean across %d upload paths" % len(paths))
+          if scanned[0] == 0:
+              print("E_K2_SWEEP_EMPTY no files scanned across %d upload paths" % len(paths)); sys.exit(94)
+          print("zero-private-key gate: clean across %d upload paths (scanned=%d)" % (len(paths), scanned[0]))
           PYK
       - name: OVMF_CI_SECURE_BOOT_UKI env2 evidence upload (ephemeral CI artifact only)
         if: always() && steps.k2gate-env2.outcome == 'success'
@@ -862,7 +1065,11 @@ jobs:
           pem = b"PRIVATE KEY"
           der_rsa = re.compile(rb"\x30\x82..\x02\x01\x00\x02\x82", re.S)
           der_p8 = re.compile(rb"\x30\x82..\x02\x01\x00\x30", re.S)
+          scanned = [0]
+          def _k2raise(e):
+              print("E_K2_SWEEP_UNREADABLE %s" % e); sys.exit(94)
           def scan_file(p):
+              scanned[0] += 1
               if re.search(r"\.(key|pem|p12|pfx)$", os.path.basename(p), re.I):
                   namehit.append(p); return
               b = open(p, "rb").read()
@@ -874,7 +1081,7 @@ jobs:
               if os.path.isfile(p):
                   scan_file(p)
               elif os.path.isdir(p):
-                  for base, dirs, files in os.walk(p):
+                  for base, dirs, files in os.walk(p, onerror=_k2raise):
                       for dn in dirs:
                           if os.path.islink(os.path.join(base, dn)):
                               linkhit.append(os.path.join(base, dn))
@@ -889,7 +1096,9 @@ jobs:
           if namehit or conthit:
               print("E_PRIVATE_KEY_IN_EVIDENCE names=%r content=%r" % (namehit[:3], conthit[:3]))
               sys.exit(94)
-          print("zero-private-key gate: clean across %d upload paths" % len(paths))
+          if scanned[0] == 0:
+              print("E_K2_SWEEP_EMPTY no files scanned across %d upload paths" % len(paths)); sys.exit(94)
+          print("zero-private-key gate: clean across %d upload paths (scanned=%d)" % (len(paths), scanned[0]))
           PYK
       - name: OVMF_CI_SECURE_BOOT_UKI marker upload (ephemeral CI artifact only)
         if: always() && steps.k2gate-marker.outcome == 'success'

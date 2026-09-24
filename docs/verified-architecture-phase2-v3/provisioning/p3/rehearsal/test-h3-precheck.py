@@ -57,6 +57,14 @@ plines = PLANT.splitlines()
 pind = min(len(l) - len(l.lstrip()) for l in plines if l.strip())
 PLANT = "\n".join(l[pind:] for l in plines) + "\n"
 
+vstart = DS.index("          # peer run-36048129342 ruling (v): the H3 must-show proof")
+vendmark = "H3 evidence set: 5 files under"
+vend = DS.index("\n", DS.index(vendmark, vstart)) + 1
+VEV = DS[vstart:vend]
+vlines = VEV.splitlines()
+vind = min(len(l) - len(l.lstrip()) for l in vlines if l.strip())
+VEV = "\n".join(l[vind:] for l in vlines) + "\n"
+
 CANON = "NON_CERTIFYING_REHEARSAL"
 SCRATCH = "NON_CERTIFYING_SCRATCH"
 CFG = json.load(open(os.path.join(HERE, "config.json")))
@@ -252,6 +260,59 @@ T, rc, out = run_planting(CANON, edit=edit_sabotage)
 cleanup_T(T)
 report("P6 negative (b): sabotaged bootindex removal dies E_H3_NEG_INJECTION",
        rc == 97 and "E_H3_NEG_INJECTION" in out, (rc, out[:200]))
+
+# --- (v) evidence block, executed against a synthetic but byte-real H3 tree ---
+def h3_case_setup(prefix):
+    T, rc, out = run_planting(prefix)
+    assert rc == 0, (rc, out[:200])
+    cfgL = resolve_config_value(json.loads(json.dumps(CFG)), prefix)
+    case = cfgL["cases"][0]
+    cdir = os.path.join(T, "cases", case["id"])
+    os.makedirs(cdir)
+    sock = resolve_path("/tmp/%s-q0.sock" % CANON, prefix)
+    argv = build_argv(cfgL, cdir, os.path.join(cdir, "vars.fd"), case["esp"], case["firmware"], sock)
+    argv = [el.replace(",bootindex=0", "") for el in argv]
+    open(os.path.join(cdir, "argv.txt"), "w").write("\0".join(argv))
+    open(os.path.join(cdir, "ovmf-debug.log"), "w").write("noise\n[Bds]Booting Linux\n")
+    open(os.path.join(T, "h3.log"), "w").write("some output\n" + JBOOT + "\n[Bds]Booting Linux\n")
+    return T, cdir
+
+
+def run_vev(prefix, sabotage=False):
+    T, cdir = h3_case_setup(prefix)
+    if sabotage:
+        open(os.path.join(cdir, "argv.txt"), "a").write("tamper")
+    outdir = "/tmp/%s-out" % prefix
+    os.makedirs(outdir, exist_ok=True)
+    script = "set -euo pipefail\nT=%s\n_cdir=%s\n%s" % (T, cdir, VEV)
+    r = subprocess.run(["bash", "-c", script], capture_output=True, text=True,
+                       env=dict(os.environ, PREFIX=prefix, ALLOWED_PREFIX=prefix))
+    ev = os.path.join(outdir, "%s-h3-evidence" % prefix)
+    names = sorted(os.listdir(ev)) if os.path.isdir(ev) else []
+    rec = None
+    if "h3-must-show-record.json" in names:
+        rec = json.load(open(os.path.join(ev, "h3-must-show-record.json")))
+    shutil.rmtree(ev, ignore_errors=True)
+    try:
+        os.rmdir(outdir)
+    except OSError:
+        pass
+    cleanup_T(T)
+    return r.returncode, r.stdout + r.stderr, names, rec
+
+
+rc, out, names, rec = run_vev(CANON)
+want = ["case-argv.txt", "case-ovmf-debug.log", "h3-log".replace("-", "."), "h3-must-show-record.json", "planted-argv-freeze.json"]
+want = sorted(["case-argv.txt", "case-ovmf-debug.log", "h3.log", "h3-must-show-record.json", "planted-argv-freeze.json"])
+report("P7 (v) evidence block executes clean: 5 named files, record reproves canonicalized == planted entry",
+       rc == 0 and names == want and rec is not None
+       and rec["canonicalized_executed_sha256"] == rec["planted_entry_argv_sha256"]
+       and rec["death_codes"] == ["E_CASE_BOOT_TARGET"] and rec["rc"] == 90
+       and rec["boot_line"].startswith("[Bds]Booting "),
+       (rc, names, out[:200]))
+rc, out, names, rec = run_vev(CANON, sabotage=True)
+report("P8 (v) sabotaged case argv dies E_H3_EVIDENCE_RECORD",
+       rc == 97 and "E_H3_EVIDENCE_RECORD" in out, (rc, out[:200]))
 
 if FAILS:
     sys.exit(1)

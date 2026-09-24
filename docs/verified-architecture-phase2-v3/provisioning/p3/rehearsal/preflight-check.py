@@ -446,6 +446,38 @@ for _c in _fz2["cases"]:
         fail("E_ARGV_FREEZE_QMP_SOCK",_c["id"]+" qmp_sock "+_qs+" != argv -qmp element "+_el)
     if _qs in _qmp_seen: fail("E_ARGV_FREEZE_QMP_SOCK",_c["id"]+" shares qmp_sock "+_qs+" with "+_qmp_seen[_qs])
     _qmp_seen[_qs]=_c["id"]
+# 6e3e) peer run-36048129342 signed-slot ruling (d): config.json's "enrollments"
+# declaration must EQUAL the predicate checker's in-run mode map - a one-sided config
+# edit must not let a widened-db case count as the positive. The map is read from the
+# committed enroll-predicate-check.py (PROD_CERT constant + the pinned map-encoding
+# lines), so a two-sided drift on EITHER side dies named. Planted negatives:
+# test-argv-freeze.py.
+_epc=open(os.path.join(here,"enroll-predicate-check.py")).read()
+_m=_re.search(r'PROD_CERT = "([0-9a-f]{64})"',_epc)
+if not _m:
+    fail("E_ENROLL_MODE_MAP_DRIFT","enroll-predicate-check.py PROD_CERT constant unreadable")
+else:
+    _prod=_m.group(1)
+    for _pin in ("db_expected = [PROD_CERT, HOSTILE_CERT] if widened else [PROD_CERT]",
+                 'if mode == "throwaway":'):
+        if _pin not in _epc:
+            fail("E_ENROLL_MODE_MAP_DRIFT","predicate mode-map line missing: "+_pin)
+    _expected={"sole":[_prod],"sole-fresh":[_prod],
+               "widened":[_prod,"IN-RUN:c5-hostile-fixture"],
+               "throwaway":["IN-RUN:c5-throwaway-ci-cert"]}
+    _enr=cfg.get("enrollments")
+    if not isinstance(_enr,dict):
+        fail("E_ENROLL_MODE_MAP_DRIFT","config enrollments missing or not an object")
+    else:
+        _want={"NON_CERTIFYING_REHEARSAL-enroll-"+_k for _k in _expected}
+        if set(_enr)!=_want:
+            fail("E_ENROLL_MODE_MAP_DRIFT","enrollments keys "+str(sorted(_enr))+" != expected "+str(sorted(_want)))
+        else:
+            for _k,_v in _enr.items():
+                _mode=_k.rsplit("-enroll-",1)[1]
+                if not isinstance(_v,dict) or _v.get("db_der_sha256")!=_expected[_mode]:
+                    fail("E_ENROLL_MODE_MAP_DRIFT",_k+" db_der_sha256 declaration != predicate mode map for "+_mode)
+
 # 6e6) peer FINAL COUNT RULING: pin the EXACT prefix occurrence counts (grep -o ... | wc -l,
 # not line counts) of BOTH lane workflows, recomputed at the frozen bytes. Any edit to either
 # workflow that adds/removes a literal NON_CERTIFYING_REHEARSAL occurrence fails closed here.
