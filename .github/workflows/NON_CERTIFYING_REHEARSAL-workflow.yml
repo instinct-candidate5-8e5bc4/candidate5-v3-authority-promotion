@@ -112,6 +112,10 @@ jobs:
         run: |
           set -euo pipefail
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+          # D14-1: the shared helper must be importable by EVERY caller - smoke the
+          # real import path first so a filename/module mistake dies named, never as
+          # a bare ModuleNotFoundError traceback in staging
+          python3 -c "import sys, os; sys.path.insert(0, os.getcwd()); from fetch_locked import fetch_locked; print('fetch_locked import smoke OK')" || { echo "E_FETCH_HELPER_IMPORT fetch_locked not importable from the caller path"; exit 97; }
           ./stage-platform.sh platform.lock.json /tmp/$PREFIX-stage
           # addendum2 condition 2: fetch the four lock-recorded index snapshots for the
           # byte-for-byte lockgen regeneration gate (inside the only network phase)
@@ -611,6 +615,10 @@ jobs:
         run: |
           set -euo pipefail
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+          # D14-1: the shared helper must be importable by EVERY caller - smoke the
+          # real import path first so a filename/module mistake dies named, never as
+          # a bare ModuleNotFoundError traceback in staging
+          python3 -c "import sys, os; sys.path.insert(0, os.getcwd()); from fetch_locked import fetch_locked; print('fetch_locked import smoke OK')" || { echo "E_FETCH_HELPER_IMPORT fetch_locked not importable from the caller path"; exit 97; }
           ./stage-platform.sh platform.lock.json /tmp/$PREFIX-stage-env2
       - name: NON_CERTIFYING_REHEARSAL env2 userns/bwrap preflight (staged, lock-verified bwrap)
         run: |

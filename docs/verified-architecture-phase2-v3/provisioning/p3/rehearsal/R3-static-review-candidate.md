@@ -1114,7 +1114,7 @@ PINS after #14: 6e6 grep -o NON_CERTIFYING_REHEARSAL counts unchanged (cert 44,
 
 PEER F1-F6 RULING (fetch retry wrapper, adopted via main 2026-09-24, F1 capped at 3
 attempts to match D7 per main's reconciliation):
-F1/F4/F5. New shared helper fetch-locked.py - ONE implementation for every staging
+F1/F4/F5. New shared helper fetch_locked.py - ONE implementation for every staging
     HTTP(S) fetch (stage-platform.sh debs + the lockgen index loop, all lanes):
     max 3 attempts, bounded backoff (5s/10s), per-attempt log line with URL +
     status/exception + attempt n/3; transient-only retries (HTTP 5xx, 429,
@@ -1129,17 +1129,45 @@ F3. Sources restricted to lock-recorded URLs: the four lockgen indices ARE
     pre-existing) constructs from the lock-recorded snapshot_ts + pool path under
     the same pinned sha256/size. No new source, no lock change. The index loop
     retries ONLY its own lock-recorded URL (no alternate source for indices).
-F5 audit: urlopen appears ONLY in fetch-locked.py across the p3 lanes; no
+F5 audit: urlopen appears ONLY in fetch_locked.py across the p3 lanes; no
     curl/wget anywhere. Residual urlopen hits are in
     tools/verified-architecture-phase3/*-browser-runner.py - localhost Chrome
     DevTools JSON probes in unrelated phase-3 tooling, not staging fetches, not
     in any lane's network phase. The edk2 source cache uses git protocol via
     src_fetch (existing 3-attempt + E_SOURCE_STAGE_FAILED 35 shape; not
     urlopen/curl/wget, unchanged).
-F6. Scratch-only step "fetch-locked helper negative tests (F6)" (localhost
+F6. Scratch-only step "fetch_locked helper negative tests (F6)" (localhost
     127.0.0.1 server, no external network): case1 500,500-then-bytes recovers on
     attempt 3 with exact bytes; case2 wrong-sha fails attempt 1 named
     E_LOCKGEN_INDEX_MISMATCH exit 52 with ZERO retry lines; case3 404 fails
     attempt 1 named E_STAGE_FETCH_HTTP 404 exit 54; case4 always-500 runs 3
     attempts then E_STAGE_FETCH_EXHAUSTED exit 53. All four cases verified
     LOCALLY against the shipped helper before commit (same flow, same asserts).
+
+PEER RUN-14 D RULINGS (D14 review of #14-rev, adopted via main 2026-09-24):
+D14-1. BLOCKING - the helper shipped as fetch-locked.py (hyphenated), unimportable
+    by every `from fetch_locked import fetch_locked` caller; the F6 tests had only
+    exercised the CLI path. Renamed fetch_locked.py; every caller reference
+    updated; an import smoke (E_FETCH_HELPER_IMPORT exit 97) now runs at the
+    start of ALL FOUR staging steps (main + env2, rehearsal + certification) and
+    as F6 case 0. Local: import via the workflow caller path (cwd) and via
+    STAGE_HELPER_DIR from a foreign cwd both resolve. Conformance audit covers
+    the filename: no fetch-locked references remain anywhere.
+D14-2. BLOCKING - PF-6 no longer gates the ceremony: removed from ceremony_if and
+    relocated AFTER the ceremony step, gated only on the build prerequisite
+    (steps.pf-prereq), independent of every pf/ceremony outcome; a PF-6 failure
+    still fails the run. The badpred injector's bare assert is now a NAMED
+    precondition: E_PF_BADPRED_PRECONDITION exit 93 when the guest produced no
+    unique SET_DB_STATUS=0 (not exercisable, distinguishable from a gate miss);
+    the wrapper propagates 93 under the ERR trap with zero E_BASH_ERRTRAP
+    (verified through the exact extracted block); the PF-6 step reports the
+    precondition distinctly before its must-show asserts. PF-6 closes only on a
+    run whose guest produced a valid ENROLL.TXT.
+MINOR-1. stage-platform.sh comment said "max 4 attempts" - corrected to 3 (F1 cap).
+MINOR-2. urlopen redirects: integrity unaffected (bytes are lock-pinned), but the
+    helper now logs "redirect followed: requested=... final=..." whenever
+    r.geturl() differs, and the deb source manifest records the FINAL URL.
+    Local: 302 case logged the redirect and returned the final URL.
+Local suite for the revision: F6 cases 0-4 (import path, transient-recover,
+    wrong-sha first-attempt, 404 immediate, exhausted) + redirect + injector
+    precondition + wrapper trap behavior - all green pre-commit.

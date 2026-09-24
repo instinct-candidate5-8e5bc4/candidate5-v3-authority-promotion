@@ -27,7 +27,7 @@ def fetch_locked(url, name, dest, sha256, size=None,
                  mismatch_name="E_LOCKGEN_INDEX_MISMATCH", mismatch_rc=52,
                  hard=True):
     """Fetch url to dest with lock-pinned verification.
-    Returns ('ok', sha256, attempts) | ('http', code) | ('exhausted', last_error).
+    Returns ('ok', sha256, attempts, final_url) | ('http', code) | ('exhausted', last_error).
     sha256/size mismatch exits immediately (named, mismatch_rc) in every mode.
     With hard=True, http/exhausted also exit named (E_STAGE_FETCH_HTTP 54 /
     E_STAGE_FETCH_EXHAUSTED 53); with hard=False they return for caller policy."""
@@ -36,11 +36,13 @@ def fetch_locked(url, name, dest, sha256, size=None,
     for attempt in range(1, MAX_ATTEMPTS + 1):
         print("fetch attempt %d/%d [%s] url=%s" % (attempt, MAX_ATTEMPTS, name, url), flush=True)
         try:
-            with urllib.request.urlopen(url, timeout=60) as r, open(part, "wb") as f:
-                while True:
-                    chunk = r.read(1 << 20)
-                    if not chunk: break
-                    f.write(chunk)
+            with urllib.request.urlopen(url, timeout=60) as r:
+                final_url = r.geturl()
+                with open(part, "wb") as f:
+                    while True:
+                        chunk = r.read(1 << 20)
+                        if not chunk: break
+                        f.write(chunk)
         except urllib.error.HTTPError as ex:
             if os.path.exists(part): os.unlink(part)
             print("attempt %d/%d failed [%s] url=%s: HTTP %d" % (attempt, MAX_ATTEMPTS, name, url, ex.code),
@@ -68,8 +70,12 @@ def fetch_locked(url, name, dest, sha256, size=None,
                 os.unlink(part)
                 print("%s %s sha256 %s != %s (%s)" % (mismatch_name, name, d, sha256, url), file=sys.stderr)
                 sys.exit(mismatch_rc)
+            if final_url != url:
+                # MINOR-2: redirects are integrity-safe (bytes are lock-pinned) but
+                # always logged; the final URL is what the manifest records
+                print("redirect followed [%s]: requested=%s final=%s" % (name, url, final_url), flush=True)
             os.rename(part, dest)
-            return ("ok", d, attempt)
+            return ("ok", d, attempt, final_url)
         if attempt < MAX_ATTEMPTS:
             time.sleep(min(5 * (2 ** (attempt - 1)), 30))
     if hard:

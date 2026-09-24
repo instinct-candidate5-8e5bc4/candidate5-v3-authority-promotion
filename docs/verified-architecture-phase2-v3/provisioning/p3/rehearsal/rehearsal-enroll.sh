@@ -598,16 +598,29 @@ if [ "$ENROLL_PLANTED_FAULT" = "badpred" ]; then
   # D13-1 scratch negative test (PF-6): flip SET_DB_STATUS 0->1 in the extracted
   # ENROLL.TXT (UTF-16LE, no BOM guaranteed) so the frozen predicate MUST reject the
   # evidence; the wrapper must then die E_ENROLL_PREDICATE_FAIL, never E_BASH_ERRTRAP.
+  # D14-2: if the guest produced no valid ENROLL.TXT the injector dies
+  # E_PF_BADPRED_PRECONDITION exit 93 (precondition, not a gate miss).
   _pf_before=$(sha256sum "$EVD/ENROLL.TXT" | cut -d' ' -f1)
-  python3 - "$EVD/ENROLL.TXT" <<'PYB'
+  _pf_rc=0
+  python3 - "$EVD/ENROLL.TXT" <<'PYB' || _pf_rc=$?
 import sys
 p = sys.argv[1]
 b = open(p, "rb").read()
 needle = "SET_DB_STATUS=0".encode("utf-16-le")
-assert b.count(needle) == 1, "badpred: SET_DB_STATUS=0 not present exactly once"
+# D14-2: a missing needle means the GUEST never produced a valid ENROLL.TXT - a
+# named precondition (exit 93), distinguishable from "gate did not fire", never
+# a bare assert traceback.
+if b.count(needle) != 1:
+    print("E_PF_BADPRED_PRECONDITION guest ENROLL.TXT has SET_DB_STATUS=0 count=%d, expected exactly 1 - PF-6 not exercisable" % b.count(needle))
+    sys.exit(93)
 open(p, "wb").write(b.replace(needle, "SET_DB_STATUS=1".encode("utf-16-le")))
 print("badpred: SET_DB_STATUS flipped 0->1 in the extracted ENROLL.TXT")
 PYB
+  if [ "$_pf_rc" = "93" ]; then
+    echo "PF-6 NOT EXERCISABLE: E_PF_BADPRED_PRECONDITION above (guest evidence invalid)"
+    exit 93
+  fi
+  [ "$_pf_rc" = "0" ] || { echo "E_PF_INJECTION_FAILED badpred injector rc=$_pf_rc"; exit 97; }
   _pf_after=$(sha256sum "$EVD/ENROLL.TXT" | cut -d' ' -f1)
   echo "planted fault injection confirmation: ENROLL.TXT sha256 before=$_pf_before after=$_pf_after"
   [ "$_pf_before" != "$_pf_after" ] || { echo "E_PF_INJECTION_NOOP injector left ENROLL.TXT unchanged"; exit 97; }

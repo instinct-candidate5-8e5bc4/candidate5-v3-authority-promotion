@@ -101,6 +101,10 @@ jobs:
         run: |
           set -euo pipefail
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+          # D14-1: the shared helper must be importable by EVERY caller - smoke the
+          # real import path first so a filename/module mistake dies named, never as
+          # a bare ModuleNotFoundError traceback in staging
+          python3 -c "import sys, os; sys.path.insert(0, os.getcwd()); from fetch_locked import fetch_locked; print('fetch_locked import smoke OK')" || { echo "E_FETCH_HELPER_IMPORT fetch_locked not importable from the caller path"; exit 97; }
           ./stage-platform.sh platform.lock.json /tmp/$PREFIX-stage
           # addendum2 condition 2: fetch the four lock-recorded index snapshots for the
           # byte-for-byte lockgen regeneration gate (inside the only network phase)
@@ -123,13 +127,16 @@ jobs:
               open("/tmp/" + sys.argv[2] + "-lockgen-indices/" + name + ".xz", "wb").write(data)
               print("index", name, len(data), "bytes", got)
           PYEOF
-      - name: NON_CERTIFYING_SCRATCH fetch-locked helper negative tests (F6)
+      - name: NON_CERTIFYING_SCRATCH fetch_locked helper negative tests (F6)
         run: |
           set -euo pipefail
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
           T=/tmp/$PREFIX-fetchtest; rm -rf "$T"; mkdir -p "$T"
           printf 'indexbytes' > "$T/good.bin"
           GOODSHA=$(sha256sum "$T/good.bin" | cut -d' ' -f1)
+          # case 0 (D14-1): the real caller import path must resolve (a hyphenated
+          # module name dies here named, never as a bare ModuleNotFoundError)
+          python3 -c "import sys, os; sys.path.insert(0, os.getcwd()); from fetch_locked import fetch_locked; print('IMPORT_PATH_OK')" || { echo "E_FETCHTEST import path broken (D14-1)"; exit 97; }
           python3 - "$T" <<'PYT' &
           import http.server, sys, os
           T = sys.argv[1]
@@ -157,26 +164,26 @@ jobs:
           sleep 1
           B=http://127.0.0.1:18099
           # case 1: transient 500,500 then bytes -> success on attempt 3
-          python3 fetch-locked.py "$B/good" case1 "$T/c1.bin" "$GOODSHA" > "$T/c1.log" 2>&1 \
+          python3 fetch_locked.py "$B/good" case1 "$T/c1.bin" "$GOODSHA" > "$T/c1.log" 2>&1 \
             || { echo "E_FETCHTEST case1 transient-then-success failed"; cat "$T/c1.log"; exit 97; }
           [ "$(grep -c 'fetch attempt' "$T/c1.log")" = "3" ] \
             || { echo "E_FETCHTEST case1 expected 3 attempt lines"; cat "$T/c1.log"; exit 97; }
           cmp "$T/good.bin" "$T/c1.bin" || { echo "E_FETCHTEST case1 bytes differ"; exit 97; }
           # case 2 (F6 core): wrong sha -> named mismatch on attempt 1, ZERO retry lines
           rc=0
-          python3 fetch-locked.py "$B/wrongsha" case2 "$T/c2.bin" "$GOODSHA" > "$T/c2.log" 2>&1 || rc=$?
+          python3 fetch_locked.py "$B/wrongsha" case2 "$T/c2.bin" "$GOODSHA" > "$T/c2.log" 2>&1 || rc=$?
           [ "$rc" = "52" ] || { echo "E_FETCHTEST case2 expected exit 52, got $rc"; cat "$T/c2.log"; exit 97; }
           grep -q "E_LOCKGEN_INDEX_MISMATCH" "$T/c2.log" || { echo "E_FETCHTEST case2 not named"; cat "$T/c2.log"; exit 97; }
           [ "$(grep -c 'fetch attempt' "$T/c2.log")" = "1" ] || { echo "E_FETCHTEST case2 retried a mismatch"; cat "$T/c2.log"; exit 97; }
           # case 3: non-429 4xx -> E_STAGE_FETCH_HTTP 404 exit 54, attempt 1 only
           rc=0
-          python3 fetch-locked.py "$B/nope" case3 "$T/c3.bin" "$GOODSHA" > "$T/c3.log" 2>&1 || rc=$?
+          python3 fetch_locked.py "$B/nope" case3 "$T/c3.bin" "$GOODSHA" > "$T/c3.log" 2>&1 || rc=$?
           [ "$rc" = "54" ] || { echo "E_FETCHTEST case3 expected exit 54, got $rc"; cat "$T/c3.log"; exit 97; }
           grep -q "E_STAGE_FETCH_HTTP 404" "$T/c3.log" || { echo "E_FETCHTEST case3 not named"; cat "$T/c3.log"; exit 97; }
           [ "$(grep -c 'fetch attempt' "$T/c3.log")" = "1" ] || { echo "E_FETCHTEST case3 retried a 404"; cat "$T/c3.log"; exit 97; }
           # case 4: always-500 -> 3 attempts then E_STAGE_FETCH_EXHAUSTED exit 53
           rc=0
-          python3 fetch-locked.py "$B/bad" case4 "$T/c4.bin" "$GOODSHA" > "$T/c4.log" 2>&1 || rc=$?
+          python3 fetch_locked.py "$B/bad" case4 "$T/c4.bin" "$GOODSHA" > "$T/c4.log" 2>&1 || rc=$?
           [ "$rc" = "53" ] || { echo "E_FETCHTEST case4 expected exit 53, got $rc"; cat "$T/c4.log"; exit 97; }
           grep -q "E_STAGE_FETCH_EXHAUSTED case4" "$T/c4.log" || { echo "E_FETCHTEST case4 not named"; cat "$T/c4.log"; exit 97; }
           [ "$(grep -c 'fetch attempt' "$T/c4.log")" = "3" ] || { echo "E_FETCHTEST case4 expected 3 attempts"; cat "$T/c4.log"; exit 97; }
@@ -658,6 +665,17 @@ jobs:
             || { echo "E_PF_GATE_WRONG_DIAG" | tee -a "$PFD/pf5.log"; exit 97; }
           echo "PF_5_MUST_SHOW_OK injected fsck-silent 8.3-only image died pre-boot with E_ENROLL_FAT_NAME_CONTRACT exit 97" | tee -a "$PFD/pf5.log"
           grep -F "PF_5_MUST_SHOW_OK" "$PFD/pf5.log" || { echo "E_PF_LOG_VERDICT_MISSING"; exit 97; }
+      - name: NON_CERTIFYING_SCRATCH ceremony (network-enforced-off, tee'd log)
+        if: "!cancelled() && steps.pf-prereq.outputs.ok == 'true' && steps.pf1.outcome == 'success' && steps.pf2.outcome == 'success' && steps.pf4.outcome == 'success' && steps.pf5.outcome == 'success'"
+        id: ceremony
+        timeout-minutes: 120
+        run: |
+          set -euo pipefail
+          cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+          mkdir -p /tmp/$PREFIX-out
+          date +%s >> /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-step-stamps.txt
+          sudo unshare -n env PREFIX="$PREFIX" ALLOWED_PREFIX="$ALLOWED_PREFIX" ./run-ceremony.sh config.json /tmp/$PREFIX-stage /tmp/$PREFIX-out 2>&1 \
+            | tee /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-ceremony.log
       - name: NON_CERTIFYING_SCRATCH planted-fault PF-6 badpred predicate-fail must-show (peer run-13 D13-1)
         id: pf6
         if: "!cancelled() && steps.pf-prereq.outputs.ok == 'true'"
@@ -693,6 +711,12 @@ jobs:
             "$REH/rehearsal-enroll.sh" config.json "$PREPP" "$PFD/vars.fd" "$PFD/evidence" ) \
             > "$PFD/pf6.log" 2>&1 || _rc=$?
           cat "$PFD/pf6.log"
+          # D14-2: a guest that never produced a valid ENROLL.TXT is a NAMED
+          # precondition (exit 93), reported distinctly from "gate did not fire".
+          if grep -F "E_PF_BADPRED_PRECONDITION" "$PFD/pf6.log" > /dev/null; then
+            echo "PF-6 NOT EXERCISABLE: guest produced no valid ENROLL.TXT (E_PF_BADPRED_PRECONDITION) - not a gate miss" | tee -a "$PFD/pf6.log"
+            exit 97
+          fi
           # D13-1 must-show: the predicate MUST reject the flipped ENROLL.TXT and the wrapper
           # MUST die with the predicate's OWN named code - never E_BASH_ERRTRAP (the #12 and
           # #13-tee masking shapes). The guest itself passes; only the evidence is poisoned.
@@ -710,17 +734,6 @@ jobs:
             || { echo "E_PF_TRAP_MASKED E_BASH_ERRTRAP present - D13-1 regression" | tee -a "$PFD/pf6.log"; exit 97; }
           echo "PF_6_MUST_SHOW_OK predicate-failing evidence died with E_ENROLL_PREDICATE_FAIL exit 97, no E_BASH_ERRTRAP" | tee -a "$PFD/pf6.log"
           grep -F "PF_6_MUST_SHOW_OK" "$PFD/pf6.log" || { echo "E_PF_LOG_VERDICT_MISSING"; exit 97; }
-      - name: NON_CERTIFYING_SCRATCH ceremony (network-enforced-off, tee'd log)
-        if: "!cancelled() && steps.pf-prereq.outputs.ok == 'true' && steps.pf1.outcome == 'success' && steps.pf2.outcome == 'success' && steps.pf4.outcome == 'success' && steps.pf5.outcome == 'success' && steps.pf6.outcome == 'success'"
-        id: ceremony
-        timeout-minutes: 120
-        run: |
-          set -euo pipefail
-          cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
-          mkdir -p /tmp/$PREFIX-out
-          date +%s >> /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-step-stamps.txt
-          sudo unshare -n env PREFIX="$PREFIX" ALLOWED_PREFIX="$ALLOWED_PREFIX" ./run-ceremony.sh config.json /tmp/$PREFIX-stage /tmp/$PREFIX-out 2>&1 \
-            | tee /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-ceremony.log
       - name: NON_CERTIFYING_SCRATCH evidence readability repair (ephemeral out tree only)
         if: always()
         run: |
@@ -939,6 +952,10 @@ jobs:
         run: |
           set -euo pipefail
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+          # D14-1: the shared helper must be importable by EVERY caller - smoke the
+          # real import path first so a filename/module mistake dies named, never as
+          # a bare ModuleNotFoundError traceback in staging
+          python3 -c "import sys, os; sys.path.insert(0, os.getcwd()); from fetch_locked import fetch_locked; print('fetch_locked import smoke OK')" || { echo "E_FETCH_HELPER_IMPORT fetch_locked not importable from the caller path"; exit 97; }
           ./stage-platform.sh platform.lock.json /tmp/$PREFIX-stage-env2
       - name: NON_CERTIFYING_SCRATCH env2 userns/bwrap preflight (staged, lock-verified bwrap)
         run: |

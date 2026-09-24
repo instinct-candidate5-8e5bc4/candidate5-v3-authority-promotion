@@ -21,8 +21,8 @@ from fetch_locked import fetch_locked
 lock=json.load(open(sys.argv[1])); dest=sys.argv[2]
 # batch1r3 D7 (snapshot.ubuntu.com fallback, 2026-09-23): ONE fixed snapshot_ts is
 # frozen in the lock; the per-deb sha256/size in the lock remains the ONLY trust
-# chain. F1-F6 (peer ruling): every fetch goes through the shared fetch-locked.py
-# helper - max 4 attempts, bounded backoff, transient-only retries (5xx/429/
+# chain. F1-F6 (peer ruling): every fetch goes through the shared fetch_locked.py
+# helper - max 3 attempts, bounded backoff, transient-only retries (5xx/429/
 # timeout/reset/refused/DNS), one log line per attempt; wrong bytes or wrong size
 # from ANY source fail IMMEDIATELY (E_LOCK_HASH_MISMATCH exit 38, no retry, no
 # fallback); non-429 4xx is never retried - archive 404/410 falls through to the
@@ -45,7 +45,7 @@ def fetch(e, fn):
                          mismatch_name='E_LOCK_HASH_MISMATCH', mismatch_rc=38, hard=False)
         if res[0]=='ok':
             print('verified %s (%d bytes, %s)' % (e['name'],e['size'],source), flush=True)
-            sources.append({'name':e['name'],'source':source,'url':url,'attempts':res[2],'sha256':res[1],'size':e['size']})
+            sources.append({'name':e['name'],'source':source,'url':res[3],'attempts':res[2],'sha256':res[1],'size':e['size']})
             return
         if res[0]=='http':
             if source=='archive' and res[1] in (404,410):
