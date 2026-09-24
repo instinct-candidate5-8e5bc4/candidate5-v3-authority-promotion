@@ -267,6 +267,17 @@ for _wf,_want in (("../../../../../.github/workflows/OVMF_CI_SECURE_BOOT_UKI-CER
     if _n!=_want:
         fail("E_PREFIX_COUNT_MISMATCH",_wf+" occurrences="+str(_n)+" pinned="+str(_want))
 
+# 6e9) peer pushed-byte review 3(a): the planted-fault hook is scratch-only - the
+# certification and rehearsal workflows must contain ZERO ENROLL_PLANTED_FAULT references;
+# the scratch workflow MUST carry the must-show steps (guards a silent derivation drop).
+for _wf,_lo,_hi in (("../../../../../.github/workflows/OVMF_CI_SECURE_BOOT_UKI-CERTIFICATION-workflow.yml",0,0),
+                    ("../../../../../.github/workflows/NON_CERTIFYING_REHEARSAL-workflow.yml",0,0),
+                    ("../../../../../.github/workflows/NON_CERTIFYING_SCRATCH-workflow.yml",1,10**9)):
+    _n=len(_sp.run(["grep","-o","ENROLL_PLANTED_FAULT",os.path.join(here,_wf)],
+                   capture_output=True,text=True).stdout.splitlines())
+    if not (_lo <= _n <= _hi):
+        fail("E_PLANTED_FAULT_WORKFLOW_SCOPE",_wf+" ENROLL_PLANTED_FAULT occurrences="+str(_n)+" (cert+rehearsal must be 0; scratch must be >=1)")
+
 # 6e7) peer N4: PREFIX==ALLOWED_PREFIX equality alone accepts any literal from the same
 # workflow - bind the literals to the LANE statically per workflow file.
 import re as _re

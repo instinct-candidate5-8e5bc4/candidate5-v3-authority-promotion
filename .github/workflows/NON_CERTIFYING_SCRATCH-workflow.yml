@@ -17,6 +17,15 @@ env:
   PREFIX: NON_CERTIFYING_SCRATCH
   # peer adjudication (1): per-workflow singleton allowlist; scripts fail closed on mismatch.
   ALLOWED_PREFIX: NON_CERTIFYING_SCRATCH
+  # peer run-11 single-list: the evidence upload paths AND the manifest members come from
+  # this ONE shared list - the upload step references the same YAML anchor, so the two can
+  # never drift. Directories expand to their files at manifest time.
+  EVIDENCE_UPLOAD_PATHS: &evidence_upload_paths |
+    /tmp/NON_CERTIFYING_SCRATCH-out/
+    /tmp/NON_CERTIFYING_SCRATCH-fw-hashes.txt
+    /tmp/NON_CERTIFYING_SCRATCH-ovmf-a/basetools-build.log
+    /tmp/NON_CERTIFYING_SCRATCH-ovmf-b/basetools-build.log
+    /tmp/NON_CERTIFYING_SCRATCH-hostile-out/basetools-build.log
 jobs:
   rehearsal:
     # ubuntu-22.04 pinned: the canonical-path mechanism (build-ovmf-debug.sh) needs
@@ -304,6 +313,87 @@ jobs:
           [ "$_lc" = "1" ] || { echo "E_QEMU_SMOKE_ARGV_LANE_LOG expected exactly 1 reverse-rewrite verification line in smoke log, found $_lc"; exit 97; }
           grep -F "lane argv check:" /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-qemu-smoke.log
           echo "masked-host binding smoke OK (exact frozen case argv + -S, four host qemu dirs absent, no case booted)"
+
+      - name: NON_CERTIFYING_SCRATCH planted-fault PF-1 freemark gate must-show (peer condition 4)
+        run: |
+          set -euo pipefail
+          cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+          # a free-marked-dir image (run-9 defect-1 shape) must fail gate 1 pre-boot, exit 97.
+          # peer run-11: each PF lives in its OWN directory under the evidence out dir - its
+          # prep/log/vars/evidence artifacts are independent AND land in the shared
+          # upload+manifest list via the out-dir expansion.
+          mkdir -p /tmp/$PREFIX-out
+          export PATH="/tmp/$PREFIX-stage/shims:$PATH"
+          PFD=/tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-pf1-freemark
+          mkdir -p "$PFD"
+          ./enroll-prep.sh /tmp/$PREFIX-stage/root "$PFD/prep" evidence/c5-signing-cert.der evidence/C5-HOSTILE-FIXTURE.cer \
+            > "$PFD/prep.log" 2>&1 \
+            || { echo "E_PF_PREP rc=$?"; cat "$PFD/prep.log"; exit 97; }
+          _rc=0
+          sudo env PREFIX="$PREFIX" ALLOWED_PREFIX="$ALLOWED_PREFIX" PATH="$PATH" ENROLL_PLANTED_FAULT=freemark \
+            ./rehearsal-enroll.sh config.json "$PFD/prep" "$PFD/vars.fd" "$PFD/evidence" \
+            > "$PFD/pf1.log" 2>&1 || _rc=$?
+          cat "$PFD/pf1.log"
+          [ "$_rc" = "97" ] || { echo "E_PF_GATE_NOT_FIRED expected exit 97, got $_rc"; exit 97; }
+          grep -F "E_ENROLL_FAT_INVALID" "$PFD/pf1.log" || { echo "E_PF_GATE_WRONG_CODE"; exit 97; }
+          grep -F "Contains a free cluster" "$PFD/pf1.log" || { echo "E_PF_GATE_WRONG_DIAG"; exit 97; }
+          echo "PF-1 must-show PASS: free-marked-dir image died pre-boot with E_ENROLL_FAT_INVALID exit 97"
+      - name: NON_CERTIFYING_SCRATCH planted-fault PF-2 missingblob gate must-show (peer condition 4)
+        run: |
+          set -euo pipefail
+          cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+          # an fsck-SILENT missing-required-blob image must fail gate 2 (independent reader)
+          # pre-boot, exit 97 - this is the fault class fsck cannot see.
+          mkdir -p /tmp/$PREFIX-out
+          export PATH="/tmp/$PREFIX-stage/shims:$PATH"
+          PFD=/tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-pf2-missingblob
+          mkdir -p "$PFD"
+          ./enroll-prep.sh /tmp/$PREFIX-stage/root "$PFD/prep" evidence/c5-signing-cert.der evidence/C5-HOSTILE-FIXTURE.cer \
+            > "$PFD/prep.log" 2>&1 \
+            || { echo "E_PF_PREP rc=$?"; cat "$PFD/prep.log"; exit 97; }
+          _rc=0
+          sudo env PREFIX="$PREFIX" ALLOWED_PREFIX="$ALLOWED_PREFIX" PATH="$PATH" ENROLL_PLANTED_FAULT=missingblob \
+            ./rehearsal-enroll.sh config.json "$PFD/prep" "$PFD/vars.fd" "$PFD/evidence" \
+            > "$PFD/pf2.log" 2>&1 || _rc=$?
+          cat "$PFD/pf2.log"
+          [ "$_rc" = "97" ] || { echo "E_PF_GATE_NOT_FIRED expected exit 97, got $_rc"; exit 97; }
+          grep -F "E_ENROLL_FAT_INVALID directory round-trip failed" "$PFD/pf2.log" || { echo "E_PF_GATE_WRONG_CODE"; exit 97; }
+          grep -F "round-trip FAIL" "$PFD/pf2.log" || { echo "E_PF_GATE_WRONG_DIAG"; exit 97; }
+          echo "PF-2 must-show PASS: fsck-silent missing-blob image died pre-boot with E_ENROLL_FAT_INVALID exit 97"
+      - name: NON_CERTIFYING_SCRATCH planted-fault PF-4 missing-needed-file named-97 must-show (peer run-11)
+        run: |
+          set -euo pipefail
+          cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+          # peer run-11: a missing NEEDED FILE must die with a NAMED code and exit 97 -
+          # never a bare set -e death (run 10's pidfile cat). Remove the pristine OVMF_VARS
+          # input, expect E_BASH_ERRTRAP (or E_ENROLL_PID_MISSING) + exit 97, and RESTORE it
+          # BEFORE asserting so a failed must-show can never strand the ceremony.
+          # (PF-3 remains the queued argv lane-mismatch must-show; this slot is PF-4.)
+          mkdir -p /tmp/$PREFIX-out
+          export PATH="/tmp/$PREFIX-stage/shims:$PATH"
+          PFD=/tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-pf4-missingfile
+          mkdir -p "$PFD"
+          ./enroll-prep.sh /tmp/$PREFIX-stage/root "$PFD/prep" evidence/c5-signing-cert.der evidence/C5-HOSTILE-FIXTURE.cer \
+            > "$PFD/prep.log" 2>&1 \
+            || { echo "E_PF_PREP rc=$?"; cat "$PFD/prep.log"; exit 97; }
+          CANON_TMP=/tmp/NON_CERTIFYING_REHEARSAL-
+          PRISTINE=$(python3 -c "import json;print(json.load(open('config.json'))['ovmf_vars_pristine'])")
+          PRISTINE=${PRISTINE//$CANON_TMP//tmp/$PREFIX-}
+          [ -f "$PRISTINE" ] || { echo "E_PF_SETUP pristine vars not at $PRISTINE"; exit 97; }
+          sudo cp -a "$PRISTINE" "$PFD/pristine-vars.saved"
+          sudo rm "$PRISTINE"
+          _rc=0
+          sudo env PREFIX="$PREFIX" ALLOWED_PREFIX="$ALLOWED_PREFIX" PATH="$PATH" \
+            ./rehearsal-enroll.sh config.json "$PFD/prep" "$PFD/vars.fd" "$PFD/evidence" \
+            > "$PFD/pf4.log" 2>&1 || _rc=$?
+          sudo cp -a "$PFD/pristine-vars.saved" "$PRISTINE"
+          cat "$PFD/pf4.log"
+          [ "$(sudo sha256sum "$PRISTINE" | cut -d' ' -f1)" = "$(sudo sha256sum "$PFD/pristine-vars.saved" | cut -d' ' -f1)" ] \
+            || { echo "E_PF_RESTORE_DRIFT pristine vars not restored byte-identical"; exit 97; }
+          [ "$_rc" = "97" ] || { echo "E_PF_NAMED97_NOT_FIRED expected exit 97, got $_rc"; exit 97; }
+          grep -E "E_BASH_ERRTRAP|E_ENROLL_PID_MISSING" "$PFD/pf4.log" \
+            || { echo "E_PF_NAMED97_WRONG_CODE failure was not NAMED (bare death)"; exit 97; }
+          echo "PF-4 must-show PASS: missing needed file died with a NAMED code, exit 97"
       - name: NON_CERTIFYING_SCRATCH ceremony (network-enforced-off, tee'd log)
         timeout-minutes: 120
         run: |
@@ -313,38 +403,6 @@ jobs:
           date +%s >> /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-step-stamps.txt
           sudo unshare -n env PREFIX="$PREFIX" ALLOWED_PREFIX="$ALLOWED_PREFIX" ./run-ceremony.sh config.json /tmp/$PREFIX-stage /tmp/$PREFIX-out 2>&1 \
             | tee /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-ceremony.log
-
-      - name: NON_CERTIFYING_SCRATCH planted-fault PF-1 freemark gate must-show (peer condition 4)
-        run: |
-          set -euo pipefail
-          cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
-          # a free-marked-dir image (run-9 defect-1 shape) must fail gate 1 pre-boot, exit 97.
-          export PATH="/tmp/$PREFIX-stage/shims:$PATH"
-          ./enroll-prep.sh /tmp/$PREFIX-stage/root /tmp/$PREFIX-pf1-prep evidence/c5-signing-cert.der evidence/C5-HOSTILE-FIXTURE.cer             > /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-planted-fault-freemark-prep.log 2>&1             || { echo "E_PF_PREP rc=$?"; cat /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-planted-fault-freemark-prep.log; exit 97; }
-          mkdir -p /tmp/$PREFIX-pf1-out
-          _rc=0
-          sudo env PREFIX="$PREFIX" ALLOWED_PREFIX="$ALLOWED_PREFIX" PATH="$PATH" ENROLL_PLANTED_FAULT=freemark             ./rehearsal-enroll.sh config.json /tmp/$PREFIX-pf1-prep /tmp/$PREFIX-pf1-out/vars.fd /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-planted-fault-freemark-evidence             > /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-planted-fault-freemark.log 2>&1 || _rc=$?
-          cat /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-planted-fault-freemark.log
-          [ "$_rc" = "97" ] || { echo "E_PF_GATE_NOT_FIRED expected exit 97, got $_rc"; exit 97; }
-          grep -F "E_ENROLL_FAT_INVALID" /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-planted-fault-freemark.log || { echo "E_PF_GATE_WRONG_CODE"; exit 97; }
-          grep -F "Contains a free cluster" /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-planted-fault-freemark.log || { echo "E_PF_GATE_WRONG_DIAG"; exit 97; }
-          echo "PF-1 must-show PASS: free-marked-dir image died pre-boot with E_ENROLL_FAT_INVALID exit 97"
-      - name: NON_CERTIFYING_SCRATCH planted-fault PF-2 missingblob gate must-show (peer condition 4)
-        run: |
-          set -euo pipefail
-          cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
-          # an fsck-SILENT missing-required-blob image must fail gate 2 (independent reader)
-          # pre-boot, exit 97 - this is the fault class fsck cannot see.
-          export PATH="/tmp/$PREFIX-stage/shims:$PATH"
-          ./enroll-prep.sh /tmp/$PREFIX-stage/root /tmp/$PREFIX-pf2-prep evidence/c5-signing-cert.der evidence/C5-HOSTILE-FIXTURE.cer             > /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-planted-fault-missingblob-prep.log 2>&1             || { echo "E_PF_PREP rc=$?"; cat /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-planted-fault-missingblob-prep.log; exit 97; }
-          mkdir -p /tmp/$PREFIX-pf2-out
-          _rc=0
-          sudo env PREFIX="$PREFIX" ALLOWED_PREFIX="$ALLOWED_PREFIX" PATH="$PATH" ENROLL_PLANTED_FAULT=missingblob             ./rehearsal-enroll.sh config.json /tmp/$PREFIX-pf2-prep /tmp/$PREFIX-pf2-out/vars.fd /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-planted-fault-missingblob-evidence             > /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-planted-fault-missingblob.log 2>&1 || _rc=$?
-          cat /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-planted-fault-missingblob.log
-          [ "$_rc" = "97" ] || { echo "E_PF_GATE_NOT_FIRED expected exit 97, got $_rc"; exit 97; }
-          grep -F "E_ENROLL_FAT_INVALID directory round-trip failed" /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-planted-fault-missingblob.log || { echo "E_PF_GATE_WRONG_CODE"; exit 97; }
-          grep -F "round-trip FAIL" /tmp/$PREFIX-out/NON_CERTIFYING_SCRATCH-planted-fault-missingblob.log || { echo "E_PF_GATE_WRONG_DIAG"; exit 97; }
-          echo "PF-2 must-show PASS: fsck-silent missing-blob image died pre-boot with E_ENROLL_FAT_INVALID exit 97"
       - name: NON_CERTIFYING_SCRATCH evidence readability repair (ephemeral out tree only)
         if: always()
         run: |
@@ -358,7 +416,9 @@ jobs:
           # must never alter evidence BYTES; chown-to-runner preferred over world readability
           # (N2). The before-hash runs under sudo: pre-repair files may be root-only-readable
           # (the run-8 EACCES case); the content hashed is identical either way.
-          before=$(find /tmp/$PREFIX-out -type f -print0 | sort -z | sudo xargs -0 -r sha256sum)
+          # peer pushed-byte review (4): the find runs under sudo too - a root-only
+          # DIRECTORY would silently shrink a runner-side find's coverage.
+          before=$(sudo find /tmp/$PREFIX-out -type f -print0 | sort -z | sudo xargs -0 -r sha256sum)
           mode=chmod
           if sudo chown -R "$(id -u):$(id -g)" /tmp/$PREFIX-out; then mode=chown
           else echo "W_EVIDENCE_REPAIR_CHOWN chown failed rc=$? - falling back to chmod"; fi
@@ -375,27 +435,25 @@ jobs:
             echo "E_EVIDENCE_NONREGULAR non-regular file in evidence tree:"; find /tmp/$PREFIX-out ! -type f ! -type d -print; exit 94
           fi
           echo "evidence socket sweep: only regular files+dirs under /tmp/$PREFIX-out"
-          # peer N9: the manifest must cover EVERY uploaded path, not just the out dir -
-          # fw-hashes and the three basetools build logs are uploaded alongside it. Absent
-          # members (failed-early runs) are noted explicitly, never silently skipped.
+          # peer N9 + run-11 single-list: the manifest covers EXACTLY the uploaded paths -
+          # both iterate the ONE shared EVIDENCE_UPLOAD_PATHS list (YAML anchor at the
+          # workflow env block; the upload step aliases the same anchor), so drift between
+          # upload and manifest is impossible by construction. Directories expand to their
+          # files; absent members (failed-early runs) are noted, never silently skipped.
           man=$(mktemp)
-          { find /tmp/$PREFIX-out -type f -print0
-            for x in /tmp/$PREFIX-fw-hashes.txt \
-                     /tmp/$PREFIX-ovmf-a/basetools-build.log \
-                     /tmp/$PREFIX-ovmf-b/basetools-build.log \
-                     /tmp/$PREFIX-hostile-out/basetools-build.log; do
-              [ -f "$x" ] && printf '%s\0' "$x"
-            done
+          { while IFS= read -r p; do
+              if [ -z "$p" ]; then continue; fi
+              if [ -d "$p" ]; then find "$p" -type f -print0
+              elif [ -f "$p" ]; then printf '%s\0' "$p"; fi
+            done <<< "$EVIDENCE_UPLOAD_PATHS"
           } | sort -z | sudo xargs -0 -r sha256sum > "$man"
-          for x in /tmp/$PREFIX-fw-hashes.txt \
-                   /tmp/$PREFIX-ovmf-a/basetools-build.log \
-                   /tmp/$PREFIX-ovmf-b/basetools-build.log \
-                   /tmp/$PREFIX-hostile-out/basetools-build.log; do
-            [ -f "$x" ] || echo "ARTIFACT-DIGEST note: $x ABSENT this run (not in manifest)"
-          done
+          while IFS= read -r p; do
+            if [ -z "$p" ]; then continue; fi
+            [ -d "$p" ] || [ -f "$p" ] || echo "ARTIFACT-DIGEST note: $p ABSENT this run (not in manifest)"
+          done <<< "$EVIDENCE_UPLOAD_PATHS"
           sudo mv "$man" /tmp/$PREFIX-out/$PREFIX-evidence-manifest.txt
           sudo chown "$(id -u):$(id -g)" /tmp/$PREFIX-out/$PREFIX-evidence-manifest.txt
-          echo "ARTIFACT-DIGEST path=/tmp/$PREFIX-out/ +fw-hashes +3-basetools-logs manifest=$PREFIX-evidence-manifest.txt manifest_sha256=$(sha256sum /tmp/$PREFIX-out/$PREFIX-evidence-manifest.txt | cut -d' ' -f1) files=$(grep -c . /tmp/$PREFIX-out/$PREFIX-evidence-manifest.txt) run_id=$GITHUB_RUN_ID run_attempt=$GITHUB_RUN_ATTEMPT run_number=$GITHUB_RUN_NUMBER workflow=$GITHUB_WORKFLOW commit=$GITHUB_SHA ref=$GITHUB_REF"
+          echo "ARTIFACT-DIGEST paths=EVIDENCE_UPLOAD_PATHS(shared-list) manifest=$PREFIX-evidence-manifest.txt manifest_sha256=$(sha256sum /tmp/$PREFIX-out/$PREFIX-evidence-manifest.txt | cut -d' ' -f1) files=$(grep -c . /tmp/$PREFIX-out/$PREFIX-evidence-manifest.txt) run_id=$GITHUB_RUN_ID run_attempt=$GITHUB_RUN_ATTEMPT run_number=$GITHUB_RUN_NUMBER workflow=$GITHUB_WORKFLOW commit=$GITHUB_SHA ref=$GITHUB_REF"
       - name: NON_CERTIFYING_SCRATCH ceremony interpreter cross-check (addendum2 condition 2b)
         run: |
           set -euo pipefail
@@ -426,12 +484,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
         with:
           name: NON_CERTIFYING_SCRATCH-evidence
-          path: |
-            /tmp/NON_CERTIFYING_SCRATCH-out/
-            /tmp/NON_CERTIFYING_SCRATCH-fw-hashes.txt
-            /tmp/NON_CERTIFYING_SCRATCH-ovmf-a/basetools-build.log
-            /tmp/NON_CERTIFYING_SCRATCH-ovmf-b/basetools-build.log
-            /tmp/NON_CERTIFYING_SCRATCH-hostile-out/basetools-build.log
+          path: *evidence_upload_paths
           retention-days: 90
           if-no-files-found: error
 
@@ -606,11 +659,11 @@ jobs:
           set -euo pipefail
           # every uploaded env2 path - the env2-evidence tree plus the ovmf-env2 basetools
           # log - hashed into one manifest, with absent members noted explicitly.
-          if [ -n "$(find /tmp/$PREFIX-env2-evidence ! -type f ! -type d -print -quit)" ]; then
-            echo "E_EVIDENCE_NONREGULAR non-regular file in env2 evidence tree:"; find /tmp/$PREFIX-env2-evidence ! -type f ! -type d -print; exit 94
+          if [ -n "$(sudo find /tmp/$PREFIX-env2-evidence ! -type f ! -type d -print -quit)" ]; then
+            echo "E_EVIDENCE_NONREGULAR non-regular file in env2 evidence tree:"; sudo find /tmp/$PREFIX-env2-evidence ! -type f ! -type d -print; exit 94
           fi
           man=$(mktemp)
-          { find /tmp/$PREFIX-env2-evidence -type f -print0
+          { sudo find /tmp/$PREFIX-env2-evidence -type f -print0
             [ -f /tmp/$PREFIX-ovmf-env2/basetools-build.log ] && printf '%s\0' /tmp/$PREFIX-ovmf-env2/basetools-build.log
           } | sort -z | sudo xargs -0 -r sha256sum > "$man"
           [ -f /tmp/$PREFIX-ovmf-env2/basetools-build.log ] || echo "ARTIFACT-DIGEST note: /tmp/$PREFIX-ovmf-env2/basetools-build.log ABSENT this run (not in manifest)"

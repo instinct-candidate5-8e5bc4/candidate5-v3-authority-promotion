@@ -1,7 +1,9 @@
 #!/bin/bash
 # NON_CERTIFYING_REHEARSAL ceremony runner. Runs under sudo unshare -n (network enforced off).
 # usage: run-ceremony.sh CONFIG STAGE OUT   (run from the rehearsal directory)
-set -euo pipefail
+set -eEuo pipefail
+# peer run-11: every otherwise-bare bash failure is NAMED (script/line/rc/command), exit 97.
+trap '_rc=$?; echo "E_BASH_ERRTRAP run-ceremony.sh line $LINENO rc=$_rc cmd: $BASH_COMMAND" >&2; exit 97' ERR
 CONFIG="$1"; STAGE="$2"; OUT="$3"
 HERE="$(cd "$(dirname "$0")" && pwd)"; cd "$HERE"
 PREFIX="${PREFIX:-}"
@@ -22,6 +24,7 @@ mkdir -p "$OUT" build-output/esp build-output/esp-variant build-output/ovmf-debu
 # chmod fallback otherwise. The repair must never alter evidence BYTES.
 _repair_out() {
   _rc=$?
+  trap - ERR
   [ -d "$OUT" ] || return 0
   _before=$(find "$OUT" -type f -print0 | sort -z | xargs -0 -r sha256sum)
   _mode=chmod

@@ -3,7 +3,10 @@
 # pristine VARS copy, captures ENROLL.TXT, produces an enrolled VARS template.
 # usage: rehearsal-enroll.sh <config.json> <prep_dir> <out_template.fd> <evidence_dir> [db2]
 # MODE (sole|db2) also selects the frozen VARS predicate set checked by enroll-predicate-check.py.
-set -euo pipefail
+set -eEuo pipefail
+# peer run-11: every otherwise-bare bash failure is NAMED (script/line/rc/command) and
+# exits 97 - never another silent set -e death (run 10's pidfile cat died bare).
+trap '_rc=$?; echo "E_BASH_ERRTRAP rehearsal-enroll.sh line $LINENO rc=$_rc cmd: $BASH_COMMAND" >&2; exit 97' ERR
 CFG=${1:?}; PREP=${2:?}; OUT=${3:?}; EVD=${4:?}; MODE=${5:-sole}
 # peer N1: the enrollment QMP socket path is PINNED (argv-freeze.json enroll_qmp_sock_basename)
 # and must fit the AF_UNIX sun_path limit (108 incl. NUL -> 107 usable, mirrors harness G1/T5 F3).
@@ -129,7 +132,9 @@ PY
 # Any value outside the allowlist, or any use outside the scratch lane, fails closed.
 ENROLL_PLANTED_FAULT="${ENROLL_PLANTED_FAULT:-}"
 if [ -n "$ENROLL_PLANTED_FAULT" ]; then
-  [ "$PREFIX" = "NON_CERTIFYING_SCRATCH" ] || { echo "E_PLANTED_FAULT_LANE faults are scratch-lane only (PREFIX=$PREFIX)"; exit 97; }
+  # peer pushed-byte review 3(b): BOTH lane vars must name the scratch lane, not one.
+  [ "$PREFIX" = "NON_CERTIFYING_SCRATCH" ] && [ "$ALLOWED_PREFIX" = "NON_CERTIFYING_SCRATCH" ] \
+    || { echo "E_PLANTED_FAULT_LANE faults are scratch-lane only (PREFIX=$PREFIX ALLOWED_PREFIX=$ALLOWED_PREFIX)"; exit 97; }
   case "$ENROLL_PLANTED_FAULT" in freemark|missingblob) ;; *) echo "E_PLANTED_FAULT_UNKNOWN $ENROLL_PLANTED_FAULT"; exit 97;; esac
   echo "PLANTED FAULT ACTIVE: $ENROLL_PLANTED_FAULT (scratch-lane gate must-show; this run certifies nothing)"
   python3 - "$IMG" "$ENROLL_PLANTED_FAULT" <<'PYF'
@@ -304,9 +309,45 @@ rm -f "$QMP_SOCK"
 # peer N1b: prove the socket is actually gone (find -type f misses sockets; -e misses
 # dangling symlinks, so both forms are checked).
 [ ! -e "$QMP_SOCK" ] && [ ! -L "$QMP_SOCK" ] || { echo "E_QMP_SOCK_LEFTOVER $QMP_SOCK"; exit 97; }
-sleep 25
-PID=$(cat "$EVD/qemu.pid")
-kill -TERM "$PID" 2>/dev/null || true; sleep 2; kill -KILL "$PID" 2>/dev/null || true
+# peer run-11 reconciliation (capture+poll, CONFIRMED root cause): capture the PID
+# PROMPTLY after daemonize (short bounded wait; NAMED failure if the pidfile never
+# appears), then poll THAT PID through the bounded 25s budget and log the actual exit
+# mode. The pidfile is NOT the lifecycle signal - a cleanly self-shutting qemu (guest
+# ResetSystem2) UNLINKS its own pidfile, which is why run 10's post-window cat died bare.
+# ResetSystem2 is logged as supporting evidence of guest intent, never the mechanism.
+PID=""
+for _w in $(seq 1 10); do
+  if [ -s "$EVD/qemu.pid" ]; then PID=$(cat "$EVD/qemu.pid"); break; fi
+  sleep 0.5
+done
+[ -n "$PID" ] || { echo "E_ENROLL_PID_MISSING $EVD/qemu.pid absent 5s after daemonize - qemu never started"; exit 97; }
+echo "qemu pid $PID captured (pidfile present after launch)"
+_t=25
+for _i in $(seq 1 25); do
+  if ! kill -0 "$PID" 2>/dev/null; then _t=$_i; break; fi
+  sleep 1
+done
+if ! kill -0 "$PID" 2>/dev/null; then
+  echo "qemu pid $PID exited on its own at t=${_t}s inside the 25s budget (guest self-shutdown; qemu unlinked its own pidfile)"
+  if grep -q "ResetSystem2" "$EVD/ovmf-debug.log"; then
+    echo "supporting evidence of guest intent: DXE ResetSystem2 shutdown present in ovmf-debug.log"
+  else
+    echo "W_ENROLL_NO_RESET_RECORD qemu self-exited at t=${_t}s but no ResetSystem2 line in ovmf-debug.log"
+  fi
+else
+  kill -TERM "$PID" 2>/dev/null || true; sleep 2; kill -KILL "$PID" 2>/dev/null || true
+  echo "E_ENROLL_QEMU_DEADLINE_TERM qemu pid $PID still alive at the 25s deadline - TERM/KILL issued (no self-shutdown proof; the ENROLL.TXT extraction gate decides the final disposition)"
+fi
+# post-guest image identity (run-10 provenance: guest writes land in the image; the
+# pre/post sha difference IS the guest-wrote evidence - run 10: f48a5700... -> 41740f00...)
+echo "enroll-fat image post-guest sha256=$(sha256sum "$IMG" | cut -d' ' -f1) size=$(stat -c %s "$IMG") (guest-written state)"
+# peer run-11: post-guest fsck -n is OBSERVATIONAL ONLY (logged, never a gate) - the
+# pre-boot gates already proved the image; this records the guest-induced on-disk state.
+_fsckn_rc=0
+fsck.vfat -n "$IMG" > "$EVD/enroll-fat-fsck-postguest.log" 2>&1 || _fsckn_rc=$?
+echo "----- begin enroll-fat-fsck-postguest.log (fsck.vfat -n OBSERVATIONAL rc=$_fsckn_rc, not a gate) -----"
+cat "$EVD/enroll-fat-fsck-postguest.log"
+echo "----- end enroll-fat-fsck-postguest.log (observational only) -----"
 # extract ENROLL.TXT from the VOLUME ROOT of the FAT32 image (G2/T5 F4: the app writes it there)
 _rc=0
 python3 - "$IMG" > "$EVD/ENROLL.TXT" <<'PY' || _rc=$?
@@ -353,6 +394,7 @@ if [ "$_rc" != 0 ]; then
   echo "----- end ovmf-debug.log tail -----"
   exit 97
 fi
+echo "ENROLL.TXT extracted sha256=$(sha256sum "$EVD/ENROLL.TXT" | cut -d' ' -f1) size=$(stat -c %s "$EVD/ENROLL.TXT")"
 cp "$EVD/vars.fd" "$OUT"
 # frozen enrollment predicate gate (requirement 5a/5b resolution): any deviation fails the run
 HERE="$(cd "$(dirname "$0")" && pwd)"

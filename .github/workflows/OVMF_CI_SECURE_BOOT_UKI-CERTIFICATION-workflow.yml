@@ -341,7 +341,9 @@ jobs:
           # must never alter evidence BYTES; chown-to-runner preferred over world readability
           # (N2). The before-hash runs under sudo: pre-repair files may be root-only-readable
           # (the run-8 EACCES case); the content hashed is identical either way.
-          before=$(find /tmp/$PREFIX-out -type f -print0 | sort -z | sudo xargs -0 -r sha256sum)
+          # peer pushed-byte review (4): the find runs under sudo too - a root-only
+          # DIRECTORY would silently shrink a runner-side find's coverage.
+          before=$(sudo find /tmp/$PREFIX-out -type f -print0 | sort -z | sudo xargs -0 -r sha256sum)
           mode=chmod
           if sudo chown -R "$(id -u):$(id -g)" /tmp/$PREFIX-out; then mode=chown
           else echo "W_EVIDENCE_REPAIR_CHOWN chown failed rc=$? - falling back to chmod"; fi
@@ -575,11 +577,11 @@ jobs:
           set -euo pipefail
           # every uploaded env2 path - the env2-evidence tree plus the ovmf-env2 basetools
           # log - hashed into one manifest, with absent members noted explicitly.
-          if [ -n "$(find /tmp/$PREFIX-env2-evidence ! -type f ! -type d -print -quit)" ]; then
-            echo "E_EVIDENCE_NONREGULAR non-regular file in env2 evidence tree:"; find /tmp/$PREFIX-env2-evidence ! -type f ! -type d -print; exit 94
+          if [ -n "$(sudo find /tmp/$PREFIX-env2-evidence ! -type f ! -type d -print -quit)" ]; then
+            echo "E_EVIDENCE_NONREGULAR non-regular file in env2 evidence tree:"; sudo find /tmp/$PREFIX-env2-evidence ! -type f ! -type d -print; exit 94
           fi
           man=$(mktemp)
-          { find /tmp/$PREFIX-env2-evidence -type f -print0
+          { sudo find /tmp/$PREFIX-env2-evidence -type f -print0
             [ -f /tmp/$PREFIX-ovmf-env2/basetools-build.log ] && printf '%s\0' /tmp/$PREFIX-ovmf-env2/basetools-build.log
           } | sort -z | sudo xargs -0 -r sha256sum > "$man"
           [ -f /tmp/$PREFIX-ovmf-env2/basetools-build.log ] || echo "ARTIFACT-DIGEST note: /tmp/$PREFIX-ovmf-env2/basetools-build.log ABSENT this run (not in manifest)"

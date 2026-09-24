@@ -26,6 +26,15 @@ env:
   PREFIX: NON_CERTIFYING_REHEARSAL
   # peer adjudication (1): per-workflow singleton allowlist; scripts fail closed on mismatch.
   ALLOWED_PREFIX: NON_CERTIFYING_REHEARSAL
+  # peer run-11 single-list: the evidence upload paths AND the manifest members come from
+  # this ONE shared list - the upload step references the same YAML anchor, so the two can
+  # never drift. Directories expand to their files at manifest time.
+  EVIDENCE_UPLOAD_PATHS: &evidence_upload_paths |
+    /tmp/NON_CERTIFYING_REHEARSAL-out/
+    /tmp/NON_CERTIFYING_REHEARSAL-fw-hashes.txt
+    /tmp/NON_CERTIFYING_REHEARSAL-ovmf-a/basetools-build.log
+    /tmp/NON_CERTIFYING_REHEARSAL-ovmf-b/basetools-build.log
+    /tmp/NON_CERTIFYING_REHEARSAL-hostile-out/basetools-build.log
 jobs:
   rehearsal:
     # ubuntu-22.04 pinned: the canonical-path mechanism (build-ovmf-debug.sh) needs
@@ -337,7 +346,9 @@ jobs:
           # must never alter evidence BYTES; chown-to-runner preferred over world readability
           # (N2). The before-hash runs under sudo: pre-repair files may be root-only-readable
           # (the run-8 EACCES case); the content hashed is identical either way.
-          before=$(find /tmp/$PREFIX-out -type f -print0 | sort -z | sudo xargs -0 -r sha256sum)
+          # peer pushed-byte review (4): the find runs under sudo too - a root-only
+          # DIRECTORY would silently shrink a runner-side find's coverage.
+          before=$(sudo find /tmp/$PREFIX-out -type f -print0 | sort -z | sudo xargs -0 -r sha256sum)
           mode=chmod
           if sudo chown -R "$(id -u):$(id -g)" /tmp/$PREFIX-out; then mode=chown
           else echo "W_EVIDENCE_REPAIR_CHOWN chown failed rc=$? - falling back to chmod"; fi
@@ -354,27 +365,25 @@ jobs:
             echo "E_EVIDENCE_NONREGULAR non-regular file in evidence tree:"; find /tmp/$PREFIX-out ! -type f ! -type d -print; exit 94
           fi
           echo "evidence socket sweep: only regular files+dirs under /tmp/$PREFIX-out"
-          # peer N9: the manifest must cover EVERY uploaded path, not just the out dir -
-          # fw-hashes and the three basetools build logs are uploaded alongside it. Absent
-          # members (failed-early runs) are noted explicitly, never silently skipped.
+          # peer N9 + run-11 single-list: the manifest covers EXACTLY the uploaded paths -
+          # both iterate the ONE shared EVIDENCE_UPLOAD_PATHS list (YAML anchor at the
+          # workflow env block; the upload step aliases the same anchor), so drift between
+          # upload and manifest is impossible by construction. Directories expand to their
+          # files; absent members (failed-early runs) are noted, never silently skipped.
           man=$(mktemp)
-          { find /tmp/$PREFIX-out -type f -print0
-            for x in /tmp/$PREFIX-fw-hashes.txt \
-                     /tmp/$PREFIX-ovmf-a/basetools-build.log \
-                     /tmp/$PREFIX-ovmf-b/basetools-build.log \
-                     /tmp/$PREFIX-hostile-out/basetools-build.log; do
-              [ -f "$x" ] && printf '%s\0' "$x"
-            done
+          { while IFS= read -r p; do
+              if [ -z "$p" ]; then continue; fi
+              if [ -d "$p" ]; then find "$p" -type f -print0
+              elif [ -f "$p" ]; then printf '%s\0' "$p"; fi
+            done <<< "$EVIDENCE_UPLOAD_PATHS"
           } | sort -z | sudo xargs -0 -r sha256sum > "$man"
-          for x in /tmp/$PREFIX-fw-hashes.txt \
-                   /tmp/$PREFIX-ovmf-a/basetools-build.log \
-                   /tmp/$PREFIX-ovmf-b/basetools-build.log \
-                   /tmp/$PREFIX-hostile-out/basetools-build.log; do
-            [ -f "$x" ] || echo "ARTIFACT-DIGEST note: $x ABSENT this run (not in manifest)"
-          done
+          while IFS= read -r p; do
+            if [ -z "$p" ]; then continue; fi
+            [ -d "$p" ] || [ -f "$p" ] || echo "ARTIFACT-DIGEST note: $p ABSENT this run (not in manifest)"
+          done <<< "$EVIDENCE_UPLOAD_PATHS"
           sudo mv "$man" /tmp/$PREFIX-out/$PREFIX-evidence-manifest.txt
           sudo chown "$(id -u):$(id -g)" /tmp/$PREFIX-out/$PREFIX-evidence-manifest.txt
-          echo "ARTIFACT-DIGEST path=/tmp/$PREFIX-out/ +fw-hashes +3-basetools-logs manifest=$PREFIX-evidence-manifest.txt manifest_sha256=$(sha256sum /tmp/$PREFIX-out/$PREFIX-evidence-manifest.txt | cut -d' ' -f1) files=$(grep -c . /tmp/$PREFIX-out/$PREFIX-evidence-manifest.txt) run_id=$GITHUB_RUN_ID run_attempt=$GITHUB_RUN_ATTEMPT run_number=$GITHUB_RUN_NUMBER workflow=$GITHUB_WORKFLOW commit=$GITHUB_SHA ref=$GITHUB_REF"
+          echo "ARTIFACT-DIGEST paths=EVIDENCE_UPLOAD_PATHS(shared-list) manifest=$PREFIX-evidence-manifest.txt manifest_sha256=$(sha256sum /tmp/$PREFIX-out/$PREFIX-evidence-manifest.txt | cut -d' ' -f1) files=$(grep -c . /tmp/$PREFIX-out/$PREFIX-evidence-manifest.txt) run_id=$GITHUB_RUN_ID run_attempt=$GITHUB_RUN_ATTEMPT run_number=$GITHUB_RUN_NUMBER workflow=$GITHUB_WORKFLOW commit=$GITHUB_SHA ref=$GITHUB_REF"
       - name: NON_CERTIFYING_REHEARSAL ceremony interpreter cross-check (addendum2 condition 2b)
         run: |
           set -euo pipefail
@@ -405,12 +414,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
         with:
           name: NON_CERTIFYING_REHEARSAL-evidence
-          path: |
-            /tmp/NON_CERTIFYING_REHEARSAL-out/
-            /tmp/NON_CERTIFYING_REHEARSAL-fw-hashes.txt
-            /tmp/NON_CERTIFYING_REHEARSAL-ovmf-a/basetools-build.log
-            /tmp/NON_CERTIFYING_REHEARSAL-ovmf-b/basetools-build.log
-            /tmp/NON_CERTIFYING_REHEARSAL-hostile-out/basetools-build.log
+          path: *evidence_upload_paths
           retention-days: 90
           if-no-files-found: error
 
@@ -587,11 +591,11 @@ jobs:
           set -euo pipefail
           # every uploaded env2 path - the env2-evidence tree plus the ovmf-env2 basetools
           # log - hashed into one manifest, with absent members noted explicitly.
-          if [ -n "$(find /tmp/$PREFIX-env2-evidence ! -type f ! -type d -print -quit)" ]; then
-            echo "E_EVIDENCE_NONREGULAR non-regular file in env2 evidence tree:"; find /tmp/$PREFIX-env2-evidence ! -type f ! -type d -print; exit 94
+          if [ -n "$(sudo find /tmp/$PREFIX-env2-evidence ! -type f ! -type d -print -quit)" ]; then
+            echo "E_EVIDENCE_NONREGULAR non-regular file in env2 evidence tree:"; sudo find /tmp/$PREFIX-env2-evidence ! -type f ! -type d -print; exit 94
           fi
           man=$(mktemp)
-          { find /tmp/$PREFIX-env2-evidence -type f -print0
+          { sudo find /tmp/$PREFIX-env2-evidence -type f -print0
             [ -f /tmp/$PREFIX-ovmf-env2/basetools-build.log ] && printf '%s\0' /tmp/$PREFIX-ovmf-env2/basetools-build.log
           } | sort -z | sudo xargs -0 -r sha256sum > "$man"
           [ -f /tmp/$PREFIX-ovmf-env2/basetools-build.log ] || echo "ARTIFACT-DIGEST note: /tmp/$PREFIX-ovmf-env2/basetools-build.log ABSENT this run (not in manifest)"

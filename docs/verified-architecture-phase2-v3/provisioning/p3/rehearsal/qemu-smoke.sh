@@ -11,7 +11,9 @@
 # no case is booted. Exit 97 on any failure. Runs as root (KVM device mapping). Relative argv
 # paths resolve against a work root materialized from the pin-verified dual-build
 # products (the same bytes the ceremony copies into the repo tree one step later).
-set -euo pipefail
+set -eEuo pipefail
+# peer run-11: every otherwise-bare bash failure is NAMED (script/line/rc/command), exit 97.
+trap '_rc=$?; echo "E_BASH_ERRTRAP qemu-smoke.sh line $LINENO rc=$_rc cmd: $BASH_COMMAND" >&2; exit 97' ERR
 PREFIX="${PREFIX:-}"
 [ -n "$PREFIX" ] || { echo "E_PREFIX_UNSET"; exit 97; }
 [ "$PREFIX" = "${ALLOWED_PREFIX:-}" ] || { echo "E_PREFIX_MISMATCH prefix=$PREFIX allowed=$ALLOWED_PREFIX"; exit 97; }

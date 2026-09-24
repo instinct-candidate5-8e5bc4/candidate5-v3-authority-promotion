@@ -2,7 +2,9 @@
 # NON_CERTIFYING_REHEARSAL tool shims: wrapper scripts that run staged binaries through the
 # staged loader, so staged noble tools run under their own loader/glibc on ANY host
 # (local sandbox or CI ubuntu-22.04 jammy runner alike). usage: make-shims.sh <stage_dir> <shim_dir>
-set -euo pipefail
+set -eEuo pipefail
+# peer run-11: every otherwise-bare bash failure is NAMED (script/line/rc/command), exit 97.
+trap '_rc=$?; echo "E_BASH_ERRTRAP make-shims.sh line $LINENO rc=$_rc cmd: $BASH_COMMAND" >&2; exit 97' ERR
 STAGE=${1:?}; SHIMS=${2:?}
 RT="$STAGE/root"
 LOADER="$RT/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2"

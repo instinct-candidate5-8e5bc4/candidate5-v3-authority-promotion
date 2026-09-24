@@ -752,3 +752,107 @@ Planted-fault queue (remaining MUST-SHOW, owed as dedicated scratch runs):
 - PF-3 argv lane-mismatch (reverse-rewrite tamper): must fail the smoke with
   E_QEMU_SMOKE_ARGV_LANE; and any run whose smoke log lacks the verification line must
   fail with E_QEMU_SMOKE_ARGV_LANE_LOG.
+
+Run-10 outcomes (scratch run 35939070738, #10 candidate) - GUEST ENROLLMENT SUCCEEDED
+(ovmf-debug verbatim: FSOpen created + opened ENROLL.TXT; DXE ResetSystem2 Shutdown; image
+sha changed pre/post guest, f48a5700... -> 41740f00...): the FAT fix, both pre-boot gates,
+the fsck shim resolution line, the smoke lane-check (exactly once), KVM proof, N9 manifests
+and the socket sweep all held. Two host-side defects found and fixed (tree work, next
+candidate):
+- Collection break (run-10 defect-1; peer run-11 reconciliation): the pidfile-lifecycle
+  hypothesis is CONFIRMED, not just likely - a successful enrollment shuts the guest down
+  (run-10 evidence: ResetSystem2 + absent pidfile) and a cleanly exiting qemu UNLINKS its
+  own pidfile; the old code cat'd the pidfile after the 25s window and died bare under
+  set -e (run-9 only survived because the firmware dropped to a shell and qemu stayed
+  alive). Fixed in the peer-requested capture+poll shape: the PID is captured PROMPTLY
+  after daemonize (bounded 5s pidfile wait; E_ENROLL_PID_MISSING exit 97 if it never
+  appears), then THAT PID is polled with kill -0 through the bounded 25s budget and the
+  actual exit mode is logged - self-exit at t=N, or E_ENROLL_QEMU_DEADLINE_TERM with
+  TERM/KILL at the deadline (a named code logged for the event; the final disposition
+  stays with the E_ENROLL_TXT_MISSING 97 extraction gate, which preserves the run-9
+  shell-drop success shape). The pidfile itself is never the lifecycle signal; a
+  ResetSystem2 line is logged as SUPPORTING evidence of guest intent, not the mechanism.
+  Post-guest image sha256+size and extracted ENROLL.TXT sha256+size are logged. All
+  three modes locally tested on the exact extracted production block (self-exit, deadline
+  TERM, pidfile-never-appears -> E_ENROLL_PID_MISSING 97).
+- Ordering defect (run-10 defect-2): the PF-1/PF-2 must-show steps sat AFTER the ceremony
+  step, so the ceremony's failure skipped them. They now sit BEFORE the ceremony in the
+  scratch derivation - a must-show can never be gated by a ceremony outcome.
+ovmf-b basetools log question (run-10 ARTIFACT-DIGEST note): "didn't run" vs "ran + log
+missing" - by design it is "ran + log never written for ovmf-b". Proving code lines in
+build-ovmf-debug.sh: build_one() writes the BaseTools log to OUTA only -
+  line 68-69: make -C BaseTools -j"$(nproc)" >"$OUTA/basetools-build.log" 2>&1 || { ... E_BASETOOLS_BUILD ... }
+  line 70:    echo "basetools build log: $OUTA/basetools-build.log sha256=..."
+and ovmf-b receives only the final FDs, byte-identity enforced -
+  line 188: cp "$WORKFIX/OVMF_CODE.fd" "$WORKFIX/OVMF_VARS.fd" "$OUTB"/
+  line 190: cmp "$OUTA/OVMF_CODE.fd" "$OUTB/OVMF_CODE.fd" || { echo "E_OVMF_DUAL_BUILD_MISMATCH CODE"; exit 42; }
+CAVEAT (open reviewer decision): build_one() runs for BOTH dual-build passes and BOTH
+write "$OUTA/basetools-build.log" - the second pass OVERWRITES the first, so the FIRST
+pass's own BaseTools diagnostics are NOT retained anywhere. If the reviewer wants
+per-pass logs retained (e.g. basetools-build-pass1.log / -pass2.log), that is a
+build-ovmf-debug.sh change - surfaced here as a decision, not implemented unasked.
+ovmf-b's FDs remain byte-identical to ovmf-a's under cmp, so the absent log carries no
+firmware-integrity signal; run-9's upload silently skipped it and the N9 absent-note made
+it visible - the gate working as intended.
+Run-10 remaining owes: db2/sole-fresh ENROLL.TXT (ceremony stopped after sole), PF-1/PF-2
+CI execution, env2 compare.
+
+Run-11 hardening (peer #11 shape requests, this candidate):
+- Named ERR traps: rehearsal-enroll.sh, run-ceremony.sh, qemu-smoke.sh and make-shims.sh
+  now run set -eE with an ERR trap printing E_BASH_ERRTRAP <script> line/rc/command, exit
+  97 - no failure can ever again die bare the way run 10's pidfile cat did. The EXIT
+  evidence trap in run-ceremony.sh is preserved (the ERR trap is disabled inside
+  _repair_out so an incidental repair failure can never mask the original named exit
+  code, peer N3). Negative/positive tested: an unguarded cp failure -> E_BASH_ERRTRAP
+  rc=97; a guarded named gate -> its own E_ code, trap silent.
+- Post-guest fsck -n is run OBSERVATIONALLY (logged to enroll-fat-fsck-postguest.log and
+  teed into the run log, never a gate) to record the guest-induced on-disk state.
+- ONE SHARED LIST: EVIDENCE_UPLOAD_PATHS (YAML anchor at the workflow env block) is the
+  single source for BOTH the upload-artifact path (YAML alias) and the manifest member
+  enumeration - upload/manifest drift is impossible by construction. Directories expand
+  to their files at manifest time; absent members are noted explicitly. Locally simulated
+  with a mixed dir/file/absent list. 6e6 occurrence pins unchanged (cert 44, rehearsal 77).
+- PF-1/PF-2 now live in INDEPENDENT per-PF directories under the evidence out dir
+  (prep/log/vars/evidence each), so their logs ride the shared upload+manifest list via
+  the out-dir expansion; both still sit BEFORE the ceremony step (run-10 ordering fix).
+- PF-4 (new must-show, peer run-11): a missing NEEDED FILE (pristine OVMF_VARS removed)
+  must die with a NAMED code (E_BASH_ERRTRAP or E_ENROLL_PID_MISSING) and exit 97 - never
+  a bare set -e death. The file is restored BEFORE assertions (byte-identity checked,
+  E_PF_RESTORE_DRIFT) so a failed must-show can never strand the ceremony. PF-3 remains
+  the queued argv lane-mismatch must-show; this slot is PF-4.
+- E_ENROLL_PID_MISSING is the defensive net for "qemu never started"; most launch
+  failures (e.g. a missing readonly firmware drive) fail the daemonize command itself and
+  surface as E_BASH_ERRTRAP - both are NAMED 97s, which is what PF-4 asserts.
+
+Peer pushed-byte review of #10 (2026-09-24; run-10 watch items separate) - resolutions:
+1. CERT VERIFIER identity non-keying: the exactly-one-run verifier (peer N5 section) keys
+   ONLY on the certification workflow path, head SHA, run_attempt == 1 and conclusion.
+   Commit author/committer identity is NOT a review input and must never gate anything;
+   the #10 identity deviation is cosmetic history, not a verifier signal.
+2. argv-freeze.json whole-file hash rationale: the enroll_qmp_sock_basename append (N1)
+   RESERIALIZED the file - all seven case argvs + their SHAs, smoke_namespace and
+   bwrap_argv are byte-identical in content, but JSON serialization moved bytes, so any
+   whole-file hash differs. Content invariants are what preflight pins (6e5 key set,
+   per-case argv SHAs, structural args, basename); the whole-file sha256 at the frozen #10
+   bytes is 51b2dbc74f6b411885fcad1bbb0235dfb31e14c19418a7bfac6b33d0b12f24af
+   (recomputed at every freeze). Future edits are
+   byte-stable appends/in-place edits, never reserialization.
+3. Planted-fault hook inert-outside-scratch, implemented: (a) preflight 6e9 -
+   certification + rehearsal workflows must contain ZERO ENROLL_PLANTED_FAULT occurrences
+   (negative-tested: a planted probe fires E_PLANTED_FAULT_WORKFLOW_SCOPE), and the scratch
+   workflow must carry the must-show steps (guards a silent derivation drop); (b) the
+   switch requires BOTH PREFIX and ALLOWED_PREFIX == NON_CERTIFYING_SCRATCH (negative
+   matrix: either mismatch fires E_PLANTED_FAULT_LANE exit 97); (c) injection precedes
+   BOTH pre-boot gates (fault block sits before the image-sha log, gate 1 and gate 2;
+   proven locally for PF-1/PF-2, run-10 CI report confirms).
+4. Evidence hashing under sudo: the repair-step before-hash find now runs under sudo
+   (sudo find | sort | sudo sha256sum) in both lane workflows - a root-only DIRECTORY
+   would silently shrink runner-side find coverage; the env2 manifest sweep+find switched
+   the same way (env2 has no repair step, root-owned evidence possible).
+
+Commit identity ruling (main 2026-09-24): exactly ONE author/committer identity for all
+candidate commits - "Instinct Agent <agent@instinct.com>", the identity of every commit in
+the chain before #10. The #10 commit d1a097f3636cbbb7be35d3a5f7b7202a843af71d carries
+"candidate5-provisioning <candidate5-provisioning@localhost>" (a local -c override,
+cosmetic only, disclosed to the peer); it stays - the scratch lane is FF-only and history
+is never rewritten. Future commits use the pinned identity (repo-local git config set).
