@@ -509,6 +509,49 @@ BLOCK_BOOT_TARGET_NEG = r'''      - name: NON_CERTIFYING_SCRATCH planted-fault H
           [ "$(grep -c -F ',bootindex=0' "$T/rehearsal-harness.py")" = "1" ] || { echo "E_H3_NEG_INJECTION ESP-device bootindex count != 1 in harness source"; exit 97; }
           sed -i 's/,bootindex=0//' "$T/rehearsal-harness.py"
           [ "$(grep -c -F ',bootindex=0' "$T/rehearsal-harness.py")" = "0" ] || { echo "E_H3_NEG_INJECTION bootindex removal failed"; exit 97; }
+          # peer run-36037280674 ruling (14): the freeze gate stays LIVE and PASSING on the
+          # injected copy - never disabled, never bypassed. Plant a ONE-ENTRY argv-freeze.json:
+          # the frozen R1 argv with EXACTLY ONE ',bootindex=0' removal (the injection itself)
+          # and the $T work_root substituted in CANONICALIZED form (canonize_element maps the
+          # executed $T paths to the canonical -pf/h3boot/cases root in BOTH lanes), then pin
+          # THAT file's sha256 into the copy's ARGV_FREEZE_SHA256. Exact-count injection
+          # assertions on BOTH mutations, same discipline as the bootindex check. The canonical
+          # token is sourced from the copied lane_resolve.CANON - never a workflow literal
+          # (E_DERIVED_CANON_LITERAL: the derived scratch workflow must carry zero).
+          [ "$(grep -c -F ',bootindex=0' "$T/argv-freeze.json")" -ge "2" ] || { echo "E_H3_NEG_INJECTION planted-freeze precondition: committed freeze carries <2 bootindex flags"; exit 97; }
+          python3 - "$T" <<'PYT' || { echo "E_H3_NEG_INJECTION planted-freeze generation failed"; exit 97; }
+          import json, sys, hashlib
+          T = sys.argv[1]
+          sys.dont_write_bytecode = True
+          sys.path.insert(0, T)
+          from lane_resolve import CANON
+          fz = json.load(open(T + "/argv-freeze.json"))
+          r1 = [c for c in fz["cases"] if c["id"].endswith("-R1-historical-13309697-reject-control")]
+          assert len(r1) == 1, "freeze R1 entry count %d != 1" % len(r1)
+          e = r1[0]
+          OLD = "/tmp/%s-out/%s-cases" % (CANON, CANON)
+          NEW = "/tmp/%s-pf/h3boot/cases" % CANON
+          argv, nsub = [], 0
+          for el in e["argv"]:
+              if OLD in el: argv.append(el.replace(OLD, NEW)); nsub += 1
+              else: argv.append(el)
+          assert nsub == 3, "case-dir substitution count %d != 3 (vars.fd, debugcon, pidfile)" % nsub
+          assert sum(el.count(",bootindex=0") for el in argv) == 1, "bootindex count != 1 in freeze R1 argv"
+          argv = [el.replace(",bootindex=0", "") for el in argv]
+          assert sum(el.count(",bootindex=0") for el in argv) == 0, "bootindex removal from planted entry failed"
+          e["argv"] = argv
+          e["argv_sha256"] = hashlib.sha256("\0".join(argv).encode()).hexdigest()
+          assert e["argv_sha256"] == hashlib.sha256("\0".join(e["argv"]).encode()).hexdigest()
+          out = dict(fz); out["cases"] = [e]
+          out["note"] = "H3 planted freeze (peer run-36037280674 ruling 14): single R1 entry - the frozen argv minus exactly one ',bootindex=0' with the canonicalized $T work_root substituted; sha256 pinned into the injected harness copy's ARGV_FREEZE_SHA256."
+          json.dump(out, open(T + "/argv-freeze.json", "w"), indent=1, sort_keys=True)
+          PYT
+          [ "$(python3 -c "import json,sys;print(len(json.load(open(sys.argv[1]))['cases']))" "$T/argv-freeze.json")" = "1" ] || { echo "E_H3_NEG_INJECTION planted freeze case count != 1"; exit 97; }
+          [ "$(grep -c -F ',bootindex=0' "$T/argv-freeze.json")" = "0" ] || { echo "E_H3_NEG_INJECTION planted freeze still carries a bootindex flag"; exit 97; }
+          _PF_SHA=$(sha256sum "$T/argv-freeze.json" | awk '{print $1}')
+          [ "$(grep -c 'ARGV_FREEZE_SHA256="e9a38cec9a63986b6898203ffc39de3ba706607646b66a9610c1a87b74713f94"' "$T/rehearsal-harness.py")" = "1" ] || { echo "E_H3_NEG_INJECTION ARGV_FREEZE_SHA256 constant count != 1 in harness copy"; exit 97; }
+          sed -i "s/ARGV_FREEZE_SHA256=\"[0-9a-f]\{64\}\"/ARGV_FREEZE_SHA256=\"$_PF_SHA\"/" "$T/rehearsal-harness.py"
+          [ "$(grep -c "ARGV_FREEZE_SHA256=\"$_PF_SHA\"" "$T/rehearsal-harness.py")" = "1" ] || { echo "E_H3_NEG_INJECTION freeze pin planting failed"; exit 97; }
           python3 - config.json "$T" <<'PYT'
           import json, sys
           c = json.load(open(sys.argv[1]))
@@ -525,23 +568,35 @@ BLOCK_BOOT_TARGET_NEG = r'''      - name: NON_CERTIFYING_SCRATCH planted-fault H
           # OWNERSHIP of $T only (chown to runner) before any runner-side read - NO
           # world-readable chmod, nothing outside $T. Fail closed if the repair fails.
           sudo chown -R "$(id -u):$(id -g)" "$T" || { echo "E_H3_PERM_REPAIR_FAILED chown rc=$? on $T"; exit 97; }
+          # peer run-36037280674 ruling (15): the death code is checked FIRST, BEFORE any
+          # debug-log checks - h3.log must carry EXACTLY the named boot-target death and NO
+          # freeze-gate code; any other harness death dies E_H3_WRONG_DEATH naming it.
+          # (Extracted with the taxonomy below by test-h3-precheck.py.)
+          _codes=$(grep -o 'E_[A-Z0-9_]*' "$T/h3.log" | sort -u || true)
+          if printf '%s\n' "$_codes" | grep -q 'E_CASE_ARGV_FROZEN_'; then
+            echo "E_H3_WRONG_DEATH $(printf '%s\n' "$_codes" | grep 'E_CASE_ARGV_FROZEN_' | head -1) (freeze gate fired on the planted copy - expected exactly E_CASE_BOOT_TARGET)"; cat "$T/h3.log"; exit 97
+          fi
+          if ! printf '%s\n' "$_codes" | grep -qx 'E_CASE_BOOT_TARGET'; then
+            echo "E_H3_WRONG_DEATH $(printf '%s\n' "$_codes" | grep '^E_' | head -1) (expected exactly E_CASE_BOOT_TARGET)"; cat "$T/h3.log"; exit 97
+          fi
+          [ "$_rc" = "90" ] || { echo "E_H3_GATE_NOT_FIRED rc=$_rc expected 90 (E_CASE_BOOT_TARGET)"; cat "$T/h3.log"; exit 97; }
           # before accepting the named target death, ASSERT qemu really started (an
           # environmental death would be E_QEMU_START, also rc 90 - indistinguishable
           # without this proof): the case argv.txt exists AND a NONEMPTY ovmf-debug.log
           # carries a "[Bds]Booting " line.
-          # peer run-36031372949 ruling (2): DISTINCT named deaths - a permissions death is
-          # never "environmental", and grep's rc branches 0/1/2 (rc 2 never folds into "no match").
+          # peer run-36031372949 ruling (2) + run-36037280674 ruling (15): DISTINCT named
+          # deaths - a permissions death is never "environmental", grep's rc branches 0/1/2
+          # (rc 2 never folds into "no match"), and a MISSING ovmf-debug.log after a harness
+          # death before QEMU is E_H3_QEMU_NOT_STARTED, never E_H3_NO_BOOT_LINE.
           [ -d "$T/cases" ] || { echo "E_H3_QEMU_NOT_STARTED case dir $T/cases missing (early harness death - see h3.log)"; cat "$T/h3.log"; exit 97; }
           _cdir=$(find "$T/cases" -mindepth 1 -maxdepth 1 -type d | head -1)
           [ -n "$_cdir" ] && [ -f "$_cdir/argv.txt" ] || { echo "E_H3_QEMU_NOT_STARTED case dir or argv.txt missing"; cat "$T/h3.log"; exit 97; }
-          if [ ! -e "$_cdir/ovmf-debug.log" ]; then echo "E_H3_NO_BOOT_LINE $_cdir/ovmf-debug.log absent (qemu produced no debug log)"; cat "$T/h3.log"; exit 97; fi
+          if [ ! -e "$_cdir/ovmf-debug.log" ]; then echo "E_H3_QEMU_NOT_STARTED $_cdir/ovmf-debug.log absent (harness died before QEMU produced a debug log)"; cat "$T/h3.log"; exit 97; fi
           if [ ! -r "$_cdir/ovmf-debug.log" ]; then echo "E_H3_DEBUG_LOG_UNREADABLE $_cdir/ovmf-debug.log present but not readable by the runner"; cat "$T/h3.log"; exit 97; fi
           _grc=0; grep -q '^\[Bds\]Booting ' "$_cdir/ovmf-debug.log" || _grc=$?
           if [ "$_grc" = "1" ]; then echo "E_H3_NO_BOOT_LINE readable log carries no '^\[Bds\]Booting ' line"; cat "$T/h3.log"; exit 97; fi
           if [ "$_grc" != "0" ]; then echo "E_H3_DEBUG_LOG_UNREADABLE grep rc=$_grc on $_cdir/ovmf-debug.log"; cat "$T/h3.log"; exit 97; fi
           grep -m1 '^\[Bds\]Booting ' "$_cdir/ovmf-debug.log" | sed 's/^/H3 observed first Booting line: /' >> "$T/h3.log"
-          [ "$_rc" = "90" ] || { echo "E_H3_GATE_NOT_FIRED rc=$_rc expected 90 (E_CASE_BOOT_TARGET)"; cat "$T/h3.log"; exit 97; }
-          grep -F "E_CASE_BOOT_TARGET" "$T/h3.log" || { echo "E_H3_NEG_CODE_ABSENT named boot-target code missing"; cat "$T/h3.log"; exit 97; }
           ! grep -F "EXPECTATIONS_VIOLATED" "$T/h3.log" || { echo "E_H3_NEG_GENERIC death must be the named gate, never EXPECTATIONS_VIOLATED"; cat "$T/h3.log"; exit 97; }
           echo "H3_BOOT_TARGET_MUST_SHOW_OK planted bootindex-removed case died named (E_CASE_BOOT_TARGET rc=90, no EXPECTATIONS_VIOLATED)"
 '''

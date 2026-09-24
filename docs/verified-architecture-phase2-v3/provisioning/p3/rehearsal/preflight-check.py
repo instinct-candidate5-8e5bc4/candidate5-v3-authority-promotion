@@ -673,8 +673,10 @@ for _p in _py_files:
     _bad=_py_mods(open(_p,errors="replace").read())-PY_ALLOW
     # #18 F1 (peer #17 final ruling): NARROW named allowance - exactly the reviewed local
     # resolver module "lane_resolve" (this directory, exec-bit pinned, stdlib-only itself),
-    # ONLY in its two committed consumers. No wildcard, no other file, no other module.
-    if os.path.basename(_p) in ("rehearsal-harness.py","preflight-check.py"):
+    # ONLY in its committed consumers: the two gates plus test-argv-freeze.py (peer
+    # run-36037280674 ruling 12/13 - the comparison-block test drives the REAL lane
+    # mapping, never a synthetic rewrite). No wildcard, no other file, no other module.
+    if os.path.basename(_p) in ("rehearsal-harness.py","preflight-check.py","test-argv-freeze.py"):
         _bad-={"lane_resolve"}
     # peer run-36017957182 ruling (Q2): NARROW named allowance - exactly the reviewed
     # single-source schema module "config_schema" (this directory, exec-bit pinned,
@@ -695,9 +697,12 @@ for _p in _py_files:
     # the workflow step TEXT it injects, whose fetch-test heredoc carries an
     # "import http.server" line (stdlib, executed by the CI runner inside the step, never
     # by the generator). This line-regex scan cannot see the string boundary, so the one
-    # phantom module is allow-listed for this one file only.
+    # phantom module is allow-listed for this one file only. Same shape (peer
+    # run-36037280674 ruling 14): the embedded H3 planted-freeze heredoc sources the
+    # canonical token from the copied lane_resolve module (import executed by the CI
+    # runner inside the step under sys.dont_write_bytecode, never by the generator).
     if os.path.basename(_p)=="derive-scratch.py":
-        _bad-={"http"}
+        _bad-={"http","lane_resolve"}
     if _bad: fail("E_PYTHON_IMPORTS",_p+" "+",".join(sorted(_bad)))
 _sh_files=[os.path.join(here,f) for f in sorted(os.listdir(here)) if f.endswith(".sh")]
 _sh_files.append(os.path.join(p3_root,"build-esp-image.sh"))

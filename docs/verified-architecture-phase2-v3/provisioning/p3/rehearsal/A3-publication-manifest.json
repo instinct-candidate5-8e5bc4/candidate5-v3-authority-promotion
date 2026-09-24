@@ -3,13 +3,13 @@
  "assets": [
   {
    "path": ".github/workflows/NON_CERTIFYING_REHEARSAL-workflow.yml",
-   "sha256": "dd2383c5ebf148da9c240eed78761dd35347ef91cddbd4bfe6cf987b408f39ff",
-   "bytes": 78441
+   "sha256": "ebc61cfcb2bd062afa1a31335b9f01bb0f9cf8c9071e7b39ef71f6ce77d9b162",
+   "bytes": 78490
   },
   {
    "path": ".github/workflows/NON_CERTIFYING_SCRATCH-workflow.yml",
-   "sha256": "632cb0c0bd44f3faa6ac5603536cf3f1f6a4fc9d28bf02177b01b9903535b9df",
-   "bytes": 129802
+   "sha256": "9155f95afddf8a93f104790694731821949d904c5a61af19f68328c2f1470855",
+   "bytes": 134636
   },
   {
    "path": ".github/workflows/OVMF_CI_SECURE_BOOT_UKI-CERTIFICATION-workflow.yml",
@@ -43,8 +43,8 @@
   },
   {
    "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/R3-static-review-candidate.md",
-   "sha256": "e3398353f983cb3e755dfa084d2506ae75110f23b32eb8287612f328c6a70025",
-   "bytes": 204917
+   "sha256": "617e117bb6277eeba96582615b3bce42b91f057b09594f3b5f307e47a2fc0e1f",
+   "bytes": 212595
   },
   {
    "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/UKI-13309697-ROOT-CAUSE.md",
@@ -98,8 +98,8 @@
   },
   {
    "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/derive-scratch.py",
-   "sha256": "aef4d06535ba96566835265cad0a29dac60f49a9b6af78c45abf0d2c4ffb8f6c",
-   "bytes": 60710
+   "sha256": "c52ed392035826a661e6b192e94d6f428095c44bd1f1235882101b77b7fe428b",
+   "bytes": 65495
   },
   {
    "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/enroll-app.c",
@@ -127,14 +127,19 @@
    "bytes": 21166416
   },
   {
+   "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/fixtures/run-36037280674-R1-argv.txt",
+   "sha256": "4e281caa6cc858a5781435df84c772c658477a9d35b1fe823c5f09de8792cab7",
+   "bytes": 1767
+  },
+  {
    "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/heredoc_parse.py",
    "sha256": "c28b89a1bf00d2a81683cf717b8bccaff019d60e7ddcc1d888de1fbf05c9d989",
    "bytes": 4558
   },
   {
    "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/lane_resolve.py",
-   "sha256": "9d8549aa9299370f73337063f81cf32640d0fee1267cdb84763a949be3e9ff70",
-   "bytes": 7649
+   "sha256": "ff058921ce03e55146c9321b6f0dbdc02c6ec0541bc80080c90da613495a917f",
+   "bytes": 9184
   },
   {
    "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/make-disks.sh",
@@ -158,8 +163,8 @@
   },
   {
    "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/preflight-check.py",
-   "sha256": "23f3be1e93fcd6fb944bb72d73db06bca7321dea232ace39f266cf52a1da6a52",
-   "bytes": 61908
+   "sha256": "ab6836bc9994eb7ec23321ee7bf7caeabc1a7f2cae5629585240da99cf072c91",
+   "bytes": 62385
   },
   {
    "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/rehearsal-enroll.sh",
@@ -168,8 +173,8 @@
   },
   {
    "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/rehearsal-harness.py",
-   "sha256": "72aed52a96ef9999a25c4229bb03001fb404b18b09ea54bec0f9ab89ff72f203",
-   "bytes": 26852
+   "sha256": "f7bacb0dfa42efcac3a0a25066c09743ccb71a13c24565dce159ecef47160a53",
+   "bytes": 27768
   },
   {
    "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/run-ceremony.sh",
@@ -188,8 +193,8 @@
   },
   {
    "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/test-argv-freeze.py",
-   "sha256": "1e6f918a2b6889186048b741cd0757a21c8818267518ff5a8b93ba3a24e6db62",
-   "bytes": 7191
+   "sha256": "e214567cf673f58ab9603adc966475561c618c970f919fd4166c6876fc4653a0",
+   "bytes": 9465
   },
   {
    "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/test-c-sign-confinement.py",
@@ -223,8 +228,8 @@
   },
   {
    "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/test-h3-precheck.py",
-   "sha256": "00363e424962cda74ce9fdec6f2f7ad1aefea120a36c753dc951f45103ba913f",
-   "bytes": 3969
+   "sha256": "e30a0a3ef3b593ea49b35b247f6631f65eb11d95900bac2985f81d53e72e6f5f",
+   "bytes": 5213
   },
   {
    "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/test-h5-planted-errset.py",
@@ -263,8 +268,8 @@
   },
   {
    "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/test-marker-absence.py",
-   "sha256": "4fa1a58cd28ddc63d1c1ee8f4a2d1f746e76d351557b805de9bc2c193ad0b7eb",
-   "bytes": 3265
+   "sha256": "12a82a6c9c5cd346de4751cc30dc8ff8f17979baa71362eab107f90df7768e93",
+   "bytes": 4697
   },
   {
    "path": "docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal/test-stale-state-committed.py",
@@ -351,7 +356,7 @@
  "enrollment_predicates": "Requirement 5a/5b resolved pre-run as frozen predicates checked in-ceremony by enroll-predicate-check.py (E_ENROLL_*/E_TRUST_*, exit 92): SetupMode==0 && SecureBoot==1, EFI_SUCCESS, BS|RT attributes only; PK/KEK exactly one X509 ESL entry each (owner c501e570-0de0-0001-0000-000000000000, run throwaway DER); sole db exactly the production cert; widened db exactly production+hostile fixture; dbx/dbt/*Default absent; stored data byte-equals the enrolled ESL payloads; per-case VARS byte-equal the run's post-enrollment template (harness allowlist + byte-identity). Post-run VARS image hashes are observational evidence, not pre-frozen expectations. C1' route (ii): the hostile and wrong-signer DER hashes are supplied in-run via C5_HOSTILE_CERT_SHA256 / C5_WRONG_SIGNER_CERT_SHA256 from the per-run GENERATION-RECORD.json (R3 section 15e); the HOSTILE_CERT constant is deleted from enroll-predicate-check.py.",
  "ephemeral": "Throwaway PK/KEK private keys are generated per run inside the prep dir and plain-deleted by run-ceremony.sh (trap EXIT) the moment the enrollment window closes; they are never logged, uploaded or published. The enrolled VARS templates and the enroll FAT images are uploaded as ephemeral public CI artifacts (batch1r3 C7 correction: they are public run data, not secrets). Negative-control fixture keys are generated IN-RUN per ceremony (route (ii), R3 section 15), network-off under /tmp/$PREFIX-*, shredded end-of-step; the historical 2026-09-22 A4 fixture keys were plain-deleted after that regeneration, and the historical fixture BYTES were deleted from the tree in C1' after the 2026-09-24 C2 byte-loss event (R3 section 15d).",
  "manifest": "NON_CERTIFYING_REHEARSAL A3 publication manifest",
- "manifest_self_declaration": "This manifest is one of the 53 paths in the C1''''''''''''' candidate commit's name-status vs 5f71b13478c5e8c317950703922dcfe3f33ebc7a (30 added, 18 modified, 5 deleted; C1''''''''''''' itself is an 11-path delta on its parent aee37e2d2e7b17cf7a23da9e795abe2a193d8a64). It is deliberately EXCLUDED from the assets list above (62 review-relevant files: the 47 other present in-lineage paths plus 15 unchanged continuity pins) because its own hash cannot be recorded inside itself; verify it via the commit tree (git ls-tree) instead.",
+ "manifest_self_declaration": "This manifest is one of the 54 paths in the C1'''''''''''''' candidate commit's name-status vs 5f71b13478c5e8c317950703922dcfe3f33ebc7a (31 added, 18 modified, 5 deleted; C1'''''''''''''' itself is a 12-path delta on its parent 1a3575baf3c716c09c3e5c10305fca0259b51750). It is deliberately EXCLUDED from the assets list above (63 review-relevant files: the 48 other present in-lineage paths plus 15 unchanged continuity pins) because its own hash cannot be recorded inside itself; verify it via the commit tree (git ls-tree) instead.",
  "uki_source_commit": "92741cbdefaa78adc33bc3c74935a45f9558b88c",
  "version": "10+C1prime",
  "workflow_placement": "Both workflows live exactly once at .github/workflows/ on this commit (push-triggered; exact ref filters p3-rehearsal-3 / p3-rehearsal-4 for the rehearsal, p3-certification for the certification workflow; no wildcards, no other events). No docs/ copies; no default-branch write; no workflow_dispatch. p3-certification must not exist before STATIC ACCEPT; the certification run pushes the already-accepted SHA once."

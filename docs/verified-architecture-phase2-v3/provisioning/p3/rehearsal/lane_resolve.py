@@ -79,6 +79,34 @@ def resolve_path(p, prefix):
         raise LaneError("E_LANE_PATH", "resolved path escapes lane: " + resolved)
     return resolved
 
+def canonize_element(x, prefix):
+    """Exact INVERSE of the component-wise lane mapping (peer run-36037280674 ruling 12),
+    for executed-argv elements: every component that IS the running lane's prefix or starts
+    with it plus '-' maps back to the canonical token; components already canonical (e.g.
+    embedded case IDs, which the forward mapping never touches) pass through idempotently;
+    a namespace token embedded NOT at a component start, or a component naming a third
+    NON_CERTIFYING_ lane, fails closed. Elements with no lane-namespace component pass
+    through byte-identical. Compound argv elements (file=/tmp/..., unix:/tmp/...) split on
+    '/' exactly like resolve_path, so an embedded /tmp lane path maps component-wise the
+    same way. This is the ONE canonicalization - never a hand-written string replace."""
+    _check_prefix(prefix)
+    if not isinstance(x, str):
+        return x
+    out = []
+    for c in x.split("/"):
+        if c == prefix or c.startswith(prefix + "-"):
+            out.append(CANON + c[len(prefix):])
+        elif c == CANON or c.startswith(CANON + "-"):
+            out.append(c)
+        elif CANON in c or prefix in c:
+            raise LaneError("E_LANE_PATH_COMPONENT",
+                            "namespace token not at component start (no substring rewrites): " + x)
+        elif c.startswith("NON_CERTIFYING_"):
+            raise LaneError("E_LANE_PATH_FOREIGN", "foreign lane component %r in %s" % (c, x))
+        else:
+            out.append(c)
+    return "/".join(out)
+
 def resolve_config_value(x, prefix):
     """Config traversal: only absolute /tmp path strings are resolved (via resolve_path, so
     the G1 dot/empty/traversal component rejection applies to them identically); every other

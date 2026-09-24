@@ -19,7 +19,7 @@ if PREFIX!=ALLOWED: print("E_PREFIX_MISMATCH prefix=%s allowed=%s"%(PREFIX,ALLOW
 # caller's env drops PYTHONDONTWRITEBYTECODE (sudo env_reset on run-ceremony.sh did, and the
 # lane_resolve .pyc tripped E_CHECKOUT_MUTATED at the end-of-job gate).
 sys.dont_write_bytecode = True
-from lane_resolve import LaneError, resolve_config_value, resolve_path, allowed_vars_templates
+from lane_resolve import LaneError, resolve_config_value, resolve_path, allowed_vars_templates, canonize_element
 # peer run-36017957182 ruling (Q2): the top-level schema is single-sourced - imported
 # from config_schema.py, the SAME module preflight-check.py validates with, so the two
 # consumers can never drift apart again (run 36017957182's F6 E_CONFIG_SCHEMA).
@@ -95,19 +95,27 @@ def _load_argv_freeze(_fzpath):
 # marker-length overlap so a marker spanning a chunk boundary still fires.
 # Extracted by test-marker-absence.py.
 def _marker_scan(_inputs, cid):
-    _hits=[]
+    _hits=set()
     _maxm=max(len(MARKER_KERNEL_EXEC),len(MARKER_EXIT_98),len(MARKER_EXIT_97))
     for _kind,_p in _inputs:
+        # peer run-36037280674 ruling (x): a missing or unopenable marker input dies NAMED,
+        # never as a bare exception.
+        if not os.path.isfile(_p): fail("E_MARKER_SCAN_INPUT",cid+" "+_kind+" input missing: "+_p)
         _tail=b""
-        with open(_p,"rb") as _f:
+        try: _f=open(_p,"rb")
+        except OSError as _e: fail("E_MARKER_SCAN_INPUT",cid+" "+_kind+" input unopenable: "+_p+" "+str(_e))
+        with _f:
             while True:
-                _chunk=_f.read(1<<23)
+                try: _chunk=_f.read(1<<23)
+                except OSError as _e: fail("E_MARKER_SCAN_INPUT",cid+" "+_kind+" input unreadable: "+_p+" "+str(_e))
                 if not _chunk: break
                 _buf=_tail+_chunk
                 for _m in (MARKER_KERNEL_EXEC,MARKER_EXIT_98,MARKER_EXIT_97):
-                    if _m in _buf: _hits.append("%s %s marker=%r"%(_kind,_p,_m.decode()))
+                    # peer run-36037280674 ruling (y): one hit record per (input, marker),
+                    # never one per chunk.
+                    if (_kind,_p,_m) not in _hits and _m in _buf: _hits.add((_kind,_p,_m))
                 _tail=_buf[-(_maxm-1):]
-    if _hits: fail("E_MARKER_AT_REST",cid+" marker bytes at rest in guest input(s): "+repr(_hits))
+    if _hits: fail("E_MARKER_AT_REST",cid+" marker bytes at rest in guest input(s): "+repr(sorted("%s %s marker=%r"%(_k,_p,_m.decode()) for _k,_p,_m in _hits)))
 # end peer run-36031372949 ruling (11)
 
 def check_schema(cfg):
@@ -272,14 +280,16 @@ def run_case(cfg, case, idx):
     argv=build_argv(cfg,cdir,vars_fd,case["esp"],case["firmware"],sock)
     with open(os.path.join(cdir,"argv.txt"),"w") as f: f.write("\0".join(argv))
     # peer run-36031372949 ruling (6i): the executed argv must equal its frozen pin. The
-    # freeze stores the CANONICAL-lane form; the executed argv is reverse-rewritten to
-    # canonical before hashing (the qemu-smoke lane-argv discipline: identity in the
-    # rehearsal/certification lanes, only the /tmp/<prefix>- rewrite in scratch), so any
-    # non-prefix difference fires. An executed id missing from the freeze dies named.
-    # Extracted by test-argv-freeze.py.
+    # freeze stores the CANONICAL-lane form; the executed argv is canonicalized before
+    # hashing with canonize_element - the EXACT INVERSE of lane_resolve's component-wise
+    # mapping, imported from that ONE source (peer run-36037280674 ruling 12: run
+    # 36037280674 proved a hand-written partial replace is not the inverse - it left the
+    # inner $PREFIX-cases component in lane form, ee1df6e2.. vs pin 4110dad1..). An
+    # executed id missing from the freeze dies named. Extracted by test-argv-freeze.py.
     _fz_sha=_ARGV_FREEZE.get(cid)
     if _fz_sha is None: fail("E_CASE_ARGV_FROZEN_MISSING",cid+" executed but absent from argv-freeze.json")
-    _argv_back=[_t.replace("/tmp/%s-"%PREFIX,"/tmp/NON_CERTIFYING_REHEARSAL-") for _t in argv]
+    try: _argv_back=[canonize_element(_t,PREFIX) for _t in argv]
+    except LaneError as _e: fail("E_CASE_ARGV_FROZEN_MISMATCH",cid+" canonicalization rejected: %s %s"%(_e.code,_e.detail))
     _argv_back_sha=hashlib.sha256("\0".join(_argv_back).encode()).hexdigest()
     if _argv_back_sha!=_fz_sha: fail("E_CASE_ARGV_FROZEN_MISMATCH",cid+" executed(canonicalized) "+_argv_back_sha+" != frozen "+_fz_sha)
     # end peer run-36031372949 ruling (6i)
