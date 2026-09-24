@@ -11,7 +11,7 @@
  #hud .warn{color:#ff9d66;font-weight:700}
  #hud details{margin-top:4px}#hud summary{cursor:pointer;color:#8fb8cc}
  #hud code{color:#9fd3a8;font-size:11px}
- #err{position:fixed;inset:40% 10% auto;text-align:center;color:#ff9d66;display:none}
+ #err{position:fixed;inset:0;display:none;align-items:center;justify-content:center;text-align:center;color:#ff9d66;background:#0d1417;font-size:16px;padding:24px;z-index:10}
  canvas{display:block}
  @media (max-width:520px){
   #hud{padding:6px 8px;font-size:11px;line-height:1.35}
@@ -26,6 +26,7 @@
  <b class="t">SCHOOL TREATMENT ROOM &mdash; VISUAL PREVIEW</b> &nbsp;<span class="warn">VISUALS ARE NOT CERTIFIED PHYSICS</span><br>
  <span id="distinction"></span><br>
  <span id="meta"></span>
+ <span id="engine"></span>
  <details><summary>Status caveats, declared unknowns, digests</summary><div id="caveats"></div></details>
 </div>
 <div id="err"></div>
@@ -33,11 +34,28 @@
 <script type="module">
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import * as ENGINE from './engine-bundle.js';
 const U=1e6, m=v=>v/U; // ED-P2-02 downstream-only conversion: microunits -> meters for display. Never feeds authoritative state.
 const bundle=await (await fetch('./scene-bundle.json')).json();
 if(bundle.status!=='READY'){const e=document.getElementById('err');e.style.display='block';e.textContent='Bundle not READY: '+JSON.stringify(bundle.reason||bundle.status);throw new Error('bundle not ready')}
+// B7 fail-closed engine gate: execute the UNMODIFIED clean-runtime instantiate
+// path in-browser and require every certified anchor before any rendering.
+const fail=msg=>{const e=document.getElementById('err');e.style.display='flex';e.textContent='ENGINE FAIL-CLOSED: '+msg;document.body.dataset.engineFailed=msg;throw new Error('fail-closed: '+msg)};
+window.__engineFailClosed=fail; // test hook for the negative suite
+const live=ENGINE.buildVisualSceneDescriptor();
+if(!live||live.status!=='COMMITTED')fail('descriptor status '+(live&&live.status));
+if(live.sourcePackage.scenePackageDigest!==ENGINE.EXPECTED.packageDigest)fail('package digest mismatch');
+if(live.worldRef.stateDigest!==ENGINE.EXPECTED.worldDigest)fail('world digest mismatch');
+if(live.worldRef.replayMatchesCommittedState!==true)fail('replay does not match committed state');
+if(live.descriptorDigest!==ENGINE.EXPECTED.nodeDescriptorDigest)fail('browser descriptor != Node descriptor');
+const liveCasualty=ENGINE.buildVisualCasualty(live);
+if(!liveCasualty||liveCasualty.status!=='DIMENSIONED_TO_CERTIFIED_ENVELOPE'||liveCasualty.visualDigest!==bundle.inputs.casualtyDigest)fail('casualty build mismatch');
+const liveEquipment=ENGINE.buildVisualEquipment(live);
+if(!liveEquipment||liveEquipment.status!=='DIMENSIONED_TO_CERTIFIED_BODIES'||liveEquipment.visualDigest!==bundle.inputs.equipmentDigest)fail('equipment build mismatch');
+document.body.dataset.engineDescriptor=live.descriptorDigest;
 document.getElementById('distinction').textContent=bundle.banner.distinction;
 document.getElementById('meta').innerHTML=`branch <code>${bundle.git.branch}</code> build commit (embedded at build time; deployed branch head differs) <code>${bundle.git.commit}</code> base <code>${bundle.git.base}</code> &middot; world <code>${bundle.inputs.worldStateDigest.slice(0,16)}&hellip;</code> package <code>${bundle.inputs.sourcePackageDigest.slice(0,16)}&hellip;</code>`;
+document.getElementById('engine').innerHTML=`engine: <code>instantiate(PACKAGE) &rarr; buildVisualSceneDescriptor</code> executed in-browser at page load (read-only) &middot; descriptor <code>${live.descriptorDigest.slice(0,16)}&hellip;</code> browser == Node &middot; casualty/chair/bag built live from this descriptor; room surfaces from the B2 lineage-evidenced set`;
 document.getElementById('caveats').innerHTML=
  `<p><b>Status caveats:</b><br>Casualty: ${bundle.statusCaveats.casualty.gate} ${bundle.statusCaveats.casualty.gateResult} &mdash; ${bundle.statusCaveats.casualty.caveat}<br>Chair: ${bundle.statusCaveats.chair.gate} ${bundle.statusCaveats.chair.gateResult} &mdash; ${bundle.statusCaveats.chair.caveat}</p>`+
  `<p><b>Gate D declared unknowns (not certified):</b> ${bundle.declaredUnknowns.join('; ')}</p>`+
@@ -53,10 +71,10 @@ function box(aabb,colorHex,opts={}){const sx=m(aabb.maxX-aabb.minX),sy=m(aabb.ma
 // Room surfaces (B2, lineage-evidenced against certified physical surfaces)
 for(const s of bundle.room)scene.add(box(s.geometryMicrounits,s.visualOnlyClaims.colorHex,{cast:false}));
 // Casualty (B3, static pose == certified SUPINE_FLOOR; Gate B caveat applies)
-for(const c of bundle.casualty.components)scene.add(box(c.worldAabbMicrounits,c.visualOnlyAppearance.colorHex,{roughness:.7}));
+for(const c of liveCasualty.components)scene.add(box(c.worldAabbMicrounits,c.visualOnlyAppearance.colorHex,{roughness:.7}));
 // Chair + bag (B4; chair Gate C caveat applies)
-for(const c of bundle.equipment.chair.components)scene.add(box(c.worldAabbMicrounits,c.visualOnlyAppearance.colorHex,{roughness:.6}));
-for(const c of bundle.equipment.bag.components)scene.add(box(c.worldAabbMicrounits,c.visualOnlyAppearance.colorHex,{roughness:.5}));
+for(const c of liveEquipment.chair.components)scene.add(box(c.worldAabbMicrounits,c.visualOnlyAppearance.colorHex,{roughness:.6}));
+for(const c of liveEquipment.bag.components)scene.add(box(c.worldAabbMicrounits,c.visualOnlyAppearance.colorHex,{roughness:.5}));
 // Lighting (visual-only claims)
 scene.add(new THREE.AmbientLight(parseInt(bundle.lighting.ambient.colorHex),bundle.lighting.ambient.intensity));
 const key=new THREE.DirectionalLight(parseInt(bundle.lighting.key.colorHex),bundle.lighting.key.intensity);key.position.set(...bundle.lighting.key.positionMicrounits.map(m));key.castShadow=true;scene.add(key);

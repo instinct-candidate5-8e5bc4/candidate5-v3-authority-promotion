@@ -1,0 +1,60 @@
+{
+ "evidenceVersion": "1.0.0",
+ "kind": "TRACK_B_B7_ENGINE_INTEGRATION_EVIDENCE",
+ "phase": "B7",
+ "generatedAt": "2026-09-24T05:19:16.991499+00:00",
+ "scope": "Additive, isolated branch candidate5-track-b-visual-slice only. No production touch, no merge to main, frozen certification candidate untouched.",
+ "designFreezeRecord": "docs/track-b/b7-design-freeze-record.md",
+ "twoLayerIntegrity": {
+  "runtimeLayer": "semantic integrity verified against certified digests at runtime (value integrity only; whitespace/key-order byte changes provably do not diverge these digests)",
+  "buildLayer": "byte-exact source identity enforced at build time against pinned raw-file hashes (visual-slice/engine/pins.json); any byte difference aborts fail-closed"
+ },
+ "certifiedAnchors": {
+  "packageDigest": "187cf1a4c0af01ef12087879f44eeb88a355499a860665e29cdb2f5ab0d06aec",
+  "worldDigest": "fa1bbaa985a63a8bfa30c2bbd7fbaf14b2c4972d985815a093bdd68f7fe954ea",
+  "descriptorDigestNode": "5f6829b7b10bbbc91ff0bd7e66bd5de3c69473091d56af92f8decbc8cbecaa18"
+ },
+ "rawBytePins": [
+  {
+   "repoPath": "evidence/verified-architecture-phase2/surface-models/school.json",
+   "sha256": "6e9878bd1640b2747e8db52237843a8fd75f878e5dc6e162646c4971e85d99c5",
+   "bytes": 8988
+  }
+ ],
+ "inBrowserExecution": {
+  "entry": "visual-slice/engine-bundle.js (esbuild bundle of UNMODIFIED src/clean-runtime instantiate closure + read-only visual builders)",
+  "shims": "additive build-time shims only (crypto via vendored js-sha256 MIT, fs readFileSync over raw pinned text, path, Buffer inject); zero edits to existing engine files",
+  "networkAtRuntime": "none beyond the already-pinned three.js CDN import",
+  "result": {
+   "status": "COMMITTED",
+   "browserDescriptorDigest": "5f6829b7b10bbbc91ff0bd7e66bd5de3c69473091d56af92f8decbc8cbecaa18",
+   "browserEqualsNode": true,
+   "replayMatchesCommittedState": true
+  }
+ },
+ "failClosed": {
+  "pageGate": "all anchors checked before any rendering; mismatch shows full-screen ENGINE FAIL-CLOSED panel, marks document, renders nothing",
+  "negativeTests": [
+   "build-layer: one altered byte in pinned inline -> build aborts FAIL-CLOSED, manifest records pass:false",
+   "build-layer: value-preserving reserialization (whitespace/indent) -> build aborts FAIL-CLOSED on byte pin",
+   "runtime-layer: value tampering in school.json -> validate REJECTS; no COMMITTED descriptor; world digest diverges",
+   "page-layer: fail hook -> full-screen error panel + document marked failed",
+   "crypto shim: vendored js-sha256 matches SHA-256 known vectors"
+  ]
+ },
+ "tests": {
+  "total": 67,
+  "passed": 67,
+  "failed": 0,
+  "newInB7": 7,
+  "command": "node --test tests/clean-runtime-school-scene-v2/*.test.js"
+ },
+ "smoke": "scripts/track-b/b7-engine-smoke.js RESULT: PASS (10 checks incl. 2 page negatives); B6 visual smoke still PASS",
+ "performance": {
+  "owed": "real-hardware FPS against the 45 FPS bar remains owed; sandbox/emulated FPS is never a result",
+  "sandboxObservation": "software-GL numbers seen locally (e.g. 6.8-22.8 FPS under swiftshader) are NOT performance results"
+ },
+ "cost": "zero mandatory cost; dev-only deps (esbuild, puppeteer, pngjs, js-sha256 source) free; page runtime adds no network beyond pinned three.js CDN",
+ "statusCaveatsRidingVisibly": true,
+ "notes": "visuals are never certified physics; renderer downstream of ED-P2-02; room surfaces remain from the B2 lineage-evidenced static set while casualty/chair/bag are now built live in-browser from the instantiate output"
+}

@@ -1,0 +1,60 @@
+{
+  "manifestVersion": "1.0.0",
+  "kind": "TRACK_B_B7_ENGINE_MANIFEST",
+  "generatedAt": "2026-09-24T05:18:21.109Z",
+  "git": {
+    "branch": "candidate5-track-b-visual-slice",
+    "commit": "cc1f87baee05058f1c42603dd19c70390e635b15"
+  },
+  "inlines": [
+    {
+      "repoPath": "evidence/verified-architecture-phase2/surface-models/school.json",
+      "bytes": 8988,
+      "sha256": "6e9878bd1640b2747e8db52237843a8fd75f878e5dc6e162646c4971e85d99c5",
+      "pinnedSha256": "6e9878bd1640b2747e8db52237843a8fd75f878e5dc6e162646c4971e85d99c5",
+      "pinnedBytes": 8988,
+      "byteExact": true
+    }
+  ],
+  "checks": [
+    {
+      "check": "byte-exact inline pin",
+      "target": "evidence/verified-architecture-phase2/surface-models/school.json",
+      "pass": true
+    },
+    {
+      "check": "runtime anchor packageDigest",
+      "target": "187cf1a4c0af01ef12087879f44eeb88a355499a860665e29cdb2f5ab0d06aec",
+      "pass": true
+    },
+    {
+      "check": "runtime anchor worldDigest",
+      "target": "fa1bbaa985a63a8bfa30c2bbd7fbaf14b2c4972d985815a093bdd68f7fe954ea",
+      "pass": true
+    },
+    {
+      "check": "runtime anchor nodeDescriptorDigest",
+      "target": "5f6829b7b10bbbc91ff0bd7e66bd5de3c69473091d56af92f8decbc8cbecaa18",
+      "pass": true
+    },
+    {
+      "check": "bundle built",
+      "target": "673e46c0445c7671a3382a8826e11b5c47b4a8ccd66df345251a6a164db23066",
+      "pass": true
+    }
+  ],
+  "nodeDescriptor": {
+    "status": "COMMITTED",
+    "digest": "5f6829b7b10bbbc91ff0bd7e66bd5de3c69473091d56af92f8decbc8cbecaa18",
+    "worldDigest": "fa1bbaa985a63a8bfa30c2bbd7fbaf14b2c4972d985815a093bdd68f7fe954ea",
+    "packageDigest": "187cf1a4c0af01ef12087879f44eeb88a355499a860665e29cdb2f5ab0d06aec",
+    "replayMatchesCommittedState": true
+  },
+  "esbuildVersion": "0.28.2",
+  "bundle": {
+    "path": "visual-slice/engine-bundle.js",
+    "bytes": 141338,
+    "sha256": "673e46c0445c7671a3382a8826e11b5c47b4a8ccd66df345251a6a164db23066",
+    "minified": false
+  }
+}
