@@ -887,17 +887,63 @@ jobs:
           retention-days: 90
           if-no-files-found: error
 
+      - name: NON_CERTIFYING_SCRATCH checkout-gate negative tests (D15-1)
+        if: "!cancelled()"
+        run: |
+          set -euo pipefail
+          R=docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+          GATE="$GITHUB_WORKSPACE/$R/checkout-gate.sh"
+          T=/tmp/$PREFIX-gatetest; rm -rf "$T"; mkdir -p "$T/repo"
+          cd "$T/repo"
+          git init -q .
+          git config user.email gate@test && git config user.name gate
+          mkdir -p "$R"
+          echo tracked > "$R/tracked.txt"
+          git add -A && git commit -qm init
+          P="$R/prep"; B="$R/build-output"; D="$R/disks"
+          # clean pass WITH the allowed ceremony roots populated
+          mkdir -p "$B/esp" "$D"
+          touch "$B/esp/x.efi" "$D/y.img"
+          "$GATE" "$T/repo" "$P" "$B" "$D" || { echo "E_GATETEST clean pass failed"; exit 97; }
+          # stray untracked file outside the allowlist -> named 97
+          touch "$R/stray.txt"
+          rc=0; "$GATE" "$T/repo" "$P" "$B" "$D" > "$T/stray.log" 2>&1 || rc=$?
+          [ "$rc" = "97" ] && grep -F "E_CHECKOUT_MUTATED unexpected untracked path: $R/stray.txt" "$T/stray.log" > /dev/null \
+            || { echo "E_GATETEST stray-file case rc=$rc"; cat "$T/stray.log"; exit 97; }
+          rm "$R/stray.txt"
+          # __pycache__ -> named 97 (the F5/D14-1 class the gate exists to catch)
+          mkdir -p "$R/__pycache__" && touch "$R/__pycache__/x.pyc"
+          rc=0; "$GATE" "$T/repo" "$P" "$B" "$D" > "$T/pyc.log" 2>&1 || rc=$?
+          [ "$rc" = "97" ] && grep -F "E_CHECKOUT_MUTATED unexpected untracked path: $R/__pycache__" "$T/pyc.log" > /dev/null \
+            || { echo "E_GATETEST pycache case rc=$rc"; cat "$T/pyc.log"; exit 97; }
+          rm -rf "$R/__pycache__"
+          # tracked modification -> named 97
+          echo changed >> "$R/tracked.txt"
+          rc=0; "$GATE" "$T/repo" "$P" "$B" "$D" > "$T/tracked.log" 2>&1 || rc=$?
+          [ "$rc" = "97" ] && grep -F "E_CHECKOUT_MUTATED tracked file modified" "$T/tracked.log" > /dev/null \
+            || { echo "E_GATETEST tracked case rc=$rc"; cat "$T/tracked.log"; exit 97; }
+          git checkout -- "$R/tracked.txt"
+          # staged change -> named 97 (caught by the HEAD diff either way)
+          echo staged >> "$R/tracked.txt" && git add "$R/tracked.txt"
+          rc=0; "$GATE" "$T/repo" "$P" "$B" "$D" > "$T/staged.log" 2>&1 || rc=$?
+          [ "$rc" = "97" ] && grep -F "E_CHECKOUT_MUTATED" "$T/staged.log" > /dev/null \
+            || { echo "E_GATETEST staged case rc=$rc"; cat "$T/staged.log"; exit 97; }
+          git reset -q && git checkout -- "$R/tracked.txt"
+          # prep left behind -> E_PREP_LEFT_BEHIND 98 (throwaway keys)
+          mkdir -p "$P" && touch "$P/pk.key"
+          rc=0; "$GATE" "$T/repo" "$P" "$B" "$D" > "$T/prep.log" 2>&1 || rc=$?
+          [ "$rc" = "98" ] && grep -F "E_PREP_LEFT_BEHIND" "$T/prep.log" > /dev/null \
+            || { echo "E_GATETEST prep case rc=$rc"; cat "$T/prep.log"; exit 97; }
+          rm -rf "$P"
+          # final clean pass
+          "$GATE" "$T/repo" "$P" "$B" "$D" || { echo "E_GATETEST final clean pass failed"; exit 97; }
+          echo "CHECKOUT_GATE_TESTS_OK clean/stray/pycache/tracked/staged/prep all verified on a COPY"
       - name: checkout immutability gate (end of job, frozen SHA)
         if: "!cancelled()"
         run: |
           set -euo pipefail
-          dirty=$(git status --porcelain)
-          if [ -n "$dirty" ]; then
-            echo "E_CHECKOUT_MUTATED frozen checkout changed during the job:"
-            printf '%s\n' "$dirty"
-            exit 97
-          fi
-          echo "checkout immutability OK: no writes under the frozen SHA"
+          R=docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+          "$R/checkout-gate.sh" "$GITHUB_WORKSPACE" "$R/prep" "$R/build-output" "$R/disks"
 
   # Reviewer condition 4: reproduce once in a SECOND FRESH ENVIRONMENT (separate runner)
   # at the same canonical in-container path /build with identical pinned inputs. The FD
@@ -1150,10 +1196,5 @@ jobs:
         if: "!cancelled()"
         run: |
           set -euo pipefail
-          dirty=$(git status --porcelain)
-          if [ -n "$dirty" ]; then
-            echo "E_CHECKOUT_MUTATED frozen checkout changed during the job:"
-            printf '%s\n' "$dirty"
-            exit 97
-          fi
-          echo "checkout immutability OK: no writes under the frozen SHA"
+          R=docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+          "$R/checkout-gate.sh" "$GITHUB_WORKSPACE" "$R/prep"

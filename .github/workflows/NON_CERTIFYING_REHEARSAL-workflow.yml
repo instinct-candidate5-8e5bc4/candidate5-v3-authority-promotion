@@ -552,13 +552,8 @@ jobs:
         if: "!cancelled()"
         run: |
           set -euo pipefail
-          dirty=$(git status --porcelain)
-          if [ -n "$dirty" ]; then
-            echo "E_CHECKOUT_MUTATED frozen checkout changed during the job:"
-            printf '%s\n' "$dirty"
-            exit 97
-          fi
-          echo "checkout immutability OK: no writes under the frozen SHA"
+          R=docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+          "$R/checkout-gate.sh" "$GITHUB_WORKSPACE" "$R/prep" "$R/build-output" "$R/disks"
 
   # Reviewer condition 4: reproduce once in a SECOND FRESH ENVIRONMENT (separate runner)
   # at the same canonical in-container path /build with identical pinned inputs. The FD
@@ -813,10 +808,5 @@ jobs:
         if: "!cancelled()"
         run: |
           set -euo pipefail
-          dirty=$(git status --porcelain)
-          if [ -n "$dirty" ]; then
-            echo "E_CHECKOUT_MUTATED frozen checkout changed during the job:"
-            printf '%s\n' "$dirty"
-            exit 97
-          fi
-          echo "checkout immutability OK: no writes under the frozen SHA"
+          R=docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+          "$R/checkout-gate.sh" "$GITHUB_WORKSPACE" "$R/prep"

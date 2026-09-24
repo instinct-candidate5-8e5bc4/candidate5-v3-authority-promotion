@@ -523,13 +523,8 @@ jobs:
         if: "!cancelled()"
         run: |
           set -euo pipefail
-          dirty=$(git status --porcelain)
-          if [ -n "$dirty" ]; then
-            echo "E_CHECKOUT_MUTATED frozen checkout changed during the job:"
-            printf '%s\n' "$dirty"
-            exit 97
-          fi
-          echo "checkout immutability OK: no writes under the frozen SHA"
+          R=docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+          "$R/checkout-gate.sh" "$GITHUB_WORKSPACE" "$R/prep" "$R/build-output" "$R/disks"
 
   # Reviewer condition 4: reproduce once in a SECOND FRESH ENVIRONMENT (separate runner)
   # at the same canonical in-container path /build with identical pinned inputs. The FD
@@ -778,17 +773,12 @@ jobs:
           retention-days: 90
           if-no-files-found: error
 
-      - name: checkout immutability gate (end of job, frozen SHA)
+      - name: env2 checkout immutability gate (end of job, frozen SHA)
         if: "!cancelled()"
         run: |
           set -euo pipefail
-          dirty=$(git status --porcelain)
-          if [ -n "$dirty" ]; then
-            echo "E_CHECKOUT_MUTATED frozen checkout changed during the job:"
-            printf '%s\n' "$dirty"
-            exit 97
-          fi
-          echo "checkout immutability OK: no writes under the frozen SHA"
+          R=docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
+          "$R/checkout-gate.sh" "$GITHUB_WORKSPACE" "$R/prep"
 
   # Marker emission: ONLY reachable when every prior step of both jobs succeeded. The
   # marker is bound to the certified commit SHA, run id and ref on stdout AND in the

@@ -1198,3 +1198,45 @@ S4. PYTHONDONTWRITEBYTECODE=1 set in the top-level env of all three lane workflo
     actions/checkout step, so there is no checkout to immutabilize (disclosed).
     Step names carry no lane-token, so the 6e6 occurrence pins (44/78) are
     untouched. Step placement: last step of each covered job.
+
+PEER D15-1 RULING (checkout immutability gate rework, adopted via main 2026-09-24):
+The #15 inline gate would have failed EVERY ceremony run (run-ceremony.sh leaves
+build-output/ + disks/ untracked in the checkout by design). Reworked to ONE
+shared definition: checkout-gate.sh (exec-pinned, no heredocs), used by every
+lane's gate step AND by the scratch negative tests on COPIES.
+(a) TRACKED: git diff --quiet HEAD -- + git diff --cached --quiet -> any hit is
+    E_CHECKOUT_MUTATED exit 97 (HEAD diff catches staged changes first; the
+    cached check is defense-in-depth).
+(b) UNTRACKED: every ?? path must fall under the EXACT per-lane allowlist of
+    ceremony output roots (full repo-relative) - anything else is
+    E_CHECKOUT_MUTATED naming the path. No .gitignore anywhere.
+(c) a surviving prep/ -> E_PREP_LEFT_BEHIND exit 98 (throwaway keys;
+    run-ceremony.sh deletes prep via EXIT trap + explicit rm - the gate guards
+    regression).
+(d) AUDIT - every in-checkout write, every lane (validated independently against
+    the scripts and steps, not assumed):
+    main job (scratch/rehearsal/certification): run-ceremony.sh (cwd =
+      rehearsal dir) creates build-output/{esp,esp-variant,ovmf-debug,enroll-app}
+      + disks/ (via make-disks.sh disks) + prep/ (transient, deleted). Everything
+      else writes /tmp only: stage-platform.sh DEST=/tmp/$PREFIX-stage(+env2),
+      make-shims.sh ->/tmp, build-ovmf-debug.sh ->/tmp/$PREFIX-ovmf-{a,b},
+      build-enroll-app.sh ->/tmp/$PREFIX-app-{a,b}, build-esp-image.sh
+      ->/tmp/$PREFIX-esp-*, qemu-smoke.sh W=/tmp/$PREFIX-smoke-work, lockgen
+      ->/tmp/$PREFIX-lockgen*, F6/PF steps ->/tmp, evidence ->/tmp/$PREFIX-out.
+      ALLOWLIST == {docs/verified-architecture-phase2-v3/provisioning/p3/
+      rehearsal/build-output/, .../disks/} exactly.
+    env2 job (all lanes): ZERO in-checkout writes (env2 app rebuild + ESP
+      reproduction + single-path reproduction all target /tmp) - empty allowlist.
+    certification-marker job: no actions/checkout step - excluded (no checkout
+      to immutabilize).
+    Secrets check: the allowed roots hold only public material (ESP images,
+      firmware/app binaries - K3 public); prep/ (throwaway PRIVATE keys) is NOT
+      allowed and must not survive (c).
+(e) scratch step "checkout-gate negative tests (D15-1)" runs the SHIPPED script
+    against a /tmp COPY repo: clean-with-roots pass; stray untracked file ->
+    E_CHECKOUT_MUTATED 97 naming the path; __pycache__ -> 97; tracked
+    modification -> 97; staged change -> 97; prep/ -> E_PREP_LEFT_BEHIND 98;
+    final clean pass. Same six cases + the zero-root env2 shape verified LOCALLY
+    pre-commit (case table in the #15-REV packet).
+S3 re-run on the reworked tree: preflight-check.py PASS rc=0 (verbatim JSON in
+    the packet).
