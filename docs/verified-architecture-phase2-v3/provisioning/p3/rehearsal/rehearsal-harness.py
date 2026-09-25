@@ -46,7 +46,7 @@ ALL_REJECT_STRINGS = [STR_UNSIGNED_REJECT, STR_SIGNED_REJECT, STR_DBX_REJECT, ST
 # peer run-36031372949 ruling (9): sha256 of the committed argv-freeze.json - the harness
 # refuses any other bytes, so a workdir copy cannot drift from the committed file.
 # preflight 6e3c pins this constant to the committed file (E_ARGV_FREEZE_PIN_DRIFT).
-ARGV_FREEZE_SHA256="ceeac181022d14868788b30cc41a0f3d3e1d991dfbef01e53c93946759156945"
+ARGV_FREEZE_SHA256="97b1401222a844b97bfc0bd9445ff5006fea3c3e1a4fb483f91918ebdb943daf"
 ADAPTER_STRINGS = [s.encode() for s in ("E_PROVIDER_NAMESPACE","E_PROVIDER_LINK_MISSING")]  # the signed adapter's own fail() reasons (cloud-boot-adapter.sh). OBSERVATIONAL ONLY: these strings are at-rest bytes inside the accepted signed UKI's uncompressed newc initrd, and the firmware loads the UKI image into guest RAM for hash verification even on REJECT paths, so their presence/absence in a post-run RAM dump is non-evidentiary. Execution provenance is the frozen runtime-formatted panic records (section 6 markers).
 
 # Frozen per-case VARS template binding (reviewer ruling): each case must draw its VARS from
@@ -398,21 +398,25 @@ if __name__=="__main__":
     # peer 2026-09-24 B3: the certification lane runs ONLY the frozen six-case set
     # (no criterion-C, no historical reject-control); anything else fails closed.
     if os.environ.get("CERTIFICATION_TARGET","")=="1":
-        _CERT_IDS=frozenset(("NON_CERTIFYING_REHEARSAL-R2-N1-unsigned",
+        # signed-slot head: the frozen certification set grows to SEVEN - the six negatives/
+        # release sibling plus the signed-slot positive P1 (debug firmware, slot ESP, sole db).
+        _CERT_IDS=frozenset(("NON_CERTIFYING_REHEARSAL-P1-signed-slot-positive",
+                             "NON_CERTIFYING_REHEARSAL-R2-N1-unsigned",
                              "NON_CERTIFYING_REHEARSAL-R3-N2-wrongsig",
                              "NON_CERTIFYING_REHEARSAL-R4-N3a-hostile-sole-db",
                              "NON_CERTIFYING_REHEARSAL-R5-N3b-hostile-widened-db",
                              "NON_CERTIFYING_REHEARSAL-R6-N3c-hostile-fresh-sole-db",
                              "NON_CERTIFYING_REHEARSAL-R7-release-sibling-behavior-only"))
         _sel=[c for c in cfg["cases"] if "certification" in c.get("lanes",[])]
-        if len(_sel)!=6 or frozenset(c["id"] for c in _sel)!=_CERT_IDS:
-            fail("E_CERT_CASE_SET","certification lane cases=%s != frozen six"%sorted(c.get("id","?") for c in _sel))
+        if len(_sel)!=7 or frozenset(c["id"] for c in _sel)!=_CERT_IDS:
+            fail("E_CERT_CASE_SET","certification lane cases=%s != frozen seven"%sorted(c.get("id","?") for c in _sel))
         cfg["cases"]=_sel
     else:
         # peer run-36024634796 ruling (a): lanes drive case selection in the
-        # non-certification lanes too. R7 is certification-only (its positive expectation
-        # on the historical ESP is stale, superseded by the #19' root cause - R3 section
-        # 26); the scratch/rehearsal lanes run exactly the cases whose lanes name them.
+        # non-certification lanes too; the scratch/rehearsal lanes run exactly the
+        # cases whose lanes name them. peer pre-push ruling on 63dc0ed9 (revision 1):
+        # P1 and R7 carry scratch+rehearsal lanes too, so a green non-certification
+        # run includes signed-file firmware evidence (R3 section 32).
         _lane={"NON_CERTIFYING_REHEARSAL":"rehearsal","NON_CERTIFYING_SCRATCH":"scratch"}.get(PREFIX)
         if _lane is None: fail("E_LANE_UNKNOWN","PREFIX="+repr(PREFIX))
         cfg["cases"]=[c for c in cfg["cases"] if _lane in c.get("lanes",[])]

@@ -98,17 +98,22 @@ elif sha(vars_p)!="5d2ac383371b408398accee7ec27c8c09ea5b74a0de0ceea6513388b15be5
     fail("E_VARS_PRISTINE_MISMATCH", sha(vars_p))
 
 # 4) evidence inputs, exact hashes
-# PRE-SIGNING STATE (peer 2026-09-24 B2): the certification-target signed-UKI slot
-# (evidence/successor-to-certify.efi) is ABSENT until the owner-signed production UKI
-# returns and enters as its own reviewed head/commit. The historical signed UKI
-# 13309697.. is pinned below ONLY as history: it is the R1 reject-control's input and
+# POST-SIGNING STATE (signed-slot head): the certification-target signed-UKI slot
+# (evidence/successor-to-certify.efi) is NOW COMMITTED - the exact owner-signed bytes
+# 0ea8dd7d.. / 21,156,176 B, entered through this reviewed head (never an artifact),
+# independently verified before commitment (delta vs unsigned 4cda9c3e.. = PE checksum +
+# one WIN_CERTIFICATE only; embedded DigestInfo == section-wise b2f655b0..; PKCS#7
+# authenticode VALID; signer cert byte-equal to c5-signing-cert.der 7cda4ddc..). It is
+# pinned in EXPECT below in EVERY lane. The historical signed UKI
+# 13309697.. stays pinned below ONLY as history: it is the R1 reject-control's input and
 # its gap-included signature is exactly why it can never be a certification target
 # (UKI-13309697-ROOT-CAUSE.md). The unsigned UKI and every criterion-C fixture are
-# IN-RUN products (runner-ephemeral keys; nothing signed is committed): the unsigned
-# builder output is gated in-run against 4cda9c3e.. (E_UNSIGNED_UKI_DRIFT) and the C
-# outputs are property-gated in-run - see the rehearsal/scratch c-sign steps.
+# IN-RUN products (runner-ephemeral keys; nothing signed is committed beyond the slot):
+# the unsigned builder output is gated in-run against 4cda9c3e.. (E_UNSIGNED_UKI_DRIFT)
+# and the C outputs are property-gated in-run - see the rehearsal/scratch c-sign steps.
 ev=os.path.join(here,"evidence")
-EXPECT={"c5-signing-cert.der":("7cda4ddc149849cc61191d4b5b3d218d14770c0401e9e66dd9617b82ba1ae441",1092)}
+EXPECT={"c5-signing-cert.der":("7cda4ddc149849cc61191d4b5b3d218d14770c0401e9e66dd9617b82ba1ae441",1092),
+        "successor-to-certify.efi":("0ea8dd7da95eece8fe8eefed9f3fb701b9cdfd09abe5cfdd5f1954dd0d2f6959",21156176)}
 HISTORY={"successor-signed.efi":("133096976ee70a8c272cbcc8c28d369bfc65d93d994cbff4174b947df00239d1",21166416)}
 for fn,(h,sz) in EXPECT.items():
     p=os.path.join(ev,fn)
@@ -118,13 +123,36 @@ for fn,(h,sz) in HISTORY.items():
     p=os.path.join(ev,fn)
     if not os.path.exists(p): fail("E_HISTORY_MISSING", fn); continue
     if os.path.getsize(p)!=sz or sha(p)!=h: fail("E_HISTORY_HASH_MISMATCH", fn)
-# certification-target signed-UKI slot: ABSENT in the pre-signing state, no fallback.
+# certification-target signed-UKI slot: COMMITTED post-signing (0ea8dd7d.., pinned in
+# EXPECT above); the CERT_TARGET gate below still fails closed if it ever vanishes.
 # The certification workflow sets CERTIFICATION_TARGET=1; every other lane runs the
-# ceremony with in-run throwaway signing and never touches this slot.
+# ceremony with in-run throwaway signing and never consumes this slot.
 SLOT=os.path.join(ev,"successor-to-certify.efi")
 CERT_TARGET=os.environ.get("CERTIFICATION_TARGET","")=="1"
 if CERT_TARGET and not os.path.exists(SLOT):
-    fail("E_SIGNED_UKI_ABSENT","evidence/successor-to-certify.efi slot absent (pre-signing state; owner-signed UKI enters later as its own reviewed head)")
+    fail("E_SIGNED_UKI_ABSENT","evidence/successor-to-certify.efi slot absent (post-signing state: the slot is committed and pinned in EXPECT; this fires only if the file vanished)")
+# signed-slot ruling: the certification unsigned-UKI builder step must EQUAL the scratch
+# lane's (lane-name prefix normalized): the slot's delta proof anchors to the in-run-built
+# unsigned bytes 4cda9c3e..; a drifted certification builder breaks that anchor.
+def _uki_build_step(_wf):
+    _ls=open(_wf,errors="replace").read().split("\n")
+    _st=[i for i,l in enumerate(_ls) if "unsigned UKI in-run build (reviewed gapless builder)" in l]
+    if len(_st)!=1: return None
+    _en=[i for i in range(_st[0]+1,len(_ls)) if _ls[i].startswith("      - name:")]
+    return _ls[_st[0]:(_en[0] if _en else len(_ls))]
+_WFDIR=os.path.join(here,"..","..","..","..","..",".github","workflows")
+_sb=_uki_build_step(os.path.join(_WFDIR,"NON_CERTIFYING_SCRATCH-workflow.yml"))
+_cb=_uki_build_step(os.path.join(_WFDIR,"OVMF_CI_SECURE_BOOT_UKI-CERTIFICATION-workflow.yml"))
+if _sb is None or _cb is None:
+    fail("E_CERT_BUILDER_STEP_DRIFT","unsigned-UKI builder step not found exactly once in scratch/certification workflow")
+elif [l.replace("NON_CERTIFYING_SCRATCH","<LANE>") for l in _sb]!=[l.replace("OVMF_CI_SECURE_BOOT_UKI","<LANE>") for l in _cb]:
+    fail("E_CERT_BUILDER_STEP_DRIFT","certification unsigned-UKI builder step != scratch builder step (lane-prefix normalized)")
+# signed-slot ruling: the retired tracked unsigned UKI stays REMOVED (or, if ever
+# restored, must equal the reviewed in-run builder output 4cda9c3e.. - never the
+# superseded ed5d9d72.. build).
+_stale=os.path.join(here,"..","..","successor-uki-candidate","successor-unsigned.efi")
+if os.path.exists(_stale) and sha(_stale)!="4cda9c3e285b5b639364234400bf0b121178f12447cc88d896cd2623e07d18e1":
+    fail("E_STALE_UNSIGNED_UKI","tracked successor-uki-candidate/successor-unsigned.efi sha256=%s (must be absent or == 4cda9c3e..)"%sha(_stale))
 
 # 4b) peer run-35963407323 ruling (2): the pinned accepted UKI's EDK2-style (section-wise)
 # Authenticode digest must EQUAL the messageDigest embedded in its own WIN_CERTIFICATE
@@ -212,7 +240,8 @@ LANES_ALL={"scratch","rehearsal","certification"}
 # peer 2026-09-24 B3: every case is lane-scoped. The four criterion-C cases and the R1
 # historical reject-control are scratch/rehearsal-only; the certification lane consumes
 # exactly the frozen six-case set below (no C, no historical control), enforced here.
-FROZEN_CERT_CASE_IDS=("NON_CERTIFYING_REHEARSAL-R2-N1-unsigned",
+FROZEN_CERT_CASE_IDS=("NON_CERTIFYING_REHEARSAL-P1-signed-slot-positive",
+                            "NON_CERTIFYING_REHEARSAL-R2-N1-unsigned",
                       "NON_CERTIFYING_REHEARSAL-R3-N2-wrongsig",
                       "NON_CERTIFYING_REHEARSAL-R4-N3a-hostile-sole-db",
                       "NON_CERTIFYING_REHEARSAL-R5-N3b-hostile-widened-db",
@@ -248,12 +277,31 @@ if CERT_TARGET:
                     and e.get("exit_97") is False and e.get("no_reject_strings") is True):
                 continue
             if c.get("esp")!=_SLOT_ESP: continue
+            # signed-slot ruling (g): "the positive" is the DEBUG-firmware case (boot
+            # target provable there via the firmware log); the retargeted R7 release
+            # sibling shares the slot ESP + sole db + positive expects but MUST NOT
+            # count as a second positive, so the predicate pins debug firmware.
+            if c.get("firmware")!="build-output/ovmf-debug/OVMF_CODE.fd": continue
             _nm=[nm for nm in _enr if ("/"+nm+"/") in c.get("vars_template","")]
             if len(_nm)!=1: continue
             if _enr[_nm[0]].get("db_der_sha256")!=[_OWNER_DER]: continue
             _pos.append(c["id"])
         if len(_pos)!=1:
-            fail("E_CERT_POSITIVE_MISSING","signed slot present but %d cases satisfy the full positive predicate (need exactly 1: esp==%s, sole-db enrollment trust DER==[7cda4ddc..] per enrollment record, kernel_exec/exit_98/no_reject_strings): %s"%(len(_pos),_SLOT_ESP,repr(_pos)))
+            fail("E_CERT_POSITIVE_MISSING","signed slot present but %d cases satisfy the full positive predicate (need exactly 1: esp==%s, debug firmware, sole-db enrollment trust DER==[7cda4ddc..] per enrollment record, kernel_exec/exit_98/no_reject_strings): %s"%(len(_pos),_SLOT_ESP,repr(_pos)))
+        # peer pre-push ruling on 63dc0ed9 (revisions 1/5): the signed-file cases P1 and
+        # R7 must run in ALL THREE lanes - a green scratch/rehearsal run with zero
+        # signed-file firmware evidence is the misleading partial PASS the owner forbade.
+        _SIGNED_CASE_LANES={"NON_CERTIFYING_REHEARSAL-P1-signed-slot-positive",
+                            "NON_CERTIFYING_REHEARSAL-R7-release-sibling-behavior-only"}
+        _found=set()
+        for c in cfg.get("cases",[]):
+            if c.get("id") not in _SIGNED_CASE_LANES: continue
+            _found.add(c["id"])
+            _cl=set(c.get("lanes",[]))
+            if _cl!={"scratch","rehearsal","certification"}:
+                fail("E_SIGNED_CASE_LANES",c["id"]+" lanes="+repr(sorted(_cl))+" != ['certification', 'rehearsal', 'scratch'] (signed-file cases must run in all three lanes)")
+        if _found!=_SIGNED_CASE_LANES:
+            fail("E_SIGNED_CASE_LANES","signed-file cases missing from config: "+repr(sorted(_SIGNED_CASE_LANES-_found)))
     for pth_key in ("vars_template","esp","firmware"):
         p=c.get(pth_key,"")
         # build-output/ and out/ are generated during the ceremony by hash-pinned producers;
@@ -390,14 +438,17 @@ CASE_ARGV_PINS=(
     ("NON_CERTIFYING_REHEARSAL-R4-N3a-hostile-sole-db", "daa8eee9131d7d2cc5ad48ceb8e1f6b164327dbf489412d8761aa83289c04215"),
     ("NON_CERTIFYING_REHEARSAL-R5-N3b-hostile-widened-db", "4a780d858f457e078c4a982d007cbfafd9f5f66e797c83b00ff523456c0df156"),
     ("NON_CERTIFYING_REHEARSAL-R6-N3c-hostile-fresh-sole-db", "6f2fc5a541aebbd23c4dc875d405519a2d834ea3b8376d71c6a3e9a8313bac10"),
-    ("NON_CERTIFYING_REHEARSAL-R7-release-sibling-behavior-only", "2d450e95e778d9f1d1c9d165993c31023fb00c9b12c585bd068be89749774b05"),
+    ("NON_CERTIFYING_REHEARSAL-R7-release-sibling-behavior-only", "bffee5267e621f7eece1dbecd4957b313b2ab4ec43c35155acdb20d25e5f3535"),
+    ("NON_CERTIFYING_REHEARSAL-P1-signed-slot-positive", "ee0fdec15dedfa889572dded60c97405d4733004071b81c25c9d46f2f76f2ce1"),
     # peer run-36042868066 ruling (17)+(18): the four C pins changed EXACTLY ONCE - the
-    # enumeration-leftover sockets (q0/q6) became the stable full-config indexes q7-q10;
-    # the R1-R7 pins above are byte-identical, proven against this independent table.
-    ("NON_CERTIFYING_REHEARSAL-C-ossl-throwaway-debug", "28336d0b080c9425d41f17be7bef464d5a1ec396229061a32e1711f4f9d9608c"),
-    ("NON_CERTIFYING_REHEARSAL-C-ossl-throwaway-release", "55eab601878f4eb2d036a5ab87d5c382df5168bd5ba13fc8ad886bb8f428621c"),
-    ("NON_CERTIFYING_REHEARSAL-C-sbsign-throwaway-debug", "d26b5e269982039d569f0099964a8b1bb79b9ed3770b44083ff3660484c1ba90"),
-    ("NON_CERTIFYING_REHEARSAL-C-sbsign-throwaway-release", "a42e506e652cf34d0d4d35b9c2c3d6a7e3a95650400172cb604e1a96dc0d6bd2"),
+    # enumeration-leftover sockets (q0/q6) became the stable full-config indexes q7-q10.
+    # signed-slot head: R7's pin changed exactly once (esp retargeted to the slot ESP
+    # c5-successor-to-certify-esp.raw), P1-signed-slot-positive added at full-config index 7,
+    # the four C pins changed exactly once more (indexes shifted 7-10 -> 8-11); R1-R6 byte-identical.
+    ("NON_CERTIFYING_REHEARSAL-C-ossl-throwaway-debug", "8194c4ca2490a20433857202e5ddc7e953adbdf7598ec8a9bf93846c7c7e491a"),
+    ("NON_CERTIFYING_REHEARSAL-C-ossl-throwaway-release", "90f6549d73ab210245f5bee2e9951c2190cd9fff9d022dba6d3a7f69d8b32305"),
+    ("NON_CERTIFYING_REHEARSAL-C-sbsign-throwaway-debug", "ad86fe1fe2851229ee29f58dec5fb3a7838eb52187be7dbc2c512a2f9fb05a9b"),
+    ("NON_CERTIFYING_REHEARSAL-C-sbsign-throwaway-release", "9e85e49245b43a58a154e2f5104f786f0829a3964e90b995751ad05e0d1dffef"),
 )
 if len(_fz2["cases"])!=len(CASE_ARGV_PINS):
     fail("E_CASE_ARGV_PIN","case count drifted: %d != %d"%(len(_fz2["cases"]),len(CASE_ARGV_PINS)))
@@ -489,8 +540,12 @@ import subprocess as _sp
 # rehearsal 79->83 (C1'''' run-35999960747 D1, deliberate): four C1' literals missed by the
 # 78->79 move - confinement-tests step name, unsigned-build step name, fixture-generation
 # step name, c-fixture-generation/v1 schema literal. Per-occurrence justification in R3 sec 18.
+# rehearsal 83->84 (signed-slot head, deliberate): the signed-slot committed-bytes in-run
+# gates step name carries the lane prefix exactly once.
+# rehearsal 84->85 (peer pre-push ruling on 63dc0ed9 revision 2, deliberate): the env2
+# slot-ESP evidence filename carries the lane prefix exactly once.
 for _wf,_want in (("../../../../../.github/workflows/OVMF_CI_SECURE_BOOT_UKI-CERTIFICATION-workflow.yml",44),
-                  ("../../../../../.github/workflows/NON_CERTIFYING_REHEARSAL-workflow.yml",83)):
+                  ("../../../../../.github/workflows/NON_CERTIFYING_REHEARSAL-workflow.yml",85)):
     _n=len(_sp.run(["grep","-o","NON_CERTIFYING_REHEARSAL",os.path.join(here,_wf)],
                    capture_output=True,text=True,check=True).stdout.splitlines())
     if _n!=_want:

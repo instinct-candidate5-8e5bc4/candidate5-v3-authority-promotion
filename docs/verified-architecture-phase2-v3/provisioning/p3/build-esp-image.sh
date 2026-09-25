@@ -1,15 +1,27 @@
 #!/bin/bash
 # build-esp-image.sh - deterministic construction of the ESP boot disk image for P3.
 # Offline, no mounting, no root. Exactly one boot path: /EFI/BOOT/BOOTX64.EFI = signed UKI.
-# usage: build-esp-image.sh <signed_uki.efi> <fresh_work_dir>
+# usage: build-esp-image.sh <signed_uki.efi> <fresh_work_dir> <uki_sha256> <uki_bytes> <out_name>
+# The signed-slot head parameterizes the pinned UKI identity + output name so the SAME reviewed
+# builder constructs both the historical ESP (13309697.. -> c5-root-admitter-uki-v3-esp.raw)
+# and the signed-slot ESP (0ea8dd7d.. -> c5-successor-to-certify-esp.raw); both callers pass the
+# pin explicitly and out_name is allowlisted fail-closed.
 set -eEuo pipefail
 # peer run-11: every otherwise-bare bash failure is NAMED (script/line/rc/command), exit 97.
 trap '_rc=$?; echo "E_BASH_ERRTRAP build-esp-image.sh line $LINENO rc=$_rc cmd: $BASH_COMMAND" >&2; exit 97' ERR
 export LC_ALL=C TZ=UTC
 umask 022
 readonly EPOCH=1789923381
-readonly UKI_SHA256=133096976ee70a8c272cbcc8c28d369bfc65d93d994cbff4174b947df00239d1
-readonly UKI_BYTES=21166416
+UKI_SHA256=${3:?usage: build-esp-image.sh <signed_uki.efi> <fresh_work_dir> <uki_sha256> <uki_bytes> <out_name>}
+UKI_BYTES=${4:?}
+OUT_NAME=${5:?}
+case "$OUT_NAME" in
+  c5-root-admitter-uki-v3-esp.raw|c5-successor-to-certify-esp.raw) ;;
+  *) echo "E_ESP_NAME $OUT_NAME" >&2; exit 1;;
+esac
+[[ "$UKI_SHA256" =~ ^[0-9a-f]{64}$ ]] || { echo "E_UKI_PIN_FORMAT $UKI_SHA256" >&2; exit 1; }
+[[ "$UKI_BYTES" =~ ^[0-9]+$ ]] || { echo "E_UKI_BYTES_FORMAT $UKI_BYTES" >&2; exit 1; }
+readonly UKI_SHA256 UKI_BYTES OUT_NAME
 readonly IMG_BYTES=10737418240            # 10 GiB sparse RAW
 readonly DISK_GUID=a42ac99f-298e-71d7-54e9-69cea084f6d6   # sha256("candidate5-p3-esp:disk")[0:16]
 readonly PART_GUID=a1eee143-302e-bfce-2da6-410baab6c2ea   # sha256("candidate5-p3-esp:partition")[0:16]
@@ -38,7 +50,7 @@ sz=$(stat -c %s "$UKI"); hz=$(sha256sum "$UKI" | cut -d' ' -f1)
 [ "$sz" = "$UKI_BYTES" ] || fail "E_UKI_SIZE $sz"
 [ "$hz" = "$UKI_SHA256" ] || fail "E_UKI_HASH $hz"
 echo "uki $sz $hz"
-IMG="$WORK/c5-root-admitter-uki-v3-esp.raw"
+IMG="$WORK/$OUT_NAME"
 truncate -s "$IMG_BYTES" "$IMG"
 sgdisk -o -U "$DISK_GUID" -n 1:2048:+131072 -t 1:EF00 -u 1:"$PART_GUID" -c 1:"EFI System" "$IMG" >/dev/null
 mkfs.vfat -F 32 -s 1 -S 512 -f 2 -R 32 -i "$VOLUME_ID" -n C5ESP --offset 2048 "$IMG" 65536 >/dev/null

@@ -163,16 +163,25 @@ findmnt -T /dev/kvm -o TARGET,SOURCE,FSTYPE,OPTIONS || true
 W="/tmp/$PREFIX-smoke-work"
 rm -rf "$W"; mkdir -p "$W/build-output/ovmf-debug" "$W/build-output/esp"
 # the frozen argv carries RELATIVE paths (build-output/ovmf-debug/OVMF_CODE.fd,
-# build-output/esp/c5-root-admitter-uki-v3-esp.raw) that the ceremony resolves against the
+# build-output/esp/<case ESP>) that the ceremony resolves against the
 # repo tree after its pin-verified copy; at this earlier step the same bytes live only in
 # the dual-build product dirs. Resolve them to exactly those bytes: hash-verify each source
 # against the committed pins (exit 97 on any mismatch), then link it into the work root.
 CODE_SHA=$(python3 -c "import json;print(json.load(open('$CFG'))['firmware_debug_sha256'])")
-ESP_SHA=$(python3 -c "import json;print(json.load(open('$CFG'))['esp_sha256'])")
+# signed-slot head (peer ruling a): the smoke's case is no longer always index 0 - the
+# certification lane smokes the signed-slot positive. Derive the ESP path + its committed
+# pin from the case itself (fail-closed on any unknown ESP name), never a hardcoded one.
+ESP_REL=$(python3 -c "import json;print(json.load(open('$CFG'))['cases'][$IDX]['esp'])")
+ESP_NAME=$(basename "$ESP_REL")
+case "$ESP_NAME" in
+  c5-root-admitter-uki-v3-esp.raw)   ESP_SHA=$(python3 -c "import json;print(json.load(open('$CFG'))['esp_sha256'])");;
+  c5-successor-to-certify-esp.raw)   ESP_SHA=$(python3 -c "import json;print(json.load(open('$CFG'))['esp_slot_sha256'])");;
+  *) echo "E_QEMU_SMOKE unknown case ESP $ESP_REL"; exit 97;;
+esac
 [ "$(sha256sum "/tmp/$PREFIX-ovmf-a/OVMF_CODE.fd" | cut -d' ' -f1)" = "$CODE_SHA" ] || { echo "E_QEMU_SMOKE build product OVMF_CODE.fd sha mismatch"; exit 97; }
-[ "$(sha256sum "/tmp/$PREFIX-esp-a/c5-root-admitter-uki-v3-esp.raw" | cut -d' ' -f1)" = "$ESP_SHA" ] || { echo "E_QEMU_SMOKE build product esp sha mismatch"; exit 97; }
+[ "$(sha256sum "/tmp/$PREFIX-esp-a/$ESP_NAME" | cut -d' ' -f1)" = "$ESP_SHA" ] || { echo "E_QEMU_SMOKE build product esp sha mismatch"; exit 97; }
 ln -s "/tmp/$PREFIX-ovmf-a/OVMF_CODE.fd" "$W/build-output/ovmf-debug/OVMF_CODE.fd"
-ln -s "/tmp/$PREFIX-esp-a/c5-root-admitter-uki-v3-esp.raw" "$W/build-output/esp/c5-root-admitter-uki-v3-esp.raw"
+ln -s "/tmp/$PREFIX-esp-a/$ESP_NAME" "$W/$ESP_REL"
 # peer-ordered #9 fix (same rule as the ceremony's make-shims): make-disks output is
 # evidence, never suppressed - captured to a named log in the work root and echoed into the
 # smoke log (the durable out-dir evidence log the workflow preserves); nonzero gets a named

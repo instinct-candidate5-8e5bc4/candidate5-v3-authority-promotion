@@ -509,7 +509,7 @@
     "-m",
     "4096",
     "-drive",
-    "file=build-output/esp/c5-root-admitter-uki-v3-esp.raw,format=raw,if=none,id=esp,readonly=on",
+    "file=build-output/esp/c5-successor-to-certify-esp.raw,format=raw,if=none,id=esp,readonly=on",
     "-device",
     "virtio-blk-pci,drive=esp,serial=c5-esp,bootindex=0",
     "-drive",
@@ -542,9 +542,75 @@
     "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-cases/NON_CERTIFYING_REHEARSAL-R7-release-sibling-behavior-only/qemu.pid",
     "-daemonize"
    ],
-   "argv_sha256": "2d450e95e778d9f1d1c9d165993c31023fb00c9b12c585bd068be89749774b05",
+   "argv_sha256": "bffee5267e621f7eece1dbecd4957b313b2ab4ec43c35155acdb20d25e5f3535",
    "id": "NON_CERTIFYING_REHEARSAL-R7-release-sibling-behavior-only",
    "qmp_sock": "/tmp/NON_CERTIFYING_REHEARSAL-q6.sock"
+  },
+  {
+   "argv": [
+    "/tmp/NON_CERTIFYING_REHEARSAL-stage/shims/qemu-system-x86_64",
+    "-machine",
+    "q35,smm=on",
+    "-accel",
+    "kvm",
+    "-cpu",
+    "Skylake-Server",
+    "-drive",
+    "if=pflash,format=raw,unit=0,readonly=on,file=build-output/ovmf-debug/OVMF_CODE.fd",
+    "-drive",
+    "if=pflash,format=raw,unit=1,file=/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-cases/NON_CERTIFYING_REHEARSAL-P1-signed-slot-positive/vars.fd",
+    "-global",
+    "driver=cfi.pflash01,property=secure,value=on",
+    "-debugcon",
+    "file:/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-cases/NON_CERTIFYING_REHEARSAL-P1-signed-slot-positive/ovmf-debug.log",
+    "-global",
+    "isa-debugcon.iobase=0x402",
+    "-display",
+    "none",
+    "-serial",
+    "none",
+    "-nic",
+    "none",
+    "-no-reboot",
+    "-m",
+    "4096",
+    "-drive",
+    "file=build-output/esp/c5-successor-to-certify-esp.raw,format=raw,if=none,id=esp,readonly=on",
+    "-device",
+    "virtio-blk-pci,drive=esp,serial=c5-esp,bootindex=0",
+    "-drive",
+    "file=disks/disk0.raw,format=raw,if=none,id=d0,readonly=on",
+    "-device",
+    "virtio-blk-pci,drive=d0,serial=v3-rootfs-data",
+    "-drive",
+    "file=disks/disk1.raw,format=raw,if=none,id=d1,readonly=on",
+    "-device",
+    "virtio-blk-pci,drive=d1,serial=v3-rootfs-hash",
+    "-drive",
+    "file=disks/disk2.raw,format=raw,if=none,id=d2,readonly=on",
+    "-device",
+    "virtio-blk-pci,drive=d2,serial=v3-reviewed-root",
+    "-drive",
+    "file=disks/disk3.raw,format=raw,if=none,id=d3,readonly=on",
+    "-device",
+    "virtio-blk-pci,drive=d3,serial=v3-reviewed-input",
+    "-drive",
+    "file=disks/disk4.raw,format=raw,if=none,id=d4,readonly=on",
+    "-device",
+    "virtio-blk-pci,drive=d4,serial=v3-reviewed-output",
+    "-drive",
+    "file=disks/disk5.raw,format=raw,if=none,id=d5,readonly=on",
+    "-device",
+    "virtio-blk-pci,drive=d5,serial=v3-reviewed-evidence",
+    "-qmp",
+    "unix:/tmp/NON_CERTIFYING_REHEARSAL-q7.sock,server,nowait",
+    "-pidfile",
+    "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-cases/NON_CERTIFYING_REHEARSAL-P1-signed-slot-positive/qemu.pid",
+    "-daemonize"
+   ],
+   "argv_sha256": "ee0fdec15dedfa889572dded60c97405d4733004071b81c25c9d46f2f76f2ce1",
+   "id": "NON_CERTIFYING_REHEARSAL-P1-signed-slot-positive",
+   "qmp_sock": "/tmp/NON_CERTIFYING_REHEARSAL-q7.sock"
   },
   {
    "argv": [
@@ -603,14 +669,14 @@
     "-device",
     "virtio-blk-pci,drive=d5,serial=v3-reviewed-evidence",
     "-qmp",
-    "unix:/tmp/NON_CERTIFYING_REHEARSAL-q7.sock,server,nowait",
+    "unix:/tmp/NON_CERTIFYING_REHEARSAL-q8.sock,server,nowait",
     "-pidfile",
     "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-cases/NON_CERTIFYING_REHEARSAL-C-ossl-throwaway-debug/qemu.pid",
     "-daemonize"
    ],
-   "argv_sha256": "28336d0b080c9425d41f17be7bef464d5a1ec396229061a32e1711f4f9d9608c",
+   "argv_sha256": "8194c4ca2490a20433857202e5ddc7e953adbdf7598ec8a9bf93846c7c7e491a",
    "id": "NON_CERTIFYING_REHEARSAL-C-ossl-throwaway-debug",
-   "qmp_sock": "/tmp/NON_CERTIFYING_REHEARSAL-q7.sock"
+   "qmp_sock": "/tmp/NON_CERTIFYING_REHEARSAL-q8.sock"
   },
   {
    "argv": [
@@ -669,14 +735,14 @@
     "-device",
     "virtio-blk-pci,drive=d5,serial=v3-reviewed-evidence",
     "-qmp",
-    "unix:/tmp/NON_CERTIFYING_REHEARSAL-q8.sock,server,nowait",
+    "unix:/tmp/NON_CERTIFYING_REHEARSAL-q9.sock,server,nowait",
     "-pidfile",
     "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-cases/NON_CERTIFYING_REHEARSAL-C-ossl-throwaway-release/qemu.pid",
     "-daemonize"
    ],
-   "argv_sha256": "55eab601878f4eb2d036a5ab87d5c382df5168bd5ba13fc8ad886bb8f428621c",
+   "argv_sha256": "90f6549d73ab210245f5bee2e9951c2190cd9fff9d022dba6d3a7f69d8b32305",
    "id": "NON_CERTIFYING_REHEARSAL-C-ossl-throwaway-release",
-   "qmp_sock": "/tmp/NON_CERTIFYING_REHEARSAL-q8.sock"
+   "qmp_sock": "/tmp/NON_CERTIFYING_REHEARSAL-q9.sock"
   },
   {
    "argv": [
@@ -735,14 +801,14 @@
     "-device",
     "virtio-blk-pci,drive=d5,serial=v3-reviewed-evidence",
     "-qmp",
-    "unix:/tmp/NON_CERTIFYING_REHEARSAL-q9.sock,server,nowait",
+    "unix:/tmp/NON_CERTIFYING_REHEARSAL-q10.sock,server,nowait",
     "-pidfile",
     "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-cases/NON_CERTIFYING_REHEARSAL-C-sbsign-throwaway-debug/qemu.pid",
     "-daemonize"
    ],
-   "argv_sha256": "d26b5e269982039d569f0099964a8b1bb79b9ed3770b44083ff3660484c1ba90",
+   "argv_sha256": "ad86fe1fe2851229ee29f58dec5fb3a7838eb52187be7dbc2c512a2f9fb05a9b",
    "id": "NON_CERTIFYING_REHEARSAL-C-sbsign-throwaway-debug",
-   "qmp_sock": "/tmp/NON_CERTIFYING_REHEARSAL-q9.sock"
+   "qmp_sock": "/tmp/NON_CERTIFYING_REHEARSAL-q10.sock"
   },
   {
    "argv": [
@@ -801,20 +867,20 @@
     "-device",
     "virtio-blk-pci,drive=d5,serial=v3-reviewed-evidence",
     "-qmp",
-    "unix:/tmp/NON_CERTIFYING_REHEARSAL-q10.sock,server,nowait",
+    "unix:/tmp/NON_CERTIFYING_REHEARSAL-q11.sock,server,nowait",
     "-pidfile",
     "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-cases/NON_CERTIFYING_REHEARSAL-C-sbsign-throwaway-release/qemu.pid",
     "-daemonize"
    ],
-   "argv_sha256": "a42e506e652cf34d0d4d35b9c2c3d6a7e3a95650400172cb604e1a96dc0d6bd2",
+   "argv_sha256": "9e85e49245b43a58a154e2f5104f786f0829a3964e90b995751ad05e0d1dffef",
    "id": "NON_CERTIFYING_REHEARSAL-C-sbsign-throwaway-release",
-   "qmp_sock": "/tmp/NON_CERTIFYING_REHEARSAL-q10.sock"
+   "qmp_sock": "/tmp/NON_CERTIFYING_REHEARSAL-q11.sock"
   }
  ],
  "cpu_model": "Skylake-Server",
  "enroll_qmp_sock_basename": "qmp.sock",
  "memory_mb": 4096,
- "note": "requirement 5c + batch1r3 D1/G1: exact QEMU argv per case (harness-generated, socket = short per-case /tmp/NON_CERTIFYING_REHEARSAL-q<idx>.sock asserted <=107 bytes), plus the frozen shared bwrap namespace argv (bwrap-argv.sh is the ONLY source; $BWRAP/$REALWORK/$@ are the helper's positional parameters). argv_sha256 = sha256 of NUL-joined argv, identical to the harness per-case recording. The qemu shim adds staged -L/QEMU_MODULE_DIR INSIDE the wrapper (A3; sudo resets the environment), so they are shim-fixed, not argv-level. peer run-36042868066 ruling (17)+(18): the per-case socket index is the case's STABLE index in the FULL committed config order (R1=0..C-sbsign-release=10), never its lane-selection position, so this ONE contract is lane-independent (scratch 10 cases, rehearsal 11, certification 6); every entry carries a non-null qmp_sock equal to its argv's -qmp element; R1-R7 pins are byte-identical to the previous freeze, only the four C entries changed (q0/q6 enumeration leftovers -> q7-q10).",
+ "note": "requirement 5c + batch1r3 D1/G1: exact QEMU argv per case (harness-generated, socket = short per-case /tmp/NON_CERTIFYING_REHEARSAL-q<idx>.sock asserted <=107 bytes), plus the frozen shared bwrap namespace argv (bwrap-argv.sh is the ONLY source; $BWRAP/$REALWORK/$@ are the helper's positional parameters). argv_sha256 = sha256 of NUL-joined argv, identical to the harness per-case recording. The qemu shim adds staged -L/QEMU_MODULE_DIR INSIDE the wrapper (A3; sudo resets the environment), so they are shim-fixed, not argv-level. peer run-36042868066 ruling (17)+(18): the per-case socket index is the case's STABLE index in the FULL committed config order (R1=0..R7=6, P1-signed-slot-positive=7, C-ossl-debug=8..C-sbsign-release=11), never its lane-selection position, so this ONE contract is lane-independent (scratch 10 cases, rehearsal 10, certification 7); every entry carries a non-null qmp_sock equal to its argv's -qmp element. signed-slot head regen: R1-R6 pins byte-identical to the previous freeze; R7 changed (esp retargeted to the signed-slot ESP c5-successor-to-certify-esp.raw); the four C entries changed (full-config indexes shifted by the P1 insertion at 7); P1 is the new signed-slot positive.",
  "qemu": "/tmp/NON_CERTIFYING_REHEARSAL-stage/shims/qemu-system-x86_64",
  "qmp_sock_max_bytes": 107,
  "qmp_sock_template": "/tmp/NON_CERTIFYING_REHEARSAL-q<case-index>.sock",

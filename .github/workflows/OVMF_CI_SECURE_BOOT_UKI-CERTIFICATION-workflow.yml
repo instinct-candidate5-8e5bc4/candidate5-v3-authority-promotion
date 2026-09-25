@@ -1,6 +1,6 @@
 # OVMF_CI_SECURE_BOOT_UKI — Option A CI certification ceremony workflow.
 # Scope: QEMU/KVM + reproducible DEBUG OVMF Secure Boot certification of the EXACT accepted
-# signed UKI enters via evidence/successor-to-certify.efi (peer 2026-09-24 B2: slot absent pre-signing; this workflow dies E_SIGNED_UKI_ABSENT while absent).
+# signed UKI enters via evidence/successor-to-certify.efi (signed-slot head: the owner-signed bytes 0ea8dd7d.. / 21,156,176 B are COMMITTED at the slot, pinned by preflight EXPECT in every lane; this workflow still dies E_SIGNED_UKI_ABSENT if the file ever vanishes).
 # Expected pass = firmware Secure Boot accept + kernel exec + signed-init exit-98
 # (E_PROVIDER_NAMESPACE / E_PROVIDER_LINK_MISSING on non-Google hardware). This is NOT a
 # full runtime PASS, NOT a dm-verity runtime PASS, NOT a provisioning PASS, NOT a Google
@@ -87,7 +87,7 @@ jobs:
           # D2 gate (reviewer ruling): every relative file/script argument used by later
           # steps must exist in the committed tree. Fixed list, fail-closed exit 88.
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
-          [ -e evidence/successor-to-certify.efi ] || { echo "E_SIGNED_UKI_ABSENT evidence/successor-to-certify.efi (pre-signing state: owner-signed UKI enters as its own reviewed head; no fallback)"; exit 90; }
+          [ -e evidence/successor-to-certify.efi ] || { echo "E_SIGNED_UKI_ABSENT evidence/successor-to-certify.efi (post-signing state: the owner-signed UKI is committed and hash-pinned; this fires only if the file vanishes - no fallback)"; exit 90; }
           for f in             platform.lock.json             config.json             stage-platform.sh             make-shims.sh             preflight-check.py             build-ovmf-debug.sh             scan-pe-pdb-paths.py             build-enroll-app.sh             bwrap-argv.sh             enroll-predicate-check.py             rehearsal-enroll.sh             ../build-esp-image.sh             run-ceremony.sh             qemu-smoke.sh; do
             [ -e "$f" ] || { echo "E_WORKFLOW_ARG_MISSING $f"; exit 88; }
           done
@@ -250,14 +250,14 @@ jobs:
           sha256sum /tmp/$PREFIX-app-a/enroll-app.efi >> /tmp/$PREFIX-fw-hashes.txt
           # batch1r3 C1: the ESP step runs with the staged-loader shims on PATH
           export PATH="/tmp/$PREFIX-stage/shims:$PATH"
-          sudo unshare -n env PATH="$PATH" ../build-esp-image.sh evidence/successor-to-certify.efi /tmp/$PREFIX-esp-a
-          sudo unshare -n env PATH="$PATH" ../build-esp-image.sh evidence/successor-to-certify.efi /tmp/$PREFIX-esp-b
-          [ "$(sha256sum /tmp/$PREFIX-esp-a/c5-root-admitter-uki-v3-esp.raw | cut -d' ' -f1)" = \
-            "2bfa621238890890765c9636f99dabfb46233bfa626afb580ce33e65858019c9" ]
-          cmp /tmp/$PREFIX-esp-a/c5-root-admitter-uki-v3-esp.raw /tmp/$PREFIX-esp-b/c5-root-admitter-uki-v3-esp.raw
+          sudo unshare -n env PATH="$PATH" ../build-esp-image.sh evidence/successor-to-certify.efi /tmp/$PREFIX-esp-a 0ea8dd7da95eece8fe8eefed9f3fb701b9cdfd09abe5cfdd5f1954dd0d2f6959 21156176 c5-successor-to-certify-esp.raw
+          sudo unshare -n env PATH="$PATH" ../build-esp-image.sh evidence/successor-to-certify.efi /tmp/$PREFIX-esp-b 0ea8dd7da95eece8fe8eefed9f3fb701b9cdfd09abe5cfdd5f1954dd0d2f6959 21156176 c5-successor-to-certify-esp.raw
+          [ "$(sha256sum /tmp/$PREFIX-esp-a/c5-successor-to-certify-esp.raw | cut -d' ' -f1)" = \
+            "6ff0d9ef89668ef79e60eba41eb70704664008697637797b384e6e67075d2f77" ]
+          cmp /tmp/$PREFIX-esp-a/c5-successor-to-certify-esp.raw /tmp/$PREFIX-esp-b/c5-successor-to-certify-esp.raw
           # peer gap close: the ESP is a frozen output; record it in fw-hashes for the
           # env2 cross-runner comparison, and log the artifact digest tied to this run.
-          sha256sum /tmp/$PREFIX-esp-a/c5-root-admitter-uki-v3-esp.raw >> /tmp/$PREFIX-fw-hashes.txt
+          sha256sum /tmp/$PREFIX-esp-a/c5-successor-to-certify-esp.raw >> /tmp/$PREFIX-fw-hashes.txt
           echo "ARTIFACT-DIGEST path=/tmp/$PREFIX-fw-hashes.txt sha256=$(sha256sum /tmp/$PREFIX-fw-hashes.txt | cut -d' ' -f1) run_id=$GITHUB_RUN_ID run_attempt=$GITHUB_RUN_ATTEMPT run_number=$GITHUB_RUN_NUMBER workflow=$GITHUB_WORKFLOW commit=$GITHUB_SHA ref=$GITHUB_REF"
       - name: OVMF_CI_SECURE_BOOT_UKI unsigned UKI in-run build (reviewed gapless builder)
         if: ${{ !cancelled() }}
@@ -284,6 +284,51 @@ jobs:
           UKIB
           mkdir -p "/tmp/$PREFIX-inrun/uki"
           cp "/tmp/$PREFIX-uki/successor-unsigned.efi" "/tmp/$PREFIX-inrun/uki/successor-unsigned.efi"
+      - name: OVMF_CI_SECURE_BOOT_UKI signed-slot committed-bytes in-run gates (delta/signed/authenticode/signer-cmp)
+        run: |
+          set -eEuo pipefail
+          trap '_rc=$?; echo "E_BASH_ERRTRAP slot-gates line $LINENO rc=$_rc cmd: $BASH_COMMAND" >&2; exit 97' ERR
+          # signed-slot ruling: in-run gates rerun delta, signed, authenticode and
+          # cmp-to-7cda4ddc on the COMMITTED slot bytes (never an artifact, never re-signed).
+          cd docs/verified-architecture-phase2-v3/provisioning/p3
+          sudo unshare -n env PATH="$PATH" PREFIX="$PREFIX" PYTHONDONTWRITEBYTECODE=1 bash -se <<'SLOTGATES'
+          set -eEuo pipefail
+          trap '_rc=$?; echo "E_BASH_ERRTRAP slot-gates-inner line $LINENO rc=$_rc cmd: $BASH_COMMAND" >&2; exit 97' ERR
+          SLOT=rehearsal/evidence/successor-to-certify.efi
+          U=/tmp/$PREFIX-uki/successor-unsigned.efi
+          G=/tmp/$PREFIX-slot-gates; rm -rf "$G"; mkdir -p "$G"
+          SH=$(sha256sum "$SLOT" | cut -d' ' -f1)
+          [ "$SH" = "0ea8dd7da95eece8fe8eefed9f3fb701b9cdfd09abe5cfdd5f1954dd0d2f6959" ] || { echo "E_SLOT_COMMITTED_DRIFT $SH"; exit 91; }
+          [ -f "$U" ] || { echo "E_SLOT_UNSIGNED_MISSING $U"; exit 91; }
+          python3 verify-signed-delta.py "$U" "$SLOT" > "$G/delta.json" || { rc=$?; echo "E_SLOT_DELTA rc=$rc"; cat "$G/delta.json"; exit 91; }
+          cat "$G/delta.json"
+          python3 verify-uki-signed.py "$SLOT" > "$G/signed.json" || { rc=$?; echo "E_SLOT_SIGNED rc=$rc"; cat "$G/signed.json"; exit 91; }
+          cat "$G/signed.json"
+          python3 - "$SLOT" "$G/slot.pkcs7.der" <<'PYX'
+          import sys, struct
+          b = open(sys.argv[1],"rb").read()
+          e_lfanew = struct.unpack_from("<I", b, 0x3c)[0]
+          opt = e_lfanew + 4 + 20
+          magic = struct.unpack_from("<H", b, opt)[0]
+          dd = opt + (112 if magic == 0x20b else 96)
+          va, sz = struct.unpack_from("<II", b, dd + 4*8)
+          if va == 0 or sz < 8: print("E_SLOT_PKCS7_EXTRACT no certificate table"); sys.exit(91)
+          dwlen, wrev, wtype = struct.unpack_from("<IHH", b, va)
+          if wtype != 0x0002 or va + dwlen > len(b): print("E_SLOT_PKCS7_EXTRACT bad WIN_CERTIFICATE"); sys.exit(91)
+          der = b[va+8:va+dwlen]
+          if not der or der[0] != 0x30: print("E_SLOT_PKCS7_EXTRACT not a DER SEQUENCE"); sys.exit(91)
+          open(sys.argv[2],"wb").write(der)
+          print("pkcs7 extracted %d bytes sha256=%s" % (len(der), __import__("hashlib").sha256(der).hexdigest()))
+          PYX
+          [ -s "$G/slot.pkcs7.der" ] || { echo "E_SLOT_PKCS7_EXTRACT empty"; exit 91; }
+          python3 verify-uki-authenticode.py "$G/slot.pkcs7.der" > "$G/authenticode.json" || { rc=$?; echo "E_SLOT_AUTHENTICODE rc=$rc"; cat "$G/authenticode.json"; exit 91; }
+          cat "$G/authenticode.json"
+          openssl pkcs7 -inform DER -in "$G/slot.pkcs7.der" -print_certs -out "$G/signer.pem" 2>/dev/null
+          openssl x509 -in "$G/signer.pem" -outform DER -out "$G/signer.der" 2>/dev/null
+          [ -s "$G/signer.der" ] || { echo "E_SLOT_SIGNER_EXTRACT"; exit 91; }
+          cmp "$G/signer.der" rehearsal/evidence/c5-signing-cert.der || { echo "E_SLOT_SIGNER_CMP signer != committed c5-signing-cert.der (7cda4ddc..)"; exit 91; }
+          echo "signed-slot committed-bytes gates PASS: delta+signed+authenticode+signer-cmp (slot $SH, signer $(sha256sum "$G/signer.der" | cut -d' ' -f1))"
+          SLOTGATES
       - name: OVMF_CI_SECURE_BOOT_UKI fixture generation (in-run ephemeral keys, no c-sign)
         if: ${{ !cancelled() }}
         timeout-minutes: 20
@@ -574,7 +619,7 @@ jobs:
           [ "$A4" = "$B4" ] || { echo "E_SMOKE_PREP_DRIFT"; exit 97; }
           git ls-files -s -- qemu-smoke.sh bwrap-argv.sh
           git status --porcelain | grep . && { echo "E_SMOKE_PREP_TREE_DIRTY"; git status --porcelain; exit 97; } || echo "git status --porcelain: EMPTY (after repair)"
-          sudo env PREFIX="$PREFIX" ALLOWED_PREFIX="$ALLOWED_PREFIX" ./qemu-smoke.sh config.json argv-freeze.json 0 \
+          sudo env PREFIX="$PREFIX" ALLOWED_PREFIX="$ALLOWED_PREFIX" ./qemu-smoke.sh config.json argv-freeze.json 7 \
               > /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-qemu-smoke.log 2>&1 \
             || { echo "E_QEMU_SMOKE"; cat /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-qemu-smoke.log; exit 97; }
           # peer N8 (log-or-fail): the raw/executed equivalence proof must be IN the durable
@@ -757,7 +802,7 @@ jobs:
           # D2 gate (reviewer ruling): every relative file/script argument used by later
           # steps must exist in the committed tree. Fixed list, fail-closed exit 88.
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
-          [ -e evidence/successor-to-certify.efi ] || { echo "E_SIGNED_UKI_ABSENT evidence/successor-to-certify.efi (pre-signing state: owner-signed UKI enters as its own reviewed head; no fallback)"; exit 90; }
+          [ -e evidence/successor-to-certify.efi ] || { echo "E_SIGNED_UKI_ABSENT evidence/successor-to-certify.efi (post-signing state: the owner-signed UKI is committed and hash-pinned; this fires only if the file vanishes - no fallback)"; exit 90; }
           for f in             platform.lock.json             config.json             stage-platform.sh             make-shims.sh             preflight-check.py             build-ovmf-debug.sh             scan-pe-pdb-paths.py             build-enroll-app.sh             bwrap-argv.sh             enroll-predicate-check.py             rehearsal-enroll.sh             ../build-esp-image.sh             run-ceremony.sh; do
             [ -e "$f" ] || { echo "E_WORKFLOW_ARG_MISSING $f"; exit 88; }
           done
@@ -851,12 +896,12 @@ jobs:
           set -euo pipefail
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
           export PATH="/tmp/$PREFIX-stage-env2/shims:$PATH"
-          sudo unshare -n env PATH="$PATH" ../build-esp-image.sh evidence/successor-to-certify.efi /tmp/$PREFIX-esp-env2-a
-          sudo unshare -n env PATH="$PATH" ../build-esp-image.sh evidence/successor-to-certify.efi /tmp/$PREFIX-esp-env2-b
-          cmp /tmp/$PREFIX-esp-env2-a/c5-root-admitter-uki-v3-esp.raw /tmp/$PREFIX-esp-env2-b/c5-root-admitter-uki-v3-esp.raw
-          HE=$(sha256sum /tmp/$PREFIX-esp-env2-a/c5-root-admitter-uki-v3-esp.raw | cut -d' ' -f1)
-          [ "$HE" = "2bfa621238890890765c9636f99dabfb46233bfa626afb580ce33e65858019c9" ] || { echo "E_ESP_PIN_MISMATCH $HE"; exit 46; }
-          sha256sum /tmp/$PREFIX-esp-env2-a/c5-root-admitter-uki-v3-esp.raw > /tmp/$PREFIX-env2-evidence/NON_CERTIFYING_REHEARSAL-env2-esp-hash.txt
+          sudo unshare -n env PATH="$PATH" ../build-esp-image.sh evidence/successor-to-certify.efi /tmp/$PREFIX-esp-env2-a 0ea8dd7da95eece8fe8eefed9f3fb701b9cdfd09abe5cfdd5f1954dd0d2f6959 21156176 c5-successor-to-certify-esp.raw
+          sudo unshare -n env PATH="$PATH" ../build-esp-image.sh evidence/successor-to-certify.efi /tmp/$PREFIX-esp-env2-b 0ea8dd7da95eece8fe8eefed9f3fb701b9cdfd09abe5cfdd5f1954dd0d2f6959 21156176 c5-successor-to-certify-esp.raw
+          cmp /tmp/$PREFIX-esp-env2-a/c5-successor-to-certify-esp.raw /tmp/$PREFIX-esp-env2-b/c5-successor-to-certify-esp.raw
+          HE=$(sha256sum /tmp/$PREFIX-esp-env2-a/c5-successor-to-certify-esp.raw | cut -d' ' -f1)
+          [ "$HE" = "6ff0d9ef89668ef79e60eba41eb70704664008697637797b384e6e67075d2f77" ] || { echo "E_ESP_PIN_MISMATCH $HE"; exit 46; }
+          sha256sum /tmp/$PREFIX-esp-env2-a/c5-successor-to-certify-esp.raw > /tmp/$PREFIX-env2-evidence/NON_CERTIFYING_REHEARSAL-env2-esp-hash.txt
       - name: OVMF_CI_SECURE_BOOT_UKI env2 accepted-firmware pins + runner-1 hash echo
         run: |
           set -euo pipefail
@@ -891,8 +936,8 @@ jobs:
           A1=$(grep -- "-app-a/enroll-app.efi" /tmp/$PREFIX-fw1/$PREFIX-fw-hashes.txt | cut -d' ' -f1)
           A2=$(sha256sum /tmp/$PREFIX-app-env2-a/enroll-app.efi | cut -d' ' -f1)
           [ "$A1" = "$A2" ] || { echo "E_ENV2_APP_MISMATCH $A1 $A2"; exit 93; }
-          E1=$(grep -- "-esp-a/c5-root-admitter-uki-v3-esp.raw" /tmp/$PREFIX-fw1/$PREFIX-fw-hashes.txt | cut -d' ' -f1)
-          E2=$(sha256sum /tmp/$PREFIX-esp-env2-a/c5-root-admitter-uki-v3-esp.raw | cut -d' ' -f1)
+          E1=$(grep -- "-esp-a/c5-successor-to-certify-esp.raw" /tmp/$PREFIX-fw1/$PREFIX-fw-hashes.txt | cut -d' ' -f1)
+          E2=$(sha256sum /tmp/$PREFIX-esp-env2-a/c5-successor-to-certify-esp.raw | cut -d' ' -f1)
           [ "$E1" = "$E2" ] || { echo "E_ENV2_ESP_MISMATCH $E1 $E2"; exit 93; }
           echo "env2 reproduction byte-identical across runners at canonical /build (firmware + enroll app + ESP image)"
       - name: OVMF_CI_SECURE_BOOT_UKI env2 evidence manifest + digest (peer N9)

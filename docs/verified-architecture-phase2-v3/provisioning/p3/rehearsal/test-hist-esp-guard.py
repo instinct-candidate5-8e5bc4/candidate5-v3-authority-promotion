@@ -56,8 +56,20 @@ R7 = "NON_CERTIFYING_REHEARSAL-R7-release-sibling-behavior-only"
 planted = json.loads(json.dumps(REAL))
 for c in planted["cases"]:
     if c["id"] == R7:
+        # signed-slot head: R7's esp is now the SLOT ESP, so the planted regression
+        # must ALSO restore the historical ESP - the exact pre-head state the guard
+        # exists to keep out of the scratch/rehearsal lanes.
         c["lanes"] = ["scratch", "certification"]
-check("planted R7 in scratch lane fires", planted, "E_HIST_ESP_BOOT_EXPECT", R7)
+        c["esp"] = "build-output/esp/c5-root-admitter-uki-v3-esp.raw"
+check("planted R7 in scratch lane (historical ESP) fires", planted, "E_HIST_ESP_BOOT_EXPECT", R7)
+# signed-slot head: the retargeted R7 (slot ESP) planted into the scratch lane does NOT
+# trip this guard (it targets no historical ESP); the lane filter + ceremony source
+# binding own that rejection - this guard's scope stays the historical ESP.
+planted2 = json.loads(json.dumps(REAL))
+for c in planted2["cases"]:
+    if c["id"] == R7:
+        c["lanes"] = ["scratch", "certification"]
+check("planted slot-ESP R7 in scratch lane passes this guard", planted2, None)
 
 planted2 = json.loads(json.dumps(REAL))
 for c in planted2["cases"]:

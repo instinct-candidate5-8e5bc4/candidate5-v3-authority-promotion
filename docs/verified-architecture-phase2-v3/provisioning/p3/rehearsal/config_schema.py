@@ -15,7 +15,7 @@ class ConfigSchemaError(Exception):
 
 
 TOP_KEYS = {"cases","cpu_model","disk_dir","enroll_app","enroll_app_sha256","enrollments",
-            "esp_sha256","firmware_debug_sha256","firmware_release","firmware_release_sha256",
+            "esp_sha256","esp_slot_sha256","firmware_debug_sha256","firmware_release","firmware_release_sha256",
             "memory_mb","note","ovmf_code_debug","ovmf_vars_pristine","qemu","schema",
             "v3_serials","vars_parser"}
 # Q1: enrollments is REQUIRED (never merely tolerated) - E_CERT_POSITIVE_MISSING and the

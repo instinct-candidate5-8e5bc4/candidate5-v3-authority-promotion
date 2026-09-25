@@ -135,8 +135,17 @@ mkdir -p "$OUT"
 # batch1r2 C1: the frozen ESP is copied from the dual-built workflow step, never rebuilt here
 # scratch-8 peer ask: a missing/wrong-prefix source must FAIL with a NAMED error BEFORE cp
 # (run 35931520373 died on cp's bare exit 1 with no gate code); print the exact path.
-[ -f "/tmp/$PREFIX-esp-a/c5-root-admitter-uki-v3-esp.raw" ] || { echo "E_CEREMONY_SOURCE_ESP /tmp/$PREFIX-esp-a/c5-root-admitter-uki-v3-esp.raw"; exit 97; }
-cp "/tmp/$PREFIX-esp-a/c5-root-admitter-uki-v3-esp.raw" build-output/esp/c5-root-admitter-uki-v3-esp.raw
+# signed-slot head: the certification lane builds the SLOT ESP (from the committed signed
+# slot); every other lane builds the historical ESP. Bind which one by the lane flag.
+# peer pre-push ruling on 63dc0ed9 (revision 3): the non-certification lanes now run the
+# P1/R7 signed-file cases, so they copy and assert BOTH pinned ESPs (historical AND slot);
+# the certification lane keeps the slot-only binding. Selection is by the lane/mode flag,
+# never by filename probing.
+if [ "${CERTIFICATION_TARGET:-}" = "1" ]; then ESP_NAMES=(c5-successor-to-certify-esp.raw); else ESP_NAMES=(c5-root-admitter-uki-v3-esp.raw c5-successor-to-certify-esp.raw); fi
+for ESP_NAME in "${ESP_NAMES[@]}"; do
+  [ -f "/tmp/$PREFIX-esp-a/$ESP_NAME" ] || { echo "E_CEREMONY_SOURCE_ESP /tmp/$PREFIX-esp-a/$ESP_NAME"; exit 97; }
+  cp "/tmp/$PREFIX-esp-a/$ESP_NAME" "build-output/esp/$ESP_NAME"
+done
 [ -f "/tmp/$PREFIX-ovmf-a/OVMF_CODE.fd" ] || { echo "E_CEREMONY_SOURCE_OVMF /tmp/$PREFIX-ovmf-a/OVMF_CODE.fd"; exit 97; }
 cp "/tmp/$PREFIX-ovmf-a/OVMF_CODE.fd" build-output/ovmf-debug/OVMF_CODE.fd
 [ -f "/tmp/$PREFIX-app-a/enroll-app.efi" ] || { echo "E_CEREMONY_SOURCE_ENROLL /tmp/$PREFIX-app-a/enroll-app.efi"; exit 97; }
@@ -148,16 +157,26 @@ c=json.load(open(sys.argv[1]))
 # peer 2026-09-24 C2-route-(ii): ESP variants are built in-run from runner-ephemeral
 # fixtures - their hashes are RECORDED below, never pinned; only the ceremony ESP
 # (from the pinned history UKI), firmware, and enroll-app keep exact pins.
-for h in (c["esp_sha256"],
+# signed-slot head: the certification ceremony pins the SLOT ESP; other lanes pin the
+# historical ESP. The selection is mode-conditional, never by filename probing.
+# peer pre-push ruling on 63dc0ed9 (revision 3): emit BOTH ESP pins (historical first,
+# slot second); the certification lane consumes only the slot pin, other lanes both.
+for h in (c["esp_sha256"],c["esp_slot_sha256"],
           c["firmware_debug_sha256"],c["firmware_release_sha256"],c["enroll_app_sha256"]): print(h)
 PYEOF
 )
 assert_sha() { local got; got=$(sha256sum "$1" | cut -d' ' -f1); [ "$got" = "$2" ] || { echo "E_INPUT_PIN_MISMATCH $1 $got"; exit 94; }; }
-assert_sha build-output/esp/c5-root-admitter-uki-v3-esp.raw "${PINS[0]}"
+# revision 3: certification lane asserts the slot ESP only; other lanes assert BOTH ESPs.
+if [ "${CERTIFICATION_TARGET:-}" = "1" ]; then
+  assert_sha "build-output/esp/c5-successor-to-certify-esp.raw" "${PINS[1]}"
+else
+  assert_sha "build-output/esp/c5-root-admitter-uki-v3-esp.raw" "${PINS[0]}"
+  assert_sha "build-output/esp/c5-successor-to-certify-esp.raw" "${PINS[1]}"
+fi
 ( cd build-output && sha256sum esp-variant/NON_CERTIFYING_REHEARSAL-esp-unsigned.raw     esp-variant/NON_CERTIFYING_REHEARSAL-esp-wrongsig.raw     esp-variant/NON_CERTIFYING_REHEARSAL-esp-hostile.raw ) > "$OUT/$PREFIX-esp-variant-recorded.sha256"
-assert_sha build-output/ovmf-debug/OVMF_CODE.fd "${PINS[1]}"
-assert_sha "$STAGE/root/usr/share/OVMF/OVMF_CODE_4M.secboot.fd" "${PINS[2]}"
-assert_sha build-output/enroll-app/enroll-app.efi "${PINS[3]}"
+assert_sha build-output/ovmf-debug/OVMF_CODE.fd "${PINS[2]}"
+assert_sha "$STAGE/root/usr/share/OVMF/OVMF_CODE_4M.secboot.fd" "${PINS[3]}"
+assert_sha build-output/enroll-app/enroll-app.efi "${PINS[4]}"
 # #18 F3 (peer #17 final ruling): pre-guest static gate - every case vars_template must
 # resolve (component-wise, the ONE resolver) into THIS ceremony's constructed enrolled-
 # template set (F4 single source: lane_resolve.allowed_vars_templates); anything else dies

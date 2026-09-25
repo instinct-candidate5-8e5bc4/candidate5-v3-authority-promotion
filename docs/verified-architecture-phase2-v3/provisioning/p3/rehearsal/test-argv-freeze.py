@@ -26,7 +26,7 @@
 #      harness does (lanes lists; certification = the frozen six), build with the REAL
 #      extracted build_argv over the REAL lane work_root with the full-config socket
 #      index, canonize_element, and require the freeze entry's sha - certification proves
-#      R2-R7 build to q1-q6.
+#      R2-R7+P1 build to q1-q7.
 #   F6-F8. run-36042868066 fixture (ruling 19): the COMMITTED exact argv.txt bytes the
 #      scratch ceremony executed on C-ossl-throwaway-debug under the OLD per-lane socket
 #      rule (fixtures/run-36042868066-C-ossl-debug-argv.txt, sha256 pinned below) - a
@@ -151,7 +151,7 @@ g = {"hashlib": hashlib, "json": json, "fail": fail}
 g["ARGV_FREEZE_SHA256"] = HSRC.split('ARGV_FREEZE_SHA256="', 1)[1].split('"', 1)[0]
 exec(BLOCK, g)
 real = g["_load_argv_freeze"](os.path.join(HERE, "argv-freeze.json"))
-report("C1 committed freeze loads (11 case ids)", isinstance(real, dict) and len(real) == 11)
+report("C1 committed freeze loads (12 case ids)", isinstance(real, dict) and len(real) == 12)
 expect_fail("C2 missing freeze file dies E_ARGV_FREEZE_MISSING",
             lambda: g["_load_argv_freeze"]("/nonexistent/argv-freeze.json"), "E_ARGV_FREEZE_MISSING")
 tmp = tempfile.mkdtemp(prefix="c5-aftest-")
@@ -300,14 +300,14 @@ def dry_run(lane, prefix):
     return None
 
 
-report("G1 rehearsal-lane dry-run (11 cases, q0-q10) matches the freeze",
+report("G1 rehearsal-lane dry-run (12 cases, full-config q indexes) matches the freeze",
        dry_run("rehearsal", CANON) is None, dry_run("rehearsal", CANON))
-report("G2 scratch-lane dry-run (10 cases) matches the freeze",
+report("G2 scratch-lane dry-run (12 cases) matches the freeze",
        dry_run("scratch", SCRATCH) is None, dry_run("scratch", SCRATCH))
-report("G3 certification selection is exactly R2-R7 (full-config indexes 1-6)",
-       [fullidx[c["id"]] for c in lane_cases("certification")] == [1, 2, 3, 4, 5, 6],
+report("G3 certification selection is exactly R2-R7+P1 (full-config indexes 1-7)",
+       [fullidx[c["id"]] for c in lane_cases("certification")] == [1, 2, 3, 4, 5, 6, 7],
        [fullidx[c["id"]] for c in lane_cases("certification")])
-report("G4 certification-lane dry-run builds R2-R7 at q1-q6 matching the freeze",
+report("G4 certification-lane dry-run builds R2-R7+P1 at q1-q7 matching the freeze",
        dry_run("certification", CANON) is None, dry_run("certification", CANON))
 
 # --- F6-F8. run-36042868066 fixture: the exact argv.txt the scratch ceremony executed on

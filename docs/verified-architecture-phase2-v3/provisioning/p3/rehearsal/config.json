@@ -101,7 +101,7 @@
    "vars_template": "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-enroll-sole-fresh/vars-enrolled.fd"
   },
   {
-   "esp": "build-output/esp/c5-root-admitter-uki-v3-esp.raw",
+   "esp": "build-output/esp/c5-successor-to-certify-esp.raw",
    "expect": {
     "exit_97": false,
     "exit_98": true,
@@ -111,7 +111,22 @@
    },
    "firmware": "/tmp/NON_CERTIFYING_REHEARSAL-stage/root/usr/share/OVMF/OVMF_CODE_4M.secboot.fd",
    "id": "NON_CERTIFYING_REHEARSAL-R7-release-sibling-behavior-only",
-   "lanes": ["certification"],
+   "lanes": ["scratch", "rehearsal", "certification"],
+   "settle_seconds": 45,
+   "vars_template": "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-enroll-sole/vars-enrolled.fd"
+  },
+  {
+   "esp": "build-output/esp/c5-successor-to-certify-esp.raw",
+   "expect": {
+    "exit_97": false,
+    "exit_98": true,
+    "kernel_exec": true,
+    "no_reject_strings": true,
+    "reject_strings": []
+   },
+   "firmware": "build-output/ovmf-debug/OVMF_CODE.fd",
+   "id": "NON_CERTIFYING_REHEARSAL-P1-signed-slot-positive",
+   "lanes": ["scratch", "rehearsal", "certification"],
    "settle_seconds": 45,
    "vars_template": "/tmp/NON_CERTIFYING_REHEARSAL-out/NON_CERTIFYING_REHEARSAL-enroll-sole/vars-enrolled.fd"
   },
@@ -187,6 +202,7 @@
   "NON_CERTIFYING_REHEARSAL-enroll-widened": {"db_der_sha256": ["7cda4ddc149849cc61191d4b5b3d218d14770c0401e9e66dd9617b82ba1ae441", "IN-RUN:c5-hostile-fixture"]}
  },
  "esp_sha256": "2bfa621238890890765c9636f99dabfb46233bfa626afb580ce33e65858019c9",
+ "esp_slot_sha256": "6ff0d9ef89668ef79e60eba41eb70704664008697637797b384e6e67075d2f77",
  "firmware_debug_sha256": "fc150336fce10eb5508fa440cdf7300622c8c3ac71f2fbe10a0731422b9cef24",
  "firmware_release": "/tmp/NON_CERTIFYING_REHEARSAL-stage/root/usr/share/OVMF/OVMF_CODE_4M.secboot.fd",
  "firmware_release_sha256": "1dbb7f9b7e7285b950929bbbc1494c186bfb061cde60cf531ff9756ef87dab7a",
