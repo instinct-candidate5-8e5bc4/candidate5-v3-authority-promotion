@@ -10,6 +10,11 @@
 # 41ccb99c shape (slot dirs rewritten back onto the used dirs) and must die
 # E_WORK_EXISTS; the committed sequence must run clean. Extraction is fail-closed on
 # count drift (8 builder invocations per lane: 4 main + 4 env2).
+# peer run-36081199933-review ruling (privilege mismatch): the executed stub sequence
+# runs single-user and CANNOT see ownership, so a STRUCTURAL check proves every
+# command writing into a sudo-builder-created dir is sudo-prefixed (the builder's
+# mkdir runs as root; a non-sudo cp dies EACCES before E_SLOT_ESP_COPY_PIN). The
+# planted f48e8f0e shape (sudo stripped from the copies) must be RED.
 import os, re, subprocess, sys, tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -56,7 +61,8 @@ def esp_command_sequence(bodies):
     seq = []
     for b in bodies:
         for ln in b.splitlines():
-            if "build-esp-image.sh" in ln or ln.startswith("cp --sparse=always "):
+            if ("build-esp-image.sh" in ln or ln.startswith("cp --sparse=always ")
+                    or ln.startswith("sudo cp --sparse=always ")):
                 seq.append(ln)
     return seq
 
@@ -75,6 +81,9 @@ def run_seq(seq, sandbox, prefix):
     for ln in seq:
         ln = ln.replace("sudo unshare -n env PATH=\"$PATH\" ../build-esp-image.sh", stub)
         ln = ln.replace("../build-esp-image.sh", stub)
+        # single-user sandbox: the sudo prefix on the copies is proven by the
+        # STRUCTURAL check below (ownership is invisible to one-user execution)
+        ln = ln.replace("sudo cp --sparse=always", "cp --sparse=always")
         ln = ln.replace("/tmp/$PREFIX", os.path.join(sandbox, prefix))
         out.append(ln)
     script = ("set -euo pipefail\nPREFIX=%s\nexport PREFIX\n" % prefix) + "\n".join(out) + "\n"
@@ -111,6 +120,40 @@ for lane in LANES:
     expect(lane + " 41ccb99c shape dies E_WORK_EXISTS (RED proof)",
            r2.returncode != 0 and "E_WORK_EXISTS" in (r2.stdout + r2.stderr),
            "rc=%d out=%s" % (r2.returncode, (r2.stdout + r2.stderr)[-300:]))
+
+# --- structural privilege check: every write into a sudo-builder-created dir must be
+# sudo-prefixed (the executed stub sequence cannot see ownership) ---
+def builder_dirs(bodies):
+    dirs = set()
+    for b in bodies:
+        for ln in b.splitlines():
+            if "build-esp-image.sh" in ln:
+                parts = ln.split()
+                i = parts.index("../build-esp-image.sh")
+                dirs.add(parts[i + 2])  # <script> <input> <workdir> <sha> <bytes> <name>
+    return dirs
+
+def writes_into_builder_dir(ln, dirs):
+    for pre in ("cp --sparse=always ", "sudo cp --sparse=always "):
+        if ln.startswith(pre):
+            dst = ln.split()[-1]
+            return os.path.dirname(dst) in dirs
+    return False
+
+for lane in LANES:
+    wf = os.path.join(WF, lane + "-workflow.yml")
+    bodies = extract_step_bodies(wf)
+    dirs = builder_dirs(bodies)
+    expect(lane + " builder-dir extraction found 8 dirs", len(dirs) == 8, "dirs=%r" % (sorted(dirs),))
+    writers = [ln for b in bodies for ln in b.splitlines() if writes_into_builder_dir(ln, dirs)]
+    expect(lane + " exactly 2 copy-writes into builder dirs", len(writers) == 2, "writers=%r" % (writers,))
+    bad = [ln for ln in writers if not ln.startswith("sudo ")]
+    expect(lane + " every builder-dir write is sudo-prefixed", bad == [], "bad=%r" % (bad,))
+    # planted f48e8f0e shape: sudo stripped from the copies -> must be RED
+    planted = [ln.replace("sudo cp --sparse=always", "cp --sparse=always") for ln in writers]
+    pbad = [ln for ln in planted if not ln.startswith("sudo ")]
+    expect(lane + " f48e8f0e shape (sudo stripped) is RED", len(pbad) == len(writers) and len(writers) > 0,
+           "pbad=%d" % len(pbad))
 
 if all(results):
     print("MUST_SHOW_ESP_FRESH_DIRS all %d checks pass" % len(results))

@@ -348,7 +348,10 @@ jobs:
           [ "$(sha256sum /tmp/$PREFIX-esp-slot-a/c5-successor-to-certify-esp.raw | cut -d' ' -f1)" = \
             "6ff0d9ef89668ef79e60eba41eb70704664008697637797b384e6e67075d2f77" ]
           cmp /tmp/$PREFIX-esp-slot-a/c5-successor-to-certify-esp.raw /tmp/$PREFIX-esp-slot-b/c5-successor-to-certify-esp.raw
-          cp --sparse=always /tmp/$PREFIX-esp-slot-a/c5-successor-to-certify-esp.raw /tmp/$PREFIX-esp-a/c5-successor-to-certify-esp.raw
+          # peer run-36081199933-review ruling (privilege mismatch): the copy target dir was
+          # created by the SUDO builder (root:root 0755) - the copy must run under sudo too,
+          # or it dies EACCES before the pin check can fire.
+          sudo cp --sparse=always /tmp/$PREFIX-esp-slot-a/c5-successor-to-certify-esp.raw /tmp/$PREFIX-esp-a/c5-successor-to-certify-esp.raw
           [ "$(sha256sum /tmp/$PREFIX-esp-a/c5-successor-to-certify-esp.raw | cut -d' ' -f1)" = \
             "6ff0d9ef89668ef79e60eba41eb70704664008697637797b384e6e67075d2f77" ] || { echo "E_SLOT_ESP_COPY_PIN /tmp/$PREFIX-esp-a/c5-successor-to-certify-esp.raw"; exit 46; }
           sha256sum /tmp/$PREFIX-esp-a/c5-successor-to-certify-esp.raw >> /tmp/$PREFIX-fw-hashes.txt
@@ -1918,7 +1921,7 @@ jobs:
           cmp /tmp/$PREFIX-esp-env2-slot-a/c5-successor-to-certify-esp.raw /tmp/$PREFIX-esp-env2-slot-b/c5-successor-to-certify-esp.raw
           HS=$(sha256sum /tmp/$PREFIX-esp-env2-slot-a/c5-successor-to-certify-esp.raw | cut -d' ' -f1)
           [ "$HS" = "6ff0d9ef89668ef79e60eba41eb70704664008697637797b384e6e67075d2f77" ] || { echo "E_ESP_SLOT_PIN_MISMATCH $HS"; exit 46; }
-          cp --sparse=always /tmp/$PREFIX-esp-env2-slot-a/c5-successor-to-certify-esp.raw /tmp/$PREFIX-esp-env2-a/c5-successor-to-certify-esp.raw
+          sudo cp --sparse=always /tmp/$PREFIX-esp-env2-slot-a/c5-successor-to-certify-esp.raw /tmp/$PREFIX-esp-env2-a/c5-successor-to-certify-esp.raw
           [ "$(sha256sum /tmp/$PREFIX-esp-env2-a/c5-successor-to-certify-esp.raw | cut -d' ' -f1)" = "6ff0d9ef89668ef79e60eba41eb70704664008697637797b384e6e67075d2f77" ] || { echo "E_SLOT_ESP_COPY_PIN /tmp/$PREFIX-esp-env2-a/c5-successor-to-certify-esp.raw"; exit 46; }
           sha256sum /tmp/$PREFIX-esp-env2-a/c5-successor-to-certify-esp.raw > /tmp/$PREFIX-env2-evidence/NON_CERTIFYING_SCRATCH-env2-esp-slot-hash.txt
       - name: NON_CERTIFYING_SCRATCH env2 accepted-firmware pins + runner-1 hash echo

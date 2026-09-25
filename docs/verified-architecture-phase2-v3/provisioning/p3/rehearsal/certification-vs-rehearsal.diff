@@ -2,8 +2,8 @@
 # Produced by: diff -u <(sed 's/OVMF_CI_SECURE_BOOT_UKI/NON_CERTIFYING_REHEARSAL/g' CERT) REHEARSAL
 # The sed rewrites certification identity EVERYWHERE, including the OVMF_CI_SECURE_BOOT_UKI_PASS
 # marker string and step names. Raw-byte evidence is the unnormalized diff in the #9 packet.
---- /dev/fd/63	2026-09-25 04:35:34.043391529 +0300
-+++ ../../../../../.github/workflows/NON_CERTIFYING_REHEARSAL-workflow.yml	2026-09-25 04:33:34.875391529 +0300
+--- /dev/fd/63	2026-09-25 04:41:22.701510968 +0300
++++ ../../../../../.github/workflows/NON_CERTIFYING_REHEARSAL-workflow.yml	2026-09-25 04:40:20.229510968 +0300
 @@ -1,34 +1,26 @@
 -# NON_CERTIFYING_REHEARSAL — Option A CI certification ceremony workflow.
 -# Scope: QEMU/KVM + reproducible DEBUG OVMF Secure Boot certification of the EXACT accepted
@@ -157,7 +157,7 @@
            if sudo unshare -n curl -fsS --max-time 10 https://archive.ubuntu.com/ >/dev/null 2>&1; then
              echo "E_NET_CANARY_LEAK: network reachable inside unshare -n"; exit 96
            fi
-@@ -245,18 +270,37 @@
+@@ -245,18 +270,40 @@
          run: |
            set -euo pipefail
            cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
@@ -194,13 +194,16 @@
 +          [ "$(sha256sum /tmp/$PREFIX-esp-slot-a/c5-successor-to-certify-esp.raw | cut -d' ' -f1)" = \
 +            "6ff0d9ef89668ef79e60eba41eb70704664008697637797b384e6e67075d2f77" ]
 +          cmp /tmp/$PREFIX-esp-slot-a/c5-successor-to-certify-esp.raw /tmp/$PREFIX-esp-slot-b/c5-successor-to-certify-esp.raw
-+          cp --sparse=always /tmp/$PREFIX-esp-slot-a/c5-successor-to-certify-esp.raw /tmp/$PREFIX-esp-a/c5-successor-to-certify-esp.raw
++          # peer run-36081199933-review ruling (privilege mismatch): the copy target dir was
++          # created by the SUDO builder (root:root 0755) - the copy must run under sudo too,
++          # or it dies EACCES before the pin check can fire.
++          sudo cp --sparse=always /tmp/$PREFIX-esp-slot-a/c5-successor-to-certify-esp.raw /tmp/$PREFIX-esp-a/c5-successor-to-certify-esp.raw
 +          [ "$(sha256sum /tmp/$PREFIX-esp-a/c5-successor-to-certify-esp.raw | cut -d' ' -f1)" = \
 +            "6ff0d9ef89668ef79e60eba41eb70704664008697637797b384e6e67075d2f77" ] || { echo "E_SLOT_ESP_COPY_PIN /tmp/$PREFIX-esp-a/c5-successor-to-certify-esp.raw"; exit 46; }
            sha256sum /tmp/$PREFIX-esp-a/c5-successor-to-certify-esp.raw >> /tmp/$PREFIX-fw-hashes.txt
            echo "ARTIFACT-DIGEST path=/tmp/$PREFIX-fw-hashes.txt sha256=$(sha256sum /tmp/$PREFIX-fw-hashes.txt | cut -d' ' -f1) run_id=$GITHUB_RUN_ID run_attempt=$GITHUB_RUN_ATTEMPT run_number=$GITHUB_RUN_NUMBER workflow=$GITHUB_WORKFLOW commit=$GITHUB_SHA ref=$GITHUB_REF"
        - name: NON_CERTIFYING_REHEARSAL unsigned UKI in-run build (reviewed gapless builder)
-@@ -329,7 +373,126 @@
+@@ -329,7 +376,126 @@
            cmp "$G/signer.der" rehearsal/evidence/c5-signing-cert.der || { echo "E_SLOT_SIGNER_CMP signer != committed c5-signing-cert.der (7cda4ddc..)"; exit 91; }
            echo "signed-slot committed-bytes gates PASS: delta+signed+authenticode+signer-cmp (slot $SH, signer $(sha256sum "$G/signer.der" | cut -d' ' -f1))"
            SLOTGATES
@@ -328,7 +331,7 @@
          if: ${{ !cancelled() }}
          timeout-minutes: 20
          run: |
-@@ -339,12 +502,7 @@
+@@ -339,12 +505,7 @@
            export PATH="/tmp/$PREFIX-stage/shims:$PATH"
            [ -x "/tmp/$PREFIX-stage/root/usr/bin/sbsign" ] || { echo "E_TOOL_MISSING staged sbsign"; exit 92; }
            [ -x "/tmp/$PREFIX-stage/root/usr/bin/sbverify" ] || { echo "E_TOOL_MISSING staged sbverify"; exit 92; }
@@ -342,7 +345,7 @@
            # peer 2026-09-24 route-(ii) key lifecycle: fixtures are generated network-off
            # under /tmp/$PREFIX-*; private keys exist only inside fixture-generate.sh's own
            # mktemp workdir and are shred -u'd by its EXIT trap and explicit cleanup;
-@@ -403,8 +561,15 @@
+@@ -403,8 +564,15 @@
            OWNER = "7cda4ddc149849cc61191d4b5b3d218d14770c0401e9e66dd9617b82ba1ae441"
            H = sha(fx + "/C5-HOSTILE-FIXTURE.cer")
            W = sha(fx + "/C5-WRONG-SIGNER-FIXTURE.cer")
@@ -359,7 +362,7 @@
                if v in seen:
                    print("E_FIXTURE_CERT_DISTINCT %s DER sha256 collides with %s (%s)" % (label, seen[v], v)); sys.exit(91)
                seen[v] = label
-@@ -422,6 +587,7 @@
+@@ -422,6 +590,7 @@
                "unsigned_uki_sha256": U,
                "hostile_cert_der_sha256": H,
                "wrong_signer_cert_der_sha256": W,
@@ -367,7 +370,7 @@
                "tool_versions": {"openssl": ver(["openssl", "version"]),
                                  "sbsign": ver(["/tmp/" + __import__("os").environ["PREFIX"] + "-stage/root/usr/bin/sbsign", "--version"])},
            }
-@@ -430,7 +596,7 @@
+@@ -430,7 +599,7 @@
            shas = sp.run(["sha256sum", "F-WRONGSIG.efi", "F-HOSTILEUKI.efi", "C5-WRONG-SIGNER-FIXTURE.cer", "C5-HOSTILE-FIXTURE.cer"],
                          capture_output=True, text=True, cwd=fx, check=True).stdout
            open(fx + "/FIXTURE-SHASUMS", "w").write(shas)
@@ -376,7 +379,7 @@
            PREC
            # K2 after fixture copy-out (peer run-36009604654 ruling (d)): fixtures are
            # public-only; no key-named file and no private-key content under
-@@ -467,15 +633,21 @@
+@@ -467,15 +636,21 @@
                print("E_K2_SWEEP_EMPTY %s" % roots); sys.exit(95)
            print("K2 inrun sweep clean (post fixture copy-out, scanned=%d roots=%s)" % (scanned, roots))
            PYK2F
@@ -402,7 +405,7 @@
                "c-sign/fixtures/F-WRONGSIG.efi", "c-sign/fixtures/F-HOSTILEUKI.efi",
                "c-sign/fixtures/C5-WRONG-SIGNER-FIXTURE.cer", "c-sign/fixtures/C5-HOSTILE-FIXTURE.cer",
                "c-sign/fixtures/GENERATION-RECORD.json", "c-sign/fixtures/FIXTURE-SHASUMS",
-@@ -499,7 +671,7 @@
+@@ -499,7 +674,7 @@
            # K2 (peer run-12 K4 containment): fail closed if any private-key material stands
            # under ANY evidence upload path - by NAME (*.key/*.pem/*.p12/*.pfx) or CONTENT
            # (PEM "PRIVATE KEY" markers, PKCS#8/RSA DER key headers). Upload only if this passed.
@@ -411,7 +414,7 @@
            python3 - /tmp/$PREFIX-k2-paths.txt <<'PYK'
            import sys, os, re
            paths = [l.strip() for l in open(sys.argv[1]) if l.strip()]
-@@ -619,7 +791,7 @@
+@@ -619,7 +794,7 @@
            [ "$A4" = "$B4" ] || { echo "E_SMOKE_PREP_DRIFT"; exit 97; }
            git ls-files -s -- qemu-smoke.sh bwrap-argv.sh
            git status --porcelain | grep . && { echo "E_SMOKE_PREP_TREE_DIRTY"; git status --porcelain; exit 97; } || echo "git status --porcelain: EMPTY (after repair)"
@@ -420,7 +423,7 @@
                > /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-qemu-smoke.log 2>&1 \
              || { echo "E_QEMU_SMOKE"; cat /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-qemu-smoke.log; exit 97; }
            # peer N8 (log-or-fail): the raw/executed equivalence proof must be IN the durable
-@@ -631,13 +803,14 @@
+@@ -631,13 +806,14 @@
            grep -F "lane argv check:" /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-qemu-smoke.log
            echo "masked-host binding smoke OK (exact frozen case argv + -S, four host qemu dirs absent, no case booted)"
        - name: NON_CERTIFYING_REHEARSAL ceremony (network-enforced-off, tee'd log)
@@ -436,7 +439,7 @@
              | tee /tmp/$PREFIX-out/NON_CERTIFYING_REHEARSAL-ceremony.log
        - name: NON_CERTIFYING_REHEARSAL evidence readability repair (ephemeral out tree only)
          if: always()
-@@ -671,9 +844,10 @@
+@@ -671,9 +847,10 @@
              echo "E_EVIDENCE_NONREGULAR non-regular file in evidence tree:"; find /tmp/$PREFIX-out ! -type f ! -type d -print; exit 94
            fi
            echo "evidence socket sweep: only regular files+dirs under /tmp/$PREFIX-out"
@@ -450,7 +453,7 @@
            # files; absent members (failed-early runs) are noted, never silently skipped.
            man=$(mktemp)
            { while IFS= read -r p; do
-@@ -690,14 +864,45 @@
+@@ -690,14 +867,45 @@
            sudo chown "$(id -u):$(id -g)" /tmp/$PREFIX-out/$PREFIX-evidence-manifest.txt
            echo "ARTIFACT-DIGEST paths=EVIDENCE_UPLOAD_PATHS(shared-list) manifest=$PREFIX-evidence-manifest.txt manifest_sha256=$(sha256sum /tmp/$PREFIX-out/$PREFIX-evidence-manifest.txt | cut -d' ' -f1) files=$(grep -c . /tmp/$PREFIX-out/$PREFIX-evidence-manifest.txt) run_id=$GITHUB_RUN_ID run_attempt=$GITHUB_RUN_ATTEMPT run_number=$GITHUB_RUN_NUMBER workflow=$GITHUB_WORKFLOW commit=$GITHUB_SHA ref=$GITHUB_REF"
        - name: NON_CERTIFYING_REHEARSAL ceremony interpreter cross-check (addendum2 condition 2b)
@@ -497,7 +500,7 @@
            if [ -n "$(find /tmp/$PREFIX-out -mindepth 1 -maxdepth 1 ! -name 'NON_CERTIFYING_REHEARSAL*' -print -quit)" ]; then
              echo "E_UNPREFIXED_TOPLEVEL_EVIDENCE"; exit 94
            fi
-@@ -711,7 +916,7 @@
+@@ -711,7 +919,7 @@
            # K2 (peer run-12 K4 containment): fail closed if any private-key material stands
            # under ANY evidence upload path - by NAME (*.key/*.pem/*.p12/*.pfx) or CONTENT
            # (PEM "PRIVATE KEY" markers, PKCS#8/RSA DER key headers). Upload only if this passed.
@@ -506,7 +509,7 @@
            python3 - /tmp/$PREFIX-k2-paths.txt <<'PYK'
            import sys, os, re
            paths = [l.strip() for l in open(sys.argv[1]) if l.strip()]
-@@ -774,10 +979,10 @@
+@@ -774,10 +982,10 @@
    # at the same canonical in-container path /build with identical pinned inputs. The FD
    # hash must equal the first runner's. The Build tree is kept and every module's
    # CodeView PDB path is parsed: all absolute paths must carry the /build/ prefix.
@@ -519,7 +522,7 @@
      steps:
        - name: NON_CERTIFYING_REHEARSAL ref+attempt fail-closed gate
          env:
-@@ -787,7 +992,10 @@
+@@ -787,7 +995,10 @@
          run: |
            set -euo pipefail
            [ "${{ github.run_attempt }}" = "1" ] || { echo "E_RERUN_FORBIDDEN run_attempt=${{ github.run_attempt }}"; exit 89; }
@@ -531,7 +534,7 @@
            # pushed-once gate (T3 F5): the ref must be created by THIS push, never force-pushed
            [ "$EV_CREATED" = "true" ] || { echo "E_PUSHED_ONCE created=$EV_CREATED"; exit 89; }
            [ "$EV_FORCED" = "false" ] || { echo "E_PUSHED_ONCE forced=$EV_FORCED"; exit 89; }
-@@ -802,8 +1010,7 @@
+@@ -802,8 +1013,7 @@
            # D2 gate (reviewer ruling): every relative file/script argument used by later
            # steps must exist in the committed tree. Fixed list, fail-closed exit 88.
            cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
@@ -541,7 +544,7 @@
              [ -e "$f" ] || { echo "E_WORKFLOW_ARG_MISSING $f"; exit 88; }
            done
        - name: NON_CERTIFYING_REHEARSAL env2 host inputs declared (B3)
-@@ -896,12 +1103,22 @@
+@@ -896,12 +1106,22 @@
            set -euo pipefail
            cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
            export PATH="/tmp/$PREFIX-stage-env2/shims:$PATH"
@@ -564,13 +567,13 @@
 +          cmp /tmp/$PREFIX-esp-env2-slot-a/c5-successor-to-certify-esp.raw /tmp/$PREFIX-esp-env2-slot-b/c5-successor-to-certify-esp.raw
 +          HS=$(sha256sum /tmp/$PREFIX-esp-env2-slot-a/c5-successor-to-certify-esp.raw | cut -d' ' -f1)
 +          [ "$HS" = "6ff0d9ef89668ef79e60eba41eb70704664008697637797b384e6e67075d2f77" ] || { echo "E_ESP_SLOT_PIN_MISMATCH $HS"; exit 46; }
-+          cp --sparse=always /tmp/$PREFIX-esp-env2-slot-a/c5-successor-to-certify-esp.raw /tmp/$PREFIX-esp-env2-a/c5-successor-to-certify-esp.raw
++          sudo cp --sparse=always /tmp/$PREFIX-esp-env2-slot-a/c5-successor-to-certify-esp.raw /tmp/$PREFIX-esp-env2-a/c5-successor-to-certify-esp.raw
 +          [ "$(sha256sum /tmp/$PREFIX-esp-env2-a/c5-successor-to-certify-esp.raw | cut -d' ' -f1)" = "6ff0d9ef89668ef79e60eba41eb70704664008697637797b384e6e67075d2f77" ] || { echo "E_SLOT_ESP_COPY_PIN /tmp/$PREFIX-esp-env2-a/c5-successor-to-certify-esp.raw"; exit 46; }
 +          sha256sum /tmp/$PREFIX-esp-env2-a/c5-successor-to-certify-esp.raw > /tmp/$PREFIX-env2-evidence/NON_CERTIFYING_REHEARSAL-env2-esp-slot-hash.txt
        - name: NON_CERTIFYING_REHEARSAL env2 accepted-firmware pins + runner-1 hash echo
          run: |
            set -euo pipefail
-@@ -936,10 +1153,14 @@
+@@ -936,10 +1156,14 @@
            A1=$(grep -- "-app-a/enroll-app.efi" /tmp/$PREFIX-fw1/$PREFIX-fw-hashes.txt | cut -d' ' -f1)
            A2=$(sha256sum /tmp/$PREFIX-app-env2-a/enroll-app.efi | cut -d' ' -f1)
            [ "$A1" = "$A2" ] || { echo "E_ENV2_APP_MISMATCH $A1 $A2"; exit 93; }
@@ -588,7 +591,7 @@
        - name: NON_CERTIFYING_REHEARSAL env2 evidence manifest + digest (peer N9)
          run: |
            set -euo pipefail
-@@ -972,7 +1193,7 @@
+@@ -972,7 +1196,7 @@
            # K2 (peer run-12 K4 containment): fail closed if any private-key material stands
            # under ANY evidence upload path - by NAME (*.key/*.pem/*.p12/*.pfx) or CONTENT
            # (PEM "PRIVATE KEY" markers, PKCS#8/RSA DER key headers). Upload only if this passed.
@@ -597,7 +600,7 @@
            python3 - /tmp/$PREFIX-k2-paths.txt <<'PYK'
            import sys, os, re
            paths = [l.strip() for l in open(sys.argv[1]) if l.strip()]
-@@ -1023,133 +1244,9 @@
+@@ -1023,133 +1247,9 @@
            path: *env2_evidence_upload_paths
            retention-days: 90
            if-no-files-found: error
