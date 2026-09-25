@@ -13,11 +13,12 @@ P3 = os.path.dirname(HERE)
 REPO = os.path.normpath(os.path.join(HERE, "..", "..", "..", "..", ".."))
 PROBE = "from lane_resolve import resolve_config_value\n"
 
-def run_preflight(reh, stage):
+def run_preflight(reh, stage, prefix="NON_CERTIFYING_REHEARSAL"):
     env = dict(os.environ)
-    env["PREFIX"] = "NON_CERTIFYING_REHEARSAL"
-    env["ALLOWED_PREFIX"] = "NON_CERTIFYING_REHEARSAL"
+    env["PREFIX"] = prefix
+    env["ALLOWED_PREFIX"] = prefix
     env["PYTHONDONTWRITEBYTECODE"] = "1"
+    env.pop("CERTIFICATION_TARGET", None)  # never a certification context in these runs
     r = subprocess.run([sys.executable, os.path.join(reh, "preflight-check.py"),
                         os.path.join(reh, "config.json"), stage],
                        capture_output=True, text=True, env=env)
@@ -61,6 +62,34 @@ try:
              and "," not in pim and pim.split()[-1:] == ["lane_resolve"])
     expect("planted-exact-pair", exact,
            "delta=%r" % (delta,))
+
+    # peer run-36081199933 ruling (item 3): the E_SIGNED_CASE_LANES guard must fire in
+    # the SCRATCH lane (no CERTIFICATION_TARGET). Planted negative: P1 lanes reduced to
+    # ["certification"] in the temp tree's config; the REAL preflight run with
+    # PREFIX=NON_CERTIFYING_SCRATCH must attribute EXACTLY one new error to it.
+    cfgp = os.path.join(treh, "config.json")
+    cfg0 = open(cfgp).read()
+    rc_s0, errs_s0, raw_s0 = run_preflight(treh, stage, "NON_CERTIFYING_SCRATCH")
+    expect("scratch-baseline-parseable", errs_s0 is not None and rc_s0 in (0, 30), "rc=%d" % rc_s0)
+    sl_base = [e for e in (errs_s0 or []) if e[0] == "E_SIGNED_CASE_LANES"]
+    expect("scratch-baseline-no-lanes-error", sl_base == [], "sl_base=%r" % (sl_base,))
+    cfgm = json.loads(cfg0)
+    planted = 0
+    for c in cfgm["cases"]:
+        if c["id"] == "NON_CERTIFYING_REHEARSAL-P1-signed-slot-positive":
+            c["lanes"] = ["certification"]; planted += 1
+    expect("planted-p1-lanes-mutation", planted == 1, "planted=%d" % planted)
+    open(cfgp, "w").write(json.dumps(cfgm, indent=1) + "\n")
+    try:
+        rc_s1, errs_s1, raw_s1 = run_preflight(treh, stage, "NON_CERTIFYING_SCRATCH")
+        sdelta = [e for e in (errs_s1 or []) if e not in (errs_s0 or [])]
+        sl = [e for e in sdelta if e[0] == "E_SIGNED_CASE_LANES"]
+        expect("scratch-planted-p1-lanes-fires-exactly-once",
+               rc_s1 == 30 and len(sdelta) == 1 and len(sl) == 1
+               and "P1-signed-slot-positive" in str(sl[0][1]),
+               "rc=%d delta=%r" % (rc_s1, sdelta))
+    finally:
+        open(cfgp, "w").write(cfg0)
     print("H5_PLANTED_ERRSET_TESTS %d/%d pass" % (sum(results), len(results)))
 finally:
     shutil.rmtree(tmp, ignore_errors=True)

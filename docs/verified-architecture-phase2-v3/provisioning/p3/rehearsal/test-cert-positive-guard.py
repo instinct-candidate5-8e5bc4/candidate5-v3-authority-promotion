@@ -17,12 +17,21 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = open(os.path.join(HERE, "preflight-check.py")).read()
 CFG = json.load(open(os.path.join(HERE, "config.json")))
 
-m = re.search(r'    if os\.path\.exists\(os\.path\.join\(here,"evidence","successor-to-certify\.efi"\)\):.*?_SIGNED_CASE_LANES-_found\)\)\)', SRC, re.S)
+# peer run-36081199933 ruling (item 3): the guard is TWO blocks now - the positive
+# predicate stays nested under `if CERT_TARGET:` (it gates the certification positive
+# set); the E_SIGNED_CASE_LANES guard sits at TOP LEVEL so it fires in the
+# scratch/rehearsal lanes too. Both are extracted and exec'd; the top-level placement
+# of the lanes block is asserted structurally (its `if` must start at column 0).
+m = re.search(r'    if os\.path\.exists\(os\.path\.join\(here,"evidence","successor-to-certify\.efi"\)\):.*?repr\(_pos\)\)\)', SRC, re.S)
 if not m:
-    print("E_TEST_EXTRACTION guard block not found in preflight-check.py"); sys.exit(97)
+    print("E_TEST_EXTRACTION positive-guard block not found in preflight-check.py"); sys.exit(97)
 _ls = m.group(0).splitlines()
 _ind = min(len(l) - len(l.lstrip()) for l in _ls if l.strip())
 BLOCK = "\n".join(l[_ind:] for l in _ls)
+m2 = re.search(r'\nif os\.path\.exists\(os\.path\.join\(here,"evidence","successor-to-certify\.efi"\)\):\n    _SIGNED_CASE_LANES.*?_SIGNED_CASE_LANES-_found\)\)\)', SRC, re.S)
+if not m2:
+    print("E_TEST_EXTRACTION top-level lanes-guard block not found in preflight-check.py (must sit OUTSIDE the CERT_TARGET gate)"); sys.exit(97)
+BLOCK2 = m2.group(0).lstrip("\n")
 
 def run_guard(cfg, slot_exists):
     fails = []
@@ -34,6 +43,7 @@ def run_guard(cfg, slot_exists):
     ns = {"os": _Os, "here": HERE, "cfg": cfg,
           "fail": lambda c, m: fails.append((c, m))}
     exec(BLOCK, ns)
+    exec(BLOCK2, ns)
     return fails
 
 P1_ID = "NON_CERTIFYING_REHEARSAL-P1-signed-slot-positive"

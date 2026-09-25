@@ -69,7 +69,7 @@ jobs:
           # D2 gate (reviewer ruling): every relative file/script argument used by later
           # steps must exist in the committed tree. Fixed list, fail-closed exit 88.
           cd docs/verified-architecture-phase2-v3/provisioning/p3/rehearsal
-          for f in             platform.lock.json             config.json             stage-platform.sh             make-shims.sh             test-c-sign-confinement.py             test-enroll-predicate-env.py             test-cert-positive-guard.py             test-k2-sweeps.py             test-inrun-writes.py             test-inrun-stale-path.py             test-inrun-allowlist.py             test-stale-state-committed.py             test-heredoc-structure.py             test-h5-planted-errset.py             preflight-check.py             build-ovmf-debug.sh             scan-pe-pdb-paths.py             build-enroll-app.sh             bwrap-argv.sh             enroll-predicate-check.py             rehearsal-enroll.sh             ../build-esp-image.sh             evidence/successor-signed.efi             evidence/successor-to-certify.efi             run-ceremony.sh             qemu-smoke.sh             config_schema.py             bind-fixture-certs.sh             test-config-schema.py             test-fixture-cert-binding.py             test-env-contract.py             test-hist-esp-guard.py             test-workdir-sibling.py             test-h3-precheck.py             test-argv-freeze.py             test-marker-absence.py             fixtures/run-36037280674-R1-argv.txt             fixtures/run-36042868066-C-ossl-debug-argv.txt; do
+          for f in             platform.lock.json             config.json             stage-platform.sh             make-shims.sh             test-c-sign-confinement.py             test-enroll-predicate-env.py             test-cert-positive-guard.py             test-k2-sweeps.py             test-inrun-writes.py             test-inrun-stale-path.py             test-inrun-allowlist.py             test-stale-state-committed.py             test-heredoc-structure.py             test-h5-planted-errset.py             preflight-check.py             build-ovmf-debug.sh             scan-pe-pdb-paths.py             build-enroll-app.sh             bwrap-argv.sh             enroll-predicate-check.py             rehearsal-enroll.sh             ../build-esp-image.sh             evidence/successor-signed.efi             evidence/successor-to-certify.efi             run-ceremony.sh             qemu-smoke.sh             config_schema.py             bind-fixture-certs.sh             test-config-schema.py             test-fixture-cert-binding.py             test-env-contract.py             test-hist-esp-guard.py             test-esp-fresh-dirs.py             test-workdir-sibling.py             test-h3-precheck.py             test-argv-freeze.py             test-marker-absence.py             fixtures/run-36037280674-R1-argv.txt             fixtures/run-36042868066-C-ossl-debug-argv.txt; do
             [ -e "$f" ] || { echo "E_WORKFLOW_ARG_MISSING $f"; exit 88; }
           done
       - name: NON_CERTIFYING_SCRATCH host inputs declared (B3)
@@ -255,6 +255,7 @@ jobs:
           python3 test-env-contract.py 2>&1 | tee /tmp/$PREFIX-out/$PREFIX-env-contract-tests.log
           # peer run-36024634796 ruling: historical-ESP boot-expectation guard + workdir sibling-closure gate
           python3 test-hist-esp-guard.py 2>&1 | tee /tmp/$PREFIX-out/$PREFIX-hist-esp-guard-tests.log
+          python3 test-esp-fresh-dirs.py 2>&1 | tee /tmp/$PREFIX-out/$PREFIX-esp-fresh-dirs-tests.log
           python3 test-workdir-sibling.py 2>&1 | tee /tmp/$PREFIX-out/$PREFIX-workdir-sibling-tests.log
           # peer run-36031372949 ruling: H3 precheck taxonomy, executed-argv freeze contract, marker-at-rest
           python3 test-h3-precheck.py 2>&1 | tee /tmp/$PREFIX-out/$PREFIX-h3-precheck-tests.log
@@ -336,14 +337,20 @@ jobs:
           # peer pre-push ruling on 63dc0ed9 (revision 2): the scratch/rehearsal lanes must
           # dual-build the SLOT ESP from the committed signed slot at pin 6ff0d9ef..,
           # alongside the historical ESP, so the P1/R7 signed-file cases boot the signed
-          # file's ESP in these lanes. Built into the SAME esp-a/esp-b staging dirs the
-          # ceremony and qemu-smoke read; the CI pin gate proves the pin the reviewer
-          # could not reproduce locally.
-          sudo unshare -n env PATH="$PATH" ../build-esp-image.sh evidence/successor-to-certify.efi /tmp/$PREFIX-esp-a 0ea8dd7da95eece8fe8eefed9f3fb701b9cdfd09abe5cfdd5f1954dd0d2f6959 21156176 c5-successor-to-certify-esp.raw
-          sudo unshare -n env PATH="$PATH" ../build-esp-image.sh evidence/successor-to-certify.efi /tmp/$PREFIX-esp-b 0ea8dd7da95eece8fe8eefed9f3fb701b9cdfd09abe5cfdd5f1954dd0d2f6959 21156176 c5-successor-to-certify-esp.raw
-          [ "$(sha256sum /tmp/$PREFIX-esp-a/c5-successor-to-certify-esp.raw | cut -d' ' -f1)" = \
+          # file's ESP in these lanes. The CI pin gate proves the pin the reviewer could
+          # not reproduce locally. peer run-36081199933 ruling (item 1, allowed
+          # alternative): the slot builds run in SEPARATE FRESH dirs (the builder's
+          # E_WORK_EXISTS guard stays at full strength - reusing esp-a killed run
+          # 36081199933), then the a-product is copied into the esp-a staging dir the
+          # ceremony and qemu-smoke read, closed by a named post-copy pin check.
+          sudo unshare -n env PATH="$PATH" ../build-esp-image.sh evidence/successor-to-certify.efi /tmp/$PREFIX-esp-slot-a 0ea8dd7da95eece8fe8eefed9f3fb701b9cdfd09abe5cfdd5f1954dd0d2f6959 21156176 c5-successor-to-certify-esp.raw
+          sudo unshare -n env PATH="$PATH" ../build-esp-image.sh evidence/successor-to-certify.efi /tmp/$PREFIX-esp-slot-b 0ea8dd7da95eece8fe8eefed9f3fb701b9cdfd09abe5cfdd5f1954dd0d2f6959 21156176 c5-successor-to-certify-esp.raw
+          [ "$(sha256sum /tmp/$PREFIX-esp-slot-a/c5-successor-to-certify-esp.raw | cut -d' ' -f1)" = \
             "6ff0d9ef89668ef79e60eba41eb70704664008697637797b384e6e67075d2f77" ]
-          cmp /tmp/$PREFIX-esp-a/c5-successor-to-certify-esp.raw /tmp/$PREFIX-esp-b/c5-successor-to-certify-esp.raw
+          cmp /tmp/$PREFIX-esp-slot-a/c5-successor-to-certify-esp.raw /tmp/$PREFIX-esp-slot-b/c5-successor-to-certify-esp.raw
+          cp --sparse=always /tmp/$PREFIX-esp-slot-a/c5-successor-to-certify-esp.raw /tmp/$PREFIX-esp-a/c5-successor-to-certify-esp.raw
+          [ "$(sha256sum /tmp/$PREFIX-esp-a/c5-successor-to-certify-esp.raw | cut -d' ' -f1)" = \
+            "6ff0d9ef89668ef79e60eba41eb70704664008697637797b384e6e67075d2f77" ] || { echo "E_SLOT_ESP_COPY_PIN /tmp/$PREFIX-esp-a/c5-successor-to-certify-esp.raw"; exit 46; }
           sha256sum /tmp/$PREFIX-esp-a/c5-successor-to-certify-esp.raw >> /tmp/$PREFIX-fw-hashes.txt
           echo "ARTIFACT-DIGEST path=/tmp/$PREFIX-fw-hashes.txt sha256=$(sha256sum /tmp/$PREFIX-fw-hashes.txt | cut -d' ' -f1) run_id=$GITHUB_RUN_ID run_attempt=$GITHUB_RUN_ATTEMPT run_number=$GITHUB_RUN_NUMBER workflow=$GITHUB_WORKFLOW commit=$GITHUB_SHA ref=$GITHUB_REF"
       - name: NON_CERTIFYING_SCRATCH unsigned UKI in-run build (reviewed gapless builder)
@@ -1905,11 +1912,14 @@ jobs:
           [ "$HE" = "2bfa621238890890765c9636f99dabfb46233bfa626afb580ce33e65858019c9" ] || { echo "E_ESP_PIN_MISMATCH $HE"; exit 46; }
           sha256sum /tmp/$PREFIX-esp-env2-a/c5-root-admitter-uki-v3-esp.raw > /tmp/$PREFIX-env2-evidence/NON_CERTIFYING_SCRATCH-env2-esp-hash.txt
           # peer pre-push ruling on 63dc0ed9 (revision 2): env2 reproduces the SLOT ESP too.
-          sudo unshare -n env PATH="$PATH" ../build-esp-image.sh evidence/successor-to-certify.efi /tmp/$PREFIX-esp-env2-a 0ea8dd7da95eece8fe8eefed9f3fb701b9cdfd09abe5cfdd5f1954dd0d2f6959 21156176 c5-successor-to-certify-esp.raw
-          sudo unshare -n env PATH="$PATH" ../build-esp-image.sh evidence/successor-to-certify.efi /tmp/$PREFIX-esp-env2-b 0ea8dd7da95eece8fe8eefed9f3fb701b9cdfd09abe5cfdd5f1954dd0d2f6959 21156176 c5-successor-to-certify-esp.raw
-          cmp /tmp/$PREFIX-esp-env2-a/c5-successor-to-certify-esp.raw /tmp/$PREFIX-esp-env2-b/c5-successor-to-certify-esp.raw
-          HS=$(sha256sum /tmp/$PREFIX-esp-env2-a/c5-successor-to-certify-esp.raw | cut -d' ' -f1)
+          # peer run-36081199933 ruling (item 1): SEPARATE FRESH dirs + copy + pin check.
+          sudo unshare -n env PATH="$PATH" ../build-esp-image.sh evidence/successor-to-certify.efi /tmp/$PREFIX-esp-env2-slot-a 0ea8dd7da95eece8fe8eefed9f3fb701b9cdfd09abe5cfdd5f1954dd0d2f6959 21156176 c5-successor-to-certify-esp.raw
+          sudo unshare -n env PATH="$PATH" ../build-esp-image.sh evidence/successor-to-certify.efi /tmp/$PREFIX-esp-env2-slot-b 0ea8dd7da95eece8fe8eefed9f3fb701b9cdfd09abe5cfdd5f1954dd0d2f6959 21156176 c5-successor-to-certify-esp.raw
+          cmp /tmp/$PREFIX-esp-env2-slot-a/c5-successor-to-certify-esp.raw /tmp/$PREFIX-esp-env2-slot-b/c5-successor-to-certify-esp.raw
+          HS=$(sha256sum /tmp/$PREFIX-esp-env2-slot-a/c5-successor-to-certify-esp.raw | cut -d' ' -f1)
           [ "$HS" = "6ff0d9ef89668ef79e60eba41eb70704664008697637797b384e6e67075d2f77" ] || { echo "E_ESP_SLOT_PIN_MISMATCH $HS"; exit 46; }
+          cp --sparse=always /tmp/$PREFIX-esp-env2-slot-a/c5-successor-to-certify-esp.raw /tmp/$PREFIX-esp-env2-a/c5-successor-to-certify-esp.raw
+          [ "$(sha256sum /tmp/$PREFIX-esp-env2-a/c5-successor-to-certify-esp.raw | cut -d' ' -f1)" = "6ff0d9ef89668ef79e60eba41eb70704664008697637797b384e6e67075d2f77" ] || { echo "E_SLOT_ESP_COPY_PIN /tmp/$PREFIX-esp-env2-a/c5-successor-to-certify-esp.raw"; exit 46; }
           sha256sum /tmp/$PREFIX-esp-env2-a/c5-successor-to-certify-esp.raw > /tmp/$PREFIX-env2-evidence/NON_CERTIFYING_SCRATCH-env2-esp-slot-hash.txt
       - name: NON_CERTIFYING_SCRATCH env2 accepted-firmware pins + runner-1 hash echo
         run: |

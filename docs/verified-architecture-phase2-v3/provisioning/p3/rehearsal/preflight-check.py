@@ -253,6 +253,23 @@ for c in cfg.get("cases",[]):
     _lanes=c.get("lanes")
     if not isinstance(_lanes,list) or not _lanes or set(_lanes)-LANES_ALL:
         fail("E_CONFIG_CASE_LANES", c.get("id","?")+" lanes="+repr(_lanes))
+# peer pre-push ruling on 63dc0ed9 (revisions 1/5), moved OUT of the CERT_TARGET gate per
+# the peer run-36081199933 ruling (item 3): the signed-file cases P1 and R7 must run in
+# ALL THREE lanes, and this guard must fire in the scratch/rehearsal lanes too - a green
+# scratch/rehearsal run with zero signed-file firmware evidence is the misleading
+# partial PASS the owner forbade.
+if os.path.exists(os.path.join(here,"evidence","successor-to-certify.efi")):
+    _SIGNED_CASE_LANES={"NON_CERTIFYING_REHEARSAL-P1-signed-slot-positive",
+                        "NON_CERTIFYING_REHEARSAL-R7-release-sibling-behavior-only"}
+    _found=set()
+    for c in cfg.get("cases",[]):
+        if c.get("id") not in _SIGNED_CASE_LANES: continue
+        _found.add(c["id"])
+        _cl=set(c.get("lanes",[]))
+        if _cl!={"scratch","rehearsal","certification"}:
+            fail("E_SIGNED_CASE_LANES",c["id"]+" lanes="+repr(sorted(_cl))+" != ['certification', 'rehearsal', 'scratch'] (signed-file cases must run in all three lanes)")
+    if _found!=_SIGNED_CASE_LANES:
+        fail("E_SIGNED_CASE_LANES","signed-file cases missing from config: "+repr(sorted(_SIGNED_CASE_LANES-_found)))
 if CERT_TARGET:
     _cert_ids=tuple(sorted(c["id"] for c in cfg.get("cases",[]) if "certification" in c.get("lanes",[])))
     if _cert_ids!=tuple(sorted(FROZEN_CERT_CASE_IDS)):
@@ -288,20 +305,6 @@ if CERT_TARGET:
             _pos.append(c["id"])
         if len(_pos)!=1:
             fail("E_CERT_POSITIVE_MISSING","signed slot present but %d cases satisfy the full positive predicate (need exactly 1: esp==%s, debug firmware, sole-db enrollment trust DER==[7cda4ddc..] per enrollment record, kernel_exec/exit_98/no_reject_strings): %s"%(len(_pos),_SLOT_ESP,repr(_pos)))
-        # peer pre-push ruling on 63dc0ed9 (revisions 1/5): the signed-file cases P1 and
-        # R7 must run in ALL THREE lanes - a green scratch/rehearsal run with zero
-        # signed-file firmware evidence is the misleading partial PASS the owner forbade.
-        _SIGNED_CASE_LANES={"NON_CERTIFYING_REHEARSAL-P1-signed-slot-positive",
-                            "NON_CERTIFYING_REHEARSAL-R7-release-sibling-behavior-only"}
-        _found=set()
-        for c in cfg.get("cases",[]):
-            if c.get("id") not in _SIGNED_CASE_LANES: continue
-            _found.add(c["id"])
-            _cl=set(c.get("lanes",[]))
-            if _cl!={"scratch","rehearsal","certification"}:
-                fail("E_SIGNED_CASE_LANES",c["id"]+" lanes="+repr(sorted(_cl))+" != ['certification', 'rehearsal', 'scratch'] (signed-file cases must run in all three lanes)")
-        if _found!=_SIGNED_CASE_LANES:
-            fail("E_SIGNED_CASE_LANES","signed-file cases missing from config: "+repr(sorted(_SIGNED_CASE_LANES-_found)))
     for pth_key in ("vars_template","esp","firmware"):
         p=c.get(pth_key,"")
         # build-output/ and out/ are generated during the ceremony by hash-pinned producers;
