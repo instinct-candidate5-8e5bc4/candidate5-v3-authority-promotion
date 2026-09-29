@@ -1,0 +1,117 @@
+{
+ "mapVersion": "1.0.0",
+ "kind": "TRACK_B_ENTITY_BODY_MAP",
+ "generatedAt": "2026-09-29T22:02:35.940Z",
+ "git": {
+  "branch": "candidate5-track-b-visual-slice",
+  "commit": "6c7b4737f6dc11ea39e993075c500954596f1fb0"
+ },
+ "policy": "Every visual entity resolves through this table ONLY. Unknown or unmapped entity = NO VISUAL ACTION (fail-closed). No default mapping, no substitution, no inference from names or meshes.",
+ "anchors": {
+  "sourcePackageDigest": "187cf1a4c0af01ef12087879f44eeb88a355499a860665e29cdb2f5ab0d06aec",
+  "worldStateDigest": "fa1bbaa985a63a8bfa30c2bbd7fbaf14b2c4972d985815a093bdd68f7fe954ea",
+  "descriptorDigest": "5f6829b7b10bbbc91ff0bd7e66bd5de3c69473091d56af92f8decbc8cbecaa18",
+  "surfaceModelPin": {
+   "repoPath": "evidence/verified-architecture-phase2/surface-models/school.json",
+   "sha256": "6e9878bd1640b2747e8db52237843a8fd75f878e5dc6e162646c4971e85d99c5",
+   "bytes": 8988
+  }
+ },
+ "entryTypes": {
+  "CLINICAL_SUBJECT": "A patient body. clinicalSubjectOf() may return this entry. Region semantics remain engine-owned and frozen (see clinicalSemantics).",
+  "EQUIPMENT": "Certified equipment body. NEVER resolvable as a clinical subject.",
+  "ENVIRONMENT": "Room/surface geometry. NEVER resolvable as a clinical subject.",
+  "SYNTHETIC_TRAINING": "Labeled temporary integration-bridge entity (Option A). MUST NEVER carry clinicalBodyRegion/bodyRegions/clinicalSubject fields and NEVER resolve to a real medical body region or action. None is defined here yet; the engine/contract side introduces any synthetic entity explicitly."
+ },
+ "entities": {
+  "school-casualty-adult-v1": {
+   "entityId": "school-casualty-adult-v1",
+   "entryType": "CLINICAL_SUBJECT",
+   "layoutGroup": "casualty",
+   "physicalBodyRef": {
+    "recordId": "casualty/adult-v1/supine-floor",
+    "revision": 1,
+    "digest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3",
+    "proofGeometryDigest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+   },
+   "boundsMicrounits": {
+    "minX": -330000,
+    "maxX": 330000,
+    "minY": 0,
+    "maxY": 302000,
+    "minZ": -1179000,
+    "maxZ": 767000
+   },
+   "sourceAnchor": {
+    "visualDigest": "efe6bd00ebbc4aeb13cf219d3aa1a81258b6b2f6ae2f109eb5f4c44850a535d9",
+    "bodyDigest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+   },
+   "clinicalSemantics": {
+    "owner": "AUTHORITATIVE_ENGINE",
+    "note": "examine(head/airway/chest/wrist/abdomen/leg) medical meaning is frozen and owned by the authoritative engine. This visual table defines NO body-region semantics and MUST NOT be extended with any."
+   }
+  },
+  "school-treatment-chair": {
+   "entityId": "school-treatment-chair",
+   "entryType": "EQUIPMENT",
+   "layoutGroup": "chair",
+   "physicalBodyRef": {
+    "recordId": "school/treatment-chair",
+    "revision": 1,
+    "digest": "1e78439ad5977c6c050475b4ac692cee9fce7da034725ea88a7ed4f0b0803247",
+    "proofGeometryDigest": "1e78439ad5977c6c050475b4ac692cee9fce7da034725ea88a7ed4f0b0803247"
+   },
+   "boundsMicrounits": {
+    "minX": -250000,
+    "maxX": 250000,
+    "minY": 0,
+    "maxY": 900000,
+    "minZ": -250000,
+    "maxZ": 250000
+   },
+   "sourceAnchor": {
+    "visualDigest": "e97a9d885f0c431fe36fac51461d330ef20503b72ecbb2f8ca7fc27b8dcb1770",
+    "bodyDigest": "1e78439ad5977c6c050475b4ac692cee9fce7da034725ea88a7ed4f0b0803247"
+   },
+   "supportSurfaceRef": {
+    "id": "school/treatment-chair-seat",
+    "revision": 1,
+    "digest": "08028ddd3faa51edaba2c202b44f91c18e3f60ac5c74b353a14d4ab89ba5501d"
+   }
+  },
+  "school-medical-bag": {
+   "entityId": "school-medical-bag",
+   "entryType": "EQUIPMENT",
+   "layoutGroup": "bag",
+   "physicalBodyRef": {
+    "recordId": "school-medical-bag-body",
+    "revision": 1,
+    "digest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+    "proofGeometryDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a"
+   },
+   "boundsMicrounits": {
+    "minX": -275000,
+    "maxX": 275000,
+    "minY": -175000,
+    "maxY": 175000,
+    "minZ": -175000,
+    "maxZ": 175000
+   },
+   "sourceAnchor": {
+    "visualDigest": "e97a9d885f0c431fe36fac51461d330ef20503b72ecbb2f8ca7fc27b8dcb1770",
+    "bodyDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a"
+   }
+  },
+  "school-treatment-room-v1": {
+   "entityId": "school-treatment-room-v1",
+   "entryType": "ENVIRONMENT",
+   "layoutGroup": "room",
+   "boundsMicrounits": null,
+   "sourceAnchor": {
+    "surfaceSetDigest": "df03ff358879ecd99cd6751596a59376036105b3b4d8d8daa7e9e7b01e225c98",
+    "surfaceModelPinSha256": "6e9878bd1640b2747e8db52237843a8fd75f878e5dc6e162646c4971e85d99c5"
+   },
+   "note": "Room surfaces are lineage-evidenced presentation geometry, not entities with physical body records."
+  }
+ }
+}
