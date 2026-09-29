@@ -1,0 +1,48 @@
+{
+ "pinsVersion": "1.0.0",
+ "kind": "TRACK_B_SERVED_PINS",
+ "generatedAt": "2026-09-29T22:15:53.553Z",
+ "policy": "Byte-exact pins of every runtime-served demo file. Post-push verification recomputes pins from the deployed bytes and requires an exact match; any drift is a HARD STOP, never a silent pass.",
+ "pins": [
+  {
+   "path": "visual-slice/index.html",
+   "bytes": 19503,
+   "sha256": "3872bf3a5e00671b3e53ff529c5b61e63872acc7b6edde3f5c98b57580410063"
+  },
+  {
+   "path": "visual-slice/engine-bundle.js",
+   "bytes": 145740,
+   "sha256": "c718dcee047177a61f78b0e9fc3890427707c14fe976b1b79ac704a3d5c6959b"
+  },
+  {
+   "path": "visual-slice/articulated-layout.mjs",
+   "bytes": 5460,
+   "sha256": "f1ecef52c3622cd58dffb2fb78204e259b46b0ab31cbbcd0070b7fe539fd27f5"
+  },
+  {
+   "path": "visual-slice/camera-lighting.mjs",
+   "bytes": 3300,
+   "sha256": "e270383bd38bf4a7a0a8b5541a07b7ed37fe5675df94b07030548f0f73ade46e"
+  },
+  {
+   "path": "visual-slice/scene-registry.json",
+   "bytes": 1748,
+   "sha256": "d7b91479cba3020d66253a92f3f2c2eb8e7f3e0761c282ede17ea701f4509e06"
+  },
+  {
+   "path": "visual-slice/scene-bundle.json",
+   "bytes": 31637,
+   "sha256": "08fa59f6a4492acb0bab6f719beb70090c8ae8f5d090a47a3ea82ae873b39cfd"
+  }
+ ],
+ "externalImports": [
+  {
+   "url": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+   "note": "version-pinned CDN import (importmap)"
+  },
+  {
+   "url": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js",
+   "note": "version-pinned CDN import (importmap)"
+  }
+ ]
+}
