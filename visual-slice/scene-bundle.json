@@ -1,10 +1,10 @@
 {
  "bundleVersion": "1.0.0",
  "kind": "TRACK_B_VISUAL_SCENE_BUNDLE",
- "generatedAt": "2026-09-29T23:22:04.127Z",
+ "generatedAt": "2026-09-30T04:18:45.777Z",
  "git": {
-  "branch": "candidate5-track-b-visual-slice",
-  "commit": "1f99291b3ced7084650218f9ac9c0319f7401c7b",
+  "branch": "rebase-t7",
+  "commit": "a42b5e35e891013c28065809ef2aa713bbaf6e81",
   "base": "7cd96d36"
  },
  "banner": {
