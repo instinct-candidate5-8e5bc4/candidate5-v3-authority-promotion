@@ -7,6 +7,8 @@
 // authoritative state; animation/presentation is never a medical result.
 // Claim gate: "connected" only when the running shell consumes this package.
 import * as THREE from 'three';
+import {buildProceduralRoom} from './procedural-room.mjs';
+import {validatePresentationManifest} from './presentation-guard.mjs';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import * as ENGINE from '../engine-bundle.js';
 import {buildArticulatedLayout} from '../articulated-layout.mjs';
@@ -40,8 +42,8 @@ export async function mount(container,opts={}){
  try{
   if(!container||!container.appendChild)return{ok:false,reason:'container missing'};
   const base=new URL('..',import.meta.url);
-  const [bundle,map,statuses,manifest,build]=await Promise.all([
-   fetchJson(new URL('scene-bundle.json',base)),fetchJson(new URL('entity-body-map.json',base)),
+  const [bundle,map,presentationManifest,statuses,manifest,build]=await Promise.all([
+   fetchJson(new URL('scene-bundle.json',base)),fetchJson(new URL('entity-body-map.json',base)),fetchJson(new URL('presentation-manifest.json',base)).catch(()=>null),
    fetchJson(new URL('package/gate-statuses.json',base)),fetchJson(new URL('package/asset-manifest.json',base)),
    fetchJson(new URL('package/package-build.json',base))]);
   const mapCheck=validateMap(map);
@@ -88,7 +90,12 @@ export async function mount(container,opts={}){
   const box=(aabb,colorHex,o={})=>{const sx=m(aabb.maxX-aabb.minX),sy=m(aabb.maxY-aabb.minY),sz=m(aabb.maxZ-aabb.minZ);
    const mesh=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),new THREE.MeshStandardMaterial({color:parseInt(colorHex),roughness:o.roughness??.85,metalness:.05}));
    mesh.position.set(m(aabb.minX)+sx/2,m(aabb.minY)+sy/2,m(aabb.minZ)+sz/2);mesh.receiveShadow=true;return mesh};
-  for(const s of bundle.room)scene.add(box(s.geometryMicrounits,s.visualOnlyClaims.colorHex));
+  // PW-2: production room skin when the presentation manifest validates against
+  // the committed world digest; otherwise the certified debug boxes render with a
+  // LOUD placeholder line (never a silent fallback).
+  const pmCheck=presentationManifest?validatePresentationManifest(presentationManifest,{map,worldDigest:bundle.inputs.worldStateDigest}):{ok:false,reason:'presentation-manifest.json unavailable'};
+  if(pmCheck.ok){scene.add(buildProceduralRoom(THREE,bundle.room))}
+  else{for(const s of bundle.room)scene.add(box(s.geometryMicrounits,s.visualOnlyClaims.colorHex))}
   const layout=buildArticulatedLayout(liveCasualty,liveEquipment);
   // DOM/mesh binding registry: entityId -> componentId -> meshes[].
   // Certified bodies come from the B-W5 map; unknown entity = no meshes.
@@ -148,6 +155,7 @@ export async function mount(container,opts={}){
   overlay.style.cssText='position:absolute;top:0;left:0;right:0;padding:8px 12px;background:rgba(10,16,20,.92);border-bottom:2px solid #b8892d;font:12px/1.5 system-ui;color:#cfe3ee;pointer-events:none;z-index:5';
   overlay.innerHTML='<b>'+bundle.banner.title+'</b> — '+bundle.banner.warning+'<br>'+
    (bundle.banner.worldClassification?'<span style="color:#ffb84d">'+bundle.banner.worldClassification+'</span><br>':'')+
+   (pmCheck.ok?'<span style="color:#7dc4ff">PRESENTATION LAYER (PW-2 room architecture) - bound to authoritative geometry; physics authority unchanged</span><br>':'<span style="color:#ff6a5e">PRESENTATION MANIFEST PLACEHOLDER: '+(presentationManifest?'invalid - '+pmCheck.reason:'unavailable')+' - rendering certified debug geometry</span><br>')+
    'Casualty: '+statuses.statuses.casualty.gate+' '+statuses.statuses.casualty.gateResult+' ('+statuses.statuses.casualty.reviewId+') · Chair: '+statuses.statuses.chair.gate+' '+statuses.statuses.chair.gateResult+' ('+statuses.statuses.chair.reviewId+')';
   const finding=document.createElement('div');
   finding.style.cssText='position:absolute;left:0;right:0;bottom:0;padding:8px 12px;background:rgba(8,14,18,.9);font:13px/1.5 system-ui;color:#ffe9b8;display:none;z-index:5;white-space:pre-wrap';
@@ -155,7 +163,7 @@ export async function mount(container,opts={}){
   if(getComputedStyle(container).position==='static')container.style.position='relative';
   container.appendChild(overlay);container.appendChild(finding);
   const bagInitialPos=bundle.equipment.bag.authoritativeTransformMicrounits.positionMicrounits;
-  const state={container,opts,renderer,scene,camera,controls,layout,map,statuses,manifest,build,manifestOk,manifestDetail,
+  const state={container,opts,renderer,scene,camera,controls,layout,map,statuses,manifest,build,manifestOk,manifestDetail,pm:{ok:pmCheck.ok,bound:pmCheck.bound||null,reason:pmCheck.reason||null},
    bindings,finding,overlay,bagLocation:'INITIAL',bagInitialPos,lastCue:'NONE',disposed:false,
    loop:()=>{if(state.disposed)return;renderer.render(scene,camera)}};
   renderer.setAnimationLoop(state.loop);
@@ -231,4 +239,5 @@ export function status(){
   boundEntities:Object.keys(inst.bindings),
   bagLocation:inst.bagLocation,lastCue:inst.lastCue,
   syntheticUnit:syn?{bound:true,useState:syn.useState,gateAStatus:'PROPOSED_NOT_ADMITTED',note:'UNCERTIFIED presentation bridge (B-W11 interim, Gate A in flight)'}:{bound:false},
+  presentation:inst.pm?{active:inst.pm.ok,bound:inst.pm.ok?inst.pm.bound:null,reason:inst.pm.ok?null:inst.pm.reason}:null,
   claimGate:'SLICE-PACKAGE ONLY: not "connected" until the running shell consumes this package'}}

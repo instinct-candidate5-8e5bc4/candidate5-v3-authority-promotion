@@ -5,7 +5,7 @@
   "definitionId": "SCHOOL_TREATMENT_ROOM",
   "authoritativeWorldDigest": "fa1bbaa985a63a8bfa30c2bbd7fbaf14b2c4972d985815a093bdd68f7fe954ea"
  },
- "policy": "Presentation never invents positions/supports/collisions; decorative meshes are never authoritative unless separately certified; missing asset = loud labeled placeholder, never silent fallback; licensing/provenance explicit for any non-procedural asset (owner clarification 2026-09-30).",
+ "policy": "Presentation never invents positions/supports/collisions; decorative meshes are never authoritative unless separately certified; missing asset = loud labeled placeholder, never silent fallback; ZERO-COST is a permanent project constraint (owner directive 2026-09-30): procedural, in-project custom, CC0, or verified-free assets only, every external asset with explicit provenance/license evidence before entering the approved pipeline; $0 never lowers the production-quality target - each scene must be unmistakably recognizable (owner clarification + zero-cost directive 2026-09-30).",
  "entities": [
   {
    "physicalEntityId": "school-casualty-adult-v1",
@@ -62,5 +62,5 @@
   "rigRef": "procedural:renderer-package.mjs#lighting",
   "shadowPolicy": "PCFSoftShadowMap"
  },
- "manifestDigest": "7bf28e44cda8a466768abe25b48d9f4d0ba54df9d1943ed54b649d6d09e6be30"
+ "manifestDigest": "da2311bf6991677796151833520c149e68c009628b73afb3d78fcd8f87d2393e"
 }
