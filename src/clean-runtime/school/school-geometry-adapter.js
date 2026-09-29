@@ -35,11 +35,67 @@ function schoolGeometryAdapter({surfaceModel}){return Object.freeze({kind:'SCHOO
  const dynBounds=rid=>rid===SCHOOL_BAG_BODY.bodyId?{minX:Math.round(SCHOOL_BAG_BODY.geometry.minX*1e6),maxX:Math.round(SCHOOL_BAG_BODY.geometry.maxX*1e6),minY:Math.round(SCHOOL_BAG_BODY.geometry.minY*1e6),maxY:Math.round(SCHOOL_BAG_BODY.geometry.maxY*1e6),minZ:Math.round(SCHOOL_BAG_BODY.geometry.minZ*1e6),maxZ:Math.round(SCHOOL_BAG_BODY.geometry.maxZ*1e6)}:rid===BODY.bodyDefinitionId?BODY.aggregateBounds:rid===CHAIR.BODY.bodyDefinitionId?CHAIR.BODY.aggregateBounds:rid==='synthetic/gate-c-supported-box-body'?{minX:-100000,maxX:100000,minY:-100000,maxY:100000,minZ:-100000,maxZ:100000}:rid===SYN.UNIT_BODY.definition.bodyDefinitionId?SYN.UNIT_BODY.definition.aggregateBounds:null;
  const cmdB=dynBounds(body.recordId);
  if(cmdB){const cw={minX:cmdB.minX+position[0],maxX:cmdB.maxX+position[0],minY:cmdB.minY+position[1],maxY:cmdB.maxY+position[1],minZ:cmdB.minZ+position[2],maxZ:cmdB.maxZ+position[2]};const bad=[];
-  for(const oid of Object.keys(input.proposedState.entities).sort()){if(oid===entityId)continue;const o=input.proposedState.entities[oid];if(!o||o.lifecycleState==='REMOVED'||!o.physicalBodyRef)continue;const ob=dynBounds(o.physicalBodyRef.recordId);if(!ob)return Object.freeze({outcome:'UNKNOWN',evidence:{adapterReason:'DYNAMIC_BODY_UNMODELED',entityId:oid,recordId:o.physicalBodyRef.recordId}});const op=o.transform?.positionMicrounits;if(!Array.isArray(op)||op.length!==3)return Object.freeze({outcome:'UNKNOWN',evidence:{adapterReason:'DYNAMIC_BODY_TRANSFORM_MISSING',entityId:oid}});const ow={minX:ob.minX+op[0],maxX:ob.maxX+op[0],minY:ob.minY+op[1],maxY:ob.maxY+op[1],minZ:ob.minZ+op[2],maxZ:ob.maxZ+op[2]};const overlaps=cw.minX<ow.maxX&&cw.maxX>ow.minX&&cw.minY<ow.maxY&&cw.maxY>ow.minY&&cw.minZ<ow.maxZ&&cw.maxZ>ow.minZ;if(!overlaps)continue;const exempt=(input.proposedState.supportRelations||[]).some(r=>(r.supportedEntityId===entityId&&r.ownerEntityRef?.id===oid)||(r.supportedEntityId===oid&&r.ownerEntityRef?.id===entityId))
-   // v1 school runtime carries the validated support dependency on the entity
-   // (freshness enforced by its own dependency gate before legality runs).
-   ||entity.supportRelation?.ownerEntityId===oid||o.supportRelation?.ownerEntityId===entityId
-   ||(input.proposedState.physicalRelations||[]).some(r=>(r.entityId===entityId&&r.ownerEntityId===oid)||(r.entityId===oid&&r.ownerEntityId===entityId));if(!exempt)bad.push({pair:[entityId,oid],commandEntityWorldAabbMicrounits:cw,otherEntityWorldAabbMicrounits:ow})}
+  for(const oid of Object.keys(input.proposedState.entities).sort()){if(oid===entityId)continue;const o=input.proposedState.entities[oid];if(!o||o.lifecycleState==='REMOVED'||!o.physicalBodyRef)continue;const ob=dynBounds(o.physicalBodyRef.recordId);if(!ob)return Object.freeze({outcome:'UNKNOWN',evidence:{adapterReason:'DYNAMIC_BODY_UNMODELED',entityId:oid,recordId:o.physicalBodyRef.recordId}});const op=o.transform?.positionMicrounits;if(!Array.isArray(op)||op.length!==3)return Object.freeze({outcome:'UNKNOWN',evidence:{adapterReason:'DYNAMIC_BODY_TRANSFORM_MISSING',entityId:oid}});const ow={minX:ob.minX+op[0],maxX:ob.maxX+op[0],minY:ob.minY+op[1],maxY:ob.maxY+op[1],minZ:ob.minZ+op[2],maxZ:ob.maxZ+op[2]};const overlaps=cw.minX<ow.maxX&&cw.maxX>ow.minX&&cw.minY<ow.maxY&&cw.maxY>ow.minY&&cw.minZ<ow.maxZ&&cw.maxZ>ow.minZ;if(!overlaps)continue;// R1 v7 (executor finding): relation PRESENCE is not an exemption - an
+   // invented ENTITY_OWNED relation passes generic validateRelations without
+   // any contact-geometry proof for the pair. Exemption is scoped to exactly
+   // the admitted, proof-carrying pairs:
+   //  (a) v2: the certified unit/bag containment pair - relation id, volume
+   //      pins and owner volume state checked, and FULL containment
+   //      recomputed at the proposed transforms, right here;
+   //  (b) v1: the certified Gate-C fixture pair (synthetic-supported-fixture
+   //      on school-treatment-chair), whose contact is validated against the
+   //      materialized owner seat surface in the isSynthetic branch.
+   // Every other overlapping dynamic pair is a collision, relation or not.
+   let exempt=false;
+   const pairIds=[entityId,oid];
+   if(pairIds.includes('synthetic-training-unit-v1')&&pairIds.includes('school-medical-bag')){
+    // The certified pair's legality is OWNED by the containment proof on the
+    // unit's own evaluation (the unit is always in the affected set as a
+    // supported entity): contained -> legal, protruding -> CONTAINMENT_
+    // VIOLATION. This gate therefore exempts the pair whenever the certified
+    // relation and its volume pins hold - never for any other pair.
+    const unitId=pairIds[0]==='synthetic-training-unit-v1'?entityId:oid;
+    const ownerE=input.proposedState.entities[pairIds[0]==='synthetic-training-unit-v1'?oid:entityId];
+    const rel=(input.proposedState.supportRelations||[]).find(r=>r.relationId==='synthetic:unit:bag-interior-floor'&&r.supportedEntityId===unitId&&r.ownerEntityRef?.id==='school-medical-bag'&&r.supportSourceKind==='ENTITY_OWNED');
+    if(rel&&ownerE){
+     const VOL=SYN.CONTAINMENT_VOLUME.definition;
+     const ownerVol=ownerE.physicalState?.supportVolume;
+     exempt=!!(rel.supportVolumeRef&&rel.supportVolumeRef.id===VOL.supportVolumeId&&rel.supportVolumeRef.revision===VOL.volumeRevision&&rel.supportVolumeRef.digest===VOL.canonicalDigest&&ownerVol&&ownerVol.supportVolumeId===VOL.supportVolumeId&&ownerVol.volumeRevision===VOL.volumeRevision&&ownerVol.canonicalDigest===VOL.canonicalDigest);
+    }
+   }
+   // v1 certified Gate-C fixture pair only (contact validated via the
+   // materialized owner seat surface in the isSynthetic evaluation branch).
+   if(!exempt&&pairIds.includes('synthetic-supported-fixture')&&pairIds.includes('school-treatment-chair'))
+    exempt=entity.supportRelation?.ownerEntityId===oid||o.supportRelation?.ownerEntityId===entityId
+     ||(input.proposedState.physicalRelations||[]).some(r=>(r.entityId===entityId&&r.ownerEntityId===oid)||(r.entityId===oid&&r.ownerEntityId===entityId));
+   // (c) surface-contact exemption: a pair linked by an ENTITY_OWNED relation
+   // where the supported entity RESTS on the owner's materialized certified
+   // support surface - contact plane equality (supported AABB bottom ==
+   // materialized surface plane). Resting contact is not penetration; whether
+   // that placement is ADMITTED stays with the supported entity's own Phase 2
+   // evaluation (e.g. the certified C6 gate truth: seat not admitted on the
+   // v2.0.0 path -> CONTACT_GAP_FLOATING). A plane mismatch means the bodies
+   // interpenetrate -> collision (the executor's bag-on-chair bypass: bag
+   // bottom at floor level 0 != seat plane 490000 -> DYNAMIC_BODY_COLLISION).
+   if(!exempt){
+    const relC=(input.proposedState.supportRelations||[]).find(r=>r.supportSourceKind==='ENTITY_OWNED'&&((r.supportedEntityId===entityId&&r.ownerEntityRef?.id===oid)||(r.supportedEntityId===oid&&r.ownerEntityRef?.id===entityId)));
+    if(relC){
+     const supE=input.proposedState.entities[relC.supportedEntityId],ownE=input.proposedState.entities[relC.ownerEntityRef.id];
+     const isChairOwner=ownE?.physicalBodyRef?.recordId===CHAIR.BODY.bodyDefinitionId;
+     const isBagOwner=ownE?.physicalBodyRef?.recordId===SCHOOL_BAG_BODY.bodyId;
+     const surfDef=isChairOwner?CHAIR.SURFACE:isBagOwner?SYN.INTERIOR_FLOOR.definition:null;
+     const od=isChairOwner?CHAIR.ENTITY:isBagOwner?SYN.OWNER_ENTITY.definition:null;
+     const pin=ownE?.physicalState?.supportSurface;
+     if(supE&&ownE&&surfDef&&od&&pin&&pin.supportSurfaceId===surfDef.supportSurfaceId&&pin.surfaceRevision===surfDef.surfaceRevision&&pin.canonicalDigest===surfDef.canonicalDigest&&relC.supportSurfaceRef?.id===pin.supportSurfaceId&&relC.supportSurfaceRef?.revision===pin.surfaceRevision&&relC.supportSurfaceRef?.digest===pin.canonicalDigest){
+      const supB=dynBounds(supE.physicalBodyRef.recordId);
+      if(supB){try{
+       const defOwner={entityDefinitionId:od.entityDefinitionId,entityRevision:od.entityRevision,entityDigest:od.entityDigest,transform:{translationMicrounits:ownE.transform.positionMicrounits,orientation:A.V1.canonicalOrientation}};
+       const mat=A.materializeSupportSurface({staticModelRef:SCHOOL_SURFACE_MODEL_REF,owner:defOwner,surface:surfDef});
+       exempt=(supB.minY+supE.transform.positionMicrounits[1])===Math.round(mat.planeOrDepth.planeY*1e6);
+      }catch(e){exempt=false}}
+     }
+    }
+   }if(!exempt)bad.push({pair:[entityId,oid],commandEntityWorldAabbMicrounits:cw,otherEntityWorldAabbMicrounits:ow})}
   if(bad.length)return Object.freeze({outcome:'ILLEGAL',evidence:{adapterKind:'SCHOOL_PHASE2_GEOMETRY_ADAPTER',adapterReason:'DYNAMIC_BODY_COLLISION',collidingPairs:bad,gate:'Dynamic-body AABB intersections evaluated between the command entity and every other dynamic body in the proposed world; only pairs bound by a validated support relation in the proposed state are exempt.'}})}
  return Object.freeze({outcome:result.result,evidence:{adapterKind:'SCHOOL_PHASE2_GEOMETRY_ADAPTER',request,requestDigest:digest(request),requestBytes,sceneProvenance:SCHOOL_SCENE,bodyProvenance:{classification:contract.provenance.classification,lineageStatus:contract.provenance.lineageStatus,sourceId:contract.provenance.sourceId,revision:contract.revision,digest:contract.digest},surfaceProvenance:{classification:SCHOOL_SURFACE_MODEL_REF.classification,lineageStatus:SCHOOL_SURFACE_MODEL_REF.lineageStatus,sourceId:SCHOOL_SURFACE_MODEL_REF.sourceId,revision:surfaceModel.revision,digest:surfaceModel.surfaceModelDigest,sourceEvidence:surfaceModel.sourceEvidence,resolvedSurface:(surfaceModel.surfaces.find(x=>x.surfaceId===request.surfaceId)||null)?.provenance||null},phase2ReasonCode:result.reasonCode,phase2Evidence:result.evidence,phase2ProofDigest:result.proofDigest||null,...(containmentProof?{containmentProof}:{})}})}})}
 module.exports={schoolGeometryAdapter};

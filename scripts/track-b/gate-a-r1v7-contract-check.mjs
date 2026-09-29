@@ -1,7 +1,22 @@
 #!/usr/bin/env node
-// GATE A R1 v6 evidence harness: v5 fixed the engine's three R1 v4 verdict
-// findings; the executor's v5 review confirmed two of three repros FIXED and
-// added two more findings, both fixed and proven here:
+// GATE A R1 v7 evidence harness: v6 fixed the executor's two v5 findings;
+// the executor's v6 review found the collision exemption bypassable by an
+// invented support relation (relation presence without contact-geometry
+// proof) and flagged the optional owner-bounds validator contract. Both are
+// fixed and proven here:
+//  (v7-1) collision exemption is SCOPED and PROOF-CARRYING: (a) the certified
+//      unit/bag pair (relation id + volume pins; the containment verdict is
+//      owned by the unit's own evaluation), (b) the certified Gate-C fixture
+//      pair, (c) surface-contact pairs whose supported entity provably RESTS
+//      on the owner's materialized certified surface (contact plane equality;
+//      admission still belongs to the supported entity's own Phase 2
+//      evaluation - the certified C6 gate truth CONTACT_GAP_FLOATING is
+//      preserved verbatim). The executor's standalone bag-on-chair bypass
+//      repro (his exact file) REJECTS DYNAMIC_BODY_COLLISION, atomically.
+//  (v7-2) validateSupportVolume REQUIRES owner body bounds for
+//      CONTAINMENT_INTERIOR (MISSING_OWNER_BODY_BOUNDS) - an optional guard
+//      is a bypassable guard.
+// The v6 fixes remain proven below:
 //  (v6-1) the collision exception is no longer an evidence string: the adapter
 //      now computes ACTUAL dynamic-body AABB intersections in the legality
 //      path (the executor's chair overlap hostile repro REJECTS
@@ -39,7 +54,7 @@ const out=[];const c=(label,ok,detail)=>out.push((ok?'PASS ':'FAIL ')+label+(ok?
 // Part C1: boundary 1 - ENTITY + SUPPORT_VOLUME admissible via envelope+registry, no self-admission.
 for(const[type,def]of[['ENTITY',SYN.OWNER_ENTITY.definition],['SUPPORT_VOLUME',SYN.CONTAINMENT_VOLUME.definition]]){
  const ref=A.refFor(type,def);
- const env=A.createDraft({envelopeId:'r1v6-harness-'+type,definitionRef:ref,limitations:['R1 v6 proposal - pre-admission']});
+ const env=A.createDraft({envelopeId:'r1v7-harness-'+type,definitionRef:ref,limitations:['R1 v7 proposal - pre-admission']});
  const adm=A.admit({definitionType:type,definition:def,envelope:env});
  c('C1 '+type+' envelope VALIDATED + registry rejects draft NOT_VERIFIED_FOR_SLICE (admissible, not self-admitted)',
   A.validateEnvelope(env).status==='VALIDATED'&&adm.status==='REJECTED'&&adm.failure.code==='NOT_VERIFIED_FOR_SLICE');}
@@ -99,43 +114,43 @@ c('C7 Gate C fixture branch untouched; unit branch is separate and keyed on the 
 // Part C8: v5 runtime proofs - the engine's exact revision-2 repro COMMITS; all stale/containment negatives REJECT.
 const v=validateScenePackage(p);
 const api=createMultiSupportRuntime({initialWorld:empty(),legalityPort:schoolGeometryAdapter({surfaceModel:model}),ownerBodyBindings:v.ownerBodyBindings});
-const boot=api.proposeTransaction({transactionId:'r1v6:boot',expectedWorldRevision:0,commands:p.entities.map(e=>({commandId:'spawn:'+e.entityId,type:'SpawnEntity',expectedWorldRevision:0,entity:e})).concat(p.supportRelations.map(r=>({commandId:'support:'+r.relationId,type:'AttachSupportRelation',expectedWorldRevision:0,relation:r})))});
+const boot=api.proposeTransaction({transactionId:'r1v7:boot',expectedWorldRevision:0,commands:p.entities.map(e=>({commandId:'spawn:'+e.entityId,type:'SpawnEntity',expectedWorldRevision:0,entity:e})).concat(p.supportRelations.map(r=>({commandId:'support:'+r.relationId,type:'AttachSupportRelation',expectedWorldRevision:0,relation:r})))});
 const b1=api.getWorldState();
 const rebindTo=(st,rev,fn)=>st.supportRelations.map(r=>{const cl=structuredClone(r);cl.boundWorldRevision=rev;if(fn)fn(cl,r);return {commandId:'tx:rebind:'+rev+':'+r.relationId,type:'ReplaceSupportRelation',expectedWorldRevision:st.revision,relationId:r.relationId,relation:cl}});
-const repro=api.proposeTransaction({transactionId:'r1v6:engine-repro',expectedWorldRevision:1,commands:[
- {commandId:'r1v6:set-transform',type:'SetTransform',expectedWorldRevision:1,entityId:'synthetic-training-unit-v1',transform:structuredClone(b1.entities['synthetic-training-unit-v1'].transform)},
+const repro=api.proposeTransaction({transactionId:'r1v7:engine-repro',expectedWorldRevision:1,commands:[
+ {commandId:'r1v7:set-transform',type:'SetTransform',expectedWorldRevision:1,entityId:'synthetic-training-unit-v1',transform:structuredClone(b1.entities['synthetic-training-unit-v1'].transform)},
  ...rebindTo(b1,2)]});
 c('C8a v5 ENGINE REPRO: SetTransform unit unchanged + all 4 relations rebound to revision 2 COMMITS (v4 broke here: STALE_OWNER_BODY)',boot.status==='COMMITTED'&&repro.status==='COMMITTED',(boot.code||'')+' '+(repro.code||''));
 const b2=api.getWorldState();
 const newBagBody={recordId:SCHOOL_BAG_BODY.bodyId,revision:2,digest:'0'.repeat(64)};
-const negBody=api.proposeTransaction({transactionId:'r1v6:neg-body',expectedWorldRevision:2,commands:[
- {commandId:'r1v6:nb:body',type:'ReplacePhysicalBody',expectedWorldRevision:2,entityId:'school-medical-bag',physicalBodyRef:newBagBody},
+const negBody=api.proposeTransaction({transactionId:'r1v7:neg-body',expectedWorldRevision:2,commands:[
+ {commandId:'r1v7:nb:body',type:'ReplacePhysicalBody',expectedWorldRevision:2,entityId:'school-medical-bag',physicalBodyRef:newBagBody},
  ...rebindTo(b2,3,(cl,r)=>{if(r.relationId==='school:bag:floor'){cl.supportedBodyRef={id:newBagBody.recordId,revision:2,digest:newBagBody.digest};cl.contactRegionRef={...cl.contactRegionRef,bodyRevision:2,bodyDigest:newBagBody.digest}}if(r.supportedEntityId==='synthetic-training-unit-v1')cl.ownerEntityRef={...cl.ownerEntityRef,revision:2}})]});
 c('C8b v5 negative: replaced bag body -> unit relation STALE_OWNER_BODY',negBody.status==='REJECTED'&&negBody.code==='STALE_OWNER_BODY',negBody.code);
-const negRev=api.proposeTransaction({transactionId:'r1v6:neg-rev',expectedWorldRevision:2,commands:[
- {commandId:'r1v6:nr:xf',type:'SetTransform',expectedWorldRevision:2,entityId:'school-medical-bag',transform:structuredClone(b2.entities['school-medical-bag'].transform)},
+const negRev=api.proposeTransaction({transactionId:'r1v7:neg-rev',expectedWorldRevision:2,commands:[
+ {commandId:'r1v7:nr:xf',type:'SetTransform',expectedWorldRevision:2,entityId:'school-medical-bag',transform:structuredClone(b2.entities['school-medical-bag'].transform)},
  ...rebindTo(b2,3)]});
 c('C8c v5 negative: owner revision bump without relation update -> STALE_OWNER_REVISION',negRev.status==='REJECTED'&&negRev.code==='STALE_OWNER_REVISION',negRev.code);
-const negVol=api.proposeTransaction({transactionId:'r1v6:neg-vol',expectedWorldRevision:2,commands:rebindTo(b2,3,(cl,r)=>{if(r.supportedEntityId==='synthetic-training-unit-v1')cl.supportVolumeRef={...cl.supportVolumeRef,digest:'0'.repeat(64)}})});
+const negVol=api.proposeTransaction({transactionId:'r1v7:neg-vol',expectedWorldRevision:2,commands:rebindTo(b2,3,(cl,r)=>{if(r.supportedEntityId==='synthetic-training-unit-v1')cl.supportVolumeRef={...cl.supportVolumeRef,digest:'0'.repeat(64)}})});
 c('C8d v5 negative: forged volume digest on the unit relation -> STALE_SUPPORT_VOLUME',negVol.status==='REJECTED'&&negVol.code==='STALE_SUPPORT_VOLUME',negVol.code);
-const negPro=api.proposeTransaction({transactionId:'r1v6:neg-protrusion',expectedWorldRevision:2,commands:[
- {commandId:'r1v6:np:xf',type:'SetTransform',expectedWorldRevision:2,entityId:'synthetic-training-unit-v1',transform:{positionMicrounits:[-2800000,25000,1000000],orientation:[0,0,0,1],scaleMicrounits:[1000000,1000000,1000000]}},
+const negPro=api.proposeTransaction({transactionId:'r1v7:neg-protrusion',expectedWorldRevision:2,commands:[
+ {commandId:'r1v7:np:xf',type:'SetTransform',expectedWorldRevision:2,entityId:'synthetic-training-unit-v1',transform:{positionMicrounits:[-2800000,25000,1000000],orientation:[0,0,0,1],scaleMicrounits:[1000000,1000000,1000000]}},
  ...rebindTo(b2,3)]});
 c('C8e v5 negative: unit protruding 0.2m out of the containment volume -> legality CONTAINMENT_VIOLATION',negPro.status==='REJECTED'&&negPro.evidence?.detail?.evidence?.adapterReason==='CONTAINMENT_VIOLATION',negPro.code);
 const unit2=structuredClone(b2.entities['synthetic-training-unit-v1']);unit2.entityId='synthetic-training-unit-v2-foreign';unit2.transform={positionMicrounits:[-3000000,25000,1100000],orientation:[0,0,0,1],scaleMicrounits:[1000000,1000000,1000000]};
 const rel2=structuredClone(b2.supportRelations.find(r=>r.supportedEntityId==='synthetic-training-unit-v1'));rel2.relationId='synthetic:unit2:bag-interior-floor';rel2.supportedEntityId=unit2.entityId;rel2.boundWorldRevision=3;
-const negFor=api.proposeTransaction({transactionId:'r1v6:neg-foreign',expectedWorldRevision:2,commands:[
- {commandId:'r1v6:nf:spawn',type:'SpawnEntity',expectedWorldRevision:2,entity:unit2},
- {commandId:'r1v6:nf:attach',type:'AttachSupportRelation',expectedWorldRevision:2,relation:rel2},
+const negFor=api.proposeTransaction({transactionId:'r1v7:neg-foreign',expectedWorldRevision:2,commands:[
+ {commandId:'r1v7:nf:spawn',type:'SpawnEntity',expectedWorldRevision:2,entity:unit2},
+ {commandId:'r1v7:nf:attach',type:'AttachSupportRelation',expectedWorldRevision:2,relation:rel2},
  ...rebindTo(b2,3)]});
 c('C8f v5 negative: foreign item claiming the same containment -> legality PAIR_SUPERSESSION_SCOPE',negFor.status==='REJECTED'&&negFor.evidence?.detail?.evidence?.adapterReason==='PAIR_SUPERSESSION_SCOPE',negFor.code);
 // Part C8g/C8h (v6): dynamic-pair intersection gate in the authoritative legality path.
-const chairRepro=api.proposeTransaction({transactionId:'r1v6:chair-hostile',expectedWorldRevision:2,commands:[
- {commandId:'r1v6:ch:xf',type:'SetTransform',expectedWorldRevision:2,entityId:'school-treatment-chair',transform:{positionMicrounits:[-3000000,0,1000000],orientation:[0,0,0,1],scaleMicrounits:[1000000,1000000,1000000]}},
+const chairRepro=api.proposeTransaction({transactionId:'r1v7:chair-hostile',expectedWorldRevision:2,commands:[
+ {commandId:'r1v7:ch:xf',type:'SetTransform',expectedWorldRevision:2,entityId:'school-treatment-chair',transform:{positionMicrounits:[-3000000,0,1000000],orientation:[0,0,0,1],scaleMicrounits:[1000000,1000000,1000000]}},
  ...rebindTo(b2,3)]});
 c('C8g v6 negative: EXECUTOR CHAIR HOSTILE REPRO (chair moved onto unit X/Z + bag occupied space) -> legality DYNAMIC_BODY_COLLISION, atomic',chairRepro.status==='REJECTED'&&chairRepro.evidence?.detail?.evidence?.adapterReason==='DYNAMIC_BODY_COLLISION'&&(chairRepro.evidence?.detail?.evidence?.collidingPairs||[]).some(x=>x.pair.includes('school-treatment-chair'))&&api.getWorldState().stateDigest===b2.stateDigest,chairRepro.code);
-const bagMove=api.proposeTransaction({transactionId:'r1v6:bag-10cm',expectedWorldRevision:2,commands:[
- {commandId:'r1v6:bag:xf',type:'SetTransform',expectedWorldRevision:2,entityId:'school-medical-bag',transform:{positionMicrounits:[-2900000,175000,1000000],orientation:[0,0,0,1],scaleMicrounits:[1000000,1000000,1000000]}},
+const bagMove=api.proposeTransaction({transactionId:'r1v7:bag-10cm',expectedWorldRevision:2,commands:[
+ {commandId:'r1v7:bag:xf',type:'SetTransform',expectedWorldRevision:2,entityId:'school-medical-bag',transform:{positionMicrounits:[-2900000,175000,1000000],orientation:[0,0,0,1],scaleMicrounits:[1000000,1000000,1000000]}},
  ...rebindTo(b2,3,(cl,r)=>{if(cl.ownerEntityRef?.id==='school-medical-bag')cl.ownerEntityRef={...cl.ownerEntityRef,revision:2}})]});
 c('C8h v6 legal: bag +10cm translation, unit still inside moved interior -> COMMITS (containment semantics confirmed legal case)',bagMove.status==='COMMITTED',bagMove.code);
 // Part C4l/C4m (v6): volume strictly inside the owner shell, outward expansion rejected.
@@ -144,6 +159,41 @@ const volOwner={entityDefinitionId:SYN.OWNER_ENTITY.definition.entityDefinitionI
 c('C4l v6 negative: volume outward expansion REJECTED on every axis (maxY 200mm / maxX 300mm / minX -300mm / maxZ 200mm / minY -175.001mm)',[['maxY',200000],['maxX',300000],['minX',-300000],['maxZ',200000],['minY',-175001]].every(([k,v])=>{const m=structuredClone(volBase);m.localBoundsMicrounits[k]=v;const r=A.validateSupportVolume(m,volOwner,SYN.BAG_BOUNDS_MU);return r.status==='REJECTED'&&r.failure.code==='SUPPORT_VOLUME_EXCEEDS_OWNER_BODY'}));
 const volTouch=structuredClone(volBase);volTouch.localBoundsMicrounits.maxY=175000;
 c('C4m v6 negative: boundary-touching ceiling (+175mm = shell top) REJECTED; interior ceiling is strictly inside (+150mm VALIDATED)',(()=>{const r=A.validateSupportVolume(volTouch,volOwner,SYN.BAG_BOUNDS_MU);const ok=A.validateSupportVolume(structuredClone(volBase),volOwner,SYN.BAG_BOUNDS_MU);return r.status==='REJECTED'&&r.failure.code==='SUPPORT_VOLUME_EXCEEDS_OWNER_BODY'&&ok.status==='VALIDATED'})());
+// Part C8i/C8j (v7): the executor's standalone bypass repro, verbatim, as a
+// permanent negative + the certified C6 resting-contact gate truth preserved.
+const bypassWorld=instantiate(PACKAGE).state;
+const bypassApi=createMultiSupportRuntime({initialWorld:bypassWorld,legalityPort:schoolGeometryAdapter({surfaceModel:model})});
+const bBag=bypassWorld.entities['school-medical-bag'],bChair=bypassWorld.entities['school-treatment-chair'];
+const bFloor=bypassWorld.supportRelations.find(r=>r.supportedEntityId===bBag.entityId);
+const inventedRelation={relationId:'bag:chair:invented',supportedEntityId:bBag.entityId,
+ supportedBodyRef:{...bFloor.supportedBodyRef},contactRegionRef:{...bFloor.contactRegionRef},
+ contactRegionGeometry:structuredClone(bFloor.contactRegionGeometry),contactRegionDigest:bFloor.contactRegionDigest,
+ contactRole:'GENERIC',requirement:'REQUIRED',supportSourceKind:'ENTITY_OWNED',boundWorldRevision:2,
+ ownerEntityRef:{id:bChair.entityId,revision:bChair.revision},
+ ownerBodyRef:{id:bChair.physicalBodyRef.recordId,revision:bChair.physicalBodyRef.revision,digest:bChair.physicalBodyRef.digest},
+ supportSurfaceRef:{id:bChair.physicalState.supportSurface.supportSurfaceId,revision:bChair.physicalState.supportSurface.surfaceRevision,digest:bChair.physicalState.supportSurface.canonicalDigest},
+ surfaceId:bChair.physicalState.supportSurface.supportSurfaceId,
+ contactNormal:{x:0,y:1,z:0},evidenceRefs:['unsupported-extra-relation']};
+const bypassCommands=bypassWorld.supportRelations.map(r=>({commandId:'rebind:'+r.relationId,type:'ReplaceSupportRelation',expectedWorldRevision:1,relationId:r.relationId,relation:{...r,boundWorldRevision:2}}));
+bypassCommands.push({commandId:'bag-move',type:'SetTransform',expectedWorldRevision:1,entityId:bBag.entityId,transform:{...bBag.transform,positionMicrounits:[-2000000,175000,1000000]}});
+bypassCommands.push({commandId:'attach',type:'AttachSupportRelation',expectedWorldRevision:1,relation:inventedRelation});
+const bypass=bypassApi.proposeTransaction({transactionId:'collision-bypass',expectedWorldRevision:1,commands:bypassCommands});
+c("C8i v7 negative: EXECUTOR'S STANDALONE BYPASS REPRO verbatim (invented bag-on-chair relation, copied floor contact geometry) -> REJECTED DYNAMIC_BODY_COLLISION, world digest unchanged",bypass.status==='REJECTED'&&bypass.evidence?.detail?.evidence?.adapterReason==='DYNAMIC_BODY_COLLISION'&&bypassApi.getWorldState().stateDigest===bypassWorld.stateDigest&&bypassApi.getWorldState().revision===1,bypass.code);
+// The resting-contact twin: bag placed exactly ON the chair seat (contact
+// plane equality) must NOT be a collision - the certified C6 gate truth owns
+// the verdict: seat not admitted on the v2.0.0 path -> CONTACT_GAP_FLOATING.
+const seatApi=createMultiSupportRuntime({initialWorld:instantiate(PACKAGE).state,legalityPort:schoolGeometryAdapter({surfaceModel:model})});
+const seatWorld=seatApi.getWorldState();
+const seatRel={...structuredClone(seatWorld.supportRelations.find(r=>r.supportedEntityId==='school-medical-bag')),boundWorldRevision:2,supportSourceKind:'ENTITY_OWNED',surfaceModelRef:undefined,surfaceId:undefined,
+ ownerEntityRef:{id:'school-treatment-chair',revision:seatWorld.entities['school-treatment-chair'].revision},
+ ownerBodyRef:{id:seatWorld.entities['school-treatment-chair'].physicalBodyRef.recordId,revision:seatWorld.entities['school-treatment-chair'].physicalBodyRef.revision,digest:seatWorld.entities['school-treatment-chair'].physicalBodyRef.digest},
+ supportSurfaceRef:{id:bChair.physicalState.supportSurface.supportSurfaceId,revision:bChair.physicalState.supportSurface.surfaceRevision,digest:bChair.physicalState.supportSurface.canonicalDigest}};
+const seatCommands=seatWorld.supportRelations.map(r=>({commandId:'rebind:'+r.relationId,type:'ReplaceSupportRelation',expectedWorldRevision:1,relationId:r.relationId,relation:r.relationId===seatRel.relationId?seatRel:{...r,boundWorldRevision:2}}));
+seatCommands.push({commandId:'bag-seat',type:'SetTransform',expectedWorldRevision:1,entityId:'school-medical-bag',transform:{positionMicrounits:[-2000000,665000,1000000],orientation:[0,0,0,1],scaleMicrounits:[1000000,1000000,1000000]}});
+const seat=seatApi.proposeTransaction({transactionId:'r1v7:bag-on-seat',expectedWorldRevision:1,commands:seatCommands});
+c("C8j v7 gate truth: bag resting exactly ON the chair seat is NOT a collision - certified C6 verdict CONTACT_GAP_FLOATING preserved (resting contact != penetration; admission stays with Phase 2)",seat.status==='REJECTED'&&seat.code==='LEGALITY_FAIL'&&seat.evidence?.detail?.evidence?.phase2ReasonCode==='CONTACT_GAP_FLOATING',seat.code+' '+JSON.stringify(seat.evidence?.detail?.evidence?.adapterReason||''));
+const noBoundsCheck=(()=>{const m=structuredClone(volBase);const r=A.validateSupportVolume(m,volOwner);return r.status==='REJECTED'&&r.failure.code==='MISSING_OWNER_BODY_BOUNDS'})();
+c('C4n v7 contract: owner body bounds MANDATORY for CONTAINMENT_INTERIOR (optional guard = bypassable guard)',noBoundsCheck);
 out.forEach(x=>console.log(x));
 const fails=out.filter(x=>x.startsWith('FAIL'));
 console.log('RESULT: '+(fails.length?'FAIL ('+fails.length+')':'PASS - '+out.length+' checks'));

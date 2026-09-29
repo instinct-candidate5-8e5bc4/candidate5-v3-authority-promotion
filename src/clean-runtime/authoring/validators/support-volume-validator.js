@@ -18,6 +18,11 @@ function validateSupportVolume(x,owner,ownerBodyLocalBoundsMicrounits){
  if(x.ownerEntityRef?.id!==owner.entityDefinitionId||x.ownerEntityRef?.revision!==owner.entityRevision||x.ownerEntityRef?.digest!==owner.entityDigest)return reject('STALE_VOLUME_OWNER','ownerEntityRef');
  if(x.transformBinding!=='OWNER_TRANSLATION_IDENTITY_ORIENTATION'||JSON.stringify(owner.transform.orientation)!==JSON.stringify(V1.canonicalOrientation))return reject('UNSUPPORTED_V1_CAPABILITY','transformBinding');
  if(x.containmentRole!=='CONTAINMENT_INTERIOR')return reject('INVALID_SUPPORT_VOLUME','containmentRole');
+ // R1 v7 (executor contract question): for CONTAINMENT_INTERIOR the owner
+ // body bounds are MANDATORY - an optional guard is a bypassable guard. Any
+ // caller validating a containment interior must prove the volume against
+ // the owner shell, not merely assert it.
+ if(!ownerBodyLocalBoundsMicrounits)return reject('MISSING_OWNER_BODY_BOUNDS','localBoundsMicrounits');
  try{for(const k of['minX','maxX','minY','maxY','minZ','maxZ'])integer(x.localBoundsMicrounits?.[k],'localBoundsMicrounits.'+k)}catch(e){return reject(e.code,e.path)}
  const b=x.localBoundsMicrounits;
  if(b.minX>=b.maxX||b.minY>=b.maxY||b.minZ>=b.maxZ)return reject('INVALID_SUPPORT_VOLUME','localBoundsMicrounits');

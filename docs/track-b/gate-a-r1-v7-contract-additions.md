@@ -1,16 +1,63 @@
-# Gate A R1 v6 - Contract Additions Resolving the Engine's R1 v4 + Executor v5 Verdicts
+# Gate A R1 v7 - Contract Additions Resolving the Engine's R1 v4 + Executor v5/v6 Verdicts
 
 Status: PROPOSAL, pre-admission. Nothing in this package is admitted, certified
 or signed. The formal R1 review signs exact bytes; this document identifies them.
 
-Supersedes: R1 v5 (commits 79453f2, cfacc7f, 291205b). The executor's v5 review
-confirmed two of three v4 repros FIXED (revision-2 transaction COMMITS; forged
-provenanceRefs REJECTS OWNER_BODY_BINDING_BYTES_MISMATCH; 31/31 harness + 35
-targeted pass) and required two more fixes before signoff, resolved below as
-Fix 4 and Fix 5. v5 content (Fixes 1-3) is unchanged unless explicitly listed.
+Supersedes: R1 v6 (commits 9b2fd68, ea25308, c0a554e). The executor's v6 review
+confirmed the v5 fixes (chair repro rejects, +10cm bag move commits, 35/35
+harness + 38 targeted) and found the v6 collision exemption bypassable by an
+INVENTED support relation (relation presence without contact-geometry proof:
+his standalone bag-on-chair repro COMMITTED under v6), plus flagged the
+optional owner-bounds validator contract. Both resolved below as Fix 6 and
+the Fix 5 contract hardening. v6 content (Fixes 4-5 geometry) is unchanged
+unless explicitly listed.
 
-Evidence harness: `node scripts/track-b/gate-a-r1v6-contract-check.mjs` (35 checks,
-all through the real repo contracts). Test suite: `tests/track-b/gate-a-r1v6-contracts.test.js`.
+Evidence harness: `node scripts/track-b/gate-a-r1v7-contract-check.mjs` (38 checks,
+all through the real repo contracts). Test suite: `tests/track-b/gate-a-r1v7-contracts.test.js`.
+
+## Fix 6 (v7) - collision exemption is scoped and proof-carrying, never relation-presence
+
+Executor finding: v6 exempted ANY pair with a support relation in the proposed
+state; validateRelations verifies IDs/digests/revisions but not contact
+geometry, so an invented ENTITY_OWNED bag->chair relation (valid surface ref,
+copied floor contact geometry) turned a real bag/chair penetration into a
+legal-looking exemption. His standalone repro COMMITTED under v6 (revision 2,
+4 relations).
+
+v7: exemption is scoped to exactly three proof-carrying classes:
+(a) the certified unit/bag containment pair - exact relation id
+    synthetic:unit:bag-interior-floor + volume pins + owner volume state; the
+    containment verdict itself is owned by the unit's own evaluation
+    (contained -> legal; protruding -> CONTAINMENT_VIOLATION), so this gate
+    never weakens it;
+(b) the certified Gate-C fixture pair (synthetic-supported-fixture on
+    school-treatment-chair), contact validated via the materialized owner
+    seat surface in the isSynthetic branch;
+(c) surface-contact pairs whose supported entity PROVABLY rests on the
+    owner's materialized certified support surface: surface pins must match
+    the owner's physicalState supportSurface AND the relation's
+    supportSurfaceRef, and the supported AABB bottom must equal the
+    materialized surface plane (contact plane equality). Resting contact is
+    not penetration; whether that placement is ADMITTED stays with the
+    supported entity's own Phase 2 evaluation.
+Every other overlapping dynamic pair -> ILLEGAL / DYNAMIC_BODY_COLLISION.
+
+Proofs: C8i - the executor's standalone repro, embedded verbatim, REJECTS
+DYNAMIC_BODY_COLLISION with the world digest unchanged (atomic). C8j - the
+resting-contact twin: bag exactly ON the chair seat is NOT a collision; the
+certified C6 gate truth (seat not admitted on the v2.0.0 path ->
+CONTACT_GAP_FLOATING) is preserved verbatim, including the frozen
+support-binding case table expectations. Known limitation, disclosed: the
+contact proof is AABB-level (plane equality, no footprint/solid test - a bag
+overhanging the seat edge reads as resting contact, and admission remains
+Phase 2's call); finer solid geometry is future work, not a silent bypass.
+
+## Fix 5 contract hardening (v7) - owner bounds MANDATORY for CONTAINMENT_INTERIOR
+
+Executor contract question: the owner-body-bounds argument was optional, so
+the expansion guard could be bypassed outside the central draft definition.
+v7: validateSupportVolume REJECTS containment-interior volumes without owner
+body bounds (MISSING_OWNER_BODY_BOUNDS). Proof: C4n.
 
 ## Fix 4 (v6) - collision exception is a real geometric gate, not an evidence string
 

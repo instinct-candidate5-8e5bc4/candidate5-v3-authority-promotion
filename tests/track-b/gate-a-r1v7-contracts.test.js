@@ -112,7 +112,20 @@ test('v5 runtime: engine revision-2 repro COMMITS; stale body/revision/volume, p
  const negFor=api.proposeTransaction({transactionId:'t:neg-for',expectedWorldRevision:2,commands:[
   {commandId:'t:nf:spawn',type:'SpawnEntity',expectedWorldRevision:2,entity:unit2},
   {commandId:'t:nf:attach',type:'AttachSupportRelation',expectedWorldRevision:2,relation:rel2},...rebindTo(b2,3)]});
- assert.equal(negFor.status,'REJECTED');assert.equal(negFor.evidence?.detail?.evidence?.adapterReason,'PAIR_SUPERSESSION_SCOPE');});
+ assert.equal(negFor.status,'REJECTED');
+ // v7: the foreign item rests exactly on the interior-floor plane, so the
+ // surface-contact exemption applies at the bag's own evaluation - and its
+ // OWN evaluation still dies on the pair-supersession scope check (relation
+ // id is not the certified synthetic:unit:bag-interior-floor).
+ assert.equal(negFor.evidence?.detail?.evidence?.adapterReason,'PAIR_SUPERSESSION_SCOPE');
+ // ...and a foreign item claiming containment WITHOUT shell overlap still
+ // dies on the pair-supersession scope check in its own evaluation.
+ const unit3=structuredClone(b2.entities['synthetic-training-unit-v1']);unit3.entityId='synthetic-training-unit-v3-foreign';unit3.transform={positionMicrounits:[-2000000,25000,2000000],orientation:[0,0,0,1],scaleMicrounits:[1000000,1000000,1000000]};
+ const rel3=structuredClone(rel2);rel3.relationId='synthetic:unit3:bag-interior-floor';rel3.supportedEntityId=unit3.entityId;
+ const negFor2=api.proposeTransaction({transactionId:'t:neg-for2',expectedWorldRevision:2,commands:[
+  {commandId:'t:nf2:spawn',type:'SpawnEntity',expectedWorldRevision:2,entity:unit3},
+  {commandId:'t:nf2:attach',type:'AttachSupportRelation',expectedWorldRevision:2,relation:rel3},...rebindTo(b2,3)]});
+ assert.equal(negFor2.status,'REJECTED');assert.equal(negFor2.evidence?.detail?.evidence?.adapterReason,'PAIR_SUPERSESSION_SCOPE');});
 
 test('v6 validator: volume outward expansion and boundary-touching ceiling REJECT',()=>{
  const OE=SYN.OWNER_ENTITY.definition,owner={entityDefinitionId:OE.entityDefinitionId,entityRevision:OE.entityRevision,entityDigest:OE.entityDigest,transform:OE.transform};
@@ -124,8 +137,11 @@ test('v6 validator: volume outward expansion and boundary-touching ceiling REJEC
   const r=A.validateSupportVolume(mut,owner,SYN.BAG_BOUNDS_MU);
   assert.equal(r.status,'REJECTED',k+'='+v+' must reject');
   assert.equal(r.failure.code,'SUPPORT_VOLUME_EXCEEDS_OWNER_BODY',k+'='+v);}
- // backward compatibility: without owner bounds the record still validates (v2.0.0 paths unaffected)
- assert.equal(A.validateSupportVolume(structuredClone(base),owner).status,'VALIDATED');});
+ // v7 contract hardening: for CONTAINMENT_INTERIOR the owner bounds are
+ // MANDATORY - validating without them rejects (an optional guard is a
+ // bypassable guard, per the executor's contract question).
+ const noBounds=A.validateSupportVolume(structuredClone(base),owner);
+ assert.equal(noBounds.status,'REJECTED');assert.equal(noBounds.failure.code,'MISSING_OWNER_BODY_BOUNDS');});
 
 test('v6 runtime: executor chair hostile overlap repro REJECTS with DYNAMIC_BODY_COLLISION',()=>{
  const p=buildV21(),v=validateScenePackage(p);

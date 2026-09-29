@@ -698,6 +698,7 @@ var require_support_volume_validator = __commonJS({
       if (x.ownerEntityRef?.id !== owner.entityDefinitionId || x.ownerEntityRef?.revision !== owner.entityRevision || x.ownerEntityRef?.digest !== owner.entityDigest) return reject("STALE_VOLUME_OWNER", "ownerEntityRef");
       if (x.transformBinding !== "OWNER_TRANSLATION_IDENTITY_ORIENTATION" || JSON.stringify(owner.transform.orientation) !== JSON.stringify(V1.canonicalOrientation)) return reject("UNSUPPORTED_V1_CAPABILITY", "transformBinding");
       if (x.containmentRole !== "CONTAINMENT_INTERIOR") return reject("INVALID_SUPPORT_VOLUME", "containmentRole");
+      if (!ownerBodyLocalBoundsMicrounits) return reject("MISSING_OWNER_BODY_BOUNDS", "localBoundsMicrounits");
       try {
         for (const k of ["minX", "maxX", "minY", "maxY", "minZ", "maxZ"]) integer(x.localBoundsMicrounits?.[k], "localBoundsMicrounits." + k);
       } catch (e3) {
@@ -1573,7 +1574,43 @@ var require_school_geometry_adapter = __commonJS({
             const ow = { minX: ob.minX + op[0], maxX: ob.maxX + op[0], minY: ob.minY + op[1], maxY: ob.maxY + op[1], minZ: ob.minZ + op[2], maxZ: ob.maxZ + op[2] };
             const overlaps = cw.minX < ow.maxX && cw.maxX > ow.minX && cw.minY < ow.maxY && cw.maxY > ow.minY && cw.minZ < ow.maxZ && cw.maxZ > ow.minZ;
             if (!overlaps) continue;
-            const exempt = (input.proposedState.supportRelations || []).some((r2) => r2.supportedEntityId === entityId && r2.ownerEntityRef?.id === oid || r2.supportedEntityId === oid && r2.ownerEntityRef?.id === entityId) || entity.supportRelation?.ownerEntityId === oid || o2.supportRelation?.ownerEntityId === entityId || (input.proposedState.physicalRelations || []).some((r2) => r2.entityId === entityId && r2.ownerEntityId === oid || r2.entityId === oid && r2.ownerEntityId === entityId);
+            let exempt = false;
+            const pairIds = [entityId, oid];
+            if (pairIds.includes("synthetic-training-unit-v1") && pairIds.includes("school-medical-bag")) {
+              const unitId = pairIds[0] === "synthetic-training-unit-v1" ? entityId : oid;
+              const ownerE = input.proposedState.entities[pairIds[0] === "synthetic-training-unit-v1" ? oid : entityId];
+              const rel = (input.proposedState.supportRelations || []).find((r2) => r2.relationId === "synthetic:unit:bag-interior-floor" && r2.supportedEntityId === unitId && r2.ownerEntityRef?.id === "school-medical-bag" && r2.supportSourceKind === "ENTITY_OWNED");
+              if (rel && ownerE) {
+                const VOL = SYN.CONTAINMENT_VOLUME.definition;
+                const ownerVol = ownerE.physicalState?.supportVolume;
+                exempt = !!(rel.supportVolumeRef && rel.supportVolumeRef.id === VOL.supportVolumeId && rel.supportVolumeRef.revision === VOL.volumeRevision && rel.supportVolumeRef.digest === VOL.canonicalDigest && ownerVol && ownerVol.supportVolumeId === VOL.supportVolumeId && ownerVol.volumeRevision === VOL.volumeRevision && ownerVol.canonicalDigest === VOL.canonicalDigest);
+              }
+            }
+            if (!exempt && pairIds.includes("synthetic-supported-fixture") && pairIds.includes("school-treatment-chair"))
+              exempt = entity.supportRelation?.ownerEntityId === oid || o2.supportRelation?.ownerEntityId === entityId || (input.proposedState.physicalRelations || []).some((r2) => r2.entityId === entityId && r2.ownerEntityId === oid || r2.entityId === oid && r2.ownerEntityId === entityId);
+            if (!exempt) {
+              const relC = (input.proposedState.supportRelations || []).find((r2) => r2.supportSourceKind === "ENTITY_OWNED" && (r2.supportedEntityId === entityId && r2.ownerEntityRef?.id === oid || r2.supportedEntityId === oid && r2.ownerEntityRef?.id === entityId));
+              if (relC) {
+                const supE = input.proposedState.entities[relC.supportedEntityId], ownE = input.proposedState.entities[relC.ownerEntityRef.id];
+                const isChairOwner = ownE?.physicalBodyRef?.recordId === CHAIR.BODY.bodyDefinitionId;
+                const isBagOwner = ownE?.physicalBodyRef?.recordId === SCHOOL_BAG_BODY.bodyId;
+                const surfDef = isChairOwner ? CHAIR.SURFACE : isBagOwner ? SYN.INTERIOR_FLOOR.definition : null;
+                const od = isChairOwner ? CHAIR.ENTITY : isBagOwner ? SYN.OWNER_ENTITY.definition : null;
+                const pin = ownE?.physicalState?.supportSurface;
+                if (supE && ownE && surfDef && od && pin && pin.supportSurfaceId === surfDef.supportSurfaceId && pin.surfaceRevision === surfDef.surfaceRevision && pin.canonicalDigest === surfDef.canonicalDigest && relC.supportSurfaceRef?.id === pin.supportSurfaceId && relC.supportSurfaceRef?.revision === pin.surfaceRevision && relC.supportSurfaceRef?.digest === pin.canonicalDigest) {
+                  const supB = dynBounds(supE.physicalBodyRef.recordId);
+                  if (supB) {
+                    try {
+                      const defOwner = { entityDefinitionId: od.entityDefinitionId, entityRevision: od.entityRevision, entityDigest: od.entityDigest, transform: { translationMicrounits: ownE.transform.positionMicrounits, orientation: A.V1.canonicalOrientation } };
+                      const mat = A.materializeSupportSurface({ staticModelRef: SCHOOL_SURFACE_MODEL_REF, owner: defOwner, surface: surfDef });
+                      exempt = supB.minY + supE.transform.positionMicrounits[1] === Math.round(mat.planeOrDepth.planeY * 1e6);
+                    } catch (e3) {
+                      exempt = false;
+                    }
+                  }
+                }
+              }
+            }
             if (!exempt) bad.push({ pair: [entityId, oid], commandEntityWorldAabbMicrounits: cw, otherEntityWorldAabbMicrounits: ow });
           }
           if (bad.length) return Object.freeze({ outcome: "ILLEGAL", evidence: { adapterKind: "SCHOOL_PHASE2_GEOMETRY_ADAPTER", adapterReason: "DYNAMIC_BODY_COLLISION", collidingPairs: bad, gate: "Dynamic-body AABB intersections evaluated between the command entity and every other dynamic body in the proposed world; only pairs bound by a validated support relation in the proposed state are exempt." } });
