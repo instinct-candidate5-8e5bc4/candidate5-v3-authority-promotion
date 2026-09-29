@@ -5,8 +5,8 @@
  "assets": [
   {
    "path": "package/renderer-package.mjs",
-   "bytes": 17053,
-   "sha256": "d552383c51b9eb458618f6023e46cbbbf7947c70079911e35ce00e592a067ab3"
+   "bytes": 17175,
+   "sha256": "4c468d2ff9026d5ba3a50e218a4330fdd30236fd433e3ed5e738dfeec68df227"
   },
   {
    "path": "package/projection-guard.mjs",
@@ -45,8 +45,8 @@
   },
   {
    "path": "scene-bundle.json",
-   "bytes": 31637,
-   "sha256": "08fa59f6a4492acb0bab6f719beb70090c8ae8f5d090a47a3ea82ae873b39cfd"
+   "bytes": 31844,
+   "sha256": "2d7987588fef54c9800b33dbbe238736c2f675cd7acdc049b770f6107e9a68d6"
   },
   {
    "path": "engine/pins.json",
