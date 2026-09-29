@@ -693,7 +693,7 @@ var require_support_volume_validator = __commonJS({
     function reject(code, path) {
       return { status: "REJECTED", failure: { code, path } };
     }
-    function validateSupportVolume(x, owner) {
+    function validateSupportVolume(x, owner, ownerBodyLocalBoundsMicrounits) {
       if (!x || x.schemaVersion !== "1.0.0" || !x.supportVolumeId || !(x.volumeRevision >= 1)) return reject("MALFORMED_SCHEMA", "$");
       if (x.ownerEntityRef?.id !== owner.entityDefinitionId || x.ownerEntityRef?.revision !== owner.entityRevision || x.ownerEntityRef?.digest !== owner.entityDigest) return reject("STALE_VOLUME_OWNER", "ownerEntityRef");
       if (x.transformBinding !== "OWNER_TRANSLATION_IDENTITY_ORIENTATION" || JSON.stringify(owner.transform.orientation) !== JSON.stringify(V1.canonicalOrientation)) return reject("UNSUPPORTED_V1_CAPABILITY", "transformBinding");
@@ -705,6 +705,18 @@ var require_support_volume_validator = __commonJS({
       }
       const b = x.localBoundsMicrounits;
       if (b.minX >= b.maxX || b.minY >= b.maxY || b.minZ >= b.maxZ) return reject("INVALID_SUPPORT_VOLUME", "localBoundsMicrounits");
+      if (ownerBodyLocalBoundsMicrounits) {
+        const ob = ownerBodyLocalBoundsMicrounits;
+        for (const k of ["minX", "maxX", "minY", "maxY", "minZ", "maxZ"]) if (b[k] < ob[k] || b[k] > ob[k === "minX" ? "minX" : k]) {
+        }
+        if (b.minX < ob.minX) return reject("SUPPORT_VOLUME_EXCEEDS_OWNER_BODY", "localBoundsMicrounits.minX");
+        if (b.maxX > ob.maxX) return reject("SUPPORT_VOLUME_EXCEEDS_OWNER_BODY", "localBoundsMicrounits.maxX");
+        if (b.minY < ob.minY) return reject("SUPPORT_VOLUME_EXCEEDS_OWNER_BODY", "localBoundsMicrounits.minY");
+        if (b.maxY > ob.maxY) return reject("SUPPORT_VOLUME_EXCEEDS_OWNER_BODY", "localBoundsMicrounits.maxY");
+        if (b.minZ < ob.minZ) return reject("SUPPORT_VOLUME_EXCEEDS_OWNER_BODY", "localBoundsMicrounits.minZ");
+        if (b.maxZ > ob.maxZ) return reject("SUPPORT_VOLUME_EXCEEDS_OWNER_BODY", "localBoundsMicrounits.maxZ");
+        if (b.maxY >= ob.maxY) return reject("SUPPORT_VOLUME_EXCEEDS_OWNER_BODY", "localBoundsMicrounits.maxY (ceiling must lie strictly below the owner shell top)");
+      }
       if (x.classification !== "AUTHORED_NEW") return reject("INVALID_SUPPORT_VOLUME", "classification");
       if (!Array.isArray(x.provenanceRefs) || !x.provenanceRefs.length) return reject("MISSING_PROVENANCE", "provenanceRefs");
       const y2 = structuredClone(x);
@@ -1420,15 +1432,15 @@ var require_synthetic_training_unit_v1 = __commonJS({
     var rawVolume = {
       schemaVersion: "1.0.0",
       supportVolumeId: "school/medical-bag-containment-interior",
-      volumeRevision: 1,
+      volumeRevision: 2,
       ownerEntityRef: { id: OWNER_ENTITY.definition.entityDefinitionId, revision: OWNER_ENTITY.definition.entityRevision, digest: OWNER_ENTITY.definition.entityDigest },
       transformBinding: "OWNER_TRANSLATION_IDENTITY_ORIENTATION",
       containmentRole: "CONTAINMENT_INTERIOR",
-      localBoundsMicrounits: { minX: -25e4, maxX: 25e4, minY: -15e4, maxY: 175e3, minZ: -15e4, maxZ: 15e4 },
+      localBoundsMicrounits: { minX: -25e4, maxX: 25e4, minY: -15e4, maxY: 15e4, minZ: -15e4, maxZ: 15e4 },
       classification: "AUTHORED_NEW",
       provenanceRefs: ["owner-r1-q1:wamid.HBgMOTcyNTMyNDkwMzUxFQIAEhgUM0EwRTNFRDUxRDZDQzAwNEU2NjcA", "decision:gate-a-unit-authoring-001"]
     };
-    var CONTAINMENT_VOLUME = A.validateSupportVolume(rawVolume, OWNER_ENTITY.definition);
+    var CONTAINMENT_VOLUME = A.validateSupportVolume(rawVolume, OWNER_ENTITY.definition, BAG_BOUNDS_MU);
     if (CONTAINMENT_VOLUME.status !== "VALIDATED") throw Object.assign(Error("R1v4 containment volume failed: " + JSON.stringify(CONTAINMENT_VOLUME.failure)), { code: "R1V4_DRAFT_INVALID" });
     var rawUnitBody = {
       schemaVersion: "1.0.0",
@@ -1545,6 +1557,27 @@ var require_school_geometry_adapter = __commonJS({
         if (!Array.isArray(position) || position.length !== 3) return Object.freeze({ outcome: "UNKNOWN", evidence: { adapterReason: "TRANSFORM_CONTRACT_MISSING" } });
         const request = { requestId: input.command.commandId, surfaceId: entity.physicalState?.surfaceId || entity.supportRelation?.surfaceId || null, surfaceModelRef: { id: surface.id, revision: surface.revision, digest: surface.digest }, geometry: contract.geometry, geometryDigest: isCasualty || isChair || isSynthetic || isTrainingUnit ? require_canonical().digest(contract.geometry) : body.digest, proofGeometryDigest: isCasualty || isChair || isSynthetic || isTrainingUnit ? body.proofGeometryDigest === contract.proof ? require_canonical().digest(contract.geometry) : body.proofGeometryDigest : body.proofGeometryDigest || contract.proof, transform: { x: position[0] / MICROUNITS_PER_UNIT, y: position[1] / MICROUNITS_PER_UNIT, z: position[2] / MICROUNITS_PER_UNIT }, orientationUpDot: entity.physicalState?.orientationUpDot, supportNormalUpDot: entity.physicalState?.supportNormalUpDot, evidenceRefs: contract.evidenceRefs };
         const requestBytes = canonical(request), result = evaluate(request, dynamicModel);
+        const dynBounds = (rid) => rid === SCHOOL_BAG_BODY.bodyId ? { minX: Math.round(SCHOOL_BAG_BODY.geometry.minX * 1e6), maxX: Math.round(SCHOOL_BAG_BODY.geometry.maxX * 1e6), minY: Math.round(SCHOOL_BAG_BODY.geometry.minY * 1e6), maxY: Math.round(SCHOOL_BAG_BODY.geometry.maxY * 1e6), minZ: Math.round(SCHOOL_BAG_BODY.geometry.minZ * 1e6), maxZ: Math.round(SCHOOL_BAG_BODY.geometry.maxZ * 1e6) } : rid === BODY.bodyDefinitionId ? BODY.aggregateBounds : rid === CHAIR.BODY.bodyDefinitionId ? CHAIR.BODY.aggregateBounds : rid === "synthetic/gate-c-supported-box-body" ? { minX: -1e5, maxX: 1e5, minY: -1e5, maxY: 1e5, minZ: -1e5, maxZ: 1e5 } : rid === SYN.UNIT_BODY.definition.bodyDefinitionId ? SYN.UNIT_BODY.definition.aggregateBounds : null;
+        const cmdB = dynBounds(body.recordId);
+        if (cmdB) {
+          const cw = { minX: cmdB.minX + position[0], maxX: cmdB.maxX + position[0], minY: cmdB.minY + position[1], maxY: cmdB.maxY + position[1], minZ: cmdB.minZ + position[2], maxZ: cmdB.maxZ + position[2] };
+          const bad = [];
+          for (const oid of Object.keys(input.proposedState.entities).sort()) {
+            if (oid === entityId) continue;
+            const o2 = input.proposedState.entities[oid];
+            if (!o2 || o2.lifecycleState === "REMOVED" || !o2.physicalBodyRef) continue;
+            const ob = dynBounds(o2.physicalBodyRef.recordId);
+            if (!ob) return Object.freeze({ outcome: "UNKNOWN", evidence: { adapterReason: "DYNAMIC_BODY_UNMODELED", entityId: oid, recordId: o2.physicalBodyRef.recordId } });
+            const op = o2.transform?.positionMicrounits;
+            if (!Array.isArray(op) || op.length !== 3) return Object.freeze({ outcome: "UNKNOWN", evidence: { adapterReason: "DYNAMIC_BODY_TRANSFORM_MISSING", entityId: oid } });
+            const ow = { minX: ob.minX + op[0], maxX: ob.maxX + op[0], minY: ob.minY + op[1], maxY: ob.maxY + op[1], minZ: ob.minZ + op[2], maxZ: ob.maxZ + op[2] };
+            const overlaps = cw.minX < ow.maxX && cw.maxX > ow.minX && cw.minY < ow.maxY && cw.maxY > ow.minY && cw.minZ < ow.maxZ && cw.maxZ > ow.minZ;
+            if (!overlaps) continue;
+            const exempt = (input.proposedState.supportRelations || []).some((r2) => r2.supportedEntityId === entityId && r2.ownerEntityRef?.id === oid || r2.supportedEntityId === oid && r2.ownerEntityRef?.id === entityId) || entity.supportRelation?.ownerEntityId === oid || o2.supportRelation?.ownerEntityId === entityId || (input.proposedState.physicalRelations || []).some((r2) => r2.entityId === entityId && r2.ownerEntityId === oid || r2.entityId === oid && r2.ownerEntityId === entityId);
+            if (!exempt) bad.push({ pair: [entityId, oid], commandEntityWorldAabbMicrounits: cw, otherEntityWorldAabbMicrounits: ow });
+          }
+          if (bad.length) return Object.freeze({ outcome: "ILLEGAL", evidence: { adapterKind: "SCHOOL_PHASE2_GEOMETRY_ADAPTER", adapterReason: "DYNAMIC_BODY_COLLISION", collidingPairs: bad, gate: "Dynamic-body AABB intersections evaluated between the command entity and every other dynamic body in the proposed world; only pairs bound by a validated support relation in the proposed state are exempt." } });
+        }
         return Object.freeze({ outcome: result.result, evidence: { adapterKind: "SCHOOL_PHASE2_GEOMETRY_ADAPTER", request, requestDigest: digest(request), requestBytes, sceneProvenance: SCHOOL_SCENE, bodyProvenance: { classification: contract.provenance.classification, lineageStatus: contract.provenance.lineageStatus, sourceId: contract.provenance.sourceId, revision: contract.revision, digest: contract.digest }, surfaceProvenance: { classification: SCHOOL_SURFACE_MODEL_REF.classification, lineageStatus: SCHOOL_SURFACE_MODEL_REF.lineageStatus, sourceId: SCHOOL_SURFACE_MODEL_REF.sourceId, revision: surfaceModel.revision, digest: surfaceModel.surfaceModelDigest, sourceEvidence: surfaceModel.sourceEvidence, resolvedSurface: (surfaceModel.surfaces.find((x) => x.surfaceId === request.surfaceId) || null)?.provenance || null }, phase2ReasonCode: result.reasonCode, phase2Evidence: result.evidence, phase2ProofDigest: result.proofDigest || null, ...containmentProof ? { containmentProof } : {} } });
       } });
     }

@@ -1,10 +1,10 @@
 {
   "manifestVersion": "1.0.0",
   "kind": "TRACK_B_B7_ENGINE_MANIFEST",
-  "generatedAt": "2026-09-30T04:18:45.466Z",
+  "generatedAt": "2026-09-30T04:18:46.486Z",
   "git": {
     "branch": "rebase-t7",
-    "commit": "d79157e7750e719ab6341e0431ca78fd979766f3"
+    "commit": "4f822e1531e40aa581487c40450b48a738364269"
   },
   "inlines": [
     {
@@ -39,7 +39,7 @@
     },
     {
       "check": "bundle built",
-      "target": "f2350e1014db0d5b537273d5274fe9d5db249ea6705ff7d9ee941bf10628dab2",
+      "target": "099a5e11e8d52a2514bc67c7d2a9a937bd882303acd6d5ad7f058e9d636b176a",
       "pass": true
     }
   ],
@@ -53,8 +53,8 @@
   "esbuildVersion": "0.28.2",
   "bundle": {
     "path": "visual-slice/engine-bundle.js",
-    "bytes": 169698,
-    "sha256": "f2350e1014db0d5b537273d5274fe9d5db249ea6705ff7d9ee941bf10628dab2",
+    "bytes": 174044,
+    "sha256": "099a5e11e8d52a2514bc67c7d2a9a937bd882303acd6d5ad7f058e9d636b176a",
     "minified": false
   }
 }

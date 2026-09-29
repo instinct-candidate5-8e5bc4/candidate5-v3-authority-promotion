@@ -8,7 +8,12 @@
 // two-layer proposal's volume layer - admission stays the review's call.
 const {V1}=require('../contracts/constants'),{integer}=require('../contracts/geometry'),{digest}=require('../contracts/canonical');
 function reject(code,path){return {status:'REJECTED',failure:{code,path}}}
-function validateSupportVolume(x,owner){
+function validateSupportVolume(x,owner,ownerBodyLocalBoundsMicrounits){
+ // R1 v6: when the owner body's local bounds are supplied, the volume must
+ // not expand beyond the owner shell on ANY axis (outward expansion rejects),
+ // and the ceiling must lie strictly below the owner shell top (the certified
+ // hollow interior keeps a strict top margin; v5's boundary-touching +175mm
+ // draft ceiling was disclosed and reverted to +150mm).
  if(!x||x.schemaVersion!=='1.0.0'||!x.supportVolumeId||!(x.volumeRevision>=1))return reject('MALFORMED_SCHEMA','$');
  if(x.ownerEntityRef?.id!==owner.entityDefinitionId||x.ownerEntityRef?.revision!==owner.entityRevision||x.ownerEntityRef?.digest!==owner.entityDigest)return reject('STALE_VOLUME_OWNER','ownerEntityRef');
  if(x.transformBinding!=='OWNER_TRANSLATION_IDENTITY_ORIENTATION'||JSON.stringify(owner.transform.orientation)!==JSON.stringify(V1.canonicalOrientation))return reject('UNSUPPORTED_V1_CAPABILITY','transformBinding');
@@ -16,6 +21,15 @@ function validateSupportVolume(x,owner){
  try{for(const k of['minX','maxX','minY','maxY','minZ','maxZ'])integer(x.localBoundsMicrounits?.[k],'localBoundsMicrounits.'+k)}catch(e){return reject(e.code,e.path)}
  const b=x.localBoundsMicrounits;
  if(b.minX>=b.maxX||b.minY>=b.maxY||b.minZ>=b.maxZ)return reject('INVALID_SUPPORT_VOLUME','localBoundsMicrounits');
+ if(ownerBodyLocalBoundsMicrounits){const ob=ownerBodyLocalBoundsMicrounits;
+  for(const k of['minX','maxX','minY','maxY','minZ','maxZ'])if(b[k]<ob[k]||b[k]>ob[k==='minX'?'minX':k]){}
+  if(b.minX<ob.minX)return reject('SUPPORT_VOLUME_EXCEEDS_OWNER_BODY','localBoundsMicrounits.minX');
+  if(b.maxX>ob.maxX)return reject('SUPPORT_VOLUME_EXCEEDS_OWNER_BODY','localBoundsMicrounits.maxX');
+  if(b.minY<ob.minY)return reject('SUPPORT_VOLUME_EXCEEDS_OWNER_BODY','localBoundsMicrounits.minY');
+  if(b.maxY>ob.maxY)return reject('SUPPORT_VOLUME_EXCEEDS_OWNER_BODY','localBoundsMicrounits.maxY');
+  if(b.minZ<ob.minZ)return reject('SUPPORT_VOLUME_EXCEEDS_OWNER_BODY','localBoundsMicrounits.minZ');
+  if(b.maxZ>ob.maxZ)return reject('SUPPORT_VOLUME_EXCEEDS_OWNER_BODY','localBoundsMicrounits.maxZ');
+  if(b.maxY>=ob.maxY)return reject('SUPPORT_VOLUME_EXCEEDS_OWNER_BODY','localBoundsMicrounits.maxY (ceiling must lie strictly below the owner shell top)');}
  if(x.classification!=='AUTHORED_NEW')return reject('INVALID_SUPPORT_VOLUME','classification');
  if(!Array.isArray(x.provenanceRefs)||!x.provenanceRefs.length)return reject('MISSING_PROVENANCE','provenanceRefs');
  const y=structuredClone(x);y.canonicalDigest=digest(y);

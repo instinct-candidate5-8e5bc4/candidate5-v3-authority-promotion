@@ -1,5 +1,5 @@
 'use strict';
-// TRACK B / Gate A R1 v5: the engine's R1 v4 verdict required three fixes:
+// TRACK B / Gate A R1 v6: the engine's R1 v4 verdict required three fixes:
 // (1) binding staleness bound to owner/body/volume revisions, not a frozen
 // world revision; (2) support-volume pinning + full-3D containment + pair
 // supersession in the authoritative legality path; (3) scene-validator byte
@@ -23,7 +23,7 @@ const redigest=x=>{delete x.scenePackageDigest;x.scenePackageDigest=digest({...x
 test('boundary 1: ENTITY + SUPPORT_VOLUME are admissible definition types (envelope + registry path)',()=>{
  for(const[type,def]of[['ENTITY',SYN.OWNER_ENTITY.definition],['SUPPORT_VOLUME',SYN.CONTAINMENT_VOLUME.definition]]){
   const ref=A.refFor(type,def);assert(A.TYPES.includes(type));
-  const env=A.createDraft({envelopeId:'r1v5-test-'+type,definitionRef:ref,limitations:['R1 v5 proposal - pre-admission']});
+  const env=A.createDraft({envelopeId:'r1v6-test-'+type,definitionRef:ref,limitations:['R1 v6 proposal - pre-admission']});
   assert.equal(A.validateEnvelope(env).status,'VALIDATED');
   const adm=A.admit({definitionType:type,definition:def,envelope:env});
   assert.equal(adm.status,'REJECTED');assert.equal(adm.failure.code,'NOT_VERIFIED_FOR_SLICE','draft must not self-admit');}
@@ -79,7 +79,7 @@ test('boundary 3 integration: v2.1.0 instantiates atomically in a throwaway sess
 test('volume materializer: world region matches the R1 arithmetic; rotated owner throws',()=>{
  const OE=SYN.OWNER_ENTITY.definition;
  const m=A.materializeSupportVolume({owner:{entityDefinitionId:OE.entityDefinitionId,entityRevision:OE.entityRevision,entityDigest:OE.entityDigest,transform:OE.transform},volume:SYN.CONTAINMENT_VOLUME.definition});
- assert.deepEqual(m.worldRegionMicrounits,{minX:-3250000,maxX:-2750000,minY:25000,maxY:350000,minZ:850000,maxZ:1150000});
+ assert.deepEqual(m.worldRegionMicrounits,{minX:-3250000,maxX:-2750000,minY:25000,maxY:325000,minZ:850000,maxZ:1150000});
  assert.throws(()=>A.materializeSupportVolume({owner:{entityDefinitionId:OE.entityDefinitionId,entityRevision:OE.entityRevision,entityDigest:OE.entityDigest,transform:{translationMicrounits:OE.transform.translationMicrounits,orientation:[0,0,1000000,0]}},volume:SYN.CONTAINMENT_VOLUME.definition}),/UNSUPPORTED_V1_CAPABILITY/);
  assert.throws(()=>A.materializeSupportVolume({owner:{entityDefinitionId:OE.entityDefinitionId,entityRevision:OE.entityRevision,entityDigest:'0'.repeat(64),transform:OE.transform},volume:SYN.CONTAINMENT_VOLUME.definition}),/STALE_VOLUME_OWNER/);});
 test('v5 runtime: engine revision-2 repro COMMITS; stale body/revision/volume, protrusion and foreign item REJECT',()=>{
@@ -113,3 +113,45 @@ test('v5 runtime: engine revision-2 repro COMMITS; stale body/revision/volume, p
   {commandId:'t:nf:spawn',type:'SpawnEntity',expectedWorldRevision:2,entity:unit2},
   {commandId:'t:nf:attach',type:'AttachSupportRelation',expectedWorldRevision:2,relation:rel2},...rebindTo(b2,3)]});
  assert.equal(negFor.status,'REJECTED');assert.equal(negFor.evidence?.detail?.evidence?.adapterReason,'PAIR_SUPERSESSION_SCOPE');});
+
+test('v6 validator: volume outward expansion and boundary-touching ceiling REJECT',()=>{
+ const OE=SYN.OWNER_ENTITY.definition,owner={entityDefinitionId:OE.entityDefinitionId,entityRevision:OE.entityRevision,entityDigest:OE.entityDigest,transform:OE.transform};
+ const base=structuredClone(SYN.CONTAINMENT_VOLUME.definition);delete base.canonicalDigest;
+ const ok=A.validateSupportVolume(base,owner,SYN.BAG_BOUNDS_MU);
+ assert.equal(ok.status,'VALIDATED');
+ for(const[k,v]of[['maxY',200000],['maxY',175000],['maxX',300000],['minX',-300000],['maxZ',200000],['minY',-175001]]){
+  const mut=structuredClone(base);mut.localBoundsMicrounits[k]=v;
+  const r=A.validateSupportVolume(mut,owner,SYN.BAG_BOUNDS_MU);
+  assert.equal(r.status,'REJECTED',k+'='+v+' must reject');
+  assert.equal(r.failure.code,'SUPPORT_VOLUME_EXCEEDS_OWNER_BODY',k+'='+v);}
+ // backward compatibility: without owner bounds the record still validates (v2.0.0 paths unaffected)
+ assert.equal(A.validateSupportVolume(structuredClone(base),owner).status,'VALIDATED');});
+
+test('v6 runtime: executor chair hostile overlap repro REJECTS with DYNAMIC_BODY_COLLISION',()=>{
+ const p=buildV21(),v=validateScenePackage(p);
+ const api=createMultiSupportRuntime({initialWorld:empty(),legalityPort:schoolGeometryAdapter({surfaceModel:model}),ownerBodyBindings:v.ownerBodyBindings});
+ const boot=api.proposeTransaction({transactionId:'t:boot',expectedWorldRevision:0,commands:p.entities.map(e=>({commandId:'spawn:'+e.entityId,type:'SpawnEntity',expectedWorldRevision:0,entity:e})).concat(p.supportRelations.map(r=>({commandId:'support:'+r.relationId,type:'AttachSupportRelation',expectedWorldRevision:0,relation:r})))});
+ assert.equal(boot.status,'COMMITTED',boot.code||'');
+ const b1=api.getWorldState();
+ assert.deepEqual(b1.entities['school-treatment-chair'].transform.positionMicrounits,[-2000000,0,1000000]);
+ const rebind=b1.supportRelations.map(r=>{const cl=structuredClone(r);cl.boundWorldRevision=2;return {commandId:'tx:rebind:2:'+r.relationId,type:'ReplaceSupportRelation',expectedWorldRevision:1,relationId:r.relationId,relation:cl}});
+ // The executor's exact v5-breaking repro: chair moved exactly onto the unit's X/Z area and the bag's occupied space.
+ const repro=api.proposeTransaction({transactionId:'t:chair-hostile',expectedWorldRevision:1,commands:[
+  {commandId:'t:ch:xf',type:'SetTransform',expectedWorldRevision:1,entityId:'school-treatment-chair',transform:{positionMicrounits:[-3000000,0,1000000],orientation:[0,0,0,1],scaleMicrounits:[1000000,1000000,1000000]}},...rebind]});
+ assert.equal(repro.status,'REJECTED','v5 committed this; v6 must collision-reject');
+ assert.equal(repro.code,'LEGALITY_ILLEGAL');
+ assert.equal(repro.evidence?.detail?.evidence?.adapterReason,'DYNAMIC_BODY_COLLISION');
+ const pairs=repro.evidence?.detail?.evidence?.collidingPairs||[];
+ assert(pairs.some(x=>x.pair.includes('school-treatment-chair')&&(x.pair.includes('synthetic-training-unit-v1')||x.pair.includes('school-medical-bag'))),'a chair/unit or chair/bag colliding pair must be named');
+ assert.equal(api.getWorldState().stateDigest,b1.stateDigest,'atomic: no partial commit');});
+
+test('v6 runtime: bag +10cm translation with rebound relations COMMITS (legal containment at moved owner)',()=>{
+ const p=buildV21(),v=validateScenePackage(p);
+ const api=createMultiSupportRuntime({initialWorld:empty(),legalityPort:schoolGeometryAdapter({surfaceModel:model}),ownerBodyBindings:v.ownerBodyBindings});
+ const boot=api.proposeTransaction({transactionId:'t:boot',expectedWorldRevision:0,commands:p.entities.map(e=>({commandId:'spawn:'+e.entityId,type:'SpawnEntity',expectedWorldRevision:0,entity:e})).concat(p.supportRelations.map(r=>({commandId:'support:'+r.relationId,type:'AttachSupportRelation',expectedWorldRevision:0,relation:r})))});
+ assert.equal(boot.status,'COMMITTED',boot.code||'');
+ const b1=api.getWorldState();
+ const rebind=b1.supportRelations.map(r=>{const cl=structuredClone(r);cl.boundWorldRevision=2;if(cl.ownerEntityRef?.id==='school-medical-bag')cl.ownerEntityRef={...cl.ownerEntityRef,revision:2};return {commandId:'tx:rebind:2:'+r.relationId,type:'ReplaceSupportRelation',expectedWorldRevision:1,relationId:r.relationId,relation:cl}});
+ const move=api.proposeTransaction({transactionId:'t:bag-10cm',expectedWorldRevision:1,commands:[
+  {commandId:'t:bag:xf',type:'SetTransform',expectedWorldRevision:1,entityId:'school-medical-bag',transform:{positionMicrounits:[-2900000,175000,1000000],orientation:[0,0,0,1],scaleMicrounits:[1000000,1000000,1000000]}},...rebind]});
+ assert.equal(move.status,'COMMITTED','unit AABB remains within the moved interior: legal containment, must commit; got '+(move.code||'')+' '+JSON.stringify(move.evidence?.detail?.evidence?.adapterReason||''));});

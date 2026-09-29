@@ -47,13 +47,19 @@ const rawFloor={schemaVersion:'1.0.0',supportSurfaceId:'school/medical-bag-inter
 const INTERIOR_FLOOR=A.validateSupportSurface(rawFloor,OWNER_ENTITY.definition);
 if(INTERIOR_FLOOR.status!=='VALIDATED')throw Object.assign(Error('R1v4 interior floor failed: '+JSON.stringify(INTERIOR_FLOOR.failure)),{code:'R1V4_DRAFT_INVALID'});
 // 4. Containment SUPPORT_VOLUME (the hollow interior above the floor).
-const rawVolume={schemaVersion:'1.0.0',supportVolumeId:'school/medical-bag-containment-interior',volumeRevision:1,
+//    R1 v6 (executor finding): the v5 draft's ceiling touched the bag shell
+//    top (+175000 = owner outer maxY). Reverted to the v3/v4 strict 25mm
+//    interior margin (+150000); the validator now rejects outward expansion
+//    on any axis and requires the ceiling strictly below the shell top.
+//    X/Z faces still coincide with the single-AABB shell (no wall thickness
+//    is modeled) - disclosed for exact-byte review.
+const rawVolume={schemaVersion:'1.0.0',supportVolumeId:'school/medical-bag-containment-interior',volumeRevision:2,
  ownerEntityRef:{id:OWNER_ENTITY.definition.entityDefinitionId,revision:OWNER_ENTITY.definition.entityRevision,digest:OWNER_ENTITY.definition.entityDigest},
  transformBinding:'OWNER_TRANSLATION_IDENTITY_ORIENTATION',containmentRole:'CONTAINMENT_INTERIOR',
- localBoundsMicrounits:{minX:-250000,maxX:250000,minY:-150000,maxY:175000,minZ:-150000,maxZ:150000},
+ localBoundsMicrounits:{minX:-250000,maxX:250000,minY:-150000,maxY:150000,minZ:-150000,maxZ:150000},
  classification:'AUTHORED_NEW',
  provenanceRefs:['owner-r1-q1:wamid.HBgMOTcyNTMyNDkwMzUxFQIAEhgUM0EwRTNFRDUxRDZDQzAwNEU2NjcA','decision:gate-a-unit-authoring-001']};
-const CONTAINMENT_VOLUME=A.validateSupportVolume(rawVolume,OWNER_ENTITY.definition);
+const CONTAINMENT_VOLUME=A.validateSupportVolume(rawVolume,OWNER_ENTITY.definition,BAG_BOUNDS_MU);
 if(CONTAINMENT_VOLUME.status!=='VALIDATED')throw Object.assign(Error('R1v4 containment volume failed: '+JSON.stringify(CONTAINMENT_VOLUME.failure)),{code:'R1V4_DRAFT_INVALID'});
 // 5. Unit body (200x120x80mm rigid box, bottom contact region at local Y=0).
 const rawUnitBody={schemaVersion:'1.0.0',bodyDefinitionId:'synthetic-training-unit-body-v1',bodyRevision:1,

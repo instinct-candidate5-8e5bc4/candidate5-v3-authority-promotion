@@ -1,16 +1,57 @@
-# Gate A R1 v5 - Contract Additions Resolving the Engine's R1 v4 Verdict
+# Gate A R1 v6 - Contract Additions Resolving the Engine's R1 v4 + Executor v5 Verdicts
 
 Status: PROPOSAL, pre-admission. Nothing in this package is admitted, certified
 or signed. The formal R1 review signs exact bytes; this document identifies them.
 
-Supersedes: R1 v4 (commits 7948b81, fea8c7c, 1101695). The engine's v4 verdict
-(required all three fixes before resubmission) is resolved point by point below.
-v4 content (ENTITY/SUPPORT_VOLUME admission types, six central records validated
-at load, v2.1.0 scene branch, throwaway instantiate proof) is unchanged unless
-explicitly listed here.
+Supersedes: R1 v5 (commits 79453f2, cfacc7f, 291205b). The executor's v5 review
+confirmed two of three v4 repros FIXED (revision-2 transaction COMMITS; forged
+provenanceRefs REJECTS OWNER_BODY_BINDING_BYTES_MISMATCH; 31/31 harness + 35
+targeted pass) and required two more fixes before signoff, resolved below as
+Fix 4 and Fix 5. v5 content (Fixes 1-3) is unchanged unless explicitly listed.
 
-Evidence harness: `node scripts/track-b/gate-a-r1v5-contract-check.mjs` (31 checks,
-all through the real repo contracts). Test suite: `tests/track-b/gate-a-r1v5-contracts.test.js`.
+Evidence harness: `node scripts/track-b/gate-a-r1v6-contract-check.mjs` (35 checks,
+all through the real repo contracts). Test suite: `tests/track-b/gate-a-r1v6-contracts.test.js`.
+
+## Fix 4 (v6) - collision exception is a real geometric gate, not an evidence string
+
+Executor finding: in v5 the pairSupersession claim was descriptive text; no
+unit-vs-bag overlap evaluation, no pairwise dynamic-body collision check, and
+the Phase 2 gate checks only static WALL/DOOR/OBSTACLE volumes. The executor's
+hostile repro - SetTransform school-treatment-chair onto the unit's X/Z area
+and the bag's occupied space, relations rebound - COMMITTED under v5.
+
+v6: `school-geometry-adapter.js` now computes ACTUAL world-AABB intersections
+between the command entity and every other dynamic body in the proposed world,
+inside the authoritative legality path. The only exemption is a pair directly
+bound by a support relation present in the proposed state - v2 relations there
+have already passed validateRelations in the same transaction; v1-runtime
+entity supportRelation/physicalRelations entries are honored with their own
+dependency gate - and for the unit/bag pair, containment is independently
+recomputed by the isTrainingUnit branch on the unit's own evaluation (the unit
+is always in the affected set). Every other overlapping dynamic pair returns
+ILLEGAL with adapterReason DYNAMIC_BODY_COLLISION naming the colliding pairs.
+Proofs: C8g - the executor's exact chair repro REJECTS (atomic, state digest
+unchanged); C8h - bag +10cm translation with the unit still inside the moved
+interior COMMITS (the executor's confirmed-legal case); the gate-c
+box-on-chair fixture transactions still COMMIT (relation-exempt pair).
+
+## Fix 5 (v6) - containment volume strictly inside the owner shell; expansion rejected
+
+Executor finding: v5's volume ceiling (+175mm local) exactly equaled the bag
+shell top (+175mm), a silent change from v3/v4's strict 25mm interior margin.
+Disclosed here per the executor's correction: the owner approved a certified
+hollow interior for this configuration, not the specific margin; the lost
+margin is not an independent permission blocker, but the changed draft
+geometry is disclosed for exact-byte review and must be tested against
+outward expansion.
+
+v6: the ceiling is RESTORED to +150mm (strict 25mm interior margin; volume
+revision 2, new digest). validateSupportVolume accepts the owner body's local
+bounds and REJECTS (SUPPORT_VOLUME_EXCEEDS_OWNER_BODY) any outward expansion
+on any axis and any boundary-touching ceiling. X/Z faces still coincide with
+the single-AABB shell (no wall thickness is modeled) - disclosed. Proofs:
+C4l (expansion rejected on every axis), C4m (boundary-touching ceiling
+rejected; +150mm validated), C6a (world region Y top now 0.325).
 
 ## Fix 1 - binding staleness bound to owner/body/volume revisions, not a frozen world revision
 
