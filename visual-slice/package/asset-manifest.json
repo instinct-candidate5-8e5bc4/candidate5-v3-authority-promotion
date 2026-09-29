@@ -5,8 +5,8 @@
  "assets": [
   {
    "path": "package/renderer-package.mjs",
-   "bytes": 16996,
-   "sha256": "b1b3c1d2e4ac31860ec3d42253ab22ae1659f6631fec16309ec322422e6dd02d"
+   "bytes": 17053,
+   "sha256": "d552383c51b9eb458618f6023e46cbbbf7947c70079911e35ce00e592a067ab3"
   },
   {
    "path": "package/projection-guard.mjs",
