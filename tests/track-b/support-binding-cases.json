@@ -1,0 +1,23 @@
+{
+ "casesVersion": "1.0.0",
+ "kind": "TRACK_B_SUPPORT_BINDING_CASES",
+ "policy": "Declarative positioning/support case suite. Every case asserts the EXACT gate outcome (status, code, phase-2 reason, state digests) through the certified Geometry Gate. The demo's three buttons are a special case of this table. Regression rule: any engine or renderer change that alters gate truth fails loudly here - never adjust expectations to make a change pass; a changed outcome is a HARD STOP for review.",
+ "baseWorldDigest": "fa1bbaa985a63a8bfa30c2bbd7fbaf14b2c4972d985815a093bdd68f7fe954ea",
+ "entity": "school-medical-bag",
+ "cases": [
+  {"caseId": "floor-beside-chair", "relationKind": "floor-src", "positionMicrounits": [-1200000, 175000, 1000000],
+   "expect": {"status": "COMMITTED", "stateDigest": "0ff66dcebe2cdb310e08ee4b9d493e3360e6c3f2077dfe896716238a6f61066e"}},
+  {"caseId": "floor-far-corner", "relationKind": "floor-src", "positionMicrounits": [-4000000, 175000, 2000000],
+   "expect": {"status": "COMMITTED", "stateDigest": "81da62b83b63d8e4b39afef007bc0a0fec84d0f90d08af97cc744a7b36088971"}},
+  {"caseId": "chair-seat", "relationKind": "chair-seat-derived", "positionMicrounits": [-2000000, 665000, 1000000],
+   "expect": {"status": "REJECTED", "code": "LEGALITY_FAIL", "reasonCode": "CONTACT_GAP_FLOATING", "stateDigest": "fa1bbaa985a63a8bfa30c2bbd7fbaf14b2c4972d985815a093bdd68f7fe954ea"}},
+  {"caseId": "into-wall", "relationKind": "floor-src", "positionMicrounits": [0, 175000, -3900000],
+   "expect": {"status": "REJECTED", "code": "LEGALITY_FAIL", "reasonCode": "OBSTACLE_PENETRATION", "stateDigest": "fa1bbaa985a63a8bfa30c2bbd7fbaf14b2c4972d985815a093bdd68f7fe954ea"}},
+  {"caseId": "floating-0.5m", "relationKind": "floor-src", "positionMicrounits": [-1200000, 500000, 1000000],
+   "expect": {"status": "REJECTED", "code": "LEGALITY_FAIL", "reasonCode": "CONTACT_GAP_FLOATING", "stateDigest": "fa1bbaa985a63a8bfa30c2bbd7fbaf14b2c4972d985815a093bdd68f7fe954ea"}},
+  {"caseId": "floating-1mm", "relationKind": "floor-src", "positionMicrounits": [-1200000, 176000, 1000000],
+   "expect": {"status": "REJECTED", "code": "LEGALITY_FAIL", "reasonCode": "CONTACT_GAP_FLOATING", "stateDigest": "fa1bbaa985a63a8bfa30c2bbd7fbaf14b2c4972d985815a093bdd68f7fe954ea"}},
+  {"caseId": "below-floor", "relationKind": "floor-src", "positionMicrounits": [-1200000, -100000, 1000000],
+   "expect": {"status": "REJECTED", "code": "LEGALITY_FAIL", "reasonCode": "SUPPORT_PENETRATION", "stateDigest": "fa1bbaa985a63a8bfa30c2bbd7fbaf14b2c4972d985815a093bdd68f7fe954ea"}}
+ ]
+}
