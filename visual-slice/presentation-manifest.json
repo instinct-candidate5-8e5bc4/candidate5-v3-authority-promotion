@@ -1,0 +1,66 @@
+{
+ "kind": "TRACK_B_PRESENTATION_MANIFEST",
+ "manifestVersion": "0.1.0",
+ "sceneRef": {
+  "definitionId": "SCHOOL_TREATMENT_ROOM",
+  "authoritativeWorldDigest": "fa1bbaa985a63a8bfa30c2bbd7fbaf14b2c4972d985815a093bdd68f7fe954ea"
+ },
+ "policy": "Presentation never invents positions/supports/collisions; decorative meshes are never authoritative unless separately certified; missing asset = loud labeled placeholder, never silent fallback; licensing/provenance explicit for any non-procedural asset (owner clarification 2026-09-30).",
+ "entities": [
+  {
+   "physicalEntityId": "school-casualty-adult-v1",
+   "visualEntityId": "vw-school-casualty-adult",
+   "assetRef": {
+    "kind": "procedural",
+    "source": "renderer-package.mjs#bindGroup:casualty"
+   },
+   "transformSource": "authoritative",
+   "physicsAuthoritative": false
+  },
+  {
+   "physicalEntityId": "school-treatment-chair",
+   "visualEntityId": "vw-school-treatment-chair",
+   "assetRef": {
+    "kind": "procedural",
+    "source": "renderer-package.mjs#bindGroup:chair"
+   },
+   "transformSource": "authoritative",
+   "physicsAuthoritative": false
+  },
+  {
+   "physicalEntityId": "school-medical-bag",
+   "visualEntityId": "vw-school-medical-bag",
+   "assetRef": {
+    "kind": "procedural",
+    "source": "renderer-package.mjs#bindGroup:bag"
+   },
+   "transformSource": "authoritative",
+   "physicsAuthoritative": false
+  },
+  {
+   "physicalEntityId": "school-treatment-room-v1",
+   "visualEntityId": "vw-school-treatment-room",
+   "assetRef": {
+    "kind": "procedural",
+    "source": "renderer-package.mjs#roomSurfaces"
+   },
+   "transformSource": "authoritative",
+   "physicsAuthoritative": false
+  },
+  {
+   "physicalEntityId": "synthetic-training-unit-v1",
+   "visualEntityId": "vw-synthetic-training-unit",
+   "assetRef": {
+    "kind": "procedural",
+    "source": "renderer-package.mjs#mountSyntheticUnit"
+   },
+   "transformSource": "authoritative",
+   "physicsAuthoritative": false
+  }
+ ],
+ "lighting": {
+  "rigRef": "procedural:renderer-package.mjs#lighting",
+  "shadowPolicy": "PCFSoftShadowMap"
+ },
+ "manifestDigest": "7bf28e44cda8a466768abe25b48d9f4d0ba54df9d1943ed54b649d6d09e6be30"
+}
