@@ -1,0 +1,30 @@
+{
+ "reviewId": "r1-q1-bag-interior-semantic-authorization",
+ "authority": "USER_GATE_REVIEW",
+ "decision": "R1 APPROVED - NARROW SEMANTIC AUTHORIZATION",
+ "approvedSemanticMeaning": "For this specifically certified synthetic-unit configuration, the approved bag has a certified hollow interior with a valid internal support floor on which this unit may physically rest.",
+ "strictScope": [
+  "This authorization applies ONLY to the currently certified synthetic unit/configuration.",
+  "It does NOT establish a general rule that every bag has a usable interior.",
+  "It does NOT automatically authorize any other item to be placed inside the bag.",
+  "The bag remains opaque/closed to all other unsupported semantics.",
+  "The internal support floor must have its own explicit identity/lineage and validation evidence.",
+  "Placement must still pass the normal Geometry / Support / Ground Contact rules.",
+  "No hidden geometry inference or fallback is allowed.",
+  "No other item inherits this authorization.",
+  "Any future item requires its own applicable certified relationship or a separately approved generalized bag-interior contract."
+ ],
+ "appliesTo": {
+  "unitBody": "synthetic-training-unit-body-v1 revision 1 (draft, pre-admission)",
+  "ownerBodyDefinition": "school/medical-bag-owner-body revision 1 (draft, pre-admission)",
+  "ownerEntityDefinition": "school/medical-bag-entity revision 1 (draft, pre-admission)",
+  "interiorFloorSurface": "school/medical-bag-interior-floor revision 1 (draft, pre-admission)",
+  "containmentVolume": "school/medical-bag-interior-volume-v1 revision 1 (draft, pre-admission)"
+ },
+ "signedAt": "2026-09-30T01:29:11+03:00",
+ "provenanceRefs": [
+  "whatsapp:wamid.HBgMOTcyNTMyNDkwMzUxFQIAEhgUM0EwRTNFRDUxRDZDQzAwNEU2NjcA"
+ ],
+ "status": "SIGNED_SEMANTIC_AUTHORIZATION: records the owner's approval of the semantic MEANING only. The drafted records it covers remain pre-admission; R1 formal signoff still requires the validator matrix, deterministic fixture, authority audit and exact-review round per the Gate A lifecycle.",
+ "personalReviewerIdentityInvented": false
+}
