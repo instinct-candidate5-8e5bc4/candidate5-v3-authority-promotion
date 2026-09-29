@@ -15,6 +15,12 @@ const ROOT=path.join(__dirname,'../..');
   const errs=[];page.on('pageerror',e=>errs.push(String(e)));
   await page.goto('http://127.0.0.1:8899/visual-slice/',{waitUntil:'domcontentloaded',timeout:60000});
   await page.waitForSelector('#btnSeat',{timeout:30000});
+  // B-W2 race fix: buttons ship disabled in markup and are enabled only after
+  // the fail-closed engine init completes (~1s window). Clicking before the
+  // wiring lands races the init. Wait for all three to be ENABLED first.
+  await page.waitForFunction(
+    `['btnSeat','btnLegal','btnWall'].every(id=>{const b=document.getElementById(id);return b&&!b.disabled})`,
+    {timeout:30000});
   async function click(id){await page.click('#'+id);await page.waitForFunction(
     `!document.querySelector('#demoOut').textContent.includes('מעבד')`,{timeout:30000});
    return page.$eval('#demoOut',el=>el.textContent)}
