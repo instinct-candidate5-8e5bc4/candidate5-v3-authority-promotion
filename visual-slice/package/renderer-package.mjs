@@ -147,6 +147,7 @@ export async function mount(container,opts={}){
   const overlay=document.createElement('div');
   overlay.style.cssText='position:absolute;top:0;left:0;right:0;padding:8px 12px;background:rgba(10,16,20,.92);border-bottom:2px solid #b8892d;font:12px/1.5 system-ui;color:#cfe3ee;pointer-events:none;z-index:5';
   overlay.innerHTML='<b>'+bundle.banner.title+'</b> — '+bundle.banner.warning+'<br>'+
+   (bundle.banner.worldClassification?'<span style="color:#ffb84d">'+bundle.banner.worldClassification+'</span><br>':'')+
    'Casualty: '+statuses.statuses.casualty.gate+' '+statuses.statuses.casualty.gateResult+' ('+statuses.statuses.casualty.reviewId+') · Chair: '+statuses.statuses.chair.gate+' '+statuses.statuses.chair.gateResult+' ('+statuses.statuses.chair.reviewId+')';
   const finding=document.createElement('div');
   finding.style.cssText='position:absolute;left:0;right:0;bottom:0;padding:8px 12px;background:rgba(8,14,18,.9);font:13px/1.5 system-ui;color:#ffe9b8;display:none;z-index:5;white-space:pre-wrap';

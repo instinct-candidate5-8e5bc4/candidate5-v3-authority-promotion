@@ -1,15 +1,16 @@
 {
  "bundleVersion": "1.0.0",
  "kind": "TRACK_B_VISUAL_SCENE_BUNDLE",
- "generatedAt": "2026-09-24T22:33:30.203Z",
+ "generatedAt": "2026-09-29T23:22:04.127Z",
  "git": {
   "branch": "candidate5-track-b-visual-slice",
-  "commit": "ebc159aa8d443efd9e798ede7cb10fcf7b584e4a",
+  "commit": "1f99291b3ced7084650218f9ac9c0319f7401c7b",
   "base": "7cd96d36"
  },
  "banner": {
-  "title": "SCHOOL TREATMENT ROOM - VISUAL PREVIEW",
+  "title": "SCHOOL TREATMENT ROOM - ENGINEERING/PHYSICS DEBUG VIEW",
   "warning": "VISUALS ARE NOT CERTIFIED PHYSICS",
+  "worldClassification": "ENGINEERING / PHYSICS VALIDATION ENVIRONMENT - NOT the production visual world (owner directive 2026-09-30; see evidence/track-b/visual-layer-classification.json)",
   "distinction": "Everything drawn here is a presentation-only projection of certified authoritative state. No physical truth is derived from pixels. Renderer values never feed authoritative state (ED-P2-02 downstream-only)."
  },
  "inputs": {

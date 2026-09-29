@@ -1,0 +1,19 @@
+{
+ "kind": "TRACK_B_VISUAL_LAYER_CLASSIFICATION",
+ "issued": "2026-09-30T02:21:00+03:00",
+ "classification": "ENGINEERING_PHYSICS_DEBUG_VIEW",
+ "ownerDirective": {
+  "receivedAt": "2026-09-30T02:20:40+03:00",
+  "messageId": "wamid.HBgMOTcyNTMyNDkwMzUxFQIAEhgUM0E4NEU5OUJENjQ0QUIwQzVCOTUA",
+  "summary": "Owner reviewed the current SCHOOL_TREATMENT_ROOM preview: acceptable as an ENGINEERING/PHYSICS VALIDATION ENVIRONMENT, NOT acceptable as the target visual world of the Ko Rishon simulator. Two explicit layers established: (1) PHYSICS/AUTHORITY - existing certified geometry, surfaces, supports, collision bodies, physical bodies, gates; (2) PRESENTATION/WORLD - high-quality environment rendered from and bound to the authoritative physical world, never replacing or bypassing layer 1. Decorative meshes are never authoritative unless separately certified; presentation never invents positions, supports or collisions. R1/R2/R3 continue uninterrupted."
+ },
+ "appliesTo": [
+  "SCHOOL_TREATMENT_ROOM visual preview (all current renders)",
+  "B-W8 pixel-verification screenshots",
+  "B-W10 package smoke screenshots",
+  "B-W11 synthetic-unit bridge renders",
+  "visual-slice/scene-bundle.json banner"
+ ],
+ "claimsRule": "Nothing in the listed artifacts is visual/world completion. The simulator world is not 'visually complete' until a production-quality scene actually runs from the same authoritative world state. Engineering validation value of the listed artifacts is unchanged.",
+ "layerModel": "SceneDefinition -> Authoritative Physical Scene -> Presentation Manifest -> Visual Assets -> Entity Bindings -> Renderer (stable entity IDs connect physical entities to visual entities; see docs/track-b/production-world-track-plan.md)"
+}
