@@ -1031,11 +1031,15 @@ var require_relations = __commonJS({
           if (!o2 || o2.lifecycleState === "REMOVED") return fail("MISSING_OWNER", r2.relationId);
           if (r2.ownerEntityRef.revision !== o2.revision) return fail("STALE_OWNER_REVISION", r2.relationId);
           let ownerBodyOk = r2.ownerBodyRef?.revision === o2.physicalBodyRef?.revision && r2.ownerBodyRef?.digest === o2.physicalBodyRef?.digest;
-          if (!ownerBodyOk && ownerBodyBindings) ownerBodyOk = ownerBodyBindings.some((bd) => bd && bd.status === "VALIDATED" && bd.binding.recoveredBodyRef.revision === o2.physicalBodyRef?.revision && bd.binding.recoveredBodyRef.digest === o2.physicalBodyRef?.digest && bd.binding.ownerBodyRef.revision === r2.ownerBodyRef?.revision && bd.binding.ownerBodyRef.digest === r2.ownerBodyRef?.digest && bd.binding.boundWorldRevision === targetWorldRevision);
+          if (!ownerBodyOk && ownerBodyBindings) ownerBodyOk = ownerBodyBindings.some((bd) => bd && bd.status === "VALIDATED" && bd.binding.recoveredBodyRef.revision === o2.physicalBodyRef?.revision && bd.binding.recoveredBodyRef.digest === o2.physicalBodyRef?.digest && bd.binding.ownerBodyRef.revision === r2.ownerBodyRef?.revision && bd.binding.ownerBodyRef.digest === r2.ownerBodyRef?.digest);
           if (!ownerBodyOk) return fail("STALE_OWNER_BODY", r2.relationId);
           const s2 = o2.physicalState?.supportSurface;
           if (!s2) return fail("MISSING_SUPPORT_SURFACE", r2.relationId);
           if (r2.supportSurfaceRef?.id !== s2.supportSurfaceId || r2.supportSurfaceRef?.revision !== s2.surfaceRevision || r2.supportSurfaceRef?.digest !== s2.canonicalDigest) return fail("STALE_SUPPORT_SURFACE", r2.relationId);
+          if (r2.supportVolumeRef) {
+            const v = o2.physicalState?.supportVolume;
+            if (!v || r2.supportVolumeRef.id !== v.supportVolumeId || r2.supportVolumeRef.revision !== v.volumeRevision || r2.supportVolumeRef.digest !== v.canonicalDigest) return fail("STALE_SUPPORT_VOLUME", r2.relationId);
+          }
         }
       }
       return Object.freeze({ status: "VALIDATED", relations: Object.freeze(x.map(Object.freeze)), relationsDigest: digest(x) });
@@ -1343,9 +1347,8 @@ var require_owner_body_binding = __commonJS({
         if (!rr || !or || rr.id !== recoveredBody.bodyId || rr.revision !== recoveredBody.revision || rr.digest !== recoveredBody.digest) return fail("STALE_RECOVERED_BODY");
         if (or.id !== ownerBody.bodyDefinitionId || or.revision !== ownerBody.bodyRevision || or.digest !== ownerBody.canonicalDigest) return fail("STALE_OWNER_BODY_RECORD");
         if (JSON.stringify(recoveredBody.boundsMicrounits) !== JSON.stringify(ownerBody.aggregateBounds)) return fail("BOUNDS_MISMATCH");
-        if (!Number.isInteger(raw.boundWorldRevision) || raw.boundWorldRevision < 1) return fail("MALFORMED_BINDING", "boundWorldRevision");
         if (!Array.isArray(raw.provenanceRefs) || !raw.provenanceRefs.length) return fail("MISSING_PROVENANCE");
-        const binding = { schemaVersion: "1.0.0", bindingId: raw.bindingId, bindingRevision: raw.bindingRevision, recoveredBodyRef: Object.freeze({ ...rr }), ownerBodyRef: Object.freeze({ ...or }), boundsMicrounits: Object.freeze({ ...ownerBody.aggregateBounds }), boundWorldRevision: raw.boundWorldRevision, provenanceRefs: Object.freeze([...raw.provenanceRefs]) };
+        const binding = { schemaVersion: "1.0.0", bindingId: raw.bindingId, bindingRevision: raw.bindingRevision, recoveredBodyRef: Object.freeze({ ...rr }), ownerBodyRef: Object.freeze({ ...or }), boundsMicrounits: Object.freeze({ ...ownerBody.aggregateBounds }), provenanceRefs: Object.freeze([...raw.provenanceRefs]) };
         const canonicalDigest = digest(binding, "canonicalDigest");
         return Object.freeze({ status: "VALIDATED", binding: Object.freeze({ ...binding, canonicalDigest }) });
       } catch (e3) {
@@ -1457,7 +1460,6 @@ var require_synthetic_training_unit_v1 = __commonJS({
       bindingRevision: 1,
       recoveredBodyRef: { id: SCHOOL_BAG_BODY.bodyId, revision: SCHOOL_BAG_BODY.revision, digest: SCHOOL_BAG_BODY.geometryDigest },
       ownerBodyRef: { id: OWNER_BODY.definition.bodyDefinitionId, revision: OWNER_BODY.definition.bodyRevision, digest: OWNER_BODY.definition.canonicalDigest },
-      boundWorldRevision: 1,
       provenanceRefs: ["certified-runtime-record:school-medical-bag-body revision 1", "owner-body-definition:school/medical-bag-owner-body r1", "decision:gate-a-bag-owner-authoring-001"]
     };
     var OWNER_BODY_BINDING = validateOwnerBodyBinding(rawBinding, { recoveredBody: { bodyId: SCHOOL_BAG_BODY.bodyId, revision: SCHOOL_BAG_BODY.revision, digest: SCHOOL_BAG_BODY.geometryDigest, boundsMicrounits: BAG_BOUNDS_MU }, ownerBody: OWNER_BODY.definition });
@@ -1485,6 +1487,7 @@ var require_school_geometry_adapter = __commonJS({
         const entityId = input.command.entityId || input.command.entity?.entityId, entity = input.proposedState.entities[entityId];
         if (input.proposedState.sceneDefinitionRef?.sceneId !== SCHOOL_SCENE.sceneId || !entity) return Object.freeze({ outcome: "UNKNOWN", evidence: { adapterReason: "UNSUPPORTED_SCENE_OR_ENTITY", sceneId: input.proposedState.sceneDefinitionRef?.sceneId || null, entityId: entityId || null } });
         const body = entity.physicalBodyRef, position = entity.transform?.positionMicrounits, isBag = body?.recordId === SCHOOL_BAG_BODY.bodyId, isCasualty = body?.recordId === BODY.bodyDefinitionId, isChair = body?.recordId === CHAIR.BODY.bodyDefinitionId, isSynthetic = body?.recordId === "synthetic/gate-c-supported-box-body", isTrainingUnit = body?.recordId === SYN.UNIT_BODY.definition.bodyDefinitionId;
+        let containmentProof = null;
         let dynamicModel = surfaceModel, surface = entity.supportRelation?.surfaceModelRef || ((isCasualty || isChair) && entity.physicalState?.surfaceId || isBag && input.proposedState.supportRelations?.some((r2) => r2.supportedEntityId === entityId) ? SCHOOL_SURFACE_MODEL_REF : null);
         if (isSynthetic) {
           const owner = input.proposedState.entities[entity.supportRelation?.ownerEntityId];
@@ -1502,7 +1505,22 @@ var require_school_geometry_adapter = __commonJS({
           const unitRel = input.proposedState.supportRelations?.find((r2) => r2.supportedEntityId === entityId);
           const owner = input.proposedState.entities[unitRel?.ownerEntityRef?.id];
           if (owner) {
+            const VOL = SYN.CONTAINMENT_VOLUME.definition, volRef = unitRel?.supportVolumeRef;
+            if (!volRef || volRef.id !== VOL.supportVolumeId || volRef.revision !== VOL.volumeRevision || volRef.digest !== VOL.canonicalDigest) return Object.freeze({ outcome: "UNKNOWN", evidence: { adapterReason: "STALE_VOLUME", actual: volRef || null } });
+            const ownerVol = owner.physicalState?.supportVolume;
+            if (!ownerVol || ownerVol.supportVolumeId !== VOL.supportVolumeId || ownerVol.volumeRevision !== VOL.volumeRevision || ownerVol.canonicalDigest !== VOL.canonicalDigest) return Object.freeze({ outcome: "UNKNOWN", evidence: { adapterReason: "STALE_VOLUME_OWNER_STATE", actual: ownerVol || null } });
+            if (unitRel.relationId !== "synthetic:unit:bag-interior-floor" || unitRel.supportSourceKind !== "ENTITY_OWNED" || unitRel.ownerEntityRef?.id !== "school-medical-bag") return Object.freeze({ outcome: "UNKNOWN", evidence: { adapterReason: "PAIR_SUPERSESSION_SCOPE", relationId: unitRel.relationId || null } });
             const OE = SYN.OWNER_ENTITY.definition, defOwner = { entityDefinitionId: OE.entityDefinitionId, entityRevision: OE.entityRevision, entityDigest: OE.entityDigest, transform: { translationMicrounits: owner.transform.positionMicrounits, orientation: A.V1.canonicalOrientation } };
+            let volMat = null;
+            try {
+              volMat = A.materializeSupportVolume({ owner: defOwner, volume: VOL });
+            } catch (e3) {
+              return Object.freeze({ outcome: "UNKNOWN", evidence: { adapterReason: e3.code || "VOLUME_MATERIALIZATION_FAILED" } });
+            }
+            const ub = SYN.UNIT_BODY.definition.aggregateBounds, unitWorld = { minX: ub.minX + position[0], maxX: ub.maxX + position[0], minY: ub.minY + position[1], maxY: ub.maxY + position[1], minZ: ub.minZ + position[2], maxZ: ub.maxZ + position[2] }, vrgn = volMat.worldRegionMicrounits;
+            const contained = unitWorld.minX > vrgn.minX && unitWorld.maxX < vrgn.maxX && unitWorld.minY >= vrgn.minY && unitWorld.maxY < vrgn.maxY && unitWorld.minZ > vrgn.minZ && unitWorld.maxZ < vrgn.maxZ;
+            if (!contained) return Object.freeze({ outcome: "UNKNOWN", evidence: { adapterReason: "CONTAINMENT_VIOLATION", unitWorldAabbMicrounits: unitWorld, volumeWorldRegionMicrounits: vrgn } });
+            containmentProof = { volumeId: VOL.supportVolumeId, materializationDigest: volMat.materializationDigest, unitWorldAabbMicrounits: unitWorld, volumeWorldRegionMicrounits: vrgn, contained: true, pairSupersession: { pair: ["synthetic-training-unit-v1", "school-medical-bag"], relationId: unitRel.relationId, bindingDigest: SYN.OWNER_BODY_BINDING.binding.canonicalDigest, scope: "Containment supersedes unit-vs-bag body overlap for exactly this relation + validated binding pair; every other body overlap remains a collision." } };
             const m = A.materializeSupportSurface({ staticModelRef: SCHOOL_SURFACE_MODEL_REF, owner: defOwner, surface: SYN.INTERIOR_FLOOR.definition });
             surface = { id: "synthetic-unit-dynamic-surfaces", revision: 1, digest: null };
             dynamicModel = { ...surfaceModel, surfaceModelId: surface.id, revision: 1, surfaces: [...surfaceModel.surfaces, { surfaceId: m.surfaceId, type: m.type, region: m.region, planeOrDepth: m.planeOrDepth, contactRules: m.contactRules, confidence: m.confidence, provenance: m.provenance }] };
@@ -1527,7 +1545,7 @@ var require_school_geometry_adapter = __commonJS({
         if (!Array.isArray(position) || position.length !== 3) return Object.freeze({ outcome: "UNKNOWN", evidence: { adapterReason: "TRANSFORM_CONTRACT_MISSING" } });
         const request = { requestId: input.command.commandId, surfaceId: entity.physicalState?.surfaceId || entity.supportRelation?.surfaceId || null, surfaceModelRef: { id: surface.id, revision: surface.revision, digest: surface.digest }, geometry: contract.geometry, geometryDigest: isCasualty || isChair || isSynthetic || isTrainingUnit ? require_canonical().digest(contract.geometry) : body.digest, proofGeometryDigest: isCasualty || isChair || isSynthetic || isTrainingUnit ? body.proofGeometryDigest === contract.proof ? require_canonical().digest(contract.geometry) : body.proofGeometryDigest : body.proofGeometryDigest || contract.proof, transform: { x: position[0] / MICROUNITS_PER_UNIT, y: position[1] / MICROUNITS_PER_UNIT, z: position[2] / MICROUNITS_PER_UNIT }, orientationUpDot: entity.physicalState?.orientationUpDot, supportNormalUpDot: entity.physicalState?.supportNormalUpDot, evidenceRefs: contract.evidenceRefs };
         const requestBytes = canonical(request), result = evaluate(request, dynamicModel);
-        return Object.freeze({ outcome: result.result, evidence: { adapterKind: "SCHOOL_PHASE2_GEOMETRY_ADAPTER", request, requestDigest: digest(request), requestBytes, sceneProvenance: SCHOOL_SCENE, bodyProvenance: { classification: contract.provenance.classification, lineageStatus: contract.provenance.lineageStatus, sourceId: contract.provenance.sourceId, revision: contract.revision, digest: contract.digest }, surfaceProvenance: { classification: SCHOOL_SURFACE_MODEL_REF.classification, lineageStatus: SCHOOL_SURFACE_MODEL_REF.lineageStatus, sourceId: SCHOOL_SURFACE_MODEL_REF.sourceId, revision: surfaceModel.revision, digest: surfaceModel.surfaceModelDigest, sourceEvidence: surfaceModel.sourceEvidence, resolvedSurface: (surfaceModel.surfaces.find((x) => x.surfaceId === request.surfaceId) || null)?.provenance || null }, phase2ReasonCode: result.reasonCode, phase2Evidence: result.evidence, phase2ProofDigest: result.proofDigest || null } });
+        return Object.freeze({ outcome: result.result, evidence: { adapterKind: "SCHOOL_PHASE2_GEOMETRY_ADAPTER", request, requestDigest: digest(request), requestBytes, sceneProvenance: SCHOOL_SCENE, bodyProvenance: { classification: contract.provenance.classification, lineageStatus: contract.provenance.lineageStatus, sourceId: contract.provenance.sourceId, revision: contract.revision, digest: contract.digest }, surfaceProvenance: { classification: SCHOOL_SURFACE_MODEL_REF.classification, lineageStatus: SCHOOL_SURFACE_MODEL_REF.lineageStatus, sourceId: SCHOOL_SURFACE_MODEL_REF.sourceId, revision: surfaceModel.revision, digest: surfaceModel.surfaceModelDigest, sourceEvidence: surfaceModel.sourceEvidence, resolvedSurface: (surfaceModel.surfaces.find((x) => x.surfaceId === request.surfaceId) || null)?.provenance || null }, phase2ReasonCode: result.reasonCode, phase2Evidence: result.evidence, phase2ProofDigest: result.proofDigest || null, ...containmentProof ? { containmentProof } : {} } });
       } });
     }
     module.exports = { schoolGeometryAdapter };
@@ -1546,6 +1564,7 @@ var require_validate = __commonJS({
     var C = require_treatment_chair();
     var { SCHOOL_BAG_BODY } = require_school_physical_contract();
     var { validateRelations, buildIndex } = require_relations();
+    var { validateOwnerBodyBinding } = require_owner_body_binding();
     var fail = (code) => ({ status: "REJECTED", code });
     function validateScenePackage(p2) {
       if (!p2 || p2.scenePackageVersion !== "2.0.0" && p2.scenePackageVersion !== "2.1.0" || p2.scenePackageId !== "SCHOOL_TREATMENT_ROOM_PHYSICAL_V2") return fail("MALFORMED_OR_WRONG_VERSION");
@@ -1561,19 +1580,28 @@ var require_validate = __commonJS({
       if (!bag || bag.physicalBodyRef.recordId !== SCHOOL_BAG_BODY.bodyId || bag.physicalBodyRef.revision !== SCHOOL_BAG_BODY.revision || bag.physicalBodyRef.digest !== SCHOOL_BAG_BODY.geometryDigest) return fail("BAG_REF_MISMATCH");
       let v21Bindings = null;
       if (isV21) {
-        const unit = by["synthetic-training-unit-v1"], UB = SYN.UNIT_BODY.definition, OE = SYN.OWNER_ENTITY.definition, FL = SYN.INTERIOR_FLOOR.definition;
+        const unit = by["synthetic-training-unit-v1"], UB = SYN.UNIT_BODY.definition, FL = SYN.INTERIOR_FLOOR.definition, VOL = SYN.CONTAINMENT_VOLUME.definition;
         if (!unit || unit.physicalBodyRef.recordId !== UB.bodyDefinitionId || unit.physicalBodyRef.revision !== UB.bodyRevision || unit.physicalBodyRef.digest !== UB.canonicalDigest) return fail("SYNTHETIC_UNIT_REF_MISMATCH");
         if (bag.physicalState?.supportSurface?.supportSurfaceId !== FL.supportSurfaceId || bag.physicalState.supportSurface.surfaceRevision !== FL.surfaceRevision || bag.physicalState.supportSurface.canonicalDigest !== FL.canonicalDigest) return fail("BAG_INTERIOR_FLOOR_MISMATCH");
+        const sv = bag.physicalState?.supportVolume;
+        if (!sv || sv.supportVolumeId !== VOL.supportVolumeId || sv.volumeRevision !== VOL.volumeRevision || sv.canonicalDigest !== VOL.canonicalDigest) return fail("BAG_CONTAINMENT_VOLUME_MISMATCH");
+        const unitRel = p2.supportRelations.find((r3) => r3.supportedEntityId === "synthetic-training-unit-v1"), vr = unitRel?.supportVolumeRef;
+        if (!vr || vr.id !== VOL.supportVolumeId || vr.revision !== VOL.volumeRevision || vr.digest !== VOL.canonicalDigest) return fail("UNIT_VOLUME_REF_MISMATCH");
         const bd = SYN.OWNER_BODY_BINDING.binding;
-        if (!Array.isArray(p2.ownerBodyBindings) || p2.ownerBodyBindings.length !== 1 || p2.ownerBodyBindings[0].canonicalDigest !== bd.canonicalDigest) return fail("OWNER_BODY_BINDING_MISMATCH");
-        v21Bindings = [SYN.OWNER_BODY_BINDING];
+        if (!Array.isArray(p2.ownerBodyBindings) || p2.ownerBodyBindings.length !== 1) return fail("OWNER_BODY_BINDING_MISMATCH");
+        const rec = p2.ownerBodyBindings[0];
+        if (digest({ ...rec, canonicalDigest: void 0 }, "canonicalDigest") !== rec.canonicalDigest) return fail("OWNER_BODY_BINDING_BYTES_MISMATCH");
+        const reval = validateOwnerBodyBinding(structuredClone(rec), { recoveredBody: { bodyId: SCHOOL_BAG_BODY.bodyId, revision: SCHOOL_BAG_BODY.revision, digest: SCHOOL_BAG_BODY.geometryDigest, boundsMicrounits: SYN.BAG_BOUNDS_MU }, ownerBody: SYN.OWNER_BODY.definition });
+        if (reval.status !== "VALIDATED") return fail("OWNER_BODY_BINDING_INVALID:" + reval.failure.code);
+        if (rec.canonicalDigest !== bd.canonicalDigest || reval.binding.canonicalDigest !== rec.canonicalDigest) return fail("OWNER_BODY_BINDING_MISMATCH");
+        v21Bindings = [reval];
       }
       if (p2.supportRelations.some((r3) => digest(r3.contactRegionGeometry) !== r3.contactRegionDigest)) return fail("CONTACT_REGION_DIGEST_MISMATCH");
       if (p2.supportRelations.length !== p2.entities.length || p2.entities.some((e3) => !p2.supportRelations.some((r3) => r3.supportedEntityId === e3.entityId))) return fail("REQUIRED_SUPPORT_RELATION_MISSING");
       const state = { entities: by, supportRelations: p2.supportRelations };
       const r2 = validateRelations(p2.supportRelations, state, { targetWorldRevision: 1, ownerBodyBindings: v21Bindings });
       if (r2.status !== "VALIDATED") return fail("SUPPORT_RELATION_INVALID:" + r2.code);
-      return Object.freeze({ status: "VALIDATED", canonicalBytes: canonicalBytes(p2).toString("hex"), package: p2, index: buildIndex(p2.supportRelations) });
+      return Object.freeze({ status: "VALIDATED", canonicalBytes: canonicalBytes(p2).toString("hex"), package: p2, index: buildIndex(p2.supportRelations), ownerBodyBindings: v21Bindings });
     }
     module.exports = { validateScenePackage };
   }
@@ -1632,7 +1660,7 @@ var require_instantiate = __commonJS({
       return { stateSchemaVersion: "2.0.0", worldId: "school-treatment-room-v2", sceneDefinitionRef: { sceneId: "school" }, revision: 0, lifecycleState: "ACTIVE", entities: {}, supportRelations: [], surfaces: { id: model.surfaceModelId, revision: model.revision, digest: model.surfaceModelDigest }, environmentPhysicalState: null, committedEventSequence: 0 };
     }
     function instantiate(p2) {
-      const v = validateScenePackage(p2), port = schoolGeometryAdapter({ surfaceModel: model }), api = createMultiSupportRuntime({ initialWorld: empty(), legalityPort: port, ownerBodyBindings: p2.scenePackageVersion === "2.1.0" ? [require_synthetic_training_unit_v1().OWNER_BODY_BINDING] : null }), before = api.getWorldState();
+      const v = validateScenePackage(p2), port = schoolGeometryAdapter({ surfaceModel: model }), api = createMultiSupportRuntime({ initialWorld: empty(), legalityPort: port, ownerBodyBindings: v.status === "VALIDATED" ? v.ownerBodyBindings : null }), before = api.getWorldState();
       if (v.status !== "VALIDATED") return { status: "REJECTED", code: v.code, before, after: api.getWorldState() };
       const commands = p2.entities.map((e3) => ({ commandId: "spawn:" + e3.entityId, type: "SpawnEntity", expectedWorldRevision: 0, entity: e3 })).concat(p2.supportRelations.map((r2) => ({ commandId: "support:" + r2.relationId, type: "AttachSupportRelation", expectedWorldRevision: 0, relation: r2 })));
       const result = api.proposeTransaction({ transactionId: "instantiate:" + p2.scenePackageDigest, expectedWorldRevision: 0, commands });

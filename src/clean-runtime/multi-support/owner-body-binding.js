@@ -3,8 +3,11 @@
 // runtime physical body (e.g. the certified recovered bag body) and an
 // AUTHORED_NEW owner body record used for support-surface/volume ownership.
 // Numerical AABB equivalence is not identity equivalence - this record makes
-// the equivalence an explicit, validated, digest-pinned, world-revision-bound
-// admission instead of a silent replacement. validateRelations accepts an
+// the equivalence an explicit, validated, digest-pinned admission instead of a
+// silent replacement. R1 v5: staleness is bound to the RECOVERED and OWNER body
+// revision+digest pins (revalidated against live state at every transaction),
+// never to a globally frozen world revision - a world-frozen binding breaks
+// every subsequent legitimate transaction (engine R1 v4 verdict, boundary 1). validateRelations accepts an
 // ownerBodyRef that differs from the runtime physicalBodyRef ONLY through a
 // VALIDATED binding that links exactly those two refs.
 const {digest}=require('../contracts/canonical');
@@ -20,9 +23,8 @@ function validateOwnerBodyBinding(raw,{recoveredBody,ownerBody}={}){try{
  if(or.id!==ownerBody.bodyDefinitionId||or.revision!==ownerBody.bodyRevision||or.digest!==ownerBody.canonicalDigest)return fail('STALE_OWNER_BODY_RECORD');
  // The equivalence must be PROVEN, not asserted: byte-exact aggregate AABB equality, recomputed from the two records.
  if(JSON.stringify(recoveredBody.boundsMicrounits)!==JSON.stringify(ownerBody.aggregateBounds))return fail('BOUNDS_MISMATCH');
- if(!Number.isInteger(raw.boundWorldRevision)||raw.boundWorldRevision<1)return fail('MALFORMED_BINDING','boundWorldRevision');
  if(!Array.isArray(raw.provenanceRefs)||!raw.provenanceRefs.length)return fail('MISSING_PROVENANCE');
- const binding={schemaVersion:'1.0.0',bindingId:raw.bindingId,bindingRevision:raw.bindingRevision,recoveredBodyRef:Object.freeze({...rr}),ownerBodyRef:Object.freeze({...or}),boundsMicrounits:Object.freeze({...ownerBody.aggregateBounds}),boundWorldRevision:raw.boundWorldRevision,provenanceRefs:Object.freeze([...raw.provenanceRefs])};
+ const binding={schemaVersion:'1.0.0',bindingId:raw.bindingId,bindingRevision:raw.bindingRevision,recoveredBodyRef:Object.freeze({...rr}),ownerBodyRef:Object.freeze({...or}),boundsMicrounits:Object.freeze({...ownerBody.aggregateBounds}),provenanceRefs:Object.freeze([...raw.provenanceRefs])};
  const canonicalDigest=digest(binding,'canonicalDigest');
  return Object.freeze({status:'VALIDATED',binding:Object.freeze({...binding,canonicalDigest})});
 }catch(e){return fail(e.code||'MALFORMED_BINDING')}}

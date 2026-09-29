@@ -75,10 +75,10 @@ const UNIT_BODY=A.validateBody(rawUnitBody);
 if(UNIT_BODY.status!=='VALIDATED')throw Object.assign(Error('R1v4 unit body failed the real validator: '+JSON.stringify(UNIT_BODY.failure)),{code:'R1V4_DRAFT_INVALID'});
 // 6. BODY IDENTITY SEAM: admitted exact binding between the certified RECOVERED
 //    bag body and the AUTHORED_NEW owner body (equivalence proven, not asserted).
+//    R1 v5: no world-revision pin - staleness lives in the body refs above.
 const rawBinding={schemaVersion:'1.0.0',bindingId:'school/medical-bag-owner-body-binding',bindingRevision:1,
  recoveredBodyRef:{id:SCHOOL_BAG_BODY.bodyId,revision:SCHOOL_BAG_BODY.revision,digest:SCHOOL_BAG_BODY.geometryDigest},
  ownerBodyRef:{id:OWNER_BODY.definition.bodyDefinitionId,revision:OWNER_BODY.definition.bodyRevision,digest:OWNER_BODY.definition.canonicalDigest},
- boundWorldRevision:1,
  provenanceRefs:['certified-runtime-record:school-medical-bag-body revision 1','owner-body-definition:school/medical-bag-owner-body r1','decision:gate-a-bag-owner-authoring-001']};
 const OWNER_BODY_BINDING=validateOwnerBodyBinding(rawBinding,{recoveredBody:{bodyId:SCHOOL_BAG_BODY.bodyId,revision:SCHOOL_BAG_BODY.revision,digest:SCHOOL_BAG_BODY.geometryDigest,boundsMicrounits:BAG_BOUNDS_MU},ownerBody:OWNER_BODY.definition});
 if(OWNER_BODY_BINDING.status!=='VALIDATED')throw Object.assign(Error('R1v4 owner-body binding failed: '+JSON.stringify(OWNER_BODY_BINDING.failure)),{code:'R1V4_DRAFT_INVALID'});
