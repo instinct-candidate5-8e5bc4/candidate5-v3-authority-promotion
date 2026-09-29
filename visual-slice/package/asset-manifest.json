@@ -41,7 +41,7 @@
   {
    "path": "entity-body-map.json",
    "bytes": 5647,
-   "sha256": "221bcc6598566229a583d12ed7987dabbe67f47b5ac24527b611c35e755de15f"
+   "sha256": "285d1b7836f9ef49c2108aa72929117ece22b2d2c518a439294e66a452959f43"
   },
   {
    "path": "articulated-layout.mjs",
@@ -55,13 +55,13 @@
   },
   {
    "path": "engine-bundle.js",
-   "bytes": 174044,
-   "sha256": "099a5e11e8d52a2514bc67c7d2a9a937bd882303acd6d5ad7f058e9d636b176a"
+   "bytes": 177481,
+   "sha256": "d8125b15ffc531500be2ce7ee4023413448637e397556039eff094bff8047cf9"
   },
   {
    "path": "scene-bundle.json",
    "bytes": 31822,
-   "sha256": "f5b11a3181cebb7d764554090d47ac0179f4fd2be8eff0605a72b128c6b9c202"
+   "sha256": "52b04192110a390a5c1be061307d1281e5e25e71d72339286750c8dd776d6f03"
   },
   {
    "path": "engine/pins.json",
