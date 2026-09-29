@@ -17,7 +17,8 @@ import {sha256} from '../engine/vendor/js-sha256.mjs';
 export const PACKAGE_API_VERSION='1.0.0';
 const U=1e6,m=v=>v/U;
 const LOCATION_TARGETS=Object.freeze({INITIAL:null,FLOOR_BESIDE_CHAIR:[-1200000,175000,1000000]});
-let inst=null; // single active mount
+let inst=null;
+let syn=null; // module-scoped: status()/unmount() read it outside mount // single active mount
 async function fetchJson(url){const r=await fetch(url);if(!r.ok)throw new Error('fetch '+url+': '+r.status);return r.json()}
 function partMesh(part,colorHex,mat={}){
  let g;
@@ -108,7 +109,6 @@ export async function mount(container,opts={}){
   // (bag top, bag-local [0,235000,0] from committed bag position). The unit
   // FOLLOWS the bag on location actions. Its materials are authored per
   // render call and never cache committed truth.
-  let syn=null;
   function mountSyntheticUnit(){
    const entry=map.entities['synthetic-training-unit-v1'];
    if(!entry||!entry.boundsMicrounits)return;
