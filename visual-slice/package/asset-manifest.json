@@ -5,13 +5,13 @@
  "assets": [
   {
    "path": "package/renderer-package.mjs",
-   "bytes": 13665,
-   "sha256": "0c268c9e6b61c57d8d83326e5b3e219d876a38fcc1ed6e4b863b440415b67d68"
+   "bytes": 16171,
+   "sha256": "fcd2f8e6bfed7b2fe6fe6b237dc289f17f136157b296e6c4aaca28dc6998a762"
   },
   {
    "path": "package/projection-guard.mjs",
-   "bytes": 3920,
-   "sha256": "ebdfe9d0d86cceb0f6e431058772a8c64dca632b3256422ad491a578fe962d05"
+   "bytes": 4922,
+   "sha256": "b4a4bcdb52cceab05357949cf2147e3a046fa60d851bea57f30bc594125c49e2"
   },
   {
    "path": "package/gate-statuses.json",
@@ -25,8 +25,8 @@
   },
   {
    "path": "entity-body-map.json",
-   "bytes": 4793,
-   "sha256": "484ec37770e03cdf2960fc47f67b08be397b11fa1e536481ed69cb9b9e415368"
+   "bytes": 5669,
+   "sha256": "7a4612f2903dc07225a11aecd3110d171fb46562ab9b2e17be33429d37f5d6ba"
   },
   {
    "path": "articulated-layout.mjs",
