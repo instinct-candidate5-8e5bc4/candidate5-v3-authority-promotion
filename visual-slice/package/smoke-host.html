@@ -1,0 +1,15 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>B-W10 package smoke host (dev harness)</title>
+<style>body{margin:0;background:#0b1114}#host{width:960px;height:600px;position:relative}</style></head><body>
+<div id="host"></div>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script type="module">
+import * as PKG from './renderer-package.mjs';
+import * as ENGINE from '../engine-bundle.js';
+const live=ENGINE.buildVisualSceneDescriptor();
+const srcRel=live.supportRelations.find(r=>r.relationId==='school:bag:floor');
+window.__srcRel=JSON.parse(JSON.stringify(srcRel));
+const S={pkg:PKG,mountResult:null};
+window.__smoke=S;
+S.mountResult=await PKG.mount(document.getElementById('host'),{bindingTable:{'pub-casualty-1':'school-casualty-adult-v1','pub-bag-1':'school-medical-bag'}});
+document.body.dataset.mount=S.mountResult.ok?'ok':'fail:'+S.mountResult.reason;
+</script></body></html>

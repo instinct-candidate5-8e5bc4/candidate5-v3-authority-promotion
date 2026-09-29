@@ -1,0 +1,77 @@
+{
+ "manifestVersion": "1.0.0",
+ "kind": "TRACK_B_PACKAGE_ASSET_MANIFEST",
+ "policy": "Every asset the embeddable package loads, pinned byte-exact. Host verifies before consuming; unverifiable pin = host refuses.",
+ "assets": [
+  {
+   "path": "package/renderer-package.mjs",
+   "bytes": 13665,
+   "sha256": "0c268c9e6b61c57d8d83326e5b3e219d876a38fcc1ed6e4b863b440415b67d68"
+  },
+  {
+   "path": "package/projection-guard.mjs",
+   "bytes": 3920,
+   "sha256": "ebdfe9d0d86cceb0f6e431058772a8c64dca632b3256422ad491a578fe962d05"
+  },
+  {
+   "path": "package/gate-statuses.json",
+   "bytes": 2221,
+   "sha256": "8f98aded9075b997fdf81fdecd8f299c0e4cc3e71f1b668a6c29650aabb32b4f"
+  },
+  {
+   "path": "entity-map.mjs",
+   "bytes": 3358,
+   "sha256": "db48885874f11a595dd1a8ccb332ce55973c4dd3651c2883e60f61606bd8b1c6"
+  },
+  {
+   "path": "entity-body-map.json",
+   "bytes": 4793,
+   "sha256": "484ec37770e03cdf2960fc47f67b08be397b11fa1e536481ed69cb9b9e415368"
+  },
+  {
+   "path": "articulated-layout.mjs",
+   "bytes": 5460,
+   "sha256": "f1ecef52c3622cd58dffb2fb78204e259b46b0ab31cbbcd0070b7fe539fd27f5"
+  },
+  {
+   "path": "camera-lighting.mjs",
+   "bytes": 3300,
+   "sha256": "e270383bd38bf4a7a0a8b5541a07b7ed37fe5675df94b07030548f0f73ade46e"
+  },
+  {
+   "path": "engine-bundle.js",
+   "bytes": 145740,
+   "sha256": "c718dcee047177a61f78b0e9fc3890427707c14fe976b1b79ac704a3d5c6959b"
+  },
+  {
+   "path": "scene-bundle.json",
+   "bytes": 31637,
+   "sha256": "08fa59f6a4492acb0bab6f719beb70090c8ae8f5d090a47a3ea82ae873b39cfd"
+  },
+  {
+   "path": "engine/pins.json",
+   "bytes": 262,
+   "sha256": "02a4ffbb539a01e564ef05116fca3f8b7c1de5bdf69fe93fd37b8b790f098022"
+  },
+  {
+   "path": "engine/vendor/js-sha256.mjs",
+   "bytes": 7801,
+   "sha256": "77c6fc4b685c022977307998b35c3a9e2fbeb76f3d59d3c68984752831e35d91"
+  },
+  {
+   "path": "engine/vendor/js-sha256.LICENSE.txt",
+   "bytes": 1076,
+   "sha256": "2153bd2978793748fbe0eb8f838ae2ae19f03f9d4ee5473dd1628a0c0790e4ab"
+  }
+ ],
+ "externalImports": [
+  {
+   "url": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+   "note": "host importmap, version-pinned"
+  },
+  {
+   "url": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js",
+   "note": "host importmap, version-pinned"
+  }
+ ]
+}

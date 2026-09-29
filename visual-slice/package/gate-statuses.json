@@ -1,0 +1,39 @@
+{
+ "kind": "TRACK_B_PACKAGE_GATE_STATUSES",
+ "correctionVersion": "1.0.0",
+ "issued": "2026-09-24",
+ "sourceRecord": "docs/track-b/lifecycle-status-correction.json",
+ "statuses": {
+  "casualty": {
+   "entityId": "school-casualty-adult-v1",
+   "gate": "GATE B",
+   "gateResult": "VERIFIED_FOR_SLICE",
+   "verifiedForSlice": true,
+   "reviewId": "gate-b-user-review-ee04481",
+   "reviewDecision": "APPROVED_FOR_SLICE",
+   "reviewScope": "SCHOOL_VERTICAL_SLICE|adult-v1|MALE|SUPINE_FLOOR|PHASE2_CONSERVATIVE_AGGREGATE_AABB",
+   "groundedRecord": "evidence/clean-runtime/gate-a2-admission/exact-review.json",
+   "caveat": "Male casualty body adult-v1 is VERIFIED_FOR_SLICE (reviewId gate-b-user-review-ee04481, APPROVED_FOR_SLICE within its recorded review scope; limitations per the grounded record). Uncertified areas remaining are the Gate D declared unknowns, including visual-physical lineage."
+  },
+  "chair": {
+   "entityId": "school-treatment-chair",
+   "gate": "GATE C",
+   "gateResult": "VERIFIED_FOR_SLICE",
+   "verifiedForSlice": true,
+   "reviewId": "gate-c-user-review-0c27c92",
+   "reviewDecision": "APPROVED_FOR_SLICE",
+   "reviewScope": "SCHOOL_VERTICAL_SLICE|TREATMENT_CHAIR_R1|SEAT_SUPPORT_SURFACE_R1|PHYSICAL_SUPPORT_AND_DEPENDENCY_VALIDATION",
+   "groundedRecord": "evidence/clean-runtime/gate-c-admission/gate-result.json",
+   "caveat": "Treatment chair is VERIFIED_FOR_SLICE (reviewId gate-c-user-review-0c27c92, APPROVED_FOR_SLICE within its recorded review scope; limitations per the grounded record, including PHYSICAL_ONLY_NO_VISUAL_BINDING)."
+  }
+ },
+ "superseded": [
+  {
+   "entityId": "school-casualty-adult-v1",
+   "supersededLabel": "NOT VERIFIED_FOR_SLICE / provisional (per-entity statusCaveat still carried by scene-bundle.json and the engine builders)",
+   "supersededBy": "docs/track-b/lifecycle-status-correction.json",
+   "note": "Historical label. Status-only presentation overlay per the owner separable-overlay ruling; engine builder bytes intentionally unchanged. The correction record above is the authoritative status source for this package."
+  }
+ ],
+ "policy": "Statuses come ONLY from the detailed correction record. Banner text and registry notes are never a status source."
+}
