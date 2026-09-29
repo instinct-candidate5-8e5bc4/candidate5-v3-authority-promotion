@@ -682,13 +682,60 @@ var require_support_validator = __commonJS({
   }
 });
 
+// src/clean-runtime/authoring/validators/support-volume-validator.js
+var require_support_volume_validator = __commonJS({
+  "src/clean-runtime/authoring/validators/support-volume-validator.js"(exports, module) {
+    "use strict";
+    init_buffer_inject();
+    var { V1 } = require_constants();
+    var { integer } = require_geometry();
+    var { digest } = require_canonical3();
+    function reject(code, path) {
+      return { status: "REJECTED", failure: { code, path } };
+    }
+    function validateSupportVolume(x, owner) {
+      if (!x || x.schemaVersion !== "1.0.0" || !x.supportVolumeId || !(x.volumeRevision >= 1)) return reject("MALFORMED_SCHEMA", "$");
+      if (x.ownerEntityRef?.id !== owner.entityDefinitionId || x.ownerEntityRef?.revision !== owner.entityRevision || x.ownerEntityRef?.digest !== owner.entityDigest) return reject("STALE_VOLUME_OWNER", "ownerEntityRef");
+      if (x.transformBinding !== "OWNER_TRANSLATION_IDENTITY_ORIENTATION" || JSON.stringify(owner.transform.orientation) !== JSON.stringify(V1.canonicalOrientation)) return reject("UNSUPPORTED_V1_CAPABILITY", "transformBinding");
+      if (x.containmentRole !== "CONTAINMENT_INTERIOR") return reject("INVALID_SUPPORT_VOLUME", "containmentRole");
+      try {
+        for (const k of ["minX", "maxX", "minY", "maxY", "minZ", "maxZ"]) integer(x.localBoundsMicrounits?.[k], "localBoundsMicrounits." + k);
+      } catch (e3) {
+        return reject(e3.code, e3.path);
+      }
+      const b = x.localBoundsMicrounits;
+      if (b.minX >= b.maxX || b.minY >= b.maxY || b.minZ >= b.maxZ) return reject("INVALID_SUPPORT_VOLUME", "localBoundsMicrounits");
+      if (x.classification !== "AUTHORED_NEW") return reject("INVALID_SUPPORT_VOLUME", "classification");
+      if (!Array.isArray(x.provenanceRefs) || !x.provenanceRefs.length) return reject("MISSING_PROVENANCE", "provenanceRefs");
+      const y2 = structuredClone(x);
+      y2.canonicalDigest = digest(y2);
+      return { status: "VALIDATED", definition: Object.freeze(y2) };
+    }
+    function materializeSupportVolume({ owner, volume }) {
+      if (JSON.stringify(owner.transform.orientation) !== JSON.stringify(V1.canonicalOrientation) || volume.transformBinding !== "OWNER_TRANSLATION_IDENTITY_ORIENTATION") throw Object.assign(Error("UNSUPPORTED_V1_CAPABILITY"), { code: "UNSUPPORTED_V1_CAPABILITY" });
+      if (volume.ownerEntityRef?.id !== owner.entityDefinitionId || volume.ownerEntityRef?.revision !== owner.entityRevision || volume.ownerEntityRef?.digest !== owner.entityDigest) throw Object.assign(Error("STALE_VOLUME_OWNER"), { code: "STALE_VOLUME_OWNER" });
+      const [x, y2, z] = owner.transform.translationMicrounits, b = volume.localBoundsMicrounits;
+      const record = {
+        volumeId: volume.supportVolumeId,
+        type: "SUPPORT_VOLUME",
+        containmentRole: volume.containmentRole,
+        worldRegionMicrounits: { minX: b.minX + x, maxX: b.maxX + x, minY: b.minY + y2, maxY: b.maxY + y2, minZ: b.minZ + z, maxZ: b.maxZ + z },
+        confidence: "AUTHORED_NEW",
+        provenance: { ownerEntityId: owner.entityDefinitionId, ownerRevision: owner.entityRevision, ownerDigest: owner.entityDigest, volumeRevision: volume.volumeRevision, volumeDigest: volume.canonicalDigest }
+      };
+      return Object.freeze({ ...record, materializationDigest: digest(record) });
+    }
+    module.exports = { validateSupportVolume, materializeSupportVolume };
+  }
+});
+
 // src/clean-runtime/authoring/admission/definition-ref.js
 var require_definition_ref = __commonJS({
   "src/clean-runtime/authoring/admission/definition-ref.js"(exports, module) {
     "use strict";
     init_buffer_inject();
     var { MACHINE_ID } = require_semantics();
-    var TYPES = Object.freeze(["PHYSICAL_BODY", "PROFILE", "POSTURE", "SUPPORT_SURFACE"]);
+    var TYPES = Object.freeze(["PHYSICAL_BODY", "PROFILE", "POSTURE", "SUPPORT_SURFACE", "ENTITY", "SUPPORT_VOLUME"]);
     function definitionRef({ definitionType, definitionId, revision, definitionDigest }) {
       if (!TYPES.includes(definitionType) || !MACHINE_ID.test(definitionId || "") || !Number.isInteger(revision) || revision < 1 || !/^[a-f0-9]{64}$/.test(definitionDigest || "")) throw Object.assign(Error("INVALID_DEFINITION_REF"), { code: "INVALID_DEFINITION_REF" });
       return Object.freeze({ definitionType, definitionId, revision, definitionDigest });
@@ -698,6 +745,8 @@ var require_definition_ref = __commonJS({
       if (type === "PROFILE") return definitionRef({ definitionType: type, definitionId: definition.profileDefinitionId, revision: definition.profileRevision, definitionDigest: definition.profileDigest });
       if (type === "SUPPORT_SURFACE") return definitionRef({ definitionType: type, definitionId: definition.supportSurfaceId, revision: definition.surfaceRevision, definitionDigest: definition.canonicalDigest });
       if (type === "POSTURE") return definitionRef({ definitionType: type, definitionId: definition.postureDefinitionId, revision: definition.postureRevision, definitionDigest: definition.canonicalDigest });
+      if (type === "ENTITY") return definitionRef({ definitionType: type, definitionId: definition.entityDefinitionId, revision: definition.entityRevision, definitionDigest: definition.entityDigest });
+      if (type === "SUPPORT_VOLUME") return definitionRef({ definitionType: type, definitionId: definition.supportVolumeId, revision: definition.volumeRevision, definitionDigest: definition.canonicalDigest });
       throw Object.assign(Error("INVALID_DEFINITION_REF"), { code: "INVALID_DEFINITION_REF" });
     }
     function matches(ref, type, definition) {
@@ -789,7 +838,7 @@ var require_authoring = __commonJS({
   "src/clean-runtime/authoring/index.js"(exports, module) {
     "use strict";
     init_buffer_inject();
-    module.exports = { ...require_constants(), ...require_semantics(), ...require_canonical3(), ...require_geometry(), ...require_review(), ...require_lifecycle(), ...require_materialize_support(), ...require_physical_body_validator(), ...require_posture_validator(), ...require_support_validator(), ...require_definition_ref(), ...require_envelope(), ...require_registry() };
+    module.exports = { ...require_constants(), ...require_semantics(), ...require_canonical3(), ...require_geometry(), ...require_review(), ...require_lifecycle(), ...require_materialize_support(), ...require_physical_body_validator(), ...require_posture_validator(), ...require_support_validator(), ...require_support_volume_validator(), ...require_definition_ref(), ...require_envelope(), ...require_registry() };
   }
 });
 
@@ -958,7 +1007,7 @@ var require_relations = __commonJS({
     function sortRelations(a2) {
       return [...a2].map((x) => structuredClone(x)).sort((x, y2) => x.relationId.localeCompare(y2.relationId));
     }
-    function validateRelations(relations, state, { targetWorldRevision = state.revision } = {}) {
+    function validateRelations(relations, state, { targetWorldRevision = state.revision, ownerBodyBindings = null } = {}) {
       if (!Array.isArray(relations)) return fail("MALFORMED_RELATIONS");
       const x = sortRelations(relations), ids = /* @__PURE__ */ new Set(), semantic = /* @__PURE__ */ new Set();
       for (const r2 of x) {
@@ -981,7 +1030,9 @@ var require_relations = __commonJS({
           const o2 = state.entities[r2.ownerEntityRef?.id];
           if (!o2 || o2.lifecycleState === "REMOVED") return fail("MISSING_OWNER", r2.relationId);
           if (r2.ownerEntityRef.revision !== o2.revision) return fail("STALE_OWNER_REVISION", r2.relationId);
-          if (r2.ownerBodyRef?.revision !== o2.physicalBodyRef?.revision || r2.ownerBodyRef?.digest !== o2.physicalBodyRef?.digest) return fail("STALE_OWNER_BODY", r2.relationId);
+          let ownerBodyOk = r2.ownerBodyRef?.revision === o2.physicalBodyRef?.revision && r2.ownerBodyRef?.digest === o2.physicalBodyRef?.digest;
+          if (!ownerBodyOk && ownerBodyBindings) ownerBodyOk = ownerBodyBindings.some((bd) => bd && bd.status === "VALIDATED" && bd.binding.recoveredBodyRef.revision === o2.physicalBodyRef?.revision && bd.binding.recoveredBodyRef.digest === o2.physicalBodyRef?.digest && bd.binding.ownerBodyRef.revision === r2.ownerBodyRef?.revision && bd.binding.ownerBodyRef.digest === r2.ownerBodyRef?.digest && bd.binding.boundWorldRevision === targetWorldRevision);
+          if (!ownerBodyOk) return fail("STALE_OWNER_BODY", r2.relationId);
           const s2 = o2.physicalState?.supportSurface;
           if (!s2) return fail("MISSING_SUPPORT_SURFACE", r2.relationId);
           if (r2.supportSurfaceRef?.id !== s2.supportSurfaceId || r2.supportSurfaceRef?.revision !== s2.surfaceRevision || r2.supportSurfaceRef?.digest !== s2.canonicalDigest) return fail("STALE_SUPPORT_SURFACE", r2.relationId);
@@ -1050,7 +1101,7 @@ var require_runtime = __commonJS({
     var { digest } = require_canonical2();
     var { validateRelations, sortRelations, buildIndex } = require_relations();
     var { EventLog } = require_event_log();
-    function createMultiSupportRuntime({ initialWorld, legalityPort, eventLog = new EventLog() }) {
+    function createMultiSupportRuntime({ initialWorld, legalityPort, eventLog = new EventLog(), ownerBodyBindings = null }) {
       let state = world({ ...initialWorld, stateSchemaVersion: "2.0.0", supportRelations: sortRelations(initialWorld.supportRelations || []), physicalRelations: void 0 });
       const seen = /* @__PURE__ */ new Set();
       function reject(id, code, evidence = {}) {
@@ -1101,7 +1152,7 @@ var require_runtime = __commonJS({
             if (c3.expectedWorldRevision !== tx.expectedWorldRevision) throw Error("STALE_COMMAND");
             draft = mutate(draft, c3);
           }
-          const vr = validateRelations(draft.supportRelations, draft, { targetWorldRevision: before.revision + 1 });
+          const vr = validateRelations(draft.supportRelations, draft, { targetWorldRevision: before.revision + 1, ownerBodyBindings });
           if (vr.status !== "VALIDATED") throw Object.assign(Error(vr.code), { detail: vr });
           draft.supportRelations = vr.relations;
           const affected = /* @__PURE__ */ new Set([...cs.map((c3) => c3.entityId).filter(Boolean), ...draft.supportRelations.map((r2) => r2.supportedEntityId)]);
@@ -1271,6 +1322,150 @@ var require_phase2_gateway = __commonJS({
   }
 });
 
+// src/clean-runtime/multi-support/owner-body-binding.js
+var require_owner_body_binding = __commonJS({
+  "src/clean-runtime/multi-support/owner-body-binding.js"(exports, module) {
+    "use strict";
+    init_buffer_inject();
+    var { digest } = require_canonical2();
+    var MACHINE_ID_RE;
+    try {
+      MACHINE_ID_RE = require_semantics().MACHINE_ID;
+    } catch {
+      MACHINE_ID_RE = /^[a-z0-9][a-z0-9/-]*$/;
+    }
+    var fail = (code, path) => Object.freeze({ status: "REJECTED", failure: Object.freeze({ code, path: path || null }) });
+    function validateOwnerBodyBinding(raw, { recoveredBody, ownerBody } = {}) {
+      try {
+        if (!raw || raw.schemaVersion !== "1.0.0" || !MACHINE_ID_RE.test(raw.bindingId || "") || !Number.isInteger(raw.bindingRevision) || raw.bindingRevision < 1) return fail("MALFORMED_BINDING");
+        if (!recoveredBody || !ownerBody) return fail("MISSING_BODY_RECORDS");
+        const rr = raw.recoveredBodyRef, or = raw.ownerBodyRef;
+        if (!rr || !or || rr.id !== recoveredBody.bodyId || rr.revision !== recoveredBody.revision || rr.digest !== recoveredBody.digest) return fail("STALE_RECOVERED_BODY");
+        if (or.id !== ownerBody.bodyDefinitionId || or.revision !== ownerBody.bodyRevision || or.digest !== ownerBody.canonicalDigest) return fail("STALE_OWNER_BODY_RECORD");
+        if (JSON.stringify(recoveredBody.boundsMicrounits) !== JSON.stringify(ownerBody.aggregateBounds)) return fail("BOUNDS_MISMATCH");
+        if (!Number.isInteger(raw.boundWorldRevision) || raw.boundWorldRevision < 1) return fail("MALFORMED_BINDING", "boundWorldRevision");
+        if (!Array.isArray(raw.provenanceRefs) || !raw.provenanceRefs.length) return fail("MISSING_PROVENANCE");
+        const binding = { schemaVersion: "1.0.0", bindingId: raw.bindingId, bindingRevision: raw.bindingRevision, recoveredBodyRef: Object.freeze({ ...rr }), ownerBodyRef: Object.freeze({ ...or }), boundsMicrounits: Object.freeze({ ...ownerBody.aggregateBounds }), boundWorldRevision: raw.boundWorldRevision, provenanceRefs: Object.freeze([...raw.provenanceRefs]) };
+        const canonicalDigest = digest(binding, "canonicalDigest");
+        return Object.freeze({ status: "VALIDATED", binding: Object.freeze({ ...binding, canonicalDigest }) });
+      } catch (e3) {
+        return fail(e3.code || "MALFORMED_BINDING");
+      }
+    }
+    module.exports = { validateOwnerBodyBinding };
+  }
+});
+
+// src/clean-runtime/school/definitions/synthetic-training-unit-v1.js
+var require_synthetic_training_unit_v1 = __commonJS({
+  "src/clean-runtime/school/definitions/synthetic-training-unit-v1.js"(exports, module) {
+    "use strict";
+    init_buffer_inject();
+    var A = require_authoring();
+    var { SCHOOL_BAG_BODY } = require_school_physical_contract();
+    var { validateOwnerBodyBinding } = require_owner_body_binding();
+    var V1 = A.V1;
+    var BAG_BOUNDS_MU = Object.freeze({ minX: Math.round(SCHOOL_BAG_BODY.geometry.minX * 1e6), maxX: Math.round(SCHOOL_BAG_BODY.geometry.maxX * 1e6), minY: Math.round(SCHOOL_BAG_BODY.geometry.minY * 1e6), maxY: Math.round(SCHOOL_BAG_BODY.geometry.maxY * 1e6), minZ: Math.round(SCHOOL_BAG_BODY.geometry.minZ * 1e6), maxZ: Math.round(SCHOOL_BAG_BODY.geometry.maxZ * 1e6) });
+    var rawBagOwnerBody = {
+      schemaVersion: "1.0.0",
+      bodyDefinitionId: "school/medical-bag-owner-body",
+      bodyRevision: 1,
+      semanticType: "equipment-container",
+      profileId: "equipment",
+      postureDefinitionId: "rigid",
+      postureSemanticType: "SYNTHETIC_POSTURE",
+      units: { linear: V1.linearUnit, microunitsPerAuthoredUnit: V1.microunitsPerAuthoredUnit },
+      coordinateFrame: { handedness: V1.handedness, axes: V1.axes, upAxis: V1.upAxis, forwardDirection: V1.forwardDirection, transformOrder: V1.transformOrder },
+      localOrigin: { kind: "AUTHOR_DECLARED_CONTACT_FRAME", positionMicrounits: [0, 0, 0] },
+      orientationContract: { mode: "IDENTITY_ONLY", canonical: V1.canonicalOrientation },
+      components: [{ componentId: "bag-shell", primitiveType: "AABB", participationRole: "BOTH", dimensionsMicrounits: [BAG_BOUNDS_MU.maxX - BAG_BOUNDS_MU.minX, BAG_BOUNDS_MU.maxY - BAG_BOUNDS_MU.minY, BAG_BOUNDS_MU.maxZ - BAG_BOUNDS_MU.minZ], localTransform: { translationMicrounits: [0, 0, 0], orientation: V1.canonicalOrientation } }],
+      aggregateBounds: BAG_BOUNDS_MU,
+      phase2Projection: { kind: V1.phase2Projection, bounds: BAG_BOUNDS_MU },
+      footprint: { kind: "XZ_RECT_UNION", regions: [{ minX: BAG_BOUNDS_MU.minX, maxX: BAG_BOUNDS_MU.maxX, minZ: BAG_BOUNDS_MU.minZ, maxZ: BAG_BOUNDS_MU.maxZ }] },
+      contactRegions: [{ contactRegionId: "bag-bottom-contact", kind: "HORIZONTAL_XZ_RECT", planeY: BAG_BOUNDS_MU.minY, region: { minX: BAG_BOUNDS_MU.minX, maxX: BAG_BOUNDS_MU.maxX, minZ: BAG_BOUNDS_MU.minZ, maxZ: BAG_BOUNDS_MU.maxZ } }],
+      supportCategories: [{ supportCategoryId: "floor", supportSemanticType: "SUPPORT_SURFACE", provenanceStatus: "RECOVERED", fixtureOnly: false }],
+      geometrySource: { classification: "AUTHORED_NEW", sourceId: "gate-a-bag-owner-authoring-001" },
+      authoringProvenance: { decisionId: "gate-a-bag-owner-authoring-001", sourceReferenceEvidenceRefs: ["certified-runtime-record:school-medical-bag-body revision 1", "certified-bag-geometry-digest:" + SCHOOL_BAG_BODY.geometryDigest, "recovered-source:index.html#school-bag-lockers@" + SCHOOL_BAG_BODY.sourceDigest] },
+      priorRevisionDigest: null
+    };
+    var OWNER_BODY = A.validateBody(rawBagOwnerBody);
+    if (OWNER_BODY.status !== "VALIDATED") throw Object.assign(Error("R1v4 bag owner body failed the real validator: " + JSON.stringify(OWNER_BODY.failure)), { code: "R1V4_DRAFT_INVALID" });
+    if (JSON.stringify(OWNER_BODY.definition.aggregateBounds) !== JSON.stringify(BAG_BOUNDS_MU)) throw Object.assign(Error("R1v4 owner-body aggregate != certified bag bounds"), { code: "R1V4_DRAFT_INVALID" });
+    var OWNER_ENTITY_RAW = {
+      entityDefinitionId: "school/medical-bag-entity",
+      entityRevision: 1,
+      physicalBodyRef: { id: OWNER_BODY.definition.bodyDefinitionId, revision: OWNER_BODY.definition.bodyRevision, digest: OWNER_BODY.definition.canonicalDigest },
+      transform: { translationMicrounits: [-3e6, 175e3, 1e6], orientation: V1.canonicalOrientation }
+    };
+    OWNER_ENTITY_RAW.entityDigest = A.digest(OWNER_ENTITY_RAW, "entityDigest");
+    var OWNER_ENTITY = A.validateSupportEntity(OWNER_ENTITY_RAW, OWNER_BODY.definition);
+    if (OWNER_ENTITY.status !== "VALIDATED") throw Object.assign(Error("R1v4 bag owner entity failed: " + JSON.stringify(OWNER_ENTITY.failure)), { code: "R1V4_DRAFT_INVALID" });
+    var rawFloor = {
+      schemaVersion: "1.0.0",
+      supportSurfaceId: "school/medical-bag-interior-floor",
+      surfaceRevision: 1,
+      ownerDefinitionRef: { id: OWNER_ENTITY.definition.entityDefinitionId, revision: OWNER_ENTITY.definition.entityRevision, digest: OWNER_ENTITY.definition.entityDigest },
+      supportSemanticType: "SUPPORT_SURFACE",
+      transformBinding: "OWNER_TRANSLATION_IDENTITY_ORIENTATION",
+      localPlane: { normal: [0, 1e6, 0], offsetMicrounits: -15e4 },
+      localRegion: { minX: -25e4, maxX: 25e4, minZ: -15e4, maxZ: 15e4 },
+      contactRule: { contactRuleId: "full-footprint-bag-interior-floor", policy: "FULL_FOOTPRINT" },
+      provenance: { classification: "AUTHORED_NEW", decisionId: "gate-a-unit-authoring-001" }
+    };
+    var INTERIOR_FLOOR = A.validateSupportSurface(rawFloor, OWNER_ENTITY.definition);
+    if (INTERIOR_FLOOR.status !== "VALIDATED") throw Object.assign(Error("R1v4 interior floor failed: " + JSON.stringify(INTERIOR_FLOOR.failure)), { code: "R1V4_DRAFT_INVALID" });
+    var rawVolume = {
+      schemaVersion: "1.0.0",
+      supportVolumeId: "school/medical-bag-containment-interior",
+      volumeRevision: 1,
+      ownerEntityRef: { id: OWNER_ENTITY.definition.entityDefinitionId, revision: OWNER_ENTITY.definition.entityRevision, digest: OWNER_ENTITY.definition.entityDigest },
+      transformBinding: "OWNER_TRANSLATION_IDENTITY_ORIENTATION",
+      containmentRole: "CONTAINMENT_INTERIOR",
+      localBoundsMicrounits: { minX: -25e4, maxX: 25e4, minY: -15e4, maxY: 175e3, minZ: -15e4, maxZ: 15e4 },
+      classification: "AUTHORED_NEW",
+      provenanceRefs: ["owner-r1-q1:wamid.HBgMOTcyNTMyNDkwMzUxFQIAEhgUM0EwRTNFRDUxRDZDQzAwNEU2NjcA", "decision:gate-a-unit-authoring-001"]
+    };
+    var CONTAINMENT_VOLUME = A.validateSupportVolume(rawVolume, OWNER_ENTITY.definition);
+    if (CONTAINMENT_VOLUME.status !== "VALIDATED") throw Object.assign(Error("R1v4 containment volume failed: " + JSON.stringify(CONTAINMENT_VOLUME.failure)), { code: "R1V4_DRAFT_INVALID" });
+    var rawUnitBody = {
+      schemaVersion: "1.0.0",
+      bodyDefinitionId: "synthetic-training-unit-body-v1",
+      bodyRevision: 1,
+      semanticType: "synthetic-training-unit",
+      profileId: "synthetic-training-unit",
+      postureDefinitionId: "rigid",
+      postureSemanticType: "SYNTHETIC_POSTURE",
+      units: { linear: V1.linearUnit, microunitsPerAuthoredUnit: V1.microunitsPerAuthoredUnit },
+      coordinateFrame: { handedness: V1.handedness, axes: V1.axes, upAxis: V1.upAxis, forwardDirection: V1.forwardDirection, transformOrder: V1.transformOrder },
+      localOrigin: { kind: "AUTHOR_DECLARED_CONTACT_FRAME", positionMicrounits: [0, 0, 0] },
+      orientationContract: { mode: "IDENTITY_ONLY", canonical: V1.canonicalOrientation },
+      components: [{ componentId: "unit-box", primitiveType: "AABB", participationRole: "BOTH", dimensionsMicrounits: [2e5, 12e4, 8e4], localTransform: { translationMicrounits: [0, 6e4, 0], orientation: V1.canonicalOrientation } }],
+      aggregateBounds: { minX: -1e5, maxX: 1e5, minY: 0, maxY: 12e4, minZ: -4e4, maxZ: 4e4 },
+      phase2Projection: { kind: V1.phase2Projection, bounds: { minX: -1e5, maxX: 1e5, minY: 0, maxY: 12e4, minZ: -4e4, maxZ: 4e4 } },
+      footprint: { kind: "XZ_RECT_UNION", regions: [{ minX: -1e5, maxX: 1e5, minZ: -4e4, maxZ: 4e4 }] },
+      contactRegions: [{ contactRegionId: "unit-bottom-contact", kind: "HORIZONTAL_XZ_RECT", planeY: 0, region: { minX: -1e5, maxX: 1e5, minZ: -4e4, maxZ: 4e4 } }],
+      supportCategories: [{ supportCategoryId: "bag-interior-floor", supportSemanticType: "SUPPORT_SURFACE", provenanceStatus: "AUTHORED_NEW", fixtureOnly: false }],
+      geometrySource: { classification: "AUTHORED_NEW", sourceId: "gate-a-unit-authoring-001" },
+      authoringProvenance: { decisionId: "gate-a-unit-authoring-001", sourceReferenceEvidenceRefs: ["owner-decision:Option A 2026-09-30 (synthetic training unit, minimal scope)"] },
+      priorRevisionDigest: null
+    };
+    var UNIT_BODY = A.validateBody(rawUnitBody);
+    if (UNIT_BODY.status !== "VALIDATED") throw Object.assign(Error("R1v4 unit body failed the real validator: " + JSON.stringify(UNIT_BODY.failure)), { code: "R1V4_DRAFT_INVALID" });
+    var rawBinding = {
+      schemaVersion: "1.0.0",
+      bindingId: "school/medical-bag-owner-body-binding",
+      bindingRevision: 1,
+      recoveredBodyRef: { id: SCHOOL_BAG_BODY.bodyId, revision: SCHOOL_BAG_BODY.revision, digest: SCHOOL_BAG_BODY.geometryDigest },
+      ownerBodyRef: { id: OWNER_BODY.definition.bodyDefinitionId, revision: OWNER_BODY.definition.bodyRevision, digest: OWNER_BODY.definition.canonicalDigest },
+      boundWorldRevision: 1,
+      provenanceRefs: ["certified-runtime-record:school-medical-bag-body revision 1", "owner-body-definition:school/medical-bag-owner-body r1", "decision:gate-a-bag-owner-authoring-001"]
+    };
+    var OWNER_BODY_BINDING = validateOwnerBodyBinding(rawBinding, { recoveredBody: { bodyId: SCHOOL_BAG_BODY.bodyId, revision: SCHOOL_BAG_BODY.revision, digest: SCHOOL_BAG_BODY.geometryDigest, boundsMicrounits: BAG_BOUNDS_MU }, ownerBody: OWNER_BODY.definition });
+    if (OWNER_BODY_BINDING.status !== "VALIDATED") throw Object.assign(Error("R1v4 owner-body binding failed: " + JSON.stringify(OWNER_BODY_BINDING.failure)), { code: "R1V4_DRAFT_INVALID" });
+    module.exports = Object.freeze({ OWNER_BODY, OWNER_ENTITY, INTERIOR_FLOOR, CONTAINMENT_VOLUME, UNIT_BODY, OWNER_BODY_BINDING, BAG_BOUNDS_MU });
+  }
+});
+
 // src/clean-runtime/school/school-geometry-adapter.js
 var require_school_geometry_adapter = __commonJS({
   "src/clean-runtime/school/school-geometry-adapter.js"(exports, module) {
@@ -1284,11 +1479,12 @@ var require_school_geometry_adapter = __commonJS({
     var { PROFILE, POSTURE, BODY } = require_adult_v1_male_supine_floor();
     var CHAIR = require_treatment_chair();
     var A = require_authoring();
+    var SYN = require_synthetic_training_unit_v1();
     function schoolGeometryAdapter({ surfaceModel }) {
       return Object.freeze({ kind: "SCHOOL_PHASE2_GEOMETRY_ADAPTER", evaluate(input) {
         const entityId = input.command.entityId || input.command.entity?.entityId, entity = input.proposedState.entities[entityId];
         if (input.proposedState.sceneDefinitionRef?.sceneId !== SCHOOL_SCENE.sceneId || !entity) return Object.freeze({ outcome: "UNKNOWN", evidence: { adapterReason: "UNSUPPORTED_SCENE_OR_ENTITY", sceneId: input.proposedState.sceneDefinitionRef?.sceneId || null, entityId: entityId || null } });
-        const body = entity.physicalBodyRef, position = entity.transform?.positionMicrounits, isBag = body?.recordId === SCHOOL_BAG_BODY.bodyId, isCasualty = body?.recordId === BODY.bodyDefinitionId, isChair = body?.recordId === CHAIR.BODY.bodyDefinitionId, isSynthetic = body?.recordId === "synthetic/gate-c-supported-box-body";
+        const body = entity.physicalBodyRef, position = entity.transform?.positionMicrounits, isBag = body?.recordId === SCHOOL_BAG_BODY.bodyId, isCasualty = body?.recordId === BODY.bodyDefinitionId, isChair = body?.recordId === CHAIR.BODY.bodyDefinitionId, isSynthetic = body?.recordId === "synthetic/gate-c-supported-box-body", isTrainingUnit = body?.recordId === SYN.UNIT_BODY.definition.bodyDefinitionId;
         let dynamicModel = surfaceModel, surface = entity.supportRelation?.surfaceModelRef || ((isCasualty || isChair) && entity.physicalState?.surfaceId || isBag && input.proposedState.supportRelations?.some((r2) => r2.supportedEntityId === entityId) ? SCHOOL_SURFACE_MODEL_REF : null);
         if (isSynthetic) {
           const owner = input.proposedState.entities[entity.supportRelation?.ownerEntityId];
@@ -1296,6 +1492,19 @@ var require_school_geometry_adapter = __commonJS({
             const defOwner = { entityDefinitionId: CHAIR.ENTITY.entityDefinitionId, entityRevision: CHAIR.ENTITY.entityRevision, entityDigest: CHAIR.ENTITY.entityDigest, transform: { translationMicrounits: owner.transform.positionMicrounits, orientation: A.V1.canonicalOrientation } };
             const m = A.materializeSupportSurface({ staticModelRef: SCHOOL_SURFACE_MODEL_REF, owner: defOwner, surface: CHAIR.SURFACE });
             surface = { id: "gate-c-dynamic-surfaces", revision: 1, digest: null };
+            dynamicModel = { ...surfaceModel, surfaceModelId: surface.id, revision: 1, surfaces: [...surfaceModel.surfaces, { surfaceId: m.surfaceId, type: m.type, region: m.region, planeOrDepth: m.planeOrDepth, contactRules: m.contactRules, confidence: m.confidence, provenance: m.provenance }] };
+            delete dynamicModel.surfaceModelDigest;
+            dynamicModel.surfaceModelDigest = digest(dynamicModel);
+            surface.digest = dynamicModel.surfaceModelDigest;
+          }
+        }
+        if (isTrainingUnit) {
+          const unitRel = input.proposedState.supportRelations?.find((r2) => r2.supportedEntityId === entityId);
+          const owner = input.proposedState.entities[unitRel?.ownerEntityRef?.id];
+          if (owner) {
+            const OE = SYN.OWNER_ENTITY.definition, defOwner = { entityDefinitionId: OE.entityDefinitionId, entityRevision: OE.entityRevision, entityDigest: OE.entityDigest, transform: { translationMicrounits: owner.transform.positionMicrounits, orientation: A.V1.canonicalOrientation } };
+            const m = A.materializeSupportSurface({ staticModelRef: SCHOOL_SURFACE_MODEL_REF, owner: defOwner, surface: SYN.INTERIOR_FLOOR.definition });
+            surface = { id: "synthetic-unit-dynamic-surfaces", revision: 1, digest: null };
             dynamicModel = { ...surfaceModel, surfaceModelId: surface.id, revision: 1, surfaces: [...surfaceModel.surfaces, { surfaceId: m.surfaceId, type: m.type, region: m.region, planeOrDepth: m.planeOrDepth, contactRules: m.contactRules, confidence: m.confidence, provenance: m.provenance }] };
             delete dynamicModel.surfaceModelDigest;
             dynamicModel.surfaceModelDigest = digest(dynamicModel);
@@ -1311,11 +1520,12 @@ var require_school_geometry_adapter = __commonJS({
           contract = { geometry: Object.fromEntries(Object.entries(BODY.aggregateBounds).map(([k, v]) => [k, v / 1e6])), digest: BODY.canonicalDigest, revision: BODY.bodyRevision, proof: BODY.canonicalDigest, evidenceRefs: ["authoring-decision:" + BODY.authoringProvenance.decisionId, "body-digest:" + BODY.canonicalDigest], provenance: { classification: "AUTHORED_NEW", lineageStatus: "AUTHORED_NEW", sourceId: BODY.geometrySource.sourceId } };
         } else if (isChair) contract = { geometry: Object.fromEntries(Object.entries(CHAIR.BODY.aggregateBounds).map(([k, v]) => [k, v / 1e6])), digest: CHAIR.BODY.canonicalDigest, revision: 1, proof: CHAIR.BODY.canonicalDigest, evidenceRefs: ["authoring-decision:" + CHAIR.decisionId], provenance: { classification: "AUTHORED_NEW", lineageStatus: "AUTHORED_NEW", sourceId: CHAIR.decisionId } };
         else if (isSynthetic) contract = { geometry: { minX: -0.1, maxX: 0.1, minY: -0.1, maxY: 0.1, minZ: -0.1, maxZ: 0.1 }, digest: "c".repeat(64), revision: 1, proof: "c".repeat(64), evidenceRefs: ["gate-c-contract-fixture"], provenance: { classification: "AUTHORED_NEW", lineageStatus: "AUTHORED_NEW", sourceId: "gate-c-contract-fixture" } };
+        else if (isTrainingUnit) contract = { geometry: Object.fromEntries(Object.entries(SYN.UNIT_BODY.definition.aggregateBounds).map(([k, v]) => [k, v / 1e6])), digest: SYN.UNIT_BODY.definition.canonicalDigest, revision: 1, proof: SYN.UNIT_BODY.definition.canonicalDigest, evidenceRefs: ["authoring-decision:gate-a-unit-authoring-001", "unit-body-digest:" + SYN.UNIT_BODY.definition.canonicalDigest], provenance: { classification: "AUTHORED_NEW", lineageStatus: "AUTHORED_NEW", sourceId: "gate-a-unit-authoring-001" } };
         else return Object.freeze({ outcome: "UNKNOWN", evidence: { adapterReason: "BODY_PROOF_STALE_OR_MISMATCHED", actual: body || null } });
         if (body.revision !== contract.revision || body.digest !== contract.digest) return Object.freeze({ outcome: "UNKNOWN", evidence: { adapterReason: "BODY_PROOF_STALE_OR_MISMATCHED", expected: { revision: contract.revision, digest: contract.digest }, actual: body } });
         if (!surface) return Object.freeze({ outcome: "UNKNOWN", evidence: { adapterReason: "SURFACE_PROOF_MISSING" } });
         if (!Array.isArray(position) || position.length !== 3) return Object.freeze({ outcome: "UNKNOWN", evidence: { adapterReason: "TRANSFORM_CONTRACT_MISSING" } });
-        const request = { requestId: input.command.commandId, surfaceId: entity.physicalState?.surfaceId || entity.supportRelation?.surfaceId || null, surfaceModelRef: { id: surface.id, revision: surface.revision, digest: surface.digest }, geometry: contract.geometry, geometryDigest: isCasualty || isChair || isSynthetic ? require_canonical().digest(contract.geometry) : body.digest, proofGeometryDigest: isCasualty || isChair || isSynthetic ? body.proofGeometryDigest === contract.proof ? require_canonical().digest(contract.geometry) : body.proofGeometryDigest : body.proofGeometryDigest || contract.proof, transform: { x: position[0] / MICROUNITS_PER_UNIT, y: position[1] / MICROUNITS_PER_UNIT, z: position[2] / MICROUNITS_PER_UNIT }, orientationUpDot: entity.physicalState?.orientationUpDot, supportNormalUpDot: entity.physicalState?.supportNormalUpDot, evidenceRefs: contract.evidenceRefs };
+        const request = { requestId: input.command.commandId, surfaceId: entity.physicalState?.surfaceId || entity.supportRelation?.surfaceId || null, surfaceModelRef: { id: surface.id, revision: surface.revision, digest: surface.digest }, geometry: contract.geometry, geometryDigest: isCasualty || isChair || isSynthetic || isTrainingUnit ? require_canonical().digest(contract.geometry) : body.digest, proofGeometryDigest: isCasualty || isChair || isSynthetic || isTrainingUnit ? body.proofGeometryDigest === contract.proof ? require_canonical().digest(contract.geometry) : body.proofGeometryDigest : body.proofGeometryDigest || contract.proof, transform: { x: position[0] / MICROUNITS_PER_UNIT, y: position[1] / MICROUNITS_PER_UNIT, z: position[2] / MICROUNITS_PER_UNIT }, orientationUpDot: entity.physicalState?.orientationUpDot, supportNormalUpDot: entity.physicalState?.supportNormalUpDot, evidenceRefs: contract.evidenceRefs };
         const requestBytes = canonical(request), result = evaluate(request, dynamicModel);
         return Object.freeze({ outcome: result.result, evidence: { adapterKind: "SCHOOL_PHASE2_GEOMETRY_ADAPTER", request, requestDigest: digest(request), requestBytes, sceneProvenance: SCHOOL_SCENE, bodyProvenance: { classification: contract.provenance.classification, lineageStatus: contract.provenance.lineageStatus, sourceId: contract.provenance.sourceId, revision: contract.revision, digest: contract.digest }, surfaceProvenance: { classification: SCHOOL_SURFACE_MODEL_REF.classification, lineageStatus: SCHOOL_SURFACE_MODEL_REF.lineageStatus, sourceId: SCHOOL_SURFACE_MODEL_REF.sourceId, revision: surfaceModel.revision, digest: surfaceModel.surfaceModelDigest, sourceEvidence: surfaceModel.sourceEvidence, resolvedSurface: (surfaceModel.surfaces.find((x) => x.surfaceId === request.surfaceId) || null)?.provenance || null }, phase2ReasonCode: result.reasonCode, phase2Evidence: result.evidence, phase2ProofDigest: result.proofDigest || null } });
       } });
@@ -1332,25 +1542,36 @@ var require_validate = __commonJS({
     var { digest, canonicalBytes } = require_canonical2();
     var { PACKAGE, model } = require_package();
     var D = require_adult_v1_male_supine_floor();
+    var SYN = require_synthetic_training_unit_v1();
     var C = require_treatment_chair();
     var { SCHOOL_BAG_BODY } = require_school_physical_contract();
     var { validateRelations, buildIndex } = require_relations();
     var fail = (code) => ({ status: "REJECTED", code });
     function validateScenePackage(p2) {
-      if (!p2 || p2.scenePackageVersion !== "2.0.0" || p2.scenePackageId !== "SCHOOL_TREATMENT_ROOM_PHYSICAL_V2") return fail("MALFORMED_OR_WRONG_VERSION");
+      if (!p2 || p2.scenePackageVersion !== "2.0.0" && p2.scenePackageVersion !== "2.1.0" || p2.scenePackageId !== "SCHOOL_TREATMENT_ROOM_PHYSICAL_V2") return fail("MALFORMED_OR_WRONG_VERSION");
+      const isV21 = p2.scenePackageVersion === "2.1.0", entityCount = isV21 ? 4 : 3;
       if (digest({ ...p2, scenePackageDigest: void 0 }, "scenePackageDigest") !== p2.scenePackageDigest) return fail("PACKAGE_DIGEST_MISMATCH");
       if (p2.refs?.surfaceModel?.id !== model.surfaceModelId || p2.refs.surfaceModel.revision !== model.revision || p2.refs.surfaceModel.digest !== model.surfaceModelDigest) return fail("SURFACE_MODEL_MISMATCH");
       for (const s2 of model.surfaces) if (!p2.refs.requiredSurfaces.some((x) => x.id === s2.surfaceId && x.type === s2.type)) return fail("REQUIRED_SURFACE_MISSING");
       const ids = p2.entities?.map((x) => x.entityId) || [];
-      if (ids.length !== 3 || new Set(ids).size !== ids.length || p2.requiredEntityIds?.length !== 3 || p2.requiredEntityIds.some((id) => !ids.includes(id))) return fail("ENTITY_MISSING_OR_DUPLICATE");
+      if (ids.length !== entityCount || new Set(ids).size !== ids.length || p2.requiredEntityIds?.length !== entityCount || p2.requiredEntityIds.some((id) => !ids.includes(id))) return fail("ENTITY_MISSING_OR_DUPLICATE");
       const by = Object.fromEntries(p2.entities.map((x) => [x.entityId, x])), cas = by["school-casualty-adult-v1"], chair = by["school-treatment-chair"], bag = by["school-medical-bag"];
       if (!cas || cas.physicalBodyRef.recordId !== D.BODY.bodyDefinitionId || cas.physicalBodyRef.revision !== D.BODY.bodyRevision || cas.physicalBodyRef.digest !== D.BODY.canonicalDigest || cas.physicalState.profileRef.digest !== D.PROFILE.profileDigest || cas.physicalState.profileRef.subjectSex !== "MALE" || cas.physicalState.postureRef.digest !== D.POSTURE.canonicalDigest || cas.physicalState.postureRef.semanticType !== "SUPINE_FLOOR") return fail("CASUALTY_REF_MISMATCH");
       if (!chair || chair.physicalBodyRef.recordId !== C.BODY.bodyDefinitionId || chair.physicalBodyRef.revision !== C.BODY.bodyRevision || chair.physicalBodyRef.digest !== C.BODY.canonicalDigest || chair.physicalState.supportSurface?.surfaceRevision !== C.SURFACE.surfaceRevision || chair.physicalState.supportSurface?.canonicalDigest !== C.SURFACE.canonicalDigest || p2.refs.bodies.seat.owner.id !== C.ENTITY.entityDefinitionId || p2.refs.bodies.seat.owner.digest !== C.ENTITY.entityDigest) return fail("CHAIR_OR_SEAT_MISMATCH");
       if (!bag || bag.physicalBodyRef.recordId !== SCHOOL_BAG_BODY.bodyId || bag.physicalBodyRef.revision !== SCHOOL_BAG_BODY.revision || bag.physicalBodyRef.digest !== SCHOOL_BAG_BODY.geometryDigest) return fail("BAG_REF_MISMATCH");
+      let v21Bindings = null;
+      if (isV21) {
+        const unit = by["synthetic-training-unit-v1"], UB = SYN.UNIT_BODY.definition, OE = SYN.OWNER_ENTITY.definition, FL = SYN.INTERIOR_FLOOR.definition;
+        if (!unit || unit.physicalBodyRef.recordId !== UB.bodyDefinitionId || unit.physicalBodyRef.revision !== UB.bodyRevision || unit.physicalBodyRef.digest !== UB.canonicalDigest) return fail("SYNTHETIC_UNIT_REF_MISMATCH");
+        if (bag.physicalState?.supportSurface?.supportSurfaceId !== FL.supportSurfaceId || bag.physicalState.supportSurface.surfaceRevision !== FL.surfaceRevision || bag.physicalState.supportSurface.canonicalDigest !== FL.canonicalDigest) return fail("BAG_INTERIOR_FLOOR_MISMATCH");
+        const bd = SYN.OWNER_BODY_BINDING.binding;
+        if (!Array.isArray(p2.ownerBodyBindings) || p2.ownerBodyBindings.length !== 1 || p2.ownerBodyBindings[0].canonicalDigest !== bd.canonicalDigest) return fail("OWNER_BODY_BINDING_MISMATCH");
+        v21Bindings = [SYN.OWNER_BODY_BINDING];
+      }
       if (p2.supportRelations.some((r3) => digest(r3.contactRegionGeometry) !== r3.contactRegionDigest)) return fail("CONTACT_REGION_DIGEST_MISMATCH");
       if (p2.supportRelations.length !== p2.entities.length || p2.entities.some((e3) => !p2.supportRelations.some((r3) => r3.supportedEntityId === e3.entityId))) return fail("REQUIRED_SUPPORT_RELATION_MISSING");
       const state = { entities: by, supportRelations: p2.supportRelations };
-      const r2 = validateRelations(p2.supportRelations, state, { targetWorldRevision: 1 });
+      const r2 = validateRelations(p2.supportRelations, state, { targetWorldRevision: 1, ownerBodyBindings: v21Bindings });
       if (r2.status !== "VALIDATED") return fail("SUPPORT_RELATION_INVALID:" + r2.code);
       return Object.freeze({ status: "VALIDATED", canonicalBytes: canonicalBytes(p2).toString("hex"), package: p2, index: buildIndex(p2.supportRelations) });
     }
@@ -1411,7 +1632,7 @@ var require_instantiate = __commonJS({
       return { stateSchemaVersion: "2.0.0", worldId: "school-treatment-room-v2", sceneDefinitionRef: { sceneId: "school" }, revision: 0, lifecycleState: "ACTIVE", entities: {}, supportRelations: [], surfaces: { id: model.surfaceModelId, revision: model.revision, digest: model.surfaceModelDigest }, environmentPhysicalState: null, committedEventSequence: 0 };
     }
     function instantiate(p2) {
-      const v = validateScenePackage(p2), port = schoolGeometryAdapter({ surfaceModel: model }), api = createMultiSupportRuntime({ initialWorld: empty(), legalityPort: port }), before = api.getWorldState();
+      const v = validateScenePackage(p2), port = schoolGeometryAdapter({ surfaceModel: model }), api = createMultiSupportRuntime({ initialWorld: empty(), legalityPort: port, ownerBodyBindings: p2.scenePackageVersion === "2.1.0" ? [require_synthetic_training_unit_v1().OWNER_BODY_BINDING] : null }), before = api.getWorldState();
       if (v.status !== "VALIDATED") return { status: "REJECTED", code: v.code, before, after: api.getWorldState() };
       const commands = p2.entities.map((e3) => ({ commandId: "spawn:" + e3.entityId, type: "SpawnEntity", expectedWorldRevision: 0, entity: e3 })).concat(p2.supportRelations.map((r2) => ({ commandId: "support:" + r2.relationId, type: "AttachSupportRelation", expectedWorldRevision: 0, relation: r2 })));
       const result = api.proposeTransaction({ transactionId: "instantiate:" + p2.scenePackageDigest, expectedWorldRevision: 0, commands });
