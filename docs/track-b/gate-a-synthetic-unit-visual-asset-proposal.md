@@ -1,10 +1,25 @@
 # Gate A Proposal: Synthetic Training Unit - Authoring + Certified Support Path
 
-Status: PROPOSED. Nothing in this document is validated, reviewed, or admitted.
-Every record below is a draft for Gate A review under the existing lifecycle
-(`AUTHORED_NEW_DRAFT -> VALIDATED -> REVIEWED -> VERIFIED_FOR_SLICE`).
-Owner decision authorizing this work: Option A (full Gate A certification of
-this ONE synthetic unit, minimal scope), WhatsApp 2026-09-30.
+Status: PROPOSED (R1 v2, corrected after engine review). Nothing here is
+validated, reviewed, or admitted. Every record is a draft for Gate A review
+under the existing lifecycle (AUTHORED_NEW_DRAFT -> VALIDATED -> REVIEWED ->
+VERIFIED_FOR_SLICE). Owner decision authorizing this work: Option A (full
+Gate A certification of this ONE synthetic unit, minimal scope), WhatsApp
+2026-09-30. The owner authorized the certification work, not specific draft
+dimensions or semantics - every number below is proven by the accompanying
+arithmetic harness (scripts/track-b/gate-a-unit-proposal-check.mjs, 14/14
+checks), none asserted.
+
+R1 v2 corrections after engine review:
+- v1 interior top extended 125mm OUTSIDE the certified bag body (bag local Y
+  is -175000..+175000; v1 used +25000..+300000). Recomputed wholly inside.
+- Phase 2 surface-type closure (FLOOR/SUPPORT_SURFACE only) is now addressed
+  by an explicit two-layer design; "Phase 2 unchanged" is no longer claimed
+  alongside a CONTAINMENT surface type.
+- The solid-bag collision conflict is resolved explicitly (section 5) instead
+  of silently inferring a hollow interior from the outer AABB.
+- CONTAINMENT admission (6), supportVolumeRef schema (7), CONSUMED lifecycle
+  (8) are now spelled out as exact additions.
 
 ## 1. Identity binding (proposed)
 
@@ -12,131 +27,185 @@ this ONE synthetic unit, minimal scope), WhatsApp 2026-09-30.
 |---|---|---|
 | Engine inventory identity | `unit-1` / `SYNTHETIC_ITEM_A` (existing V2) | unchanged, engine-owned |
 | World entity | `synthetic-training-unit-1` | entityTypeId `synthetic/training-unit` |
-| Physical body record | `synthetic-training-unit-body-v1` revision 1 | authored below |
-| Renderer map entry (B-W5) | `synthetic-training-unit-v1` | class SYNTHETIC_TRAINING, zero clinical fields (map validator already enforces) |
-| Containment region on bag | `school/medical-bag-interior-v1` | authored below, pins certified bag body r1 |
+| Physical body record | `synthetic-training-unit-body-v1` revision 1 | section 2 |
+| Renderer map entry (B-W5) | `synthetic-training-unit-v1` | SYNTHETIC_TRAINING, zero clinical fields |
+| Interior support floor (layer 1) | `school/medical-bag-interior-floor-v1` | entity-owned SUPPORT_SURFACE, chair-seat pattern |
+| Containment volume (layer 2) | `school/medical-bag-interior-volume-v1` | new authored record, section 4 |
 
 ## 2. Authored physical body (draft record, chair-definition pattern)
 
 - `bodyDefinitionId: synthetic-training-unit-body-v1`, revision 1,
-  `classification/lineageStatus: AUTHORED_NEW` (synthetic by design; no
-  recovered source claimed; geometrySource.sourceId = authoring decisionId).
+  classification/lineageStatus AUTHORED_NEW (synthetic by design; no recovered
+  source claimed; geometrySource.sourceId = authoring decisionId).
 - One component: AABB, participationRole BOTH, dimensions microunits
-  `[200000, 120000, 80000]` (0.20 x 0.12 x 0.08 m - a small boxed consumable),
-  local translation `[0, 60000, 0]`, identity orientation (V1 mandatory).
-- Derived aggregate (validator computes; author does not assert):
-  `minX:-100000 maxX:100000 minY:0 maxY:120000 minZ:-40000 maxZ:40000`.
-- Footprint `XZ_RECT_UNION`: single rect `minX:-100000 maxX:100000 minZ:-40000 maxZ:40000`.
-- Contact region `HORIZONTAL_XZ_RECT`, planeY 0, same rect (bottom face).
+  [200000, 120000, 80000] (0.20 x 0.12 x 0.08 m boxed consumable), local
+  translation [0, 60000, 0], identity orientation (V1 mandatory).
+- Validator-derived aggregate: minX -100000 maxX 100000, minY 0 maxY 120000,
+  minZ -40000 maxZ 40000 (author supplies components; validator derives).
+- Footprint XZ_RECT_UNION: minX -100000 maxX 100000, minZ -40000 maxZ 40000.
+- Contact region HORIZONTAL_XZ_RECT, planeY 0, same rect (bottom face).
 - Orientation constraints: identity only (V1).
-- `supportCategories`: EXACTLY ONE - `{ supportCategoryId: 'contained-in-bag', supportSemanticType: 'CONTAINMENT', provenanceStatus: 'AUTHORED_NEW', fixtureOnly: false }`.
-  Deliberately NO FLOOR category: the unit's only certified legal placement is
-  inside the bag interior. Narrower support surface = smaller certification
-  scope (owner: "certify only what is required for this single synthetic unit").
-- `authoringProvenance.decisionId: gate-a-unit-authoring-001` (to be created).
+- supportCategories: EXACTLY ONE - { supportCategoryId: 'bag-interior-floor',
+  supportSemanticType: 'SUPPORT_SURFACE', provenanceStatus: 'AUTHORED_NEW',
+  fixtureOnly: false }. The closed semantic set is NOT extended for the body
+  record; containment is carried by the relation layer (section 7), not
+  smuggled into the body's support type. Deliberately no FLOOR category: the
+  unit's only certified legal placement is inside the bag (minimal scope).
+- authoringProvenance.decisionId: gate-a-unit-authoring-001 (to be created).
 
-## 3. Bag containment region (draft record, chair-seat SURFACE pattern, volumetric)
+## 3. The two-layer lawful check (answers: which path, and why)
 
-The certified bag body (`school-medical-bag-body` r1, RECOVERED, authored box
-bounds .55 x .35 x .35 m) has NO interior. This record authors one, honestly:
+The V1 geometry gate accepts surface types FLOOR or SUPPORT_SURFACE only, and
+the School adapter forwards into it unchanged. Two options were weighed:
 
-- `supportVolumeId: school/medical-bag-interior-v1`, revision 1,
+- (i) New Phase 2 capability (CONTAINMENT surface type): REJECTED. It reopens
+  the certified gate byte surface, demands a full Phase 2 capability review,
+  and puts the milestone's timeline on the riskiest artifact in the repo.
+- (ii) RECOMMENDED - two layers, Phase 2 untouched:
+  - Layer 1 (existing gate, existing semantics): the bag's interior floor is
+    authored as an entity-owned SUPPORT_SURFACE ('school/medical-bag-interior-
+    floor-v1') on the chair-seat pattern: localPlane normal [0,1000000,0],
+    offset -150000; localRegion X [-250000,+250000], Z [-150000,+150000];
+    contact rule FULL_FOOTPRINT; transformBinding
+    OWNER_TRANSLATION_IDENTITY_ORIENTATION; ownerDefinitionRef pins the
+    certified bag entity/body r1 by id+revision+digest. The unit's support
+    legality is evaluated by the EXISTING Phase 2 gate as a real horizontal
+    support surface - materially the same semantics as the chair seat. This
+    meaning ("the bag has a support floor") requires owner approval and
+    correct binding to the bag - flagged as review question R1-Q1.
+  - Layer 2 (new, independently authored, separately reviewed): the full-3D
+    containment check of section 4 - walls/ceiling strict-inside + the
+    collision supersession of section 5. New validator code next to the
+    multi-support relations validator, reviewed jointly by both sides. No
+    Phase 2 byte changes.
+
+## 4. Containment volume (draft record - corrected geometry)
+
+- supportVolumeId: school/medical-bag-interior-volume-v1, revision 1,
   classification AUTHORED_NEW - a new authored claim, NOT derived from the
-  recovered bag source. The certified bag body revision/digest is pinned as
-  owner exactly as the chair-seat surface pins the chair body; bag body bytes
-  stay untouched.
-- `ownerDefinitionRef`: bag body id + revision 1 + certified digest.
-- `transformBinding: OWNER_TRANSLATION_IDENTITY_ORIENTATION` (same as chair
-  seat; materialization translates with the bag, identity orientation only).
-- Local interior region (conservative 25 mm wall inset, 25 mm floor):
-  `minX:-250000 maxX:250000 minY:25000 maxY:300000 minZ:-150000 maxZ:150000`.
-  The drafted unit (200x120x80 mm) fits with >50 mm margin on every axis.
-- Containment floor plane: `normal [0,1000000,0]`, offset 25000 microunits.
-- Contact rule: FULL_FOOTPRINT of the contained body's bottom contact region
-  on the containment floor plane, AND contained aggregate AABB strictly inside
-  the interior region (both required - no partial protrusion).
+  recovered bag source. Certified bag body bytes stay untouched (pinned by
+  reference exactly as the chair seat pins the chair body).
+- Interior region (bag-local, 25mm inset on all six faces of the certified
+  bag bounds X [-275000,+275000], Y [-175000,+175000], Z [-175000,+175000]):
+  X [-250000,+250000], Y [-150000,+150000], Z [-150000,+150000].
+  Harness-proven strictly inside the bag bounds (25mm each face).
+- Containment floor plane = interior minY = -150000 (layer-1 surface above).
+- Unit placement (bag-local, identity orientation): center [0,-90000,0];
+  occupies X [-100000,+100000], Y [-150000,-30000], Z [-40000,+40000].
+  Harness-proven: bottom face exactly on the floor plane; footprint 200x80mm
+  inside the 500x300mm floor region (FULL_FOOTPRINT); clearances +X/-X 150mm,
+  +Z/-Z 110mm, top 180mm - every margin >50mm, strict containment.
+- World transform (bag center at the certified committed position
+  [-3000000,175000,1000000]): unit world center [-3000000,85000,1000000];
+  world bottom 25000 (25mm above the world floor - no floor penetration);
+  world top 145000. Identity orientation end to end.
 
-## 4. Certified support path (the new semantics - A1-style contract extension)
+## 5. The hollow-interior / collision conflict (explicit resolution)
 
-1. `SUPPORT_SEMANTIC_TYPES` gains `'CONTAINMENT'` (alongside FLOOR,
-   SUPPORT_SURFACE). A1 precedent: adding SUPINE_FLOOR was a reviewed
-   validator-matrix extension, not a Phase 2 change. Phase 2 unchanged here.
-2. Multi-support relations: extend `ENTITY_OWNED` with a
-   `supportVolumeRef` variant (RECOMMENDED over a new kind - reuses the
-   existing staleness checks: owner revision, owner body digest, world
-   revision binding). Contact role `GENERIC`. Relation draft:
-   `synthetic-training-unit:bag-containment`, requirement REQUIRED.
-3. `materializeContainmentVolume({ owner, volume })`: owner translation +
-   identity orientation only; rotations/non-axis-aligned reject (same bar as
-   materializeSupportSurface). No legality decided during materialization.
-4. Legality rule (validator, fail-closed): contained aggregate AABB strictly
-   inside materialized interior region AND bottom contact FULL_FOOTPRINT on
-   the containment floor plane AND owner (bag) itself legally supported.
-   Negatives that must reject: protrusion beyond any interior face; floating
-   above / penetrating below the containment floor; stale bag body revision;
-   unknown container; container REMOVED; double-containment conflict.
-5. School geometry adapter: admit `synthetic-training-unit-body-v1` ONLY with
-   exact revision/digest proof (bag/casualty/chair pattern). The contract-only
-   `synthetic/gate-c-supported-box-body` fixture is NOT used and NOT admitted
-   for this unit (engine boundary, agreed).
+The certified bag body is a recovered SOLID AABB and is treated as a solid
+collision box; it does NOT evidence a hollow interior. Resolution:
 
-## 5. Consumption semantics (physical, not presentational)
+- The hollow interior is AUTHORED NEW as an explicit claim (decisionId, its
+  own digest) - never inferred from the outer AABB. It declares the interior
+  region of section 4 hollow FOR THE PINNED CONTAINED ENTITY ONLY.
+- Pair-collision supersession (reviewable rule, part of the layer-2
+  admission): while the containment relation is VALIDATED, mutual collision
+  between the pinned pair (bag body r1 digest, unit body r1 digest) is
+  evaluated as containment, not intersection. For everything else the bag
+  remains a solid collision box.
+- Collision-cover invariant (harness-proven): the unit's world AABB is
+  STRICTLY inside the bag's world AABB, so the bag's existing
+  collision-vs-world evaluation conservatively covers the contained unit.
+  Protrusion rejects at legality (layer 2), so the invariant holds by
+  construction: a contained unit can never be partly outside its container.
 
-- Consumption is an authoritative lifecycle transition of the world entity,
-  derived from the committed Inventory V2 attempt - never a renderer decision.
-- Shared seam (engine's commit-ordering finding, accepted as the contract):
-  ONE reviewable prepare/validate/commit bundle per attempt:
-  - prepare: V2 consumption intent + derived world proposal (unit lifecycle
-    ACTIVE -> CONSUMED, relation `synthetic-training-unit:bag-containment`
-    released), correlated by attemptId;
-  - validate: Geometry Gate + support/contact where applicable on the BEFORE
-    state (after consumption there is no geometry to validate - stated
-    explicitly, not bypassed);
-  - commit: atomic. Ledger event + inventory transition + world revision +
-    lifecycle transition land together or not at all. V2 failure => no world
-    commit; world failure => no inventory commit. No orphan either direction.
-- Terminal state name: RECOMMEND `CONSUMED` (distinct from REMOVED - keeps
-  audit trail honest about WHY the entity left the world). New lifecycleState
-  value = contract extension, part of the same review.
-- Post-consumption world carries the tombstone: entity digest + terminal
-  state + the release of its containment relation, all inside the committed
-  world digest. The renderer reads ONLY the committed projection
-  (v0.3 publicUseState AVAILABLE/RESERVED/CONSUMED are presentation codes
-  derived from committed state; they carry no physical authority).
+## 6. CONTAINMENT as new admission (spelled out)
 
-## 6. Visual representation (Track B side)
+The body record keeps the closed SUPPORT_SURFACE type (section 2). The NEW
+admission is the containment-volume semantics package:
+1. The authored records of sections 3-4 (floor surface + volume) with their
+   own revision digests and AUTHORED_NEW provenance.
+2. validateContainment (new validator next to multi-support relations):
+   strict-inside on 5 faces + floor contact + supersession invariant;
+   deterministic; fail-closed; emits PROTRUSION_X/Y/Z,
+   CONTACT_GAP_FLOATING, SUPPORT_PENETRATION,
+   FOOTPRINT_OUTSIDE_FLOOR_REGION, plus staleness codes of section 7.
+3. A1-style validator matrix: positives (legal placement, exact contact,
+   clearances, world transform, cover invariant) + negatives (protrusion on
+   every face incl. oversized unit through the ceiling with contact intact,
+   floating 1mm, penetration 1mm, stale bag revision, unknown container,
+   container REMOVED/CONSUMED, double containment) - mirrored today by the
+   proposal-stage harness (14/14) as arithmetic preview only.
+4. Deterministic fixture + authority audit + SHA256SUMS, then owner
+   exact-review with revision digests (USER_GATE_REVIEW, wamid provenance
+   refs), then VERIFIED_FOR_SLICE. Phase 2 capability review: NOT required
+   under option (ii); required only if review rejects the two-layer reading.
 
-- Parametric box mesh generated from the CERTIFIED aggregate bounds (same
-  pattern as casualty/chair/bag: visuals articulated strictly inside certified
-  envelopes; pixels never feed physics).
-- Distinct training-unit appearance + floating label "SYNTHETIC TRAINING UNIT"
-  in all three states; CONSUMED renders absence + grayed slot marker in the
-  status overlay - driven only by committed projections.
-- B-W5 map gains entry `synthetic-training-unit-v1` with its own visual
-  digest; entity <-> body <-> asset binding pinned by digest on all three
-  ends; validator test proves zero clinical fields.
+## 7. supportVolumeRef - exact schema addition (multi-support relations)
 
-## 7. Evidence chain (per existing gate patterns) and review rounds
+Minimal, backward-compatible: supportVolumeRef is an OPTIONAL COMPANION on
+ENTITY_OWNED relations; supportSurfaceRef remains required and governs the
+existing conflict key and buildIndex (no change to either).
+- Relation field: supportVolumeRef: { id: string, revision: int, digest:
+  hex64 }. Present IFF the supported entity is contained in the owner's
+  authored volume.
+- Owner physicalState gains containmentVolume: { volumeId, volumeRevision,
+  canonicalDigest } (chair-surface analog; bag entity revision bumps per the
+  normal entity-revision rules - bag BODY bytes still untouched).
+- validateRelations additions (existing staleness style):
+  - supportVolumeRef present but owner physicalState.containmentVolume
+    missing -> MISSING_SUPPORT_VOLUME;
+  - id/revision/digest mismatch -> STALE_SUPPORT_VOLUME;
+  - supportVolumeRef present while supported entity's placement fails
+    validateContainment -> CONTAINMENT_VIOLATION (with the section-6 codes);
+  - volume naming a different owner, or two volumes claiming the same
+    supported entity -> CONFLICTING_RELATION (existing).
+- Contact role GENERIC; contactRegionRef/contactRegionGeometry/
+  contactRegionDigest continue to reference the SUPPORTED body's bottom-face
+  contact region (existing semantics, unchanged).
 
-Per definition: authoring record + deterministic fixture + validator matrix
-(positives/negatives, A1-style) + authority audit + SHA256SUMS, then owner
-review with exact revision digests recorded in an exact-review.json record
-(`authority: USER_GATE_REVIEW`, provenanceRefs = WhatsApp wamids), then
-VERIFIED_FOR_SLICE admission. Expected rounds:
-- R1: unit body + bag containment region + CONTAINMENT semantics + validator
-  matrix (positives + the negatives listed in section 4).
-- R2: consumption seam contract + CONSUMED lifecycle + admission records.
-- R3: BEFORE/AFTER integration proof (owner's exact completion definition):
-  BEFORE - unit committed at IN_BAG, rendered from committed state;
-  AFTER - V2 commits consumption, ledger records, world revision advances,
-  renderer removes the unit from the committed projection only.
+## 8. CONSUMED lifecycle state - exact definition
 
-## 8. Boundaries
+- lifecycleState enum { ACTIVE, REMOVED } gains CONSUMED (terminal).
+- Legal transitions: ACTIVE -> CONSUMED only inside the atomic
+  prepare/validate/commit seam bundle (attemptId-correlated; ledger +
+  inventory + world revision + lifecycle land together or not at all - the
+  engine's commit-ordering finding accepted as the contract). CONSUMED ->
+  nothing. REMOVED semantics unchanged.
+- Participation: CONSUMED is excluded wherever REMOVED is excluded. Exact
+  validator change: lifecycleState==='REMOVED' checks become
+  lifecycleState!=='ACTIVE' (MISSING_SUPPORTED_ENTITY / MISSING_OWNER paths).
+  A CONSUMED entity still named by any surviving support relation = fail.
+- Retention: the entity stays in state.entities with digest lineage plus
+  terminal provenance { attemptId, ledgerEventRef,
+  consumedAtWorldRevision } - the audit trail records WHY it left, which a
+  plain REMOVED would not.
+- Geometry after consumption: explicitly not applicable (no body to
+  evaluate) - stated, never silently bypassed.
+- Renderer: reads only committed projections. v0.3 publicUseState
+  AVAILABLE/RESERVED/CONSUMED remain presentation codes derived from
+  committed state; they carry no physical authority.
 
-One unit only. No new scenes, equipment, or synthetic content. Casualty,
-chair, bag, room records untouched (bag body pinned by reference, never
-modified). Frozen Track A certification candidate untouched. Renderer stays
-read-only; FPS never feeds sim time; no dual-write. No production promotion.
-Engine owns the authority side (world-mutation path, Geometry Gate,
-contact/collision where applicable, committed state, ledger); Track B owns
-this authoring/visual package and the evidence chain above.
+## 9. Visual representation (Track B side)
+
+- Parametric box mesh from the CERTIFIED aggregate bounds (visuals inside
+  certified envelopes; pixels never feed physics). Distinct training-unit
+  appearance + "SYNTHETIC TRAINING UNIT" label in all states; CONSUMED
+  renders absence + grayed slot marker, driven only by committed projections.
+- B-W5 map entry synthetic-training-unit-v1 with visual digest;
+  entity<->body<->asset binding pinned by digest on all three ends;
+  validator test proves zero clinical fields.
+
+## 10. Evidence chain, review rounds, boundaries
+
+R1: unit body + interior floor surface + containment volume + validator
+matrix + harness -> owner review. R2: consumption seam + CONSUMED lifecycle +
+admission records. R3: BEFORE/AFTER proof exactly as the owner defined
+completion (BEFORE: unit committed at IN_BAG, rendered from committed state;
+AFTER: V2 commits consumption, ledger records, world revision advances,
+renderer removes the unit from the committed projection only).
+One unit only. No new scenes/equipment/content. Casualty/chair/bag/room
+records untouched (bag pinned by reference, never modified). Frozen Track A
+candidate untouched. Renderer read-only; FPS never feeds sim time; no
+dual-write; no production promotion. Engine owns the authority side; Track B
+owns this authoring/visual package and its evidence chain.
