@@ -5,8 +5,8 @@
  "assets": [
   {
    "path": "package/renderer-package.mjs",
-   "bytes": 17175,
-   "sha256": "4c468d2ff9026d5ba3a50e218a4330fdd30236fd433e3ed5e738dfeec68df227"
+   "bytes": 18427,
+   "sha256": "dc53c30d7dc1ed229b8750bf5ae454f25e1ab73abf51155e40ff4cf6688b9ba4"
   },
   {
    "path": "package/projection-guard.mjs",
@@ -14,9 +14,24 @@
    "sha256": "b4a4bcdb52cceab05357949cf2147e3a046fa60d851bea57f30bc594125c49e2"
   },
   {
+   "path": "package/presentation-guard.mjs",
+   "bytes": 2749,
+   "sha256": "8c7b8309c17c4e8a6b6e8f8cf9273e853f33429f05975a06875d8deb93c1fdf2"
+  },
+  {
+   "path": "package/procedural-room.mjs",
+   "bytes": 7597,
+   "sha256": "389842f63b12670086e45855f0a51ef8a439130465432c3982d62aeaa0d36907"
+  },
+  {
    "path": "package/gate-statuses.json",
    "bytes": 2221,
    "sha256": "8f98aded9075b997fdf81fdecd8f299c0e4cc3e71f1b668a6c29650aabb32b4f"
+  },
+  {
+   "path": "presentation-manifest.json",
+   "bytes": 2458,
+   "sha256": "b2fe7d364b29761776e5ca4ddd590babb3ffa129b97ae6889007261f006d8ff9"
   },
   {
    "path": "entity-map.mjs",
