@@ -40,8 +40,8 @@
   },
   {
    "path": "engine-bundle.js",
-   "bytes": 145740,
-   "sha256": "c718dcee047177a61f78b0e9fc3890427707c14fe976b1b79ac704a3d5c6959b"
+   "bytes": 165678,
+   "sha256": "05591546335405e781c4993dac88c8c0b33948528470af050c8975135369be35"
   },
   {
    "path": "scene-bundle.json",
