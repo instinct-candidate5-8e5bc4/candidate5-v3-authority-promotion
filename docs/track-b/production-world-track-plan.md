@@ -45,19 +45,33 @@ physicalEntityId reject; transformSource != 'authoritative' reject; unpinned
 file asset reject; manifest worldDigest != consumed world digest reject
 (STALE_WORLD); placeholder must render its own LAYOUT/PLACEHOLDER label.
 
-## 3. Zero-spend asset strategy (owner constraint: zero cost)
+## 3. Asset strategy (owner clarification 2026-09-30, wamid...E0FERTwNjUwRjZDQzA4...)
 
-- Phase A assets are PROCEDURAL/parametric (three.js geometry + generated
-  canvas textures): room architecture, doorway, window frames, cabinets,
-  treatment furniture, lighting rig with shadow map tuning. Zero download,
-  zero license risk, byte-reproducible, diff-reviewable - matches repo
-  discipline.
-- Phase B (only if the owner wants more): CC0-only external assets (e.g.
-  Kenney.nl, ambientCG, Poly Haven CC0), each with license record +
-  byte SHA-256 pin in the manifest. Any non-CC0 or paid asset is out of
-  scope unless the owner explicitly lifts the constraint.
+Owner clarification (wamid.HBgMOTcyNTMyNDkwMzUxFQIAEhgUM0FFMDJDRDI4MTY4Rjk2RTBCNDcA):
+"fully procedural" is NOT a permanent architectural requirement and must not
+become a visual-quality ceiling. The long-term requirement is BEST SUITABLE
+PRODUCTION QUALITY while preserving the authoritative physics/presentation
+separation. Target: a believable production world bound to the same
+authoritative physical world - a player recognizes SCHOOL_TREATMENT_ROOM
+immediately, without reading its Scene ID. The current screen stays
+permanently classified ENGINEERING/PHYSICS DEBUG VIEW.
+
+- Phase A (first $0 implementation path): PROCEDURAL/parametric assets
+  (three.js geometry + generated canvas textures). Zero download, zero
+  license risk, byte-reproducible, diff-reviewable - the starting point,
+  not the ceiling.
+- Phase B (hybrid, as quality requires): custom-built assets, CC0 assets,
+  approved/licensed assets, high-quality materials/textures, articulated
+  character assets, environment-specific visual assets - provided
+  licensing/provenance is explicit (license record + byte SHA-256 pin in the
+  manifest) and nothing bypasses physical authority. Zero-spend still binds
+  anything paid: licensed/paid assets require the owner explicitly lifting
+  the constraint per acquisition.
 - The synthetic training unit and all Gate A work are unaffected: R1-R3 stay
   purely about the authority proof and are not blocked by this track.
+- PW-6 cutover gate unchanged: the claims flip happens only there, only
+  after owner review, against a production-quality scene running from the
+  same authoritative world state.
 
 ## 4. Staged work orders (proposed IDs, each lands as its own patch set)
 
