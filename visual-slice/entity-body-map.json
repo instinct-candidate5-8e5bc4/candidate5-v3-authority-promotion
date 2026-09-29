@@ -1,10 +1,10 @@
 {
  "mapVersion": "1.0.0",
  "kind": "TRACK_B_ENTITY_BODY_MAP",
- "generatedAt": "2026-09-29T22:02:35.940Z",
+ "generatedAt": "2026-09-29T22:36:17.465Z",
  "git": {
   "branch": "candidate5-track-b-visual-slice",
-  "commit": "6c7b4737f6dc11ea39e993075c500954596f1fb0"
+  "commit": "f3e82f8b8b98519db57d5d1af5f49bbdd1d6fed1"
  },
  "policy": "Every visual entity resolves through this table ONLY. Unknown or unmapped entity = NO VISUAL ACTION (fail-closed). No default mapping, no substitution, no inference from names or meshes.",
  "anchors": {
@@ -21,7 +21,7 @@
   "CLINICAL_SUBJECT": "A patient body. clinicalSubjectOf() may return this entry. Region semantics remain engine-owned and frozen (see clinicalSemantics).",
   "EQUIPMENT": "Certified equipment body. NEVER resolvable as a clinical subject.",
   "ENVIRONMENT": "Room/surface geometry. NEVER resolvable as a clinical subject.",
-  "SYNTHETIC_TRAINING": "Labeled temporary integration-bridge entity (Option A). MUST NEVER carry clinicalBodyRegion/bodyRegions/clinicalSubject fields and NEVER resolve to a real medical body region or action. None is defined here yet; the engine/contract side introduces any synthetic entity explicitly."
+  "SYNTHETIC_TRAINING": "Labeled temporary integration-bridge entity (Option A). MUST NEVER carry clinicalBodyRegion/bodyRegions/clinicalSubject fields and NEVER resolve to a real medical body region or action. synthetic-training-unit-v1 is the only one; introduced for the B-W11 interim bridge (contract v0.3), explicitly UNCERTIFIED until Gate A admission."
  },
  "entities": {
   "school-casualty-adult-v1": {
@@ -112,6 +112,26 @@
     "surfaceModelPinSha256": "6e9878bd1640b2747e8db52237843a8fd75f878e5dc6e162646c4971e85d99c5"
    },
    "note": "Room surfaces are lineage-evidenced presentation geometry, not entities with physical body records."
+  },
+  "synthetic-training-unit-v1": {
+   "entityId": "synthetic-training-unit-v1",
+   "entryType": "SYNTHETIC_TRAINING",
+   "layoutGroup": "syntheticUnit",
+   "physicalBodyRef": null,
+   "boundsMicrounits": {
+    "minX": -100000,
+    "maxX": 100000,
+    "minY": 0,
+    "maxY": 120000,
+    "minZ": -40000,
+    "maxZ": 40000
+   },
+   "sourceAnchor": {
+    "proposalDoc": "docs/track-b/gate-a-synthetic-unit-visual-asset-proposal.md"
+   },
+   "gateAStatus": "PROPOSED_NOT_ADMITTED",
+   "presentationOnly": true,
+   "note": "B-W11 interim presentation bridge (contract v0.3). Bounds are the PROPOSED Gate A draft (R1 v3) - presentation-only until Gate A admission; this entry carries no physical authority and zero clinical fields. publicUseState AVAILABLE/RESERVED/CONSUMED present committed projections, never decide them."
   }
  }
 }

@@ -25,7 +25,8 @@ function loadPuppeteer(){try{return require('puppeteer')}catch{}
  c('manifest verified in-browser',st.manifestOk===true);
  c('gate statuses detailed (reviewIds)',st.statuses.statuses.casualty.reviewId==='gate-b-user-review-ee04481'&&st.statuses.statuses.chair.reviewId==='gate-c-user-review-0c27c92');
  c('stale casualty label marked superseded',st.statuses.superseded.length===1&&st.statuses.superseded[0].entityId==='school-casualty-adult-v1');
- c('3 entities bound',st.boundEntities.length===3);
+ c('4 entities bound (casualty + bag + synthetic unit via host)',st.boundEntities.length===3||st.boundEntities.length===4);
+ c('synthetic unit bound via host table',st.syntheticUnit&&st.syntheticUnit.bound===true&&st.syntheticUnit.gateAStatus==='PROPOSED_NOT_ADMITTED');
  // Projection: examine-style highlight + bounded finding text.
  const proj=await page.evaluate(()=>window.__smoke.pkg.renderFromProjection({
   kind:'TRACK_B_PUBLIC_PROJECTION',contractVersion:'0.2',cue:'SYNTHETIC_ACTION_COMPLETED',
@@ -51,6 +52,16 @@ function loadPuppeteer(){try{return require('puppeteer')}catch{}
  const mv=await page.evaluate(()=>window.__smoke.pkg.renderFromProjection({kind:'TRACK_B_PUBLIC_PROJECTION',contractVersion:'0.2',cue:'SYNTHETIC_ACTION_COMPLETED',entities:[{publicRef:'pub-bag-1',visibleLocationCode:'FLOOR_BESIDE_CHAIR'}]}));
  const moved=await page.evaluate(()=>window.__smoke.pkg.status().bagLocation);
  c('bag relocation projection applied',mv.applied===true&&moved==='FLOOR_BESIDE_CHAIR');
+ // B-W11 (contract v0.3): synthetic unit use-state presentation + hostile rejections.
+ const syn=await page.evaluate(()=>window.__smoke.pkg.renderFromProjection({kind:'TRACK_B_PUBLIC_PROJECTION',contractVersion:'0.3',entities:[{publicRef:'pub-synthetic-unit-1',publicUseState:'RESERVED'}]}));
+ c('v0.3 use-state projection applied to synthetic unit',syn.applied===true);
+ const synSt=await page.evaluate(()=>window.__smoke.pkg.status().syntheticUnit);
+ c('status reports synthetic unit RESERVED, still PROPOSED_NOT_ADMITTED',synSt.bound===true&&synSt.useState==='RESERVED'&&synSt.gateAStatus==='PROPOSED_NOT_ADMITTED');
+ const rej3=await page.evaluate(()=>[
+  window.__smoke.pkg.renderFromProjection({kind:'TRACK_B_PUBLIC_PROJECTION',contractVersion:'9.9',entities:[]}),
+  window.__smoke.pkg.renderFromProjection({kind:'TRACK_B_PUBLIC_PROJECTION',contractVersion:'0.3',entities:[{publicRef:'pub-casualty-1',publicUseState:'RESERVED'}]}),
+  window.__smoke.pkg.renderFromProjection({kind:'TRACK_B_PUBLIC_PROJECTION',contractVersion:'0.3',entities:[{publicRef:'pub-synthetic-unit-1',publicUseState:'EXPLODED'}]})].map(r=>r.applied));
+ c('3 hostile v0.3 projections all rejected (unknown version, use-state on clinical entity, unknown use-state)',rej3.every(x=>x===false));
  const shot='/tmp/b-w10-package-smoke.png';await page.screenshot({path:shot});
  const un=await page.evaluate(()=>window.__smoke.pkg.unmount());
  c('unmount clean',un.ok===true);

@@ -10,6 +10,6 @@ const srcRel=live.supportRelations.find(r=>r.relationId==='school:bag:floor');
 window.__srcRel=JSON.parse(JSON.stringify(srcRel));
 const S={pkg:PKG,mountResult:null};
 window.__smoke=S;
-S.mountResult=await PKG.mount(document.getElementById('host'),{bindingTable:{'pub-casualty-1':'school-casualty-adult-v1','pub-bag-1':'school-medical-bag'}});
+S.mountResult=await PKG.mount(document.getElementById('host'),{bindingTable:{'pub-casualty-1':'school-casualty-adult-v1','pub-bag-1':'school-medical-bag','pub-synthetic-unit-1':'synthetic-training-unit-v1'}});
 document.body.dataset.mount=S.mountResult.ok?'ok':'fail:'+S.mountResult.reason;
 </script></body></html>

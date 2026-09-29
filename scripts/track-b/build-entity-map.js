@@ -36,7 +36,7 @@ const map={mapVersion:'1.0.0',kind:'TRACK_B_ENTITY_BODY_MAP',generatedAt:new Dat
   CLINICAL_SUBJECT:'A patient body. clinicalSubjectOf() may return this entry. Region semantics remain engine-owned and frozen (see clinicalSemantics).',
   EQUIPMENT:'Certified equipment body. NEVER resolvable as a clinical subject.',
   ENVIRONMENT:'Room/surface geometry. NEVER resolvable as a clinical subject.',
-  SYNTHETIC_TRAINING:'Labeled temporary integration-bridge entity (Option A). MUST NEVER carry clinicalBodyRegion/bodyRegions/clinicalSubject fields and NEVER resolve to a real medical body region or action. None is defined here yet; the engine/contract side introduces any synthetic entity explicitly.'},
+  SYNTHETIC_TRAINING:'Labeled temporary integration-bridge entity (Option A). MUST NEVER carry clinicalBodyRegion/bodyRegions/clinicalSubject fields and NEVER resolve to a real medical body region or action. synthetic-training-unit-v1 is the only one; introduced for the B-W11 interim bridge (contract v0.3), explicitly UNCERTIFIED until Gate A admission.'},
  entities:{
   'school-casualty-adult-v1':bodyEntry(casualty.entityRef,'CLINICAL_SUBJECT','casualty',casualty.envelopeMicrounits,
    {visualDigest:casualty.visualDigest,bodyDigest:casualty.entityRef.physicalBodyRef.digest},
@@ -48,7 +48,14 @@ const map={mapVersion:'1.0.0',kind:'TRACK_B_ENTITY_BODY_MAP',generatedAt:new Dat
    {visualDigest:equipment.visualDigest,bodyDigest:equipment.bag.entityRef.physicalBodyRef.digest}),
   'school-treatment-room-v1':{entityId:'school-treatment-room-v1',entryType:'ENVIRONMENT',layoutGroup:'room',
    boundsMicrounits:null,sourceAnchor:{surfaceSetDigest:surfaces.setDigest,surfaceModelPinSha256:pins.inlined[0].sha256},
-   note:'Room surfaces are lineage-evidenced presentation geometry, not entities with physical body records.'}}};
+   note:'Room surfaces are lineage-evidenced presentation geometry, not entities with physical body records.'},
+  'synthetic-training-unit-v1':{entityId:'synthetic-training-unit-v1',entryType:'SYNTHETIC_TRAINING',layoutGroup:'syntheticUnit',
+   physicalBodyRef:null,
+   boundsMicrounits:{minX:-100000,maxX:100000,minY:0,maxY:120000,minZ:-40000,maxZ:40000},
+   sourceAnchor:{proposalDoc:'docs/track-b/gate-a-synthetic-unit-visual-asset-proposal.md'},
+   gateAStatus:'PROPOSED_NOT_ADMITTED',
+   presentationOnly:true,
+   note:'B-W11 interim presentation bridge (contract v0.3). Bounds are the PROPOSED Gate A draft (R1 v3) - presentation-only until Gate A admission; this entry carries no physical authority and zero clinical fields. publicUseState AVAILABLE/RESERVED/CONSUMED present committed projections, never decide them.'}}};
 if(!ok){console.error('REJECTED: builders not in expected status');process.exit(1)}
 const out=path.join(__dirname,'../../visual-slice/entity-body-map.json');
 fs.writeFileSync(out,JSON.stringify(map,null,1));

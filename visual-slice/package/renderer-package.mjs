@@ -101,6 +101,41 @@ export async function mount(container,opts={}){
   bindGroup('school-casualty-adult-v1','casualty',.6);
   bindGroup('school-treatment-chair','chair',.55);
   bindGroup('school-medical-bag','bag',.5);
+
+  // B-W11 interim bridge (contract v0.3): parametric synthetic training unit.
+  // Presentation-only, explicitly UNCERTIFIED until Gate A admission (entry
+  // gateAStatus PROPOSED_NOT_ADMITTED). Renders at the PROPOSED R1 v3 anchor
+  // (bag top, bag-local [0,235000,0] from committed bag position). The unit
+  // FOLLOWS the bag on location actions. Its materials are authored per
+  // render call and never cache committed truth.
+  let syn=null;
+  function mountSyntheticUnit(){
+   const entry=map.entities['synthetic-training-unit-v1'];
+   if(!entry||!entry.boundsMicrounits)return;
+   const b=entry.boundsMicrounits,sx=(b.maxX-b.minX)/SCALE,sy=(b.maxY-b.minY)/SCALE,sz=(b.maxZ-b.minZ)/SCALE;
+   const grp=new THREE.Group();
+   const unitMesh=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),new THREE.MeshStandardMaterial({color:0x22cc55,emissive:0x000000,metalness:.05,roughness:.7}));
+   unitMesh.name='synthetic-training-unit-v1';
+   grp.add(unitMesh);
+   const marker=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(sx,sy,sz)),new THREE.LineBasicMaterial({color:0x888888}));
+   marker.name='uncertified-marker';marker.visible=false;grp.add(marker);
+   const c=document.createElement('canvas');c.width=640;c.height=80;
+   const ctx=c.getContext('2d');ctx.fillStyle='#0a3018';ctx.fillRect(0,0,640,80);
+   ctx.fillStyle='#7dffb0';ctx.font='bold 30px system-ui';ctx.textAlign='center';
+   ctx.fillText('SYNTHETIC TRAINING UNIT',320,34);
+   ctx.font='24px system-ui';ctx.fillText('UNCERTIFIED - B-W11 interim',320,66);
+   const label=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),depthTest:true}));
+   label.name='uncertified-label';label.scale.set(.6,.075,1);label.position.set(0,sy/2+.08,0);grp.add(label);
+   const anchor=[map.positions['bag'][0],map.positions['bag'][1]+235000,map.positions['bag'][2]];
+   grp.position.set(anchor[0]/SCALE,(anchor[1]+(b.minY+b.maxY)/2)/SCALE,anchor[2]/SCALE);
+   scene.add(grp);
+   const synOverlay=document.createElement('div');
+   synOverlay.style.cssText='position:absolute;left:10px;top:96px;background:rgba(10,48,24,.92);color:#7dffb0;padding:5px 10px;font:12px/1.5 system-ui;border:1px solid #2d7a4d;max-width:340px;white-space:pre-line';
+   synOverlay.textContent='SYNTHETIC TRAINING UNIT\nUNCERTIFIED - B-W11 interim presentation bridge (Gate A in flight)';
+   hostEl.appendChild(synOverlay);
+   syn={group:grp,mesh:unitMesh,marker,label,overlay:synOverlay,useState:'AVAILABLE'};
+  }
+  mountSyntheticUnit();
   scene.add(new THREE.AmbientLight(parseInt(bundle.lighting.ambient.colorHex),bundle.lighting.ambient.intensity));
   const key=new THREE.DirectionalLight(parseInt(bundle.lighting.key.colorHex),bundle.lighting.key.intensity);
   key.position.set(...bundle.lighting.key.positionMicrounits.map(m));key.castShadow=true;scene.add(key);

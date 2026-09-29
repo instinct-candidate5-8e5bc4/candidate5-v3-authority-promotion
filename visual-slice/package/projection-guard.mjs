@@ -7,10 +7,15 @@
 import {resolveEntity} from '../entity-map.mjs';
 export const PROJECTION_KIND='TRACK_B_PUBLIC_PROJECTION';
 export const CUES=Object.freeze(['NONE','SYNTHETIC_ACTION_STARTED','SYNTHETIC_ACTION_COMPLETED','SYNTHETIC_ACTION_NO_EFFECT','SYNTHETIC_ACTION_CANCELLED']);
+// B-W11 / contract v0.3: use-state presentation codes, valid ONLY for entities
+// the binding table binds to a SYNTHETIC_TRAINING map entry. They carry no
+// physical authority - they present committed state, never decide it.
+export const KNOWN_CONTRACT_VERSIONS=Object.freeze(['0.2','0.3']);
+export const USE_STATES=Object.freeze(['AVAILABLE','RESERVED','CONSUMED']);
 // Slice-scoped visual allowlists. A code NOT listed here = reject, never a
 // best-effort render. Only poses/locations the certified slice actually has.
 export const POSE_CODES=Object.freeze({casualty:['SUPINE_FLOOR']});
-export const LOCATION_CODES=Object.freeze({bag:['INITIAL','FLOOR_BESIDE_CHAIR']});
+export const LOCATION_CODES=Object.freeze({bag:['INITIAL','FLOOR_BESIDE_CHAIR'],syntheticUnit:['IN_BAG']});
 export const FINDING_TEXT_MAX=500;
 function componentAllowlist(layout,group){return (layout[group]||[]).map(g=>g.componentId)}
 // -> {ok:true, cue, actions:[...]} | {ok:false, reason}
@@ -18,6 +23,7 @@ export function validateProjection(projection,{bindingTable,map,layout}){
  if(!projection||typeof projection!=='object')return{ok:false,reason:'projection is not an object'};
  if(projection.kind!==PROJECTION_KIND)return{ok:false,reason:'kind mismatch'};
  if(typeof projection.contractVersion!=='string'||!projection.contractVersion)return{ok:false,reason:'contractVersion missing'};
+ if(!KNOWN_CONTRACT_VERSIONS.includes(projection.contractVersion))return{ok:false,reason:'unknown contractVersion '+JSON.stringify(projection.contractVersion)};
  const cue=projection.cue==null?'NONE':projection.cue;
  if(!CUES.includes(cue))return{ok:false,reason:'unknown cue '+JSON.stringify(cue)};
  if(!bindingTable||typeof bindingTable!=='object')return{ok:false,reason:'no binding table - missing binding = no visual action'};
@@ -50,6 +56,11 @@ export function validateProjection(projection,{bindingTable,map,layout}){
    const allow=LOCATION_CODES[group]||[];
    if(!allow.includes(pe.visibleLocationCode))return{ok:false,reason:'location code '+JSON.stringify(pe.visibleLocationCode)+' not in slice allowlist for '+group};
    actions.push({type:'location',entityId,code:pe.visibleLocationCode});
+  }
+  if(pe.publicUseState!=null){
+   if(entry.entryType!=='SYNTHETIC_TRAINING')return{ok:false,reason:'publicUseState on non-synthetic entity '+entityId+' - use-state codes carry no physical authority and never apply to clinical/equipment entities'};
+   if(!USE_STATES.includes(pe.publicUseState))return{ok:false,reason:'unknown use state '+JSON.stringify(pe.publicUseState)};
+   actions.push({type:'useState',entityId,code:pe.publicUseState});
   }
  }
  return{ok:true,cue,actions}}
