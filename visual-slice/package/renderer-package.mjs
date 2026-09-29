@@ -112,7 +112,7 @@ export async function mount(container,opts={}){
   function mountSyntheticUnit(){
    const entry=map.entities['synthetic-training-unit-v1'];
    if(!entry||!entry.boundsMicrounits)return;
-   const b=entry.boundsMicrounits,sx=(b.maxX-b.minX)/SCALE,sy=(b.maxY-b.minY)/SCALE,sz=(b.maxZ-b.minZ)/SCALE;
+   const b=entry.boundsMicrounits,sx=m(b.maxX-b.minX),sy=m(b.maxY-b.minY),sz=m(b.maxZ-b.minZ);
    const grp=new THREE.Group();
    const unitMesh=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),new THREE.MeshStandardMaterial({color:0x22cc55,emissive:0x000000,metalness:.05,roughness:.7}));
    unitMesh.name='synthetic-training-unit-v1';
@@ -126,13 +126,15 @@ export async function mount(container,opts={}){
    ctx.font='24px system-ui';ctx.fillText('UNCERTIFIED - B-W11 interim',320,66);
    const label=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),depthTest:true}));
    label.name='uncertified-label';label.scale.set(.6,.075,1);label.position.set(0,sy/2+.08,0);grp.add(label);
-   const anchor=[map.positions['bag'][0],map.positions['bag'][1]+235000,map.positions['bag'][2]];
-   grp.position.set(anchor[0]/SCALE,(anchor[1]+(b.minY+b.maxY)/2)/SCALE,anchor[2]/SCALE);
+   // Anchor: committed bag position + proposed R1 v3 bag-local offset [0,235000,0].
+   const bagPos=bundle.equipment.bag.authoritativeTransformMicrounits.positionMicrounits;
+   const anchor=[bagPos[0],bagPos[1]+235000,bagPos[2]];
+   grp.position.set(m(anchor[0]),m(anchor[1])+(b.minY+b.maxY)/2/1e6,m(anchor[2]));
    scene.add(grp);
    const synOverlay=document.createElement('div');
    synOverlay.style.cssText='position:absolute;left:10px;top:96px;background:rgba(10,48,24,.92);color:#7dffb0;padding:5px 10px;font:12px/1.5 system-ui;border:1px solid #2d7a4d;max-width:340px;white-space:pre-line';
    synOverlay.textContent='SYNTHETIC TRAINING UNIT\nUNCERTIFIED - B-W11 interim presentation bridge (Gate A in flight)';
-   hostEl.appendChild(synOverlay);
+   container.appendChild(synOverlay);
    syn={group:grp,mesh:unitMesh,marker,label,overlay:synOverlay,useState:'AVAILABLE'};
   }
   mountSyntheticUnit();
@@ -165,6 +167,7 @@ export function unmount(){
  s.renderer.setAnimationLoop(null);
  s.controls.dispose();s.renderer.dispose();
  s.renderer.domElement.remove();s.overlay.remove();s.finding.remove();
+ if(syn&&syn.overlay)syn.overlay.remove();syn=null;
  return{ok:true}}
 // renderFromProjection(boundedProjection): applies a validated projection.
 // Reject = NO visual action at all. Cue is presentation metadata only; only
@@ -178,6 +181,13 @@ export function renderFromProjection(projection){
   for(const mesh of meshes)mesh.material.emissive.setHex(mesh.userData.baseEmissive);
  inst.finding.style.display='none';inst.finding.textContent='';
  for(const a of v.actions){
+  if(a.type==='useState'){
+   // Synthetic unit only (guard enforces). Tint presents committed state; it never decides it.
+   if(syn&&a.entityId==='synthetic-training-unit-v1'){
+    syn.useState=a.code;
+    syn.mesh.material.color.setHex(a.code==='AVAILABLE'?0x22cc55:a.code==='RESERVED'?0xcc7722:0x333333);
+    syn.marker.visible=a.code!=='AVAILABLE'}
+   continue}
   const b=inst.bindings[a.entityId];if(!b)return{applied:false,reason:'internal: bound entity missing meshes'};
   if(a.type==='highlight'){for(const c of a.componentIds)for(const mesh of b.componentMeshes[c]||[])mesh.material.emissive.setHex(0x6a5a12)}
   else if(a.type==='finding'){inst.finding.textContent=a.text;inst.finding.style.display='block'}
@@ -188,6 +198,7 @@ export function renderFromProjection(projection){
    const to=target||inst.bagInitialPos;
    const delta=to.map((v2,i)=>v2-from[i]);
    for(const meshes of Object.values(b.componentMeshes))for(const mesh of meshes){mesh.position.x+=m(delta[0]);mesh.position.y+=m(delta[1]);mesh.position.z+=m(delta[2])}
+   if(syn){syn.group.position.x+=m(delta[0]);syn.group.position.y+=m(delta[1]);syn.group.position.z+=m(delta[2])}
    inst.bagLocation=a.code}
  }
  inst.lastCue=v.cue;
@@ -218,4 +229,5 @@ export function status(){
   statuses:inst.statuses,
   boundEntities:Object.keys(inst.bindings),
   bagLocation:inst.bagLocation,lastCue:inst.lastCue,
+  syntheticUnit:syn?{bound:true,useState:syn.useState,gateAStatus:'PROPOSED_NOT_ADMITTED',note:'UNCERTIFIED presentation bridge (B-W11 interim, Gate A in flight)'}:{bound:false},
   claimGate:'SLICE-PACKAGE ONLY: not "connected" until the running shell consumes this package'}}

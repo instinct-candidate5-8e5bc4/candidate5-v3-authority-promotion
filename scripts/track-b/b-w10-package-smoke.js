@@ -25,7 +25,7 @@ function loadPuppeteer(){try{return require('puppeteer')}catch{}
  c('manifest verified in-browser',st.manifestOk===true);
  c('gate statuses detailed (reviewIds)',st.statuses.statuses.casualty.reviewId==='gate-b-user-review-ee04481'&&st.statuses.statuses.chair.reviewId==='gate-c-user-review-0c27c92');
  c('stale casualty label marked superseded',st.statuses.superseded.length===1&&st.statuses.superseded[0].entityId==='school-casualty-adult-v1');
- c('4 entities bound (casualty + bag + synthetic unit via host)',st.boundEntities.length===3||st.boundEntities.length===4);
+ c('3 certified entities bound in registry (synthetic unit tracked separately)',st.boundEntities.length===3);
  c('synthetic unit bound via host table',st.syntheticUnit&&st.syntheticUnit.bound===true&&st.syntheticUnit.gateAStatus==='PROPOSED_NOT_ADMITTED');
  // Projection: examine-style highlight + bounded finding text.
  const proj=await page.evaluate(()=>window.__smoke.pkg.renderFromProjection({
