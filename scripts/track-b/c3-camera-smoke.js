@@ -4,7 +4,11 @@
 const path=require('node:path'),{spawn,execSync}=require('node:child_process');
 const ROOT=path.join(__dirname,'../..');
 (async()=>{
- const puppeteer=require('/home/sandbox/verify/node_modules/puppeteer');
+function loadPuppeteer(){try{return require('puppeteer')}catch{}
+ if(process.env.SCRATCH_NODE_MODULES){for(const n of['puppeteer','puppeteer-core']){try{return require(require('node:module').createRequire(require('node:path').join(process.env.SCRATCH_NODE_MODULES,n,'package.json')).resolve(n))}catch{}}}
+ try{return require('puppeteer-core')}catch{}
+ console.log('SKIP: puppeteer not installed');process.exit(2)}
+ const puppeteer=loadPuppeteer();
  const{PNG}=require('/home/sandbox/verify/node_modules/pngjs');
  const fs=require('node:fs');
  const srv=spawn('python3',['-m','http.server','8899','-d',ROOT],{stdio:'ignore'});

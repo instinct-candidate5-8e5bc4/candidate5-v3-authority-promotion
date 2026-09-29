@@ -3,7 +3,11 @@
 const path=require('node:path'),{execSync,spawn}=require('node:child_process'),fs=require('node:fs');
 const ROOT=path.join(__dirname,'../..');
 (async()=>{
- const puppeteer=require('/home/sandbox/verify/node_modules/puppeteer');
+function loadPuppeteer(){try{return require('puppeteer')}catch{}
+ if(process.env.SCRATCH_NODE_MODULES){for(const n of['puppeteer','puppeteer-core']){try{return require(require('node:module').createRequire(require('node:path').join(process.env.SCRATCH_NODE_MODULES,n,'package.json')).resolve(n))}catch{}}}
+ try{return require('puppeteer-core')}catch{}
+ console.log('SKIP: puppeteer not installed');process.exit(2)}
+ const puppeteer=loadPuppeteer();
  const srv=spawn('python3',['-m','http.server','8899','-d',ROOT],{stdio:'ignore'});
  for(let i=0;i<30;i++){try{execSync('curl -sf -o /dev/null http://127.0.0.1:8899/visual-slice/index.html');break}catch(e){await new Promise(r=>setTimeout(r,500))}}
  const browser=await puppeteer.launch({executablePath:'/usr/bin/google-chrome',headless:'new',
