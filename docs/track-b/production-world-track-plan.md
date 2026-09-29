@@ -93,3 +93,26 @@ permanently classified ENGINEERING/PHYSICS DEBUG VIEW.
 
 Every stage: pixel-verified screenshots, fail-closed validation negatives,
 no physics byte changes, no claims beyond what runs.
+
+## 5. Locked constraints and acceptance criteria (owner, 2026-09-30)
+
+- ZERO-COST is a permanent project constraint (owner directive 2026-09-30,
+  WhatsApp wamid...AEEA): procedural generation built inside the project,
+  custom in-project assets, CC0 assets, or genuinely free assets whose license
+  explicitly permits the intended use. Every external asset needs explicit
+  provenance/license evidence BEFORE entering the approved pipeline. No
+  purchases, no subscriptions. $0 never lowers the production-quality target.
+- LOCKED FINAL-GATE ACCEPTANCE CRITERION (owner directive 2026-09-30, WhatsApp
+  wamid...288A): the final SCHOOL_TREATMENT_ROOM must be visually identifiable
+  as a school treatment/medical room from the rendered scene itself, WITHOUT
+  relying on the title, Scene ID, debug labels, or explanatory text. The same
+  identifiability bar applies to every production scene (SYNAGOGUE, STREET,
+  HOME), and night/rain/winter/environmental conditions must be visibly
+  represented when the scenario requires them. PW-3 and later passes add the
+  scene-specific visual semantics, lighting/material depth, treatment-room
+  layout details and environmental coherence to reach it. No arbitrary
+  decorative objects: presentation stays consistent with the approved scene
+  semantics and authoritative geometry, and never weakens physics authority.
+- PW-2 was accepted by the owner as an architectural presentation pass, NOT
+  as production visual acceptance (same directive). R1/R2/R3 are never blocked
+  by visual production work.
