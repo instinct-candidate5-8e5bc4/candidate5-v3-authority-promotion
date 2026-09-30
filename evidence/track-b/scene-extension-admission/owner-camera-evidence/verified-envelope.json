@@ -1,0 +1,43 @@
+{
+  "envelopeSchemaVersion": "1.0.0",
+  "envelopeId": "school-scene-camera-coverage-v1:owner-camera-evidence:r1",
+  "definitionRef": {
+    "definitionType": "SCENE_EXTENSION",
+    "definitionId": "school-scene-camera-coverage-v1",
+    "revision": 1,
+    "definitionDigest": "784bafdff6b44977a11865bd51caec135797837ff36a8fc4c721a82c1463fabf"
+  },
+  "lifecycleState": "VERIFIED_FOR_SLICE",
+  "validationEvidenceRefs": [
+    "evidence:track-b/scene-camera-candidate/v1_5-capture/source-artifact-manifest.json",
+    "source-tree:28e3e2c3537ad53030150d53398d2ec138cbafb7",
+    "evidence:track-b/scene-extension-admission/preparation-source-pins.json"
+  ],
+  "reviewEvidenceRefs": [
+    "whatsapp:wamid.HBgMOTcyNTMyNDkwMzUxFQIAERgSREYxQTc2RTU5OEMwRTQ2OEFBAA==",
+    "whatsapp:wamid.HBgMOTcyNTMyNDkwMzUxFQIAERgSQzA0NTJENjAyNkZGRkFFMjgxAA==",
+    "whatsapp:wamid.HBgMOTcyNTMyNDkwMzUxFQIAEhgUM0FCQUUxRjIzRTkxRjBGQUExRDYA",
+    "source-tree:28e3e2c3537ad53030150d53398d2ec138cbafb7",
+    "pinset-sha256:2290c669f584a3c3c2c7b98d182068ec043f005b843a7f9d2bff4f8d2a89e40d",
+    "track-b-technical-review:scene-extension-plumbing-transport11-ACCEPT",
+    "track-b-technical-review:owner-record-input-corrected-sha256:fc5237bc6806d07fa7db77396f7d1c8a771642dbe5ea05eda7bc2caa2768132e",
+    "review-record-sha256:3d66af4f355e6d8a9e98af72796132b89cd7a20e6036c0eb4111db057d0092aa"
+  ],
+  "reviewId": "school-scene-camera-evidence-owner-20260930",
+  "reviewDecision": "APPROVED_FOR_SLICE",
+  "reviewedDefinitionDigest": "784bafdff6b44977a11865bd51caec135797837ff36a8fc4c721a82c1463fabf",
+  "reviewedDefinitionRevision": 1,
+  "reviewScope": "SCHOOL_SCENE_EXTENSION_V1_3_EVIDENCE_CAMERA_ONLY",
+  "limitations": [
+    "NO_OPERATIONAL_ACTIVATION",
+    "NO_A8_MESH_ADMISSION",
+    "NO_B7_GAMEPLAY_MODE",
+    "NO_CLINICAL_OR_R1_CHANGE",
+    "האישור חל על:\n- חמש זוויות המצלמה המאושרות;\n- 17 פריימי הראיות הנלווים;\n- הוכחת הפרלקסה/שינוי נקודת המבט;\n- התיעוד והראיות הנעוצים הנלווים;\n- בדיקות חוקיות המצלמה הכלולות בחבילת הראיות.\n\nהקוביות / proxy geometry המופיעות בראיות מתקבלות לצורך הוכחת העולם הפיזי והמצלמה בלבד ואינן מתקבלות כייצוג החזותי הסופי של המשחק.",
+    "האישור אינו מהווה:\n\n- אישור R3;\n- אישור Production World;\n- אישור Production Visual;\n- אישור איכות גרפית;\n- אישור להפעיל את החבילה במשחק;\n- אישור לפתיחת דלת או לשינוי התנהגות הדלת;\n- אישור למיגרציית gameplay;\n- אישור של תוכן רפואי;\n- אישור production promotion;\n- או הרחבת סמכות מעבר ל-CAMERA-EVIDENCE שאושר כאן.\n\nהקוביות / proxy geometry המופיעות בראיות מתקבלות לצורך הוכחת העולם הפיזי והמצלמה בלבד ואינן מתקבלות כייצוג החזותי הסופי של המשחק.\n\n67 הקבצים הנעוצים הם חלק מזהות האישור:\nכל שינוי שמבטל את הרשומה לפי מנגנון הנעילה מחייב ראיה/סקירה/החלטת כניסה חדשה בהתאם לחוזה.\n\nאין להסיק מאישור זה אישור אוטומטי לגרסה עתידית של הסצנה.\n\n"
+  ],
+  "supersession": null,
+  "ownerDecisionMessageRef": "whatsapp:wamid.HBgMOTcyNTMyNDkwMzUxFQIAEhgUM0FCQUUxRjIzRTkxRjBGQUExRDYA",
+  "ownerDecisionQuestionRef": "whatsapp:wamid.HBgMOTcyNTMyNDkwMzUxFQIAERgSREYxQTc2RTU5OEMwRTQ2OEFBAA==",
+  "envelopeDigest": "33bedc5a028f151fe903f5612c4163ab541e79cef61541642ace13d9ba9c6899"
+}
