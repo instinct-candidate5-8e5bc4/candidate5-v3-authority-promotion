@@ -1,0 +1,25 @@
+{
+  "defect": "advance returned fired.slice(-0) on empty-due ticks, replaying all fired entries and world effects",
+  "preFixSha256": "b46f94981d84075af406fc6f15c16de81fe3aed240466c8385ff65844ca60b2a",
+  "preFixArchiveRelationship": "Matched the historical PHASE_3_GATE_0 archive by historical stability, not a certified pin",
+  "postFixSha256": "bef528c20645d7e2ba9fa9197033fe015e009191af8215cc66f6a2f31328d7b9",
+  "archivePreservation": "Gate0 archive records remain as-was by design",
+  "change": "Return [] on ticks with no newly-fired entries; retain new-entry ordering and audit history",
+  "unchanged": [
+    "certified definitions",
+    "geometry",
+    "sprites",
+    "index.html"
+  ],
+  "gateClaims": "This fix does not claim to satisfy any phase3/Gate0 gate",
+  "receivingBase": "a1b3a3d8479cb4293a0e1d73d93c7db11f2467d5",
+  "priorAppliedCommits": [
+    "9c42eb9",
+    "a1b3a3d8479cb4293a0e1d73d93c7db11f2467d5"
+  ],
+  "priorLocalCommits": [
+    "b851cc7e362b9a3699239436bd8296deee68ffc4",
+    "7ab5883d7de558394e607b338c701d4e3cad35bf"
+  ],
+  "review": "Track B: SOUND; post-fix SHA and three regressions independently verified; one advance call site"
+}
