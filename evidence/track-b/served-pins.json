@@ -1,7 +1,7 @@
 {
  "pinsVersion": "1.0.0",
  "kind": "TRACK_B_SERVED_PINS",
- "generatedAt": "2026-09-30T04:18:48.771Z",
+ "generatedAt": "2026-09-30T04:18:49.223Z",
  "policy": "Byte-exact pins of every runtime-served demo file. Post-push verification recomputes pins from the deployed bytes and requires an exact match; any drift is a HARD STOP, never a silent pass.",
  "pins": [
   {
@@ -31,8 +31,8 @@
   },
   {
    "path": "visual-slice/scene-bundle.json",
-   "bytes": 31990,
-   "sha256": "8d5ef71ed4ee97392b6e2854d6c6a93ea9a2896dccd7674a44fd10bc32006eb5"
+   "bytes": 31968,
+   "sha256": "6224b2e58a13c936cfa698ae86e793f413cb2f8d97f387bdb2d493440ab6991f"
   }
  ],
  "externalImports": [
