@@ -1,0 +1,12 @@
+{
+  "scope": "REVIEWABLE_GEOMETRY_EVIDENCE_PREPARATION_ONLY",
+  "verdict": "TRACK_B_ACCEPT_NO_FINDINGS_TWO_NONBLOCKING_NOTES",
+  "limitations": [
+    "Authored conservative swept AABB, not measured; analytic containment proof reviewed. Clearance figures are against that conservative AABB.",
+    "Door slab sits 20000 microunits off back wall. Model has no wall opening. Clear means clear of modeled solids only.",
+    "No modeled ceiling or front wall.",
+    "UNIMPLEMENTED: camera occupancy and concurrent-motion proof; passable opening region; dynamic replacement of static closed leaf; SetDoorState port; OPEN commit/replay; consumer.",
+    "World 88b6e019 needs its own evidence-equivalence review and record. No admission inherited from c719e834.",
+    "Owner camera-evidence admission excludes door opening. This evidence cannot authorize opening the door."
+  ]
+}

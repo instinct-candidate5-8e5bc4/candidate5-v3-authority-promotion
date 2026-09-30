@@ -1,0 +1,268 @@
+{
+  "status": "GEOMETRY_EVIDENCE_CLEAR_NOT_OPERATIONALLY_ADMITTED",
+  "reason": "OPEN_PATH_CANDIDATE_ONLY",
+  "genesisDigest": "cc2f27801d48bb1b9a8b813c78a413e50c552d6f11c103843b6acb7afe9bb887",
+  "worldDigest": "88b6e0190469a8ba32e02b83bb36d815c90532b889a9ad4786978b3ac1b90385",
+  "packetDigest": "0a5c07f33acc94731c6fa01e05a46abf1632dc1f2ebe1e8a413feb4886606735",
+  "closedDoorRef": {
+    "surfaceId": "door",
+    "state": "CLOSED",
+    "geometryDigest": "0808698899ba2cb6ab415350ee3cadd1796bf90388996cb59e183cbcb56c1f7d"
+  },
+  "proposedState": "OPEN",
+  "endpointDerivation": "EXACT_90_DEG_XZ_MAP:(dx,dz)->(-dz,dx)",
+  "openLeafBoundsMicrounits": {
+    "minX": 4665000,
+    "maxX": 4785000,
+    "minY": 0,
+    "maxY": 2900000,
+    "minZ": -3840000,
+    "maxZ": -2490000
+  },
+  "sweepContainment": {
+    "status": "ANALYTIC_CONTAINMENT_CONFIRMED",
+    "lowerMicrounits": -60000,
+    "upperContainingMicrounits": 1351333,
+    "radiusSquaredExact": "1826100000000",
+    "method": "NONNEGATIVE_SIN_COS_LOWER_BOUND_AND_CAUCHY_SCHWARZ_UPPER_BOUND",
+    "witnessVerified": "X maximum dx=width,dz=-thickness/2; Z maximum dx=width,dz=+thickness/2"
+  },
+  "checks": [
+    {
+      "id": "back-wall",
+      "sweep": {
+        "clear": true,
+        "axisGapsMicrounits": {
+          "X": 0,
+          "Y": 0,
+          "Z": 20000
+        }
+      },
+      "endpoint": {
+        "clear": true,
+        "axisGapsMicrounits": {
+          "X": 0,
+          "Y": 0,
+          "Z": 80000
+        }
+      }
+    },
+    {
+      "id": "left-wall",
+      "sweep": {
+        "clear": true,
+        "axisGapsMicrounits": {
+          "X": 11585000,
+          "Y": 0,
+          "Z": 0
+        }
+      },
+      "endpoint": {
+        "clear": true,
+        "axisGapsMicrounits": {
+          "X": 11585000,
+          "Y": 0,
+          "Z": 0
+        }
+      }
+    },
+    {
+      "id": "right-wall",
+      "sweep": {
+        "clear": true,
+        "axisGapsMicrounits": {
+          "X": 843667,
+          "Y": 0,
+          "Z": 0
+        }
+      },
+      "endpoint": {
+        "clear": true,
+        "axisGapsMicrounits": {
+          "X": 2135000,
+          "Y": 0,
+          "Z": 0
+        }
+      }
+    },
+    {
+      "id": "locker-0",
+      "sweep": {
+        "clear": true,
+        "axisGapsMicrounits": {
+          "X": 8165000,
+          "Y": 0,
+          "Z": 0
+        }
+      },
+      "endpoint": {
+        "clear": true,
+        "axisGapsMicrounits": {
+          "X": 8165000,
+          "Y": 0,
+          "Z": 0
+        }
+      }
+    },
+    {
+      "id": "locker-1",
+      "sweep": {
+        "clear": true,
+        "axisGapsMicrounits": {
+          "X": 6165000,
+          "Y": 0,
+          "Z": 0
+        }
+      },
+      "endpoint": {
+        "clear": true,
+        "axisGapsMicrounits": {
+          "X": 6165000,
+          "Y": 0,
+          "Z": 0
+        }
+      }
+    },
+    {
+      "id": "locker-2",
+      "sweep": {
+        "clear": true,
+        "axisGapsMicrounits": {
+          "X": 4165000,
+          "Y": 0,
+          "Z": 0
+        }
+      },
+      "endpoint": {
+        "clear": true,
+        "axisGapsMicrounits": {
+          "X": 4165000,
+          "Y": 0,
+          "Z": 0
+        }
+      }
+    },
+    {
+      "id": "locker-3",
+      "sweep": {
+        "clear": true,
+        "axisGapsMicrounits": {
+          "X": 2165000,
+          "Y": 0,
+          "Z": 0
+        }
+      },
+      "endpoint": {
+        "clear": true,
+        "axisGapsMicrounits": {
+          "X": 2165000,
+          "Y": 0,
+          "Z": 0
+        }
+      }
+    },
+    {
+      "id": "locker-4",
+      "sweep": {
+        "clear": true,
+        "axisGapsMicrounits": {
+          "X": 165000,
+          "Y": 0,
+          "Z": 0
+        }
+      },
+      "endpoint": {
+        "clear": true,
+        "axisGapsMicrounits": {
+          "X": 165000,
+          "Y": 0,
+          "Z": 0
+        }
+      }
+    },
+    {
+      "id": "school-casualty-adult-v1",
+      "sweep": {
+        "clear": true,
+        "axisGapsMicrounits": {
+          "X": 4335000,
+          "Y": 0,
+          "Z": 2309667
+        }
+      },
+      "endpoint": {
+        "clear": true,
+        "axisGapsMicrounits": {
+          "X": 4335000,
+          "Y": 0,
+          "Z": 2311000
+        }
+      }
+    },
+    {
+      "id": "school-medical-bag",
+      "sweep": {
+        "clear": true,
+        "axisGapsMicrounits": {
+          "X": 7390000,
+          "Y": 0,
+          "Z": 3313667
+        }
+      },
+      "endpoint": {
+        "clear": true,
+        "axisGapsMicrounits": {
+          "X": 7390000,
+          "Y": 0,
+          "Z": 3315000
+        }
+      }
+    },
+    {
+      "id": "school-treatment-chair",
+      "sweep": {
+        "clear": true,
+        "axisGapsMicrounits": {
+          "X": 6415000,
+          "Y": 0,
+          "Z": 3238667
+        }
+      },
+      "endpoint": {
+        "clear": true,
+        "axisGapsMicrounits": {
+          "X": 6415000,
+          "Y": 0,
+          "Z": 3240000
+        }
+      }
+    },
+    {
+      "id": "synthetic-training-unit-v1",
+      "sweep": {
+        "clear": true,
+        "axisGapsMicrounits": {
+          "X": 7565000,
+          "Y": 0,
+          "Z": 3448667
+        }
+      },
+      "endpoint": {
+        "clear": true,
+        "axisGapsMicrounits": {
+          "X": 7565000,
+          "Y": 0,
+          "Z": 3450000
+        }
+      }
+    }
+  ],
+  "limitations": [
+    "NEW_WORLD_88B6E019_NOT_ADMITTED_NO_INHERITANCE",
+    "NO_CAMERA_OCCUPANCY_OR_CONCURRENT_MOTION_PROOF",
+    "NO_DECLARED_PASSABLE_OPENING_NAVIGATION_REGION",
+    "STATIC_MODEL_CLOSED_LEAF_NOT_REPLACED",
+    "NO_SET_DOOR_STATE_PORT_COMMIT_REPLAY_OR_CONSUMER",
+    "DOOR_OR_OPENING_NEVER_SUPPORT"
+  ]
+}
