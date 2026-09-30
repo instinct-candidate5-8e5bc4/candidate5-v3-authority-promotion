@@ -1,10 +1,10 @@
 {
  "mapVersion": "1.0.0",
  "kind": "TRACK_B_ENTITY_BODY_MAP",
- "generatedAt": "2026-09-30T04:18:49.706Z",
+ "generatedAt": "2026-09-30T04:18:50.105Z",
  "git": {
   "branch": "rebase-t7",
-  "commit": "c1bd83af9463bc82ff092f4428928150884542a0"
+  "commit": "3cbba610a134ed83ffbbaafc16ba8ee4d80520da"
  },
  "policy": "Every visual entity resolves through this table ONLY. Unknown or unmapped entity = NO VISUAL ACTION (fail-closed). No default mapping, no substitution, no inference from names or meshes.",
  "anchors": {
