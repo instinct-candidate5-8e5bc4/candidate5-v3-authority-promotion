@@ -40,7 +40,10 @@ const manifest={manifestVersion:'1.0.0',kind:'TRACK_B_PACKAGE_ASSET_MANIFEST',
 fs.writeFileSync(path.join(PKG,'asset-manifest.json'),JSON.stringify(manifest,null,1));
 // 3. Build stamp.
 const pkgApi=(fs.readFileSync(path.join(PKG,'renderer-package.mjs'),'utf8').match(/PACKAGE_API_VERSION='([^']+)'/)||[])[1]||'UNKNOWN';
+const unitDefRel='src/clean-runtime/school/definitions/synthetic-training-unit-v1.js';
+const unitDefSha=(()=>{try{return crypto.createHash('sha256').update(execSync('git show HEAD:'+unitDefRel,{cwd:ROOT,stdio:['pipe','pipe','ignore']})).digest('hex')}catch{return sha(path.join(ROOT,unitDefRel))}})();
 const build={kind:'TRACK_B_PACKAGE_BUILD',apiVersion:pkgApi,commit:git('rev-parse HEAD'),branch:git('rev-parse --abbrev-ref HEAD'),
- builtAt:new Date().toISOString(),moduleSha256:shaRel('package/renderer-package.mjs'),manifestSha256:shaRel('package/asset-manifest.json')};
+ builtAt:new Date().toISOString(),moduleSha256:shaRel('package/renderer-package.mjs'),manifestSha256:shaRel('package/asset-manifest.json'),
+ committedWorldPins:{unitDefinitionSha256:unitDefSha,note:'Runtime recompute anchor for the presentation-guard: a manifest pin that does not match these definition bytes is refused (executor review R3-1).'}};
 fs.writeFileSync(path.join(PKG,'package-build.json'),JSON.stringify(build,null,1));
 console.log('READY package artifacts:',build.commit.slice(0,8),'assets:',assets.length);

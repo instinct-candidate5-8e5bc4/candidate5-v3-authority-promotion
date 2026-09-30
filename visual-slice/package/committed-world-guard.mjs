@@ -42,7 +42,8 @@ export function validateCommittedWorldProjection(projection,{bindingTable,map,bo
   const entry=resolveEntity(map,entityId);
   if(!entry)return{ok:false,reason:'publicRef binds to unmapped entity '+entityId+' - no visual action'};
   if(!APPLY_ALLOWLIST.includes(entityId))return{ok:false,reason:'entity '+entityId+' not on the committed-world apply allowlist ('+APPLY_ALLOWLIST.join(',')+') - allowlist extends only by reviewed increments'};
-  if(Array.isArray(boundEntities)&&!boundEntities.includes(entityId))return{ok:false,reason:'entity '+entityId+' not covered by the pinned presentation-manifest binding - unpin = no visual action'};
+  if(!Array.isArray(boundEntities))return{ok:false,reason:'pinned manifest binding coverage unavailable (manifest failed or unpinned) - no visual action'};
+  if(!boundEntities.includes(entityId))return{ok:false,reason:'entity '+entityId+' not covered by the pinned presentation-manifest binding - unpin = no visual action'};
   if(pe.authoritativeTransformMicrounits!=null){
    if(typeof pe.authoritativeTransformMicrounits!=='object'||Array.isArray(pe.authoritativeTransformMicrounits))return{ok:false,reason:'authoritativeTransformMicrounits is not an object'};
    const tk=unknownKeys(pe.authoritativeTransformMicrounits,TRANSFORM_KEYS);

@@ -59,3 +59,29 @@ increments.
 `applied:true` means every action in the projection was applied; anything
 less is `applied:false` with a reason. Renderer status() surfaces the last
 applied `committedWorld` digest/transaction for evidence.
+
+## Runtime pin verification (executor review R3-1)
+
+Format alone is never acceptance. At mount the renderer recomputes the pin
+anchors and the presentation-guard refuses the manifest on ANY mismatch:
+
+- `pinned.unitDefinitionSha256` must equal the runtime recompute anchor
+  `package-build.json.committedWorldPins.unitDefinitionSha256`, hashed by the
+  package builder from the committed `synthetic-training-unit-v1.js`
+  definition bytes. A tampered or stale manifest refuses.
+- `pinned.bindingDigest` is recomputed at runtime from the pin record fields
+  and must match; `manifestDigest` is recomputed over the manifest and must
+  match. Missing runtime sha256 refuses (never format-only).
+- If the manifest fails validation, its binding coverage is unavailable and
+  the committed-world guard rejects the projection outright - a failed
+  manifest can never bypass pin coverage (`boundEntities` must be a real
+  list; null/omitted rejects).
+
+## Committed use-state presentation (executor review R3-1)
+
+`AVAILABLE` green / `RESERVED` orange + edge marker / `CONSUMED` hides the
+whole group (no visual presence; the overlay reports the state). The label
+reads PHYSICS R1-ADMITTED - INTERIM BOX ONLY: the unit's physical records
+are owner-admitted (R1) while the visual stays an honest interim debug box,
+not the final asset - committed-state rendering is never final-asset
+acceptance.

@@ -57,13 +57,42 @@ test('manifest 0.2.0 pin matches the committed synthetic-unit definition bytes (
  assert.equal(e.assetRef.pinned.bindingDigest,bd,'binding digest drift');
  const md=crypto.createHash('sha256').update(JSON.stringify({...manifest,manifestDigest:undefined})).digest('hex');
  assert.equal(manifest.manifestDigest,md,'manifest digest drift');});
+const rtPins=()=>{const bytes=fs.readFileSync(path.join(ROOT,'src','clean-runtime','school','definitions','synthetic-training-unit-v1.js'));
+ return{expectedUnitDefinitionSha256:crypto.createHash('sha256').update(bytes).digest('hex'),
+  sha256hex:s=>crypto.createHash('sha256').update(s).digest('hex')}};
 test('presentation guard still validates the 0.2.0 manifest against the real map',async()=>{
  const pg=await import(path.join(VS,'package','presentation-guard.mjs'));
  const{manifest,map}=await load();
  const bundle=JSON.parse(fs.readFileSync(path.join(VS,'scene-bundle.json'),'utf8'));
- const r=pg.validatePresentationManifest(manifest,{map,worldDigest:bundle.inputs.worldStateDigest});
+ const r=pg.validatePresentationManifest(manifest,{map,worldDigest:bundle.inputs.worldStateDigest,...rtPins()});
  assert.equal(r.ok,true,r.reason);
  const noPin=structuredClone(manifest);
  delete noPin.entities.find(x=>x.physicalEntityId==='synthetic-training-unit-v1').assetRef.pinned;
- const r2=pg.validatePresentationManifest(noPin,{map,worldDigest:bundle.inputs.worldStateDigest});
+ const r2=pg.validatePresentationManifest(noPin,{map,worldDigest:bundle.inputs.worldStateDigest,...rtPins()});
  assert.equal(r2.ok,false);assert.match(r2.reason,/pinned/);});
+test('executor review R3-1: runtime recompute refuses format-only, tampered or stale pins',async()=>{
+ const pg=await import(path.join(VS,'package','presentation-guard.mjs'));
+ const{manifest,map}=await load();
+ const bundle=JSON.parse(fs.readFileSync(path.join(VS,'scene-bundle.json'),'utf8'));
+ const V=(x,o={})=>pg.validatePresentationManifest(x,{map,worldDigest:bundle.inputs.worldStateDigest,...rtPins(),...o});
+ // no runtime recompute supplied -> refuse (format-only acceptance is the reviewed gap)
+ const r0=V(manifest,{expectedUnitDefinitionSha256:undefined,sha256hex:undefined});
+ assert.equal(r0.ok,false);assert.match(r0.reason,/recompute/);
+ // wrong expected bytes -> refuse
+ const r1=V(manifest,{expectedUnitDefinitionSha256:'b'.repeat(64)});
+ assert.equal(r1.ok,false);assert.match(r1.reason,/recompute/);
+ // tampered bindingDigest -> refuse
+ const t1=structuredClone(manifest);t1.entities.find(x=>x.physicalEntityId==='synthetic-training-unit-v1').assetRef.pinned.bindingDigest='c'.repeat(64);
+ const r2=V(t1);assert.equal(r2.ok,false);assert.match(r2.reason,/bindingDigest/);
+ // tampered manifestDigest -> refuse
+ const t2=structuredClone(manifest);t2.manifestDigest='d'.repeat(64);
+ const r3=V(t2);assert.equal(r3.ok,false);assert.match(r3.reason,/manifestDigest/);
+ // package-build anchor matches the committed definition bytes (drift check)
+ const pb=JSON.parse(fs.readFileSync(path.join(VS,'package','package-build.json'),'utf8'));
+ assert.equal(pb.committedWorldPins.unitDefinitionSha256,rtPins().expectedUnitDefinitionSha256,'package-build anchor drift - rebuild the package');});
+test('executor review R3-1: committed-world guard refuses when pin coverage is unavailable',async()=>{
+ const{g,map}=await load();
+ const r=g.validateCommittedWorldProjection(fixture(),{bindingTable:BT,map,boundEntities:null});
+ assert.equal(r.ok,false);assert.match(r.reason,/coverage unavailable/);
+ const r2=g.validateCommittedWorldProjection(fixture(),{bindingTable:BT,map});
+ assert.equal(r2.ok,false);assert.match(r2.reason,/coverage unavailable/);});

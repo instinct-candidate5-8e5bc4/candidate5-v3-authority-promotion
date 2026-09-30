@@ -98,7 +98,7 @@ export async function mount(container,opts={}){
   // PW-2: production room skin when the presentation manifest validates against
   // the committed world digest; otherwise the certified debug boxes render with a
   // LOUD placeholder line (never a silent fallback).
-  const pmCheck=presentationManifest?validatePresentationManifest(presentationManifest,{map,worldDigest:bundle.inputs.worldStateDigest}):{ok:false,reason:'presentation-manifest.json unavailable'};
+  const pmCheck=presentationManifest?validatePresentationManifest(presentationManifest,{map,worldDigest:bundle.inputs.worldStateDigest,expectedUnitDefinitionSha256:build.committedWorldPins&&build.committedWorldPins.unitDefinitionSha256,sha256hex:s=>sha256.hex(s)}):{ok:false,reason:'presentation-manifest.json unavailable'};
   if(pmCheck.ok){scene.add(buildProceduralRoom(THREE,bundle.room))}
   else{for(const s of bundle.room)scene.add(box(s.geometryMicrounits,s.visualOnlyClaims.colorHex))}
   const layout=buildArticulatedLayout(liveCasualty,liveEquipment);
@@ -136,7 +136,7 @@ export async function mount(container,opts={}){
    const ctx=c.getContext('2d');ctx.fillStyle='#0a3018';ctx.fillRect(0,0,640,80);
    ctx.fillStyle='#7dffb0';ctx.font='bold 30px system-ui';ctx.textAlign='center';
    ctx.fillText('SYNTHETIC TRAINING UNIT',320,34);
-   ctx.font='24px system-ui';ctx.fillText('UNCERTIFIED - B-W11 interim',320,66);
+   ctx.font='24px system-ui';ctx.fillText('PHYSICS R1-ADMITTED - INTERIM BOX ONLY',320,66);
    const label=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),depthTest:true}));
    label.name='uncertified-label';label.scale.set(.6,.075,1);label.position.set(0,sy/2+.08,0);grp.add(label);
    // Anchor: committed bag position + proposed R1 v3 bag-local offset [0,235000,0].
@@ -146,7 +146,7 @@ export async function mount(container,opts={}){
    scene.add(grp);
    const synOverlay=document.createElement('div');
    synOverlay.style.cssText='position:absolute;left:10px;top:96px;background:rgba(10,48,24,.92);color:#7dffb0;padding:5px 10px;font:12px/1.5 system-ui;border:1px solid #2d7a4d;max-width:340px;white-space:pre-line';
-   synOverlay.textContent='SYNTHETIC TRAINING UNIT\nUNCERTIFIED - B-W11 interim presentation bridge (Gate A in flight)';
+   synOverlay.textContent='SYNTHETIC TRAINING UNIT\nPHYSICAL RECORDS ADMITTED (R1) - interim debug box, NOT the final visual asset';
    container.appendChild(synOverlay);
    syn={group:grp,mesh:unitMesh,marker,label,overlay:synOverlay,useState:'AVAILABLE'};
   }
@@ -241,8 +241,12 @@ export function renderPhysicalProjection(projection){
    applied.push('committedTransform:'+a.entityId)}
   else if(a.type==='useState'&&a.entityId==='synthetic-training-unit-v1'&&syn){
    syn.useState=a.code;
-   syn.mesh.material.color.setHex(a.code==='AVAILABLE'?0x22cc55:a.code==='RESERVED'?0xcc7722:0x333333);
-   syn.marker.visible=a.code!=='AVAILABLE';
+   if(a.code==='CONSUMED'){syn.group.visible=false;
+    syn.overlay.textContent='SYNTHETIC TRAINING UNIT\nCONSUMED - hidden by committed world state: no visual presence';}
+   else{syn.group.visible=true;
+    syn.mesh.material.color.setHex(a.code==='AVAILABLE'?0x22cc55:0xcc7722);
+    syn.marker.visible=a.code==='RESERVED';
+    syn.overlay.textContent='SYNTHETIC TRAINING UNIT\n'+a.code+' - committed world state; interim debug box, NOT the final visual asset';}
    applied.push('useState:'+a.entityId)}}
  inst.committedWorld={worldDigest:v.worldDigest,transactionId:v.transactionId,appliedEntities:applied.slice()};
  return{applied:true,worldDigest:v.worldDigest,transactionId:v.transactionId,actions:applied}}
