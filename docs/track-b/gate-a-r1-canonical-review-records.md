@@ -20,7 +20,7 @@ and the unit-1 cross-domain binding (R2).
 Registry admission (added after signoff, executor requirement 2026-09-30):
 the six records are ADMITTED through the runtime's own envelope lifecycle and
 A.admit with review pins to the owner's original reply and question
-(wamid...JVEAA== / wamid...021A) and the approved digests; the v2.1.0 scene
+(wamid...NUYwMjEA reply / wamid...RjVEAA== question) and the approved digests; the v2.1.0 scene
 carries a dedicated REVIEWED_SCENE_ADMISSION record. Scope unchanged - the
 exclusions above still hold.
 
