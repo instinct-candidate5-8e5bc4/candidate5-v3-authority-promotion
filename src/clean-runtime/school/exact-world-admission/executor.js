@@ -1,0 +1,33 @@
+'use strict';
+// Separate exact-world lifecycle proposal. Strings do not authenticate an owner or reviewer.
+// Independent channel/review checks are mandatory before calling execute. No module-load activation.
+const A=require('../../authoring'),{digest,deepFreeze}=require('../../contracts/canonical');
+const C=require('../exact-world-record-preparation/candidate');
+const P=require('../scene-extension-admission/pins');
+const crypto=require('node:crypto'),path=require('node:path');
+const SCOPE='EXACT_WORLD_88B6E019_CAMERA_EVIDENCE_ONLY';
+const OWNER_REF='whatsapp:wamid.HBgMOTcyNTMyNDkwMzUxFQIAEhgUM0FBOUNDRkQ2QzU2REJFREFFMTkA';
+const QUESTION_REF='whatsapp:wamid.HBgMOTcyNTMyNDkwMzUxFQIAERgSMzkwMEE2QUYzMDgxMENBQzg1AA==';
+const files=['src/clean-runtime/school/exact-world-admission/executor.js','src/clean-runtime/school/exact-world-record-preparation/candidate.js','src/clean-runtime/school/world-evidence-equivalence/candidate.js','src/clean-runtime/school/scene-extension-replay/candidate.js'];
+function sourcePins(){return [...P.sourcePins(),...files.map(p=>({path:p,sha256:P.sha(path.join(P.ROOT,p))}))].sort((a,b)=>a.path.localeCompare(b.path))}
+function definition(packet){const proposedRecord=C.prepareExactWorldRecord({packet}),d={extensionId:'school-world-88b6e019-camera-evidence',extensionRevision:1,effectScope:'EVIDENCE_ONLY_CAMERA_COVERAGE',proposedRecord,sourcePins:sourcePins(),limitations:proposedRecord.limitations};d.canonicalDigest=A.digest(d);return deepFreeze(d)}
+function ownerValid(o){return o&&digest(o)==='8979a844b71a036f80b25ca12d4e033280a5062f30b33df1e8fc8ee474d3b837'&&'whatsapp:'+o.messageId===OWNER_REF&&'whatsapp:'+o.questionMessageRef===QUESTION_REF&&o.effectScope==='EVIDENCE_ONLY_CAMERA_COVERAGE'&&crypto.createHash('sha256').update(o.originalMessage).digest('hex')===OWNER_BODY_SHA&&o.ownerMessageBodySha256===OWNER_BODY_SHA&&o.originalMessage.includes(o.verbatimExclusions)&&o.originalMessage.includes(o.verbatimSemanticSupport)&&o.originalMessage.includes(o.verbatimApprovedScope)&&!!o.verbatimExclusions&&!!o.verbatimSemanticSupport&&!!o.verbatimApprovedScope}
+function inspect({packet,genesis,committedWorld,events,definition:d,envelope,ownerDecision:o,reviewRecord:r,...extra}={}){
+ const fail=reason=>deepFreeze({status:'UNKNOWN',reason,operationalStatus:'UNKNOWN'});
+ try{
+  if(Object.keys(extra).length)return fail('CALLER_VERIFIER_OR_EXTRA_INPUT_FORBIDDEN');
+  if(!ownerValid(o))return fail('EXACT_OWNER_MESSAGE_REQUIRED');
+  if(d.effectScope!=='EVIDENCE_ONLY_CAMERA_COVERAGE'||digest(d)!==digest(definition(packet)))return fail('EXACT_DEFINITION_OR_SOURCE_PINS_REQUIRED');
+  const prepared=C.inspectExactWorldRecordPreparation({packet,genesis,committedWorld,events,proposedRecord:d.proposedRecord});
+  if(prepared.status!=='EXACT_WORLD_RECORD_MECHANICS_PREPARED_OWNER_AND_REVIEW_PENDING_NOT_ADMITTED')return fail(prepared.reason);
+  const v=A.validateEnvelope(envelope,{expectedRef:A.refFor('SCENE_EXTENSION',d),requiredScope:SCOPE});
+  if(v.status!=='VALIDATED'||envelope.lifecycleState!=='VERIFIED_FOR_SLICE')return fail('VERIFIED_ENVELOPE_REQUIRED');
+  if(!r||r.reviewDecision!=='APPROVED_FOR_SLICE'||r.ownerDecision!=='ADMIT'||r.scope!==SCOPE||r.effectScope!==d.effectScope||r.definitionDigest!==d.canonicalDigest||r.worldDigest!==d.proposedRecord.worldDigest||r.genesisDigest!==d.proposedRecord.genesisDigest||r.packetDigest!==d.proposedRecord.packetDigest||r.eventLogDigest!==d.proposedRecord.eventLogDigest||r.comparisonDigest!==d.proposedRecord.comparisonDigest||r.ownerDecisionObjectDigest!==digest(o)||r.ownerMessageBodySha256!==OWNER_BODY_SHA||r.ownerMessageRef!==OWNER_REF||r.ownerQuestionRef!==QUESTION_REF||r.verbatimExclusions!==o.verbatimExclusions||r.verbatimSemanticSupport!==o.verbatimSemanticSupport||r.verbatimApprovedScope!==o.verbatimApprovedScope||r.reviewRecordDigest!==digest({...r,reviewRecordDigest:undefined})||!r.reviewId||!Array.isArray(r.reviewEvidenceRefs)||!r.reviewEvidenceRefs.length||!r.reviewEvidenceRefs.includes(OWNER_REF)||!r.reviewEvidenceRefs.includes(QUESTION_REF))return fail('EXACT_INDEPENDENT_REVIEW_REQUIRED');
+  if(envelope.reviewId!==r.reviewId||!r.reviewEvidenceRefs.every(ref=>envelope.reviewEvidenceRefs.includes(ref))||envelope.ownerDecisionMessageRef!==OWNER_REF||envelope.ownerDecisionQuestionRef!==QUESTION_REF||!envelope.reviewEvidenceRefs.includes('review-record-sha256:'+r.reviewRecordDigest)||![o.verbatimExclusions,o.verbatimSemanticSupport,o.verbatimApprovedScope].every(t=>envelope.limitations.includes(t)))return fail('ENVELOPE_OWNER_REVIEW_BINDING_REQUIRED');
+  return deepFreeze({status:'PREPARED_NOT_ADMITTED',effectScope:d.effectScope,worldDigest:d.proposedRecord.worldDigest,genesisDigest:d.proposedRecord.genesisDigest,operationalStatus:'UNKNOWN',captureRemainsBoundToOriginalWorld:true});
+ }catch{return fail('EXACT_WORLD_ADMISSION_INPUT_INVALID')}
+}
+function createRegistry(){const history=[];return Object.freeze({inspect(input){if(history.length&&history[history.length-1].decision!=='ADMITTED')return deepFreeze({status:'UNKNOWN',reason:'RECORD_INERT_OR_REVOKED',operationalStatus:'UNKNOWN'});if(history.length&&history[0].definitionDigest!==input.definition.canonicalDigest)return deepFreeze({status:'UNKNOWN',reason:'IMMUTABLE_REVISION_CONFLICT',operationalStatus:'UNKNOWN'});return inspect(input)},execute(input){const ready=this.inspect(input);if(ready.status!=='PREPARED_NOT_ADMITTED')return ready;if(history.length)return history[0];const entry=deepFreeze({key:input.definition.extensionId+'@1',decision:'ADMITTED',effectScope:'EVIDENCE_ONLY_CAMERA_COVERAGE',definitionDigest:input.definition.canonicalDigest,worldDigest:ready.worldDigest,genesisDigest:ready.genesisDigest,admission:{status:'ADMITTED',definition:input.definition,envelope:input.envelope,ownerDecision:input.ownerDecision,reviewRecord:input.reviewRecord},operationalStatus:'UNKNOWN',captureRemainsBoundToOriginalWorld:true});history.push(entry);return entry},recordInert({decision,ownerMessageRef,ownerQuestionRef}){if(!['REJECTED','DEFERRED','REVOKED','SUPERSEDED'].includes(decision)||!ownerMessageRef||!ownerQuestionRef)throw Error('INERT_DECISION_INVALID');history.push(deepFreeze({decision,ownerMessageRef,ownerQuestionRef,priorDecisionIndex:history.length?history.length-1:null}));return this.snapshot()},snapshot(){return deepFreeze([...history])}})}
+// Fixed original-channel body binding recovered independently before preparing this proposal.
+const OWNER_BODY_SHA='a18bb937a35118e690102b6ccaab929d4e994af34218eb79f992bf27b1fb6ba8';
+module.exports={SCOPE,sourcePins,definition,inspect,createRegistry};

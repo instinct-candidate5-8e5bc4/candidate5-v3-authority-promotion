@@ -1,0 +1,13 @@
+{
+  "channel": "WhatsApp",
+  "messageId": "wamid.HBgMOTcyNTMyNDkwMzUxFQIAEhgUM0FBOUNDRkQ2QzU2REJFREFFMTkA",
+  "receivedAt": "2026-10-01T00:18:36+03:00",
+  "questionMessageRef": "wamid.HBgMOTcyNTMyNDkwMzUxFQIAERgSMzkwMEE2QUYzMDgxMENBQzg1AA==",
+  "contextMessageRef": "wamid.HBgMOTcyNTMyNDkwMzUxFQIAERgSMENENzZCMEVCMkEwRkEyNEY5AA==",
+  "originalMessage": "מאשר.\n\nAPPROVED — World 88b6e019 Admission\nScope: CAMERA-EVIDENCE ONLY.\n\nהאישור הוא רישום כניסה נפרד לזהות ההיסטורית החדשה 88b6e019.\n\nראיות העולם המקורי והלכידות ביניהם מתקבלות כתמיכה בשקילות הסמנטית בלבד; הן אינן מעבירות או מרחיבות אוטומטית סמכות בין זהויות היסטוריות.\n\nכל ההחרגות מהאישור הקודם נשארות במלואן:\n\n- לא אישור R3.\n- לא אישור להפעלה במשחק.\n- לא אישור לדלת או לפתיחתה.\n- לא אישור Production World / Production Visual.\n- לא אישור תוכן רפואי.\n- לא Production Promotion.\n- לא הרחבת סמכות.\n- לא אישור אוטומטי לגרסה/זהות עתידית אחרת.\n\nהאישור חל על CAMERA-EVIDENCE ONLY של העולם 88b6e019.\n\nרשום את ההחלטה והמשך מיד בנתיב R3 בתוך ה-integrated shell.\nאין צורך לעצור לאחר הרישום.\n\nAPPROVED.",
+  "ownerMessageBodySha256": "a18bb937a35118e690102b6ccaab929d4e994af34218eb79f992bf27b1fb6ba8",
+  "effectScope": "EVIDENCE_ONLY_CAMERA_COVERAGE",
+  "verbatimExclusions": "כל ההחרגות מהאישור הקודם נשארות במלואן:\n\n- לא אישור R3.\n- לא אישור להפעלה במשחק.\n- לא אישור לדלת או לפתיחתה.\n- לא אישור Production World / Production Visual.\n- לא אישור תוכן רפואי.\n- לא Production Promotion.\n- לא הרחבת סמכות.\n- לא אישור אוטומטי לגרסה/זהות עתידית אחרת.\n\n",
+  "verbatimSemanticSupport": "ראיות העולם המקורי והלכידות ביניהם מתקבלות כתמיכה בשקילות הסמנטית בלבד; הן אינן מעבירות או מרחיבות אוטומטית סמכות בין זהויות היסטוריות.",
+  "verbatimApprovedScope": "האישור חל על CAMERA-EVIDENCE ONLY של העולם 88b6e019."
+}

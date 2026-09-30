@@ -1,0 +1,31 @@
+{
+  "envelopeSchemaVersion": "1.0.0",
+  "envelopeId": "exact-world-88b6e019:camera:r1",
+  "definitionRef": {
+    "definitionType": "SCENE_EXTENSION",
+    "definitionId": "school-world-88b6e019-camera-evidence",
+    "revision": 1,
+    "definitionDigest": "15dbeb94e317c32f4dd63dd595c465bcc744254c24c389c85b7a0ef8a8756e58"
+  },
+  "lifecycleState": "AUTHORED_NEW_DRAFT",
+  "validationEvidenceRefs": [],
+  "reviewEvidenceRefs": [],
+  "reviewId": null,
+  "reviewDecision": null,
+  "reviewedDefinitionDigest": null,
+  "reviewedDefinitionRevision": null,
+  "reviewScope": null,
+  "limitations": [
+    "NO_EXECUTE_OR_ADMIT_OR_REGISTRY_WRITE",
+    "ORIGINAL_OWNER_APPROVAL_DOES_NOT_AUTHORIZE_NEW_WORLD",
+    "SEPARATE_AUTHENTICATED_OWNER_DECISION_AND_EXACT_REVIEW_REQUIRED",
+    "NO_CONSUMPTION_OF_88B6E019",
+    "NO_R3_GAMEPLAY_DOOR_CLINICAL_PRODUCTION_OR_AUTHORITY_EXPANSION",
+    "A8_REALISTIC_MESH_AND_B7_GAMEPLAY_MODES_OWNER_RESERVED",
+    "כל ההחרגות מהאישור הקודם נשארות במלואן:\n\n- לא אישור R3.\n- לא אישור להפעלה במשחק.\n- לא אישור לדלת או לפתיחתה.\n- לא אישור Production World / Production Visual.\n- לא אישור תוכן רפואי.\n- לא Production Promotion.\n- לא הרחבת סמכות.\n- לא אישור אוטומטי לגרסה/זהות עתידית אחרת.\n\n",
+    "ראיות העולם המקורי והלכידות ביניהם מתקבלות כתמיכה בשקילות הסמנטית בלבד; הן אינן מעבירות או מרחיבות אוטומטית סמכות בין זהויות היסטוריות.",
+    "האישור חל על CAMERA-EVIDENCE ONLY של העולם 88b6e019."
+  ],
+  "supersession": null,
+  "envelopeDigest": "202767c7f03a214ce361d190d8fcc3fce90089efe4d4efa1dfed64390e909f9f"
+}
