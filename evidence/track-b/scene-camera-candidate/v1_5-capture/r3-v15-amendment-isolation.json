@@ -1,0 +1,8 @@
+{
+  "onlyChanges": [
+    "sweepSpec",
+    "extension.sweepSpecRef",
+    "amendments"
+  ],
+  "allOtherPacketRecordsByteEquivalentCanonical": true
+}

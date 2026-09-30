@@ -1,0 +1,762 @@
+{
+  "classification": "SOURCE_BOUND_BOUNDS_MESH_RASTER_ALIGNMENT_ONLY",
+  "worldDigest": "c719e83456b3486f56e08588c60e8ec89186652d39c579ad71b7c78131b46513",
+  "packetDigest": "0a5c07f33acc94731c6fa01e05a46abf1632dc1f2ebe1e8a413feb4886606735",
+  "canvasRect": {
+    "x": 0,
+    "y": 97,
+    "width": 1200,
+    "height": 700
+  },
+  "boundaryMarginPixels": 2,
+  "all17PatientChairBagVisibleAndFramed": true,
+  "all17VisiblePixelsAligned": true,
+  "entityTransformsInvariant": true,
+  "rootsMatchAuthoritativeTransforms": true,
+  "meshWorldBoundsMatchPhysicalBodies": true,
+  "parallaxMeasured": true,
+  "negativeReplayDeterministic": true,
+  "negativeNoRender": true,
+  "externalRequests": [],
+  "errors": [],
+  "rows": [
+    {
+      "name": "FRONT",
+      "beautySha256": "ebc8fea1cb0c7e8bfaacf08dde834ada9629d5bf55974befeacc5e7d53e0bd87",
+      "idSha256": "a1ea5b6d692285c409e2e6b7d2bba5daec258fa5f98d5f931585a29e84a6f6a2",
+      "entities": [
+        {
+          "entityId": "school-casualty-adult-v1",
+          "visiblePixelCount": 20170,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            745.1511314163812,
+            326.8752901522542,
+            955.0103014427534,
+            472.07280730564446
+          ],
+          "fullyFramed": true
+        },
+        {
+          "entityId": "school-medical-bag",
+          "visiblePixelCount": 7163,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            303.24064263524053,
+            357.36751644875386,
+            415.1059180197413,
+            428.5022116437767
+          ],
+          "fullyFramed": true
+        },
+        {
+          "entityId": "school-treatment-chair",
+          "visiblePixelCount": 14375,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            467.21059762350666,
+            271.1728428319116,
+            562.8673653944081,
+            433.3442717102751
+          ],
+          "fullyFramed": true
+        }
+      ]
+    },
+    {
+      "name": "FRONT-LEFT-0.25",
+      "beautySha256": "a30a277d09af31f78c7eca754d0ae4857b0ccc7f4c83cbfd447e10ce96376bd2",
+      "idSha256": "f770f798729279ab07c56f086748dbf6c8e38971ac38b50f4bf1baf190cb924f",
+      "entities": [
+        {
+          "entityId": "school-casualty-adult-v1",
+          "visiblePixelCount": 17433,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            693.4066431201692,
+            314.41012160534626,
+            929.8147870246908,
+            443.41488560232426
+          ],
+          "fullyFramed": true
+        },
+        {
+          "entityId": "school-medical-bag",
+          "visiblePixelCount": 8243,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            289.5070750441265,
+            373.82233173615987,
+            401.99290297272404,
+            462.22127661696896
+          ],
+          "fullyFramed": true
+        },
+        {
+          "entityId": "school-treatment-chair",
+          "visiblePixelCount": 15481,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            470.5244178670339,
+            273.90186803208513,
+            571.5111096208285,
+            446.1523053201134
+          ],
+          "fullyFramed": true
+        }
+      ]
+    },
+    {
+      "name": "FRONT-LEFT-0.5",
+      "beautySha256": "9a98e632b558fe14888c80a500acf032d19bce0747afc67fc0d7b73fd00f5ee1",
+      "idSha256": "3b6bda43ed38dffc1625da326ca9791df292073749bd0352b1fda181285601b8",
+      "entities": [
+        {
+          "entityId": "school-casualty-adult-v1",
+          "visiblePixelCount": 13373,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            643.0426388848697,
+            313.14682431688067,
+            873.140522763857,
+            415.9338580643281
+          ],
+          "fullyFramed": true
+        },
+        {
+          "entityId": "school-medical-bag",
+          "visiblePixelCount": 8538,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            315.4617586482012,
+            386.0360532626413,
+            433.6506678697507,
+            481.49053871513763
+          ],
+          "fullyFramed": true
+        },
+        {
+          "entityId": "school-treatment-chair",
+          "visiblePixelCount": 15873,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            477.6691681218463,
+            281.57166831489087,
+            586.60669943915,
+            447.4505441792887
+          ],
+          "fullyFramed": true
+        }
+      ]
+    },
+    {
+      "name": "FRONT-LEFT-0.75",
+      "beautySha256": "52910d00234a483c7a0648394e84127533c5ec8e8223d3c54424d5797e90b507",
+      "idSha256": "3c90775dc9bfd7dda39c4daa2a3c84e07f00cd2f28bc3d97180a55e4e1a4ddd5",
+      "entities": [
+        {
+          "entityId": "school-casualty-adult-v1",
+          "visiblePixelCount": 9942,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            605.2300099098861,
+            318.78561031031853,
+            816.3694761313636,
+            397.7903962235686
+          ],
+          "fullyFramed": true
+        },
+        {
+          "entityId": "school-medical-bag",
+          "visiblePixelCount": 7492,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            364.76119584005625,
+            389.1382988376084,
+            476.987281671496,
+            478.2648392860088
+          ],
+          "fullyFramed": true
+        },
+        {
+          "entityId": "school-treatment-chair",
+          "visiblePixelCount": 13398,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            496.2964257623609,
+            290.6159410107529,
+            598.2478825237912,
+            438.74041434847004
+          ],
+          "fullyFramed": true
+        }
+      ]
+    },
+    {
+      "name": "LEFT",
+      "beautySha256": "2d124bb286c83bb815f83a7a85d8abefac01687ad5d5f5d2ad18512c7d8f664b",
+      "idSha256": "b20ea3c64dc1301e6080e5064244666de8baec0ecb30ceab282b2b5663eabe7f",
+      "entities": [
+        {
+          "entityId": "school-casualty-adult-v1",
+          "visiblePixelCount": 6697,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            580.8624762724185,
+            326.069439801469,
+            770.9635214071384,
+            387.2378619190935
+          ],
+          "fullyFramed": true
+        },
+        {
+          "entityId": "school-medical-bag",
+          "visiblePixelCount": 5601,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            419.24861473523964,
+            386.0867607967648,
+            514.9174438437984,
+            462.32412444153067
+          ],
+          "fullyFramed": true
+        },
+        {
+          "entityId": "school-treatment-chair",
+          "visiblePixelCount": 10215,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            516.504591246767,
+            298.84525247807346,
+            605.4774552875721,
+            426.4786842946718
+          ],
+          "fullyFramed": true
+        }
+      ]
+    },
+    {
+      "name": "LEFT-RIGHT-0.25",
+      "beautySha256": "fceb71a75b869470c1dd14e0a7ae80faf60dfb27c2e8c632348fb81224a63b9b",
+      "idSha256": "b6646f06f421128c997a8e6516a507c6e44eabfac6e42524b6bf9a2566084ac6",
+      "entities": [
+        {
+          "entityId": "school-casualty-adult-v1",
+          "visiblePixelCount": 15795,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            649.4555239717037,
+            307.21082030206253,
+            896.5399297147976,
+            422.4529669265159
+          ],
+          "fullyFramed": true
+        },
+        {
+          "entityId": "school-medical-bag",
+          "visiblePixelCount": 10066,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            288.9295485448293,
+            389.3359138694317,
+            416.80429401365416,
+            494.895352036699
+          ],
+          "fullyFramed": true
+        },
+        {
+          "entityId": "school-treatment-chair",
+          "visiblePixelCount": 18413,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            467.0176755983515,
+            275.8999311925949,
+            584.3142117125877,
+            456.5972955840999
+          ],
+          "fullyFramed": true
+        }
+      ]
+    },
+    {
+      "name": "LEFT-RIGHT-0.5",
+      "beautySha256": "b03fa698d4e632a6264edf537571305d18228c34b6f71819905f00e567d136f1",
+      "idSha256": "d6c6c5c1eca650e1d315f9975e25d0efc950fec6a3c419fc595a891aa6613941",
+      "entities": [
+        {
+          "entityId": "school-casualty-adult-v1",
+          "visiblePixelCount": 29592,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            785.2204579864517,
+            325.8933913508726,
+            1009.6236937766682,
+            522.8854841216682
+          ],
+          "fullyFramed": true
+        },
+        {
+          "entityId": "school-medical-bag",
+          "visiblePixelCount": 8294,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            286.59946472703933,
+            344.14869199699393,
+            409.221326333752,
+            424.59500266354837
+          ],
+          "fullyFramed": true
+        },
+        {
+          "entityId": "school-treatment-chair",
+          "visiblePixelCount": 19200,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            448.16119683477535,
+            257.7253081641048,
+            565.4326915073513,
+            440.7808545515202
+          ],
+          "fullyFramed": true
+        }
+      ]
+    },
+    {
+      "name": "LEFT-RIGHT-0.75",
+      "beautySha256": "c6c2156ffe378b7b514df792b2cd55843750a5c4857034c83ab285f025d6e29d",
+      "idSha256": "56307e63ed6d3709014e319286c930a985887b1376f3dc9f2471903cbf1df295",
+      "entities": [
+        {
+          "entityId": "school-casualty-adult-v1",
+          "visiblePixelCount": 25352,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            673.5788704839284,
+            365.2102272350348,
+            922.2434087414712,
+            535.4321931717685
+          ],
+          "fullyFramed": true
+        },
+        {
+          "entityId": "school-medical-bag",
+          "visiblePixelCount": 3411,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            429.607706817556,
+            326.0363525129406,
+            504.76766075964076,
+            383.6884137648754
+          ],
+          "fullyFramed": true
+        },
+        {
+          "entityId": "school-treatment-chair",
+          "visiblePixelCount": 11796,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            500.18329707041954,
+            273.79415475631197,
+            596.4952977239708,
+            411.6448660969086
+          ],
+          "fullyFramed": true
+        }
+      ]
+    },
+    {
+      "name": "RIGHT",
+      "beautySha256": "ae5ff9fd21bfa985ed62b863defcfa4bc13aca4432439475c986fff719ffeaa0",
+      "idSha256": "25356347ed27526ddcf40451b6df7910173cf5f20b3fad5e65337eec18ec8152",
+      "entities": [
+        {
+          "entityId": "school-casualty-adult-v1",
+          "visiblePixelCount": 13202,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            597.5821987280839,
+            372.13068542063377,
+            831.248515597955,
+            460.30344304794284
+          ],
+          "fullyFramed": true
+        },
+        {
+          "entityId": "school-medical-bag",
+          "visiblePixelCount": 1160,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            507.72690037205365,
+            335.41424198899625,
+            556.0832093125042,
+            374.68985241150034
+          ],
+          "fullyFramed": true
+        },
+        {
+          "entityId": "school-treatment-chair",
+          "visiblePixelCount": 5812,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            541.340394414965,
+            296.8910277095718,
+            607.4934088958228,
+            392.6653391067201
+          ],
+          "fullyFramed": true
+        }
+      ]
+    },
+    {
+      "name": "RIGHT-HIGH-0.25",
+      "beautySha256": "3443361b5202ecfa8efbe451d9fec2276c472d202cfe466d660b447d6f338160",
+      "idSha256": "8ef7a2dbb496381cc1bbde53ad9a055ea14631c5c81d19598f1c852fc0ce609b",
+      "entities": [
+        {
+          "entityId": "school-casualty-adult-v1",
+          "visiblePixelCount": 24846,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            610.6651555722696,
+            378.96926707407425,
+            887.4934096470394,
+            543.7927636835653
+          ],
+          "fullyFramed": true
+        },
+        {
+          "entityId": "school-medical-bag",
+          "visiblePixelCount": 1951,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            481.3774094347429,
+            307.50132538430455,
+            541.1616701197113,
+            362.14880484999446
+          ],
+          "fullyFramed": true
+        },
+        {
+          "entityId": "school-treatment-chair",
+          "visiblePixelCount": 8834,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            524.2547851259312,
+            273.35950558360935,
+            606.6123075489188,
+            398.07118852764404
+          ],
+          "fullyFramed": true
+        }
+      ]
+    },
+    {
+      "name": "RIGHT-HIGH-0.5",
+      "beautySha256": "64cfe5667ede425887fe0b81aae10b9cf992c795c2dc0270505c986be06460b4",
+      "idSha256": "9a45ad3f8ed702cc0abbea4254f89a04b43fb3afa268c2882577a217fae04a52",
+      "entities": [
+        {
+          "entityId": "school-casualty-adult-v1",
+          "visiblePixelCount": 38669,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            640.3043179236676,
+            374.0154921127601,
+            939.881815437684,
+            647.0044315460801
+          ],
+          "fullyFramed": true
+        },
+        {
+          "entityId": "school-medical-bag",
+          "visiblePixelCount": 3389,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            440.32355094364505,
+            263.8917219419369,
+            517.0991143526886,
+            339.6940141569421
+          ],
+          "fullyFramed": true
+        },
+        {
+          "entityId": "school-treatment-chair",
+          "visiblePixelCount": 12788,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            499.1060982575486,
+            241.87248152279335,
+            602.4756761770296,
+            400.2202376100961
+          ],
+          "fullyFramed": true
+        }
+      ]
+    },
+    {
+      "name": "RIGHT-HIGH-0.75",
+      "beautySha256": "3967035215e445bfb58029cf4b4e2797b0f1e48d78aef226b9f45205516099d7",
+      "idSha256": "03798c75fc28f0cd980b27735c2c335252f6c13411b407e597d8f070f230b7d2",
+      "entities": [
+        {
+          "entityId": "school-casualty-adult-v1",
+          "visiblePixelCount": 39226,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            695.8060631710647,
+            325.33386291839764,
+            948.5199811940548,
+            660.2340282342097
+          ],
+          "fullyFramed": true
+        },
+        {
+          "entityId": "school-medical-bag",
+          "visiblePixelCount": 5515,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            376.826460951432,
+            230.05424159161979,
+            476.95804011631895,
+            324.98282488443937
+          ],
+          "fullyFramed": true
+        },
+        {
+          "entityId": "school-treatment-chair",
+          "visiblePixelCount": 14796,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            468.435484176495,
+            223.69960624444576,
+            590.7611116287054,
+            398.0272911201337
+          ],
+          "fullyFramed": true
+        }
+      ]
+    },
+    {
+      "name": "HIGH",
+      "beautySha256": "8c0213da76ce103f641fd9c45e07aa22aea2803b35bb86e68000817d3ee4b048",
+      "idSha256": "f982d74f6345455e02e835b79b1770fc99db180d6f5d21fdd232c3589b620ec9",
+      "entities": [
+        {
+          "entityId": "school-casualty-adult-v1",
+          "visiblePixelCount": 30115,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            752.7364268208231,
+            204.37254214395318,
+            893.5613114832419,
+            481.56185078557513
+          ],
+          "fullyFramed": true
+        },
+        {
+          "entityId": "school-medical-bag",
+          "visiblePixelCount": 6078,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            325.7693953385286,
+            330.5552766078017,
+            428.47020019677694,
+            396.02872705492933
+          ],
+          "fullyFramed": true
+        },
+        {
+          "entityId": "school-treatment-chair",
+          "visiblePixelCount": 10841,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            467.6502064088252,
+            284.05521339516963,
+            565.1827999204556,
+            406.4467691266236
+          ],
+          "fullyFramed": true
+        }
+      ]
+    },
+    {
+      "name": "HIGH-LOW-0.25",
+      "beautySha256": "6c6eaaf65853660f9aa08ee1519c8a46add79f3926e9ec0b1f7aee3c9bdeeec8",
+      "idSha256": "23de12b2e1e3de4d039abaf9a2cdca3926e4efbab05972fbac3fc00d563bfcf6",
+      "entities": [
+        {
+          "entityId": "school-casualty-adult-v1",
+          "visiblePixelCount": 42081,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            771.7166981849043,
+            205.87096577535186,
+            972.3218927263914,
+            517.8210032592967
+          ],
+          "fullyFramed": true
+        },
+        {
+          "entityId": "school-medical-bag",
+          "visiblePixelCount": 9503,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            266.06519403502557,
+            332.6931317473625,
+            396.8997398906352,
+            416.80999086250716
+          ],
+          "fullyFramed": true
+        },
+        {
+          "entityId": "school-treatment-chair",
+          "visiblePixelCount": 18165,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            435.53020049455534,
+            259.3572158688238,
+            558.9485808932508,
+            428.70295621699637
+          ],
+          "fullyFramed": true
+        }
+      ]
+    },
+    {
+      "name": "HIGH-LOW-0.5",
+      "beautySha256": "7ac205d37fc184fa8be645031314c23b66eefc9cb944483a340e1c33df64b658",
+      "idSha256": "cfaeda82e238871c4ab6f67100707de6230360520c40e902a6c380ba4aa3e317",
+      "entities": [
+        {
+          "entityId": "school-casualty-adult-v1",
+          "visiblePixelCount": 54606,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            786.477508891423,
+            235.35197400225667,
+            1077.5318436439945,
+            555.3839574364525
+          ],
+          "fullyFramed": true
+        },
+        {
+          "entityId": "school-medical-bag",
+          "visiblePixelCount": 14231,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            199.77336376923387,
+            340.8831866979407,
+            363.07374378277626,
+            444.13670462193033
+          ],
+          "fullyFramed": true
+        },
+        {
+          "entityId": "school-treatment-chair",
+          "visiblePixelCount": 28296,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            402.71423719486876,
+            234.8597204465572,
+            552.4067211493206,
+            456.52718907433734
+          ],
+          "fullyFramed": true
+        }
+      ]
+    },
+    {
+      "name": "HIGH-LOW-0.75",
+      "beautySha256": "61fc6b078fe3dd3f0c3d16d19fe1a3cec99cc6b74ed03208f195ee7f184b9cc6",
+      "idSha256": "0abd7aa8f2320d536cae9e44d3dd0f530bcc9e81f29c9178968c9aa9baa6f34e",
+      "entities": [
+        {
+          "entityId": "school-casualty-adult-v1",
+          "visiblePixelCount": 55634,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            792.3795528480648,
+            299.2037661731378,
+            1166.990230610466,
+            557.0096570179118
+          ],
+          "fullyFramed": true
+        },
+        {
+          "entityId": "school-medical-bag",
+          "visiblePixelCount": 16814,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            158.30169531726997,
+            356.1872132360422,
+            339.09792496123174,
+            464.62909642575175
+          ],
+          "fullyFramed": true
+        },
+        {
+          "entityId": "school-treatment-chair",
+          "visiblePixelCount": 33523,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            392.3127037713599,
+            231.2876241216942,
+            547.9038579018259,
+            474.2988410150221
+          ],
+          "fullyFramed": true
+        }
+      ]
+    },
+    {
+      "name": "LOW",
+      "beautySha256": "2c30df9bd8e4f2ea5b2cbb325aa36ee1bd0e7521562c509d319d16284e25eaa5",
+      "idSha256": "68aa9c777f4cb68c62c34e05d4bedc35620ec911b0918add35048a1856205d7b",
+      "entities": [
+        {
+          "entityId": "school-casualty-adult-v1",
+          "visiblePixelCount": 33136,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            787.8884148270362,
+            370.6334611491253,
+            1150.2660336591778,
+            488.82338179478273
+          ],
+          "fullyFramed": true
+        },
+        {
+          "entityId": "school-medical-bag",
+          "visiblePixelCount": 13653,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            177.86882793628237,
+            370.54236788461935,
+            341.2349316472021,
+            457.4761242001672
+          ],
+          "fullyFramed": true
+        },
+        {
+          "entityId": "school-treatment-chair",
+          "visiblePixelCount": 28523,
+          "pixelsInsideCommittedProjectedBounds": true,
+          "projectedPixelBounds": [
+            416.1623915295762,
+            240.73393267577603,
+            548.4063591504375,
+            460.7031211867642
+          ],
+          "fullyFramed": true
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "NO_REALISTIC_ASSET_OR_INTEGRATED_SHELL_PROOF",
+    "UNIT_OCCLUDED_NOT_CLAIMED_VISIBLE",
+    "NO_SCENE_ADMISSION",
+    "TWO_PIXEL_MARGIN_FOR_AABB_RASTER_BOUNDARY",
+    "AUTHORITY_DERIVED_AGGREGATE_BOXES_NOT_SUBMESH_CONTACT_CERTIFICATION"
+  ]
+}

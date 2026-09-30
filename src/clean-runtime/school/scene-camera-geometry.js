@@ -39,7 +39,7 @@ function validatePacket(packet){
  return initial;
 }
 function evaluateCandidateVolumes({packet,proposedState,cameraTransform,previousCameraTransform}={}){
- const evidence={evaluatorContract:{version:'CANDIDATE_VOLUME_EVALUATOR@1.0.0',boundsRole:'DECLARED_MODEL_ENVELOPE_NOT_CLOSED_ROOM',missingSolids:['FRONT_WALL','CEILING'],contact:'CLOSED_BOUNDS_CONTAINMENT_ALLOWED;SOLID_CONTACT_REJECTED',microunits:'INTEGER_EXACT_AFTER_MODEL_DECIMAL_TO_MICROUNIT_ROUND',motion:'EXPLICIT_STRAIGHT_SEGMENT_TRANSLATION_ANY_YAW_CONSERVATIVE_ENVELOPE',cameraQuaternion:'XY_ZW_FINITE_YAW_ONLY_NORM_SQUARED_TOLERANCE_2^-50',displayOptics:'NOT_VERIFIED;AUTHORED_EVIDENCE_VOLUME_ONLY'},classification:'CANDIDATE_OPAQUE_VOLUME_CHECKS_NOT_ADMISSION',checks:[],limitations:['SCENE_ADMISSION_PENDING','AUTHORED_NOT_MEASURED_MOTION_GEOMETRY','CONSERVATIVE_AABB_EXCLUSION']};
+ const evidence={evaluatorContract:{version:'CANDIDATE_VOLUME_EVALUATOR@1.0.0',boundsRole:'DECLARED_MODEL_ENVELOPE_NOT_CLOSED_ROOM',missingSolids:['FRONT_WALL','CEILING'],contact:'CLOSED_BOUNDS_CONTAINMENT_ALLOWED;SOLID_CONTACT_REJECTED',microunits:'INTEGER_EXACT_AFTER_MODEL_DECIMAL_TO_MICROUNIT_ROUND',motion:'EXPLICIT_STRAIGHT_SEGMENT_TRANSLATION_ANY_NORMALIZED_ROTATION_CONSERVATIVE_ENVELOPE',cameraQuaternion:'XYZW_FINITE_NORM_SQUARED_TOLERANCE_2^-50',displayOptics:'NOT_VERIFIED;AUTHORED_EVIDENCE_VOLUME_ONLY'},classification:'CANDIDATE_OPAQUE_VOLUME_CHECKS_NOT_ADMISSION',checks:[],limitations:['SCENE_ADMISSION_PENDING','AUTHORED_NOT_MEASURED_MOTION_GEOMETRY','CONSERVATIVE_AABB_EXCLUSION']};
  const out=(outcome,reason)=>deepFreeze({outcome,reason,evidence,evidenceDigest:digest(evidence)});
  try{
   const initial=validatePacket(packet);evidence.swingContainment=verifySwingContainment(packet);if(!proposedState||proposedState.worldId!==initial.worldId)return out('UNKNOWN','WORLD_IDENTITY_MISSING');
@@ -51,7 +51,7 @@ function evaluateCandidateVolumes({packet,proposedState,cameraTransform,previous
   for(const s of model.surfaces.filter(s=>['WALL','OBSTACLE'].includes(s.type)))for(const v of s.region.volumes){const a=Object.fromEntries(keys.map(k=>[k,v[k]*1e6]));const c=separate(swing,a);evidence.checks.push({kind:'SWING_VS_STATIC_SOLID',surfaceId:s.surfaceId,...c});if(!c.clear)return out('FAIL','AUTHORED_SWING_STATIC_COLLISION')}
   if(!cameraTransform)return out('UNKNOWN','CAMERA_TRANSFORM_MISSING');
   if(packet.modePolicy.debug||packet.modePolicy.kind!=='EVIDENCE_ONLY'||!packet.sweepSpec.waypoints.some(w=>digest(w.transform)===digest(cameraTransform)))return out('UNKNOWN','CAMERA_NOT_AUTHORED_WAYPOINT');
-  for(const t of [cameraTransform,previousCameraTransform].filter(Boolean)){const q=t.orientation;if(!Array.isArray(q)||q.length!==4||q.some(x=>!Number.isFinite(x))||q[0]!==0||q[2]!==0||Math.abs(q.reduce((a,x)=>a+x*x,0)-1)>2**-50)return out('UNKNOWN','CAMERA_QUATERNION_INVALID');}
+  for(const t of [cameraTransform,previousCameraTransform].filter(Boolean)){const q=t.orientation;if(!Array.isArray(q)||q.length!==4||q.some(x=>!Number.isFinite(x))||Math.abs(q.reduce((a,x)=>a+x*x,0)-1)>2**-50)return out('UNKNOWN','CAMERA_QUATERNION_INVALID');}
   const p=cameraTransform.positionMicrounits,r=cameraTransform.nearPlaneMicrounits,body=packet.cameraBody;
   if(p?.length!==3||p.some(x=>!Number.isSafeInteger(x))||!Number.isSafeInteger(r)||r<=0||r!==body.nearPlaneMicrounits)return out('UNKNOWN','CAMERA_TRANSFORM_INVALID');
   if(body.bodyKind!=='CONSERVATIVE_FRUSTUM_CONTAINING_ORIENTED_BOX')return out('UNKNOWN','FULL_NEAR_PLANE_GEOMETRY_MISSING');
@@ -63,9 +63,9 @@ function evaluateCandidateVolumes({packet,proposedState,cameraTransform,previous
   // every angle. Extra near distance gives conservative near-plane clearance.
   // The swept AABB of this envelope encloses a straight segment translation
   // plus ANY yaw along the segment; false rejects are allowed, never tunneling.
-  const horizontal=r/2+h.halfWidth+h.halfDepth+r,vertical=h.halfHeight+r;
+  const radiusSquared=BigInt(h.halfWidth)**2n+BigInt(h.halfHeight)**2n+BigInt(h.halfDepth)**2n;let lo=0n,hi=BigInt(h.halfWidth+h.halfHeight+h.halfDepth);while(lo<hi){const mid=(lo+hi)/2n;if(mid*mid>=radiusSquared)hi=mid;else lo=mid+1n}const horizontal=r/2+Number(lo)+r,vertical=horizontal;
   const path={};for(let i=0;i<3;i++){const radius=i===1?vertical:horizontal;path['min'+'XYZ'[i]]=Math.min(p[i],from[i])-radius;path['max'+'XYZ'[i]]=Math.max(p[i],from[i])+radius}
-  evidence.cameraVolumeDerivation={kind:'CONSERVATIVE_YAW_OBB_L1_ENVELOPE_PLUS_NEAR_CLEARANCE',horizontalRadiusMicrounits:horizontal,verticalRadiusMicrounits:vertical,motion:'STRAIGHT_SEGMENT_TRANSLATION_ANY_YAW',falseRejectionPossible:true};
+  evidence.cameraVolumeDerivation={kind:'CONSERVATIVE_ROTATION_OBB_CEIL_RADIUS_ENVELOPE_PLUS_NEAR_CLEARANCE',horizontalRadiusMicrounits:horizontal,verticalRadiusMicrounits:vertical,motion:'STRAIGHT_SEGMENT_TRANSLATION_ANY_NORMALIZED_ROTATION',falseRejectionPossible:true};
   const floor=model.surfaces.find(s=>s.type==='FLOOR');if(!floor||floor.planeOrDepth?.kind!=='PLANE'||!floor.region.allowed.some(a=>path.minX>=Math.round(a.minX*1e6)&&path.maxX<=Math.round(a.maxX*1e6)&&path.minZ>=Math.round(a.minZ*1e6)&&path.maxZ<=Math.round(a.maxZ*1e6)))return out('FAIL','CAMERA_FOOTPRINT_OUTSIDE_SEMANTIC_FLOOR');
   if(path.minY<Math.round(floor.planeOrDepth.planeY*1e6))return out('FAIL','CAMERA_BELOW_SEMANTIC_FLOOR');
   if(!contains(b,path))return out('FAIL','CAMERA_VOLUME_PATH_OUTSIDE_BOUNDS');

@@ -1,0 +1,267 @@
+{
+  "extension": {
+    "schemaVersion": "SCENE_CAMERA_COVERAGE@1.0.0",
+    "status": "AUTHORED_CANDIDATE_NOT_ADMITTED",
+    "extensionId": "school-scene-camera-coverage-v1",
+    "version": "1.3.0",
+    "baseScenePackageRef": {
+      "scenePackageDigest": "5ba7ce47c9ff3a105a5636fda858d374bbdadcdedc41af3379d6fb2d54a989d8"
+    },
+    "worldDigest": "c719e83456b3486f56e08588c60e8ec89186652d39c579ad71b7c78131b46513",
+    "worldRevision": 1,
+    "surfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+    "boundsDigest": "94d0c2bf17897844f09177ff6a07884deb988ed96d9c0b005768a34daccc7dd7",
+    "doorStateDigest": "954c0e133f32574254df901da227c861e016a40de53586dc947d6bcce373333d",
+    "cameraBodyRef": {
+      "digest": "17b7ef2d96e3d097b396efd2c62307cca0d1267bdb2edd927f69b8c43e981109"
+    },
+    "modePolicyRef": {
+      "digest": "808fadd8407a8801b74a186e6ed16dd0ad9dedc0c80e3f8e24ba4a7648d29fd6"
+    },
+    "sweepSpecRef": {
+      "digest": "8d76896630e43832ec65e973326120641c0cc426d5c2108a87962e775a1d6b09"
+    },
+    "swingEnvelopeRef": {
+      "digest": "1803cf46d7da5d46def6ca9df97ef8d34e7703cae9804758c629323ae0df89b6"
+    },
+    "provenance": {
+      "sceneBounds": "MODEL_DERIVED:{\"minX\":\"left-wall-box.maxX\",\"maxX\":\"right-wall-box.minX\",\"minY\":\"min(WALL volumes minY)\",\"maxY\":\"max(WALL volumes maxY)\",\"minZ\":\"back-wall-box.maxZ\",\"maxZ\":\"max(left-wall-box.maxZ,right-wall-box.maxZ)\"}",
+      "doorStates": "AUTHORED_SCENARIO_CONTENT",
+      "swingEnvelope": "AUTHORED_CONSERVATIVE_MOTION_GEOMETRY_NOT_MEASURED",
+      "cameraBody": "AUTHORED_CONSERVATIVE_CAMERA_VOLUME_NOT_DISPLAY_OPTICS",
+      "sweepSpec": "AUTHORED_SWEEP_SPEC_EVIDENCE_GEOMETRY_NOT_GAMEPLAY_MODE"
+    }
+  },
+  "environmentPhysicalState": {
+    "sceneBounds": {
+      "minX": -6920000,
+      "maxX": 6920000,
+      "minY": 0,
+      "maxY": 6000000,
+      "minZ": -3920000,
+      "maxZ": 6000000
+    },
+    "doorStates": [
+      {
+        "surfaceId": "door",
+        "state": "CLOSED",
+        "geometryDigest": "0808698899ba2cb6ab415350ee3cadd1796bf90388996cb59e183cbcb56c1f7d"
+      }
+    ]
+  },
+  "swingEnvelope": {
+    "kind": "CONSERVATIVE_SWEPT_AABB_CONTAINING_QUARTER_SECTOR",
+    "parameters": {
+      "hingeAxis": {
+        "axisKind": "VERTICAL_LINE",
+        "xMicrounits": 4725000,
+        "zMicrounits": -3840000,
+        "convention": "Hinge axis on the leaf MIN_X face, centered in leaf thickness; opening rotates toward +Z (into room) through 90 degrees"
+      },
+      "openingDirection": "INTO_ROOM_POSITIVE_Z",
+      "sweepAngleDeg": 90,
+      "leafWidthMicrounits": 1350000,
+      "leafHeightMicrounits": 2900000,
+      "leafThicknessMicrounits": 120000,
+      "sweepRadiusMicrounits": {
+        "exact": "sqrt(1350000^2+60000^2) = 1351332.675546625",
+        "recordedContaining": 1351333
+      }
+    },
+    "volumeMicrounits": {
+      "minX": 4665000,
+      "maxX": 6076333,
+      "minY": 0,
+      "maxY": 2900000,
+      "minZ": -3900000,
+      "maxZ": -2488667
+    },
+    "containmentProof": "Rotation map (x,z)->(x cosT - z sinT, x sinT + z cosT) takes +X toward +Z; leaf offsets dx in [0,w], dz in [-t/2,t/2], T in [0,90deg]. x = dx cosT - dz sinT lies in [-(t/2), R]: min at dx=0, dz=+t/2, T=90deg (hinge-edge thickness reach); max at dx=w, dz=-t/2, T=atan((t/2)/w) giving w cosT + (t/2) sinT = R exactly. z = dx sinT + dz cosT lies in [-(t/2), R]: min at T=0, dz=-t/2; max at dx=w, dz=+t/2, T=90deg-atan((t/2)/w) giving w sinT + (t/2) cosT = R exactly. All four extremes are attained inside the parameter box, so the AABB X-offset[-t/2,R] Z-offset[-t/2,R] is the tight containing box. Recorded R=1351333 >= exact R=1351332.6755. Verified by grid audit against analytic extremes plus these exact witness points.",
+    "provenance": "AUTHORED_CONSERVATIVE_MOTION_GEOMETRY_NOT_MEASURED",
+    "amendment": "v1.3: proof TEXT corrected - v1.2 named the wrong max-X witness (dz=+t/2 gives 1346004.6, not R); correct max-X witness is dz=-t/2 (independent reviewer finding, verified arithmetically). Volume bytes unchanged from v1.2; only the proof text changed. v1.2 history: full-rotation re-audit after the v1.1 hinge-edge counterexample; v1.1 history: explicit hinge axis + first containment attempt.",
+    "changeDiscipline": "Any behavior change = new reviewed record with new digest; evaluator consumes as opaque geometry"
+  },
+  "sweepSpec": {
+    "version": "1.0.0",
+    "specId": "SCHOOL_CAMERA_SWEEP@1.0.0",
+    "sceneId": "school",
+    "orientationConvention": "QUATERNION_XYZW_IEEE754_DOUBLE_FORWARD_NEG_Z_Y_UP_YAW_PITCH_EVIDENCE_ONLY",
+    "cameraBodyDigest": "17b7ef2d96e3d097b396efd2c62307cca0d1267bdb2edd927f69b8c43e981109",
+    "waypoints": [
+      {
+        "id": "FRONT",
+        "mode": {
+          "policyRef": "SWEEP_EVIDENCE_MODE@1.0.0"
+        },
+        "transform": {
+          "positionMicrounits": [
+            -1500000,
+            1600000,
+            5000000
+          ],
+          "orientation": [
+            -0.13951827133052594,
+            0,
+            0,
+            0.9902194968616512
+          ],
+          "nearPlaneMicrounits": 100000
+        }
+      },
+      {
+        "id": "LEFT",
+        "mode": {
+          "policyRef": "SWEEP_EVIDENCE_MODE@1.0.0"
+        },
+        "transform": {
+          "positionMicrounits": [
+            -6000000,
+            1600000,
+            4500000
+          ],
+          "orientation": [
+            -0.08925822926590253,
+            -0.43717725885033815,
+            -0.04365475445634996,
+            0.8938698312762187
+          ],
+          "nearPlaneMicrounits": 100000
+        }
+      },
+      {
+        "id": "RIGHT",
+        "mode": {
+          "policyRef": "SWEEP_EVIDENCE_MODE@1.0.0"
+        },
+        "transform": {
+          "positionMicrounits": [
+            4000000,
+            1600000,
+            4500000
+          ],
+          "orientation": [
+            -0.0764329760836345,
+            0.47937648708734354,
+            0.04195756822336469,
+            0.8732672822587471
+          ],
+          "nearPlaneMicrounits": 100000
+        }
+      },
+      {
+        "id": "HIGH",
+        "mode": {
+          "policyRef": "SWEEP_EVIDENCE_MODE@1.0.0"
+        },
+        "transform": {
+          "positionMicrounits": [
+            -1500000,
+            4500000,
+            2500000
+          ],
+          "orientation": [
+            -0.5712642314097769,
+            0,
+            0,
+            0.8207662139195283
+          ],
+          "nearPlaneMicrounits": 100000
+        }
+      },
+      {
+        "id": "LOW",
+        "mode": {
+          "policyRef": "SWEEP_EVIDENCE_MODE@1.0.0"
+        },
+        "transform": {
+          "positionMicrounits": [
+            -1500000,
+            500000,
+            4000000
+          ],
+          "orientation": [
+            -0.008332465433472725,
+            0,
+            0,
+            0.9999652844073138
+          ],
+          "nearPlaneMicrounits": 100000
+        }
+      }
+    ],
+    "provenance": "AUTHORED_SWEEP_SPEC_EVIDENCE_GEOMETRY_NOT_GAMEPLAY_MODE",
+    "transitionContract": {
+      "position": "STRAIGHT_SEGMENT_MICROUNIT_ROUND_TO_NEAREST",
+      "aim": "LOOK_AT_FIXED_AUTHORED_TARGET",
+      "targetMicrounits": [
+        -1500000,
+        450000,
+        1000000
+      ],
+      "samples": [
+        0.25,
+        0.5,
+        0.75
+      ],
+      "rotation": "QUATERNION_XYZW_FROM_YAW_PITCH_LOOK_DIRECTION",
+      "normToleranceSquared": 8.881784197001252e-16,
+      "authority": "EVIDENCE_ONLY_NOT_GAMEPLAY"
+    }
+  },
+  "cameraBody": {
+    "bodyKind": "CONSERVATIVE_FRUSTUM_CONTAINING_ORIENTED_BOX",
+    "nearPlaneMicrounits": 100000,
+    "nearPlaneHalfExtentsMicrounits": {
+      "halfWidth": 200000,
+      "halfHeight": 150000
+    },
+    "conservativeVolume": {
+      "center": "eyePoint + forward*(nearPlane/2)",
+      "halfExtentsMicrounits": {
+        "halfWidth": 200000,
+        "halfHeight": 150000,
+        "halfDepth": 50000
+      },
+      "contains": "eye point + near-plane rectangle + the frustum between them"
+    },
+    "provenance": "AUTHORED_CONSERVATIVE_CAMERA_VOLUME_NOT_DISPLAY_OPTICS",
+    "amendment": "v1.1: previous POINT_WITH_NEAR_PLANE declared near distance only; point clearance does not prove near-plane rectangle clearance (executor finding 1, correct). Half extents declared conservatively (2x near distance laterally); if display optics ever exceed this gate the record must be re-authored - presentation cannot supply physical truth",
+    "orientationConvention": "QUATERNION_XYZW_IEEE754_DOUBLE_FORWARD_NEG_Z_Y_UP_YAW_PITCH_EVIDENCE_ONLY"
+  },
+  "modePolicy": {
+    "policyId": "SWEEP_EVIDENCE_MODE@1.0.0",
+    "kind": "EVIDENCE_ONLY",
+    "debug": false,
+    "constrainedToAuthoredWaypoints": true,
+    "note": "Not a gameplay mode; gameplay mode set remains an owner decision (contract row B7)"
+  },
+  "boundsProvenance": {
+    "rule": "INTERIOR_ENVELOPE_OF_WALL_SURFACES",
+    "sources": {
+      "minX": "left-wall-box.maxX",
+      "maxX": "right-wall-box.minX",
+      "minY": "min(WALL volumes minY)",
+      "maxY": "max(WALL volumes maxY)",
+      "minZ": "back-wall-box.maxZ",
+      "maxZ": "max(left-wall-box.maxZ,right-wall-box.maxZ)"
+    },
+    "note": "No front wall or ceiling surface exists in the model; front boundary is the side-wall extent, ceiling boundary is the wall top. Model limits, not assumptions."
+  },
+  "amendments": [
+    "v1.1 cameraBody conservative frustum-containing OBB (executor finding 1; accepted by consumer against digest b9988b45d974...)",
+    "v1.2 swingEnvelope full-rotation re-audit (hinge-edge counterexample); REGRESSION: v1.2 also silently drifted cameraBody.amendment text and added sweepSpec.cameraBodyDigest:null, changing both digests - misreported as 'camera unchanged'",
+    "v1.3 cameraBody + sweepSpec restored BYTE-IDENTICAL to v1.1 (digests b9988b45.../bc7ca705...); swing proof-text witness corrected (volume unchanged); amendment history moved to this packet-level list, out of digested records",
+    "Candidate v1.4: HIGH evidence camera pitches toward design target [-1500000,450000,1000000]; changes no world entity transform or gameplay mode. Requires review before landing.",
+    "Candidate v1.5: RIGHT offset and five view/transition look-at aim keep patient/chair/bag framed; entity transforms unchanged."
+  ],
+  "validation": {
+    "coverageStatus": "COVERED_CANDIDATE",
+    "discreteLeafOutcome": "PASS",
+    "fullAdapterOutcome": "UNKNOWN",
+    "fullAdapterReason": "SWING_CAMERA_BOUNDS_AUTHORITY_NOT_IMPLEMENTED"
+  },
+  "generatedAt": "2026-09-30T13:01:00+03:00",
+  "generator": "track-b-contract-owner",
+  "anchorMeasurements": "r3-door-existing-geometry-measurements-395a2727.json",
+  "supersedes": "scene-extension-v1_2-candidate.json v1.2.0"
+}
