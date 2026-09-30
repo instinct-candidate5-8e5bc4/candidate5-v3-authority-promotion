@@ -438,7 +438,7 @@
       "evaluatorCalls": 0,
       "decision": "AUDIT_REJECTED",
       "stateBytesUnchanged": true,
-      "resultDigest": "4f3191b0cc762bb863f8f4ca3d07b30892e39333211825469d5f0f7d7c69e4b3",
+      "resultDigest": "85010bc61df9417c26fe7127dcf548b878f8ae43653f8e31322a53ba21d5d65c",
       "evidenceFields": [
         "audit.exit-nonzero-on-mutation",
         "audit.findings.MANIFEST_SHA_MISMATCH",
@@ -453,10 +453,129 @@
       "evaluatorCalls": 0,
       "decision": "AUDIT_REJECTED",
       "stateBytesUnchanged": true,
-      "resultDigest": "4f3191b0cc762bb863f8f4ca3d07b30892e39333211825469d5f0f7d7c69e4b3",
+      "resultDigest": "85010bc61df9417c26fe7127dcf548b878f8ae43653f8e31322a53ba21d5d65c",
       "evidenceFields": [
         "audit.exit-nonzero-on-unapproved",
         "audit.findings.FOUNDATION_MANIFEST_SET_MISMATCH",
+        "audit.clean-after-restore"
+      ]
+    },
+    {
+      "row": "EVALUATOR_SEAM_UNDECLARED",
+      "outcome": "UNKNOWN",
+      "reason": "EVALUATOR_SEAM_UNDECLARED",
+      "classification": "AUDIT_FINDING",
+      "evaluatorCalls": 0,
+      "decision": "AUDIT_REJECTED",
+      "stateBytesUnchanged": true,
+      "resultDigest": "85010bc61df9417c26fe7127dcf548b878f8ae43653f8e31322a53ba21d5d65c",
+      "evidenceFields": [
+        "audit.exit-nonzero-on-hostile",
+        "audit.findings.EVALUATOR_SEAM_UNDECLARED",
+        "audit.clean-after-restore"
+      ]
+    },
+    {
+      "row": "SEAM_SHA_MISMATCH",
+      "outcome": "UNKNOWN",
+      "reason": "SEAM_SHA_MISMATCH",
+      "classification": "AUDIT_FINDING",
+      "evaluatorCalls": 0,
+      "decision": "AUDIT_REJECTED",
+      "stateBytesUnchanged": true,
+      "resultDigest": "85010bc61df9417c26fe7127dcf548b878f8ae43653f8e31322a53ba21d5d65c",
+      "evidenceFields": [
+        "audit.exit-nonzero-on-hostile",
+        "audit.findings.SEAM_SHA_MISMATCH",
+        "audit.clean-after-restore"
+      ]
+    },
+    {
+      "row": "SEAM_AUTHORITY_IMPORT_SET_MISMATCH",
+      "outcome": "UNKNOWN",
+      "reason": "SEAM_AUTHORITY_IMPORT_SET_MISMATCH",
+      "classification": "AUDIT_FINDING",
+      "evaluatorCalls": 0,
+      "decision": "AUDIT_REJECTED",
+      "stateBytesUnchanged": true,
+      "resultDigest": "85010bc61df9417c26fe7127dcf548b878f8ae43653f8e31322a53ba21d5d65c",
+      "evidenceFields": [
+        "audit.exit-nonzero-on-hostile",
+        "audit.findings.SEAM_AUTHORITY_IMPORT_SET_MISMATCH",
+        "audit.clean-after-restore"
+      ]
+    },
+    {
+      "row": "SEAM_EXECUTION_TOPOLOGY_UNREVIEWED",
+      "outcome": "UNKNOWN",
+      "reason": "SEAM_EXECUTION_TOPOLOGY_UNREVIEWED",
+      "classification": "AUDIT_FINDING",
+      "evaluatorCalls": 0,
+      "decision": "AUDIT_REJECTED",
+      "stateBytesUnchanged": true,
+      "resultDigest": "85010bc61df9417c26fe7127dcf548b878f8ae43653f8e31322a53ba21d5d65c",
+      "evidenceFields": [
+        "audit.exit-nonzero-on-hostile",
+        "audit.findings.SEAM_EXECUTION_TOPOLOGY_UNREVIEWED",
+        "audit.clean-after-restore"
+      ]
+    },
+    {
+      "row": "MANIFEST_SHA_MISMATCH",
+      "outcome": "UNKNOWN",
+      "reason": "MANIFEST_SHA_MISMATCH",
+      "classification": "AUDIT_FINDING",
+      "evaluatorCalls": 0,
+      "decision": "AUDIT_REJECTED",
+      "stateBytesUnchanged": true,
+      "resultDigest": "85010bc61df9417c26fe7127dcf548b878f8ae43653f8e31322a53ba21d5d65c",
+      "evidenceFields": [
+        "audit.exit-nonzero-on-hostile",
+        "audit.findings.MANIFEST_SHA_MISMATCH",
+        "audit.clean-after-restore"
+      ]
+    },
+    {
+      "row": "FOUNDATION_ADAPTER_BYTE_PIN",
+      "outcome": "UNKNOWN",
+      "reason": "MANIFEST_SHA_MISMATCH",
+      "classification": "AUDIT_FINDING",
+      "evaluatorCalls": 0,
+      "decision": "AUDIT_REJECTED",
+      "stateBytesUnchanged": true,
+      "resultDigest": "c2c1fde58472790ec479ac7a536550bb0a1698811b05ae9d99e7bad0612e4f5d",
+      "evidenceFields": [
+        "foundation-adapter-specific-byte-mutation",
+        "audit.clean-after-restore"
+      ]
+    },
+    {
+      "row": "SEAM_EVALUATOR_DELEGATION",
+      "outcome": "UNKNOWN",
+      "reason": "SEAM_EVALUATOR_DELEGATION",
+      "classification": "AUDIT_FINDING",
+      "evaluatorCalls": 0,
+      "decision": "AUDIT_REJECTED",
+      "stateBytesUnchanged": true,
+      "resultDigest": "85010bc61df9417c26fe7127dcf548b878f8ae43653f8e31322a53ba21d5d65c",
+      "evidenceFields": [
+        "audit.exit-nonzero-on-hostile",
+        "audit.findings.SEAM_EVALUATOR_DELEGATION",
+        "audit.clean-after-restore"
+      ]
+    },
+    {
+      "row": "SEAM_DYNAMIC_EXECUTION",
+      "outcome": "UNKNOWN",
+      "reason": "SEAM_DYNAMIC_EXECUTION",
+      "classification": "AUDIT_FINDING",
+      "evaluatorCalls": 0,
+      "decision": "AUDIT_REJECTED",
+      "stateBytesUnchanged": true,
+      "resultDigest": "85010bc61df9417c26fe7127dcf548b878f8ae43653f8e31322a53ba21d5d65c",
+      "evidenceFields": [
+        "audit.exit-nonzero-on-hostile",
+        "audit.findings.SEAM_DYNAMIC_EXECUTION",
         "audit.clean-after-restore"
       ]
     }

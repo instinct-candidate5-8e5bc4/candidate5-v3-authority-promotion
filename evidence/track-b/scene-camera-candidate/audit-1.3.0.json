@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "v3-foundation-authority-audit/1.3.0",
+  "gatewayRouted": false,
+  "schoolConnected": false,
+  "runtimeConnected": false,
+  "legalityPromoted": false,
+  "evaluatorImportSeams": [
+    "src/clean-runtime/mutation/v3-authority-adapter.js",
+    "src/clean-runtime/school/door-legality-adapter.js"
+  ],
+  "seamContracts": [
+    {
+      "path": "src/clean-runtime/mutation/v3-authority-adapter.js",
+      "blobSha": "4ef9f013fa1cc15ea2898fd39ca00dafa4c17879",
+      "sha256": "01c9ce217eda3f75235556e2ed36c087f6da09509fb7fc3192b2e3f3b08dceb8",
+      "imports": [
+        "src/clean-runtime/contracts/canonical.js",
+        "src/clean-runtime/contracts/world-state.js",
+        "src/verified-architecture-phase2-v3/definitions.js",
+        "src/verified-architecture-phase2-v3/evaluate.js"
+      ],
+      "scope": "CLOSED_FOUNDATION_OBLIGATION_ROUTE_CONTEXT_VALIDATION_ONLY"
+    },
+    {
+      "path": "src/clean-runtime/school/door-legality-adapter.js",
+      "blobSha": "78b69d74b818d85ec6e1edbafaa61be7b091fa0b",
+      "sha256": "5dd33ad759a19d8a2c77f8ba5ff61be86163487634542e5a28e80170bbd5b2ec",
+      "imports": [
+        "src/clean-runtime/contracts/canonical.js",
+        "src/clean-runtime/contracts/world-state.js",
+        "src/clean-runtime/school/definitions/adult-v1-male-supine-floor.js",
+        "src/clean-runtime/school/definitions/synthetic-training-unit-v1.js",
+        "src/clean-runtime/school/definitions/treatment-chair.js",
+        "src/clean-runtime/school/scene-v2/package.js",
+        "src/clean-runtime/school/school-geometry-adapter.js",
+        "src/clean-runtime/school/school-physical-contract.js",
+        "src/numeric-frame-rotation/graph.js",
+        "src/verified-architecture-phase2-v3/definitions.js",
+        "src/verified-architecture-phase2-v3/evaluate.js"
+      ],
+      "scope": "DISCRETE_SCHOOL_CLOSED_DOOR_LEAF_VS_KNOWN_ACTIVE_BODIES_ONLY;NO_GENERAL_GEOMETRY_AUTHORITY;NO_ADMISSION"
+    }
+  ],
+  "seamPolicy": {
+    "foundationByteAuthority": "foundation-allowed-paths.json:4ef9f013fa1cc15ea2898fd39ca00dafa4c17879",
+    "delegation": "FORBIDDEN;APPROVED_SOURCE_CLOSED_EVALUATOR_CALLS_ONLY",
+    "dynamicLoading": "FORBIDDEN",
+    "indirectExecution": "FORBIDDEN",
+    "externalGeometryCallbacks": "FORBIDDEN",
+    "plugins": "FORBIDDEN",
+    "enforcement": "EXACT_BYTE_PINS_AND_FULL_STATIC_DEPENDENCY_SETS;ANY_EXECUTION_PATH_CHANGE_REQUIRES_REVIEW"
+  },
+  "adapterEvaluatorCallSites": 1,
+  "foundationFiles": [
+    "src/clean-runtime/mutation/physical-capability-router.js",
+    "src/clean-runtime/mutation/physical-proof-planner.js",
+    "src/clean-runtime/mutation/v3-authority-adapter.js",
+    "src/clean-runtime/mutation/v3-promotion-foundation.js",
+    "src/clean-runtime/v3-authority/authority-envelope-builder.js",
+    "src/clean-runtime/v3-authority/authority-envelope.js"
+  ],
+  "manifestBlobShas": {
+    "src/clean-runtime/mutation/physical-capability-router.js": "4acc0ea42557c226b4c4ea0d162f787f46fb753e",
+    "src/clean-runtime/mutation/physical-proof-planner.js": "f2bacae79bbb476222f683fa74bda85daeef1629",
+    "src/clean-runtime/mutation/v3-authority-adapter.js": "4ef9f013fa1cc15ea2898fd39ca00dafa4c17879",
+    "src/clean-runtime/mutation/v3-promotion-foundation.js": "c09f5e2c6dac357b1a0b3d660dcc1b73c9dc04bc",
+    "src/clean-runtime/v3-authority/authority-envelope-builder.js": "19f5f180b2253dbda45401542153471ab3ce5c45",
+    "src/clean-runtime/v3-authority/authority-envelope.js": "5766c26d5deacd2b92a231c9a341e636ff97e392"
+  },
+  "inboundFoundationImports": [],
+  "findings": [],
+  "auditDigest": "85010bc61df9417c26fe7127dcf548b878f8ae43653f8e31322a53ba21d5d65c"
+}
