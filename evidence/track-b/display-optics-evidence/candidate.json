@@ -1,0 +1,30 @@
+{
+  "status": "OPTICS_EVIDENCE_CONTAINED_NOT_OPERATIONALLY_ADMITTED",
+  "genesisDigest": "cc2f27801d48bb1b9a8b813c78a413e50c552d6f11c103843b6acb7afe9bb887",
+  "worldDigest": "88b6e0190469a8ba32e02b83bb36d815c90532b889a9ad4786978b3ac1b90385",
+  "packetDigest": "0a5c07f33acc94731c6fa01e05a46abf1632dc1f2ebe1e8a413feb4886606735",
+  "opticsDigest": "bc4f1b3b0580bf183f0b1cf56d0f7c275d3a26ebfef47456f29cca03295a32e3",
+  "projectionDigest": "c463db226a952f398f0e08c2a2782620ad4be81a744bcda80ad3f2fc1fbd3fa7",
+  "nearFrustumContainingHalfExtentsMicrounits": {
+    "halfWidth": 89242,
+    "halfHeight": 52058
+  },
+  "authoredNearPlaneHalfExtentsMicrounits": {
+    "halfWidth": 200000,
+    "halfHeight": 150000
+  },
+  "depthIntervalMicrounits": [
+    0,
+    100000
+  ],
+  "numericalMarginMicrounits": 1,
+  "derivation": "SYMMETRIC_PROJECTION_NEAR_DIVIDED_BY_M00_M11_CEILING_PLUS_MARGIN;LINEAR_EYE_TO_NEAR_FRUSTUM",
+  "limitations": [
+    "NEW_WORLD_88B6E019_REQUIRES_OWN_REVIEW_AND_RECORD",
+    "CAPTURE_OPTICS_ONLY_NOT_LIVE_RENDERER_VERIFICATION",
+    "SOURCE_BOUND_NUMERIC_EVIDENCE_NOT_GENERAL_INTERVAL_PROOF",
+    "NO_ADMISSION_OR_CONSUMER_OR_RENDER_OR_GAMEPLAY_UNLOCK",
+    "FAR_FRUSTUM_NOT_CAMERA_COLLISION_BODY",
+    "NO_WALL_OPENING_FRONT_WALL_OR_CEILING_PROOF"
+  ]
+}

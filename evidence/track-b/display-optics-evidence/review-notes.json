@@ -1,0 +1,10 @@
+{
+  "scope": "REVIEWABLE_CAPTURE_OPTICS_EVIDENCE_PREPARATION_ONLY",
+  "verdict": "TRACK_B_ACCEPT_NO_FINDINGS_TWO_NONBLOCKING_NOTES",
+  "limitations": [
+    "Capture-host optics only, not live-renderer verification. Single-shot source-bound numeric evidence, not a general interval-arithmetic proof.",
+    "The 0..near depth interval assumes the apex is at the camera origin. That holds for the symmetric perspective camera sourceOptics pins, but is not proven for any other optics.",
+    "World 88b6e019 needs its own evidence-equivalence review and record. No admission inherited from c719e834.",
+    "No admission, camera consumer, render, door, gameplay, clinical or production unlock. A8 realistic mesh and B7 gameplay camera modes remain owner-reserved."
+  ]
+}
