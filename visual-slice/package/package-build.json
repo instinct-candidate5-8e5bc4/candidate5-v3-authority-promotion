@@ -1,9 +1,13 @@
 {
  "kind": "TRACK_B_PACKAGE_BUILD",
  "apiVersion": "1.1.0",
- "commit": "de81e88cec63f9a6295e966adb8c0ba778fa4075",
+ "commit": "da1459ebb105d49e4e561b18212dcbfb3e574eb7",
  "branch": "rebase-t7",
- "builtAt": "2026-09-30T04:18:54.091Z",
- "moduleSha256": "c26afd7d322106c56ef0026ed3482e0790e8d7e02f0e4dce0d65272c0966ad96",
- "manifestSha256": "9d923f5d505ddb522daa8e35e8cb26d3b011fec2be731ef8e30804d540da506e"
+ "builtAt": "2026-09-30T04:18:54.531Z",
+ "moduleSha256": "8d4273b520c49acf87fa8fd1a7ed65b8c1d7cd50252ad61a254c732d99a03d74",
+ "manifestSha256": "cab0cd7b83ef68c96ec331ccc220800d20b60cbcde63f65bbaca621b7e23d34e",
+ "committedWorldPins": {
+  "unitDefinitionSha256": "53f2376d576395d2a6f22dcd750c8e5acc77b6aa4614a1d0b32c210ff638e12f",
+  "note": "Runtime recompute anchor for the presentation-guard: a manifest pin that does not match these definition bytes is refused (executor review R3-1)."
+ }
 }

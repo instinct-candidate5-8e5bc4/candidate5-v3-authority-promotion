@@ -5,8 +5,8 @@
  "assets": [
   {
    "path": "package/renderer-package.mjs",
-   "bytes": 21235,
-   "sha256": "c26afd7d322106c56ef0026ed3482e0790e8d7e02f0e4dce0d65272c0966ad96"
+   "bytes": 21701,
+   "sha256": "8d4273b520c49acf87fa8fd1a7ed65b8c1d7cd50252ad61a254c732d99a03d74"
   },
   {
    "path": "package/projection-guard.mjs",
@@ -15,13 +15,13 @@
   },
   {
    "path": "package/committed-world-guard.mjs",
-   "bytes": 5591,
-   "sha256": "6ca7f79de2c1845325a1905c33281329730b259f9f802a36cd5ca1c31f5e8482"
+   "bytes": 5717,
+   "sha256": "8ed4e2cc1e42affd5203cc6bddb6c184aac3f190120f04729f59950b5105d52f"
   },
   {
    "path": "package/presentation-guard.mjs",
-   "bytes": 3444,
-   "sha256": "6f494446906086d397693ca6b72fd74192c4d27b66c29d503d7c8f1095edb812"
+   "bytes": 4727,
+   "sha256": "95568b32d829f0fa42fa677f1d9c86a79b9e2af7f26c6e357ccec531dab3baef"
   },
   {
    "path": "package/procedural-room.mjs",
@@ -46,7 +46,7 @@
   {
    "path": "entity-body-map.json",
    "bytes": 6121,
-   "sha256": "ffe6bc4842f92146d3468e695fb2f90d15579056f9ee5e079ceb81da5dfa2daa"
+   "sha256": "b30c3e0a76f1a316a6c04d17a52f89233c01113ca490cf5be91b94e0a861998a"
   },
   {
    "path": "articulated-layout.mjs",
@@ -66,7 +66,7 @@
   {
    "path": "scene-bundle.json",
    "bytes": 31968,
-   "sha256": "ef6405e10f579bb8312b079ec60b4a66f999b194599a41b21c6dfc6e7f2173ee"
+   "sha256": "406fd0898301d201e2842480e0c7b2437c3fa5acb98118a9152ead0edb9479d2"
   },
   {
    "path": "engine/pins.json",
