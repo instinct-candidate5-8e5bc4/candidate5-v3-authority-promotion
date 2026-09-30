@@ -4,20 +4,11 @@ var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __esm = (fn, res, err) => function __init() {
-  if (err) throw err[0];
-  try {
-    return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
-  } catch (e3) {
-    throw err = [e3], e3;
-  }
+var __esm = (fn, res) => function __init() {
+  return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
 };
 var __commonJS = (cb, mod) => function __require() {
-  try {
-    return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
-  } catch (e3) {
-    throw mod = 0, e3;
-  }
+  return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
 };
 var __export = (target, all) => {
   for (var name in all)
@@ -339,7 +330,14 @@ var require_canonical2 = __commonJS({
     function digest(v) {
       return crypto.createHash("sha256").update(canonicalBytes(v)).digest("hex");
     }
-    module.exports = { normalize, canonicalBytes, digest };
+    function deepFreeze(v) {
+      if (v && typeof v === "object" && !Object.isFrozen(v)) {
+        Object.freeze(v);
+        for (const x of Object.values(v)) deepFreeze(x);
+      }
+      return v;
+    }
+    module.exports = { normalize, canonicalBytes, digest, deepFreeze };
   }
 });
 
@@ -1119,7 +1117,7 @@ var require_runtime = __commonJS({
     var { digest } = require_canonical2();
     var { validateRelations, sortRelations, buildIndex } = require_relations();
     var { EventLog } = require_event_log();
-    function createMultiSupportRuntime({ initialWorld, legalityPort, eventLog = new EventLog(), ownerBodyBindings = null }) {
+    function createMultiSupportRuntime({ initialWorld, legalityPort, eventLog = new EventLog(), ownerBodyBindings = null, doorLegalityPort = null }) {
       let state = world({ ...initialWorld, stateSchemaVersion: "2.0.0", supportRelations: sortRelations(initialWorld.supportRelations || []), physicalRelations: void 0 });
       const seen = /* @__PURE__ */ new Set();
       function reject(id, code, evidence = {}) {
@@ -1141,6 +1139,15 @@ var require_runtime = __commonJS({
           const i2 = rs.findIndex((x) => x.relationId === c3.relationId);
           if (i2 < 0) throw Error("RELATION_NOT_FOUND");
           rs = rs.filter((_, j) => j !== i2);
+        } else if (c3.type === "SetDoorState") {
+          const environment = draft.environmentPhysicalState, doors = environment?.doorStates;
+          if (!environment?.sceneBounds || !Array.isArray(doors) || !doorLegalityPort || typeof doorLegalityPort.evaluate !== "function") throw Error("DOOR_AUTHORITY_MISSING");
+          const matches = doors.filter((d3) => d3.surfaceId === c3.surfaceId);
+          if (matches.length !== 1 || !["OPEN", "CLOSED"].includes(c3.state) || !["OPEN", "CLOSED"].includes(c3.expectedState)) throw Error("DOOR_COMMAND_INVALID");
+          const old = matches[0];
+          if (old.state !== c3.expectedState || old.geometryDigest !== c3.geometryDigest) throw Error("DOOR_STATE_OR_GEOMETRY_STALE");
+          const nextEnvironment = { ...environment, doorStates: doors.map((d3) => d3 === old ? { ...d3, state: c3.state } : d3) };
+          return { ...draft, environmentPhysicalState: nextEnvironment };
         } else if (c3.type === "SetTransform") {
           const e3 = entities[c3.entityId];
           if (!e3) throw Error("ENTITY_MISSING");
@@ -1169,6 +1176,10 @@ var require_runtime = __commonJS({
           for (const c3 of cs) {
             if (c3.expectedWorldRevision !== tx.expectedWorldRevision) throw Error("STALE_COMMAND");
             draft = mutate(draft, c3);
+          }
+          for (const c3 of cs.filter((c4) => c4.type === "SetDoorState")) {
+            const r2 = doorLegalityPort.evaluate({ worldState: before, proposedState: draft, command: c3 });
+            if (r2?.outcome !== "PASS") throw Object.assign(Error("DOOR_LEGALITY_" + (r2?.outcome || "UNKNOWN")), { detail: r2 || null });
           }
           const vr = validateRelations(draft.supportRelations, draft, { targetWorldRevision: before.revision + 1, ownerBodyBindings });
           if (vr.status !== "VALIDATED") throw Object.assign(Error(vr.code), { detail: vr });

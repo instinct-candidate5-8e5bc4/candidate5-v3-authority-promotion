@@ -1,10 +1,10 @@
 {
   "manifestVersion": "1.0.0",
   "kind": "TRACK_B_B7_ENGINE_MANIFEST",
-  "generatedAt": "2026-09-30T09:47:19.227Z",
+  "generatedAt": "2026-09-30T10:11:55.244Z",
   "git": {
-    "branch": "ws-correction-landing",
-    "commit": "a7e01179c241616a0d3d67175208040235b397ef"
+    "branch": "trackb-door-mechanics-transport9",
+    "commit": "c8f8e78f300c4d62bfd2c39b4a32df23493a8536"
   },
   "inlines": [
     {
@@ -39,7 +39,7 @@
     },
     {
       "check": "bundle built",
-      "target": "69537403cb84218fd5640fd48f8c0e5b831252fff52913131b42da9dd365b819",
+      "target": "653d841d3837648c1d74686f7f2473db43a45ec4ba1de5b9862717e3591a2a46",
       "pass": true
     }
   ],
@@ -50,11 +50,11 @@
     "packageDigest": "187cf1a4c0af01ef12087879f44eeb88a355499a860665e29cdb2f5ab0d06aec",
     "replayMatchesCommittedState": true
   },
-  "esbuildVersion": "0.28.2",
+  "esbuildVersion": "0.25.10",
   "bundle": {
     "path": "visual-slice/engine-bundle.js",
-    "bytes": 178675,
-    "sha256": "69537403cb84218fd5640fd48f8c0e5b831252fff52913131b42da9dd365b819",
+    "bytes": 180051,
+    "sha256": "653d841d3837648c1d74686f7f2473db43a45ec4ba1de5b9862717e3591a2a46",
     "minified": false
   }
 }

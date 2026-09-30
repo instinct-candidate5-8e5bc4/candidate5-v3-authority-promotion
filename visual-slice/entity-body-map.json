@@ -1,10 +1,10 @@
 {
  "mapVersion": "1.0.0",
  "kind": "TRACK_B_ENTITY_BODY_MAP",
- "generatedAt": "2026-09-30T09:47:19.418Z",
+ "generatedAt": "2026-09-30T10:11:55.447Z",
  "git": {
-  "branch": "ws-correction-landing",
-  "commit": "a7e01179c241616a0d3d67175208040235b397ef"
+  "branch": "trackb-door-mechanics-transport9",
+  "commit": "c8f8e78f300c4d62bfd2c39b4a32df23493a8536"
  },
  "policy": "Every visual entity resolves through this table ONLY. Unknown or unmapped entity = NO VISUAL ACTION (fail-closed). No default mapping, no substitution, no inference from names or meshes.",
  "anchors": {
