@@ -5,8 +5,8 @@
  "assets": [
   {
    "path": "package/renderer-package.mjs",
-   "bytes": 18427,
-   "sha256": "dc53c30d7dc1ed229b8750bf5ae454f25e1ab73abf51155e40ff4cf6688b9ba4"
+   "bytes": 18937,
+   "sha256": "8ce464c72233c66cc3d9ce71b11e39f84ef784d9cf8aa5368801269d5cb2f7d6"
   },
   {
    "path": "package/projection-guard.mjs",
@@ -20,8 +20,8 @@
   },
   {
    "path": "package/procedural-room.mjs",
-   "bytes": 7597,
-   "sha256": "389842f63b12670086e45855f0a51ef8a439130465432c3982d62aeaa0d36907"
+   "bytes": 7637,
+   "sha256": "ec73bf1eb772ed92898344ad01413a0ea9b14104d81137bc191215a4e6bb10e1"
   },
   {
    "path": "package/gate-statuses.json",
@@ -41,7 +41,7 @@
   {
    "path": "entity-body-map.json",
    "bytes": 5647,
-   "sha256": "aba4f36c6c12891c5713521bed422ef10eb94e0210c79a088ae5d5a8083f2fe1"
+   "sha256": "9720a865cc7fa68b29c926d1a3f542e4729dfa0a34eec9d457ee17affe44d097"
   },
   {
    "path": "articulated-layout.mjs",
@@ -50,8 +50,8 @@
   },
   {
    "path": "camera-lighting.mjs",
-   "bytes": 3300,
-   "sha256": "e270383bd38bf4a7a0a8b5541a07b7ed37fe5675df94b07030548f0f73ade46e"
+   "bytes": 3753,
+   "sha256": "1134fc3266ab2e8521f1e066be6f4bcaf4f78d457a831af3f416077f2fd26367"
   },
   {
    "path": "engine-bundle.js",
@@ -60,8 +60,8 @@
   },
   {
    "path": "scene-bundle.json",
-   "bytes": 31822,
-   "sha256": "3c1e905840f7453ddbfd9a4c0a661dc9b439a7f3894512bcce1b6a4b50a71852"
+   "bytes": 31990,
+   "sha256": "8d5ef71ed4ee97392b6e2854d6c6a93ea9a2896dccd7674a44fd10bc32006eb5"
   },
   {
    "path": "engine/pins.json",
