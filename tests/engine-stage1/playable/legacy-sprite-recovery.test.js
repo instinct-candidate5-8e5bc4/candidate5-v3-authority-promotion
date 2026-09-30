@@ -8,3 +8,9 @@ test('all seven legacy required sprite bytes are recoverable and pinned',()=>{
  assert.equal(crypto.createHash('sha256').update(b).digest('hex'),f.sha256);assert.equal(f.recoveryStatus,'HTTP_200_PNG_DECODE_VERIFIED');
  }
 });
+
+test('additional active root/config assets have exact recovered image bytes',()=>{
+ assert.equal(m.additionalRecovery.files.length,17);
+ for(const f of m.additionalRecovery.files){const b=fs.readFileSync(path.join(ROOT,f.path));assert.equal(b.length,f.bytes);assert.equal(crypto.createHash('sha256').update(b).digest('hex'),f.sha256);assert(['PNG','JPEG'].includes(f.format));}
+ assert(m.additionalRecovery.unavailableDormant.every(f=>f.available===false));
+});

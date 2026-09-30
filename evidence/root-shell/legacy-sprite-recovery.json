@@ -105,5 +105,519 @@
       "processing": "Alpha cleanup/crop, feather and synthetic contact shadow using Pillow; top-down v33 pair uses alpha crop.",
       "generationTimeLocal": "10:40:04"
     }
-  ]
+  ],
+  "additionalRecovery": {
+    "baseCommit": "ec29adeb19b4b0f9921e320cc2c8bc9d9fbb0659",
+    "files": [
+      {
+        "path": "assets/realistic/environments/clinic.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/environments/clinic.jpg",
+        "usage": "ACTIVE_DYNAMIC_ENVIRONMENT",
+        "httpStatus": "200",
+        "available": true,
+        "bytes": 259514,
+        "sha256": "ca89adad352cdfb99566bc4a681f29551a0c4983f3e423d16533c15da0fb5e95",
+        "width": 1600,
+        "height": 686,
+        "format": "JPEG",
+        "provenanceStatus": "RECOVERED_EXISTING_PRODUCT_ASSET",
+        "provenanceNote": "Exact legacy bytes recovered from the product origin. Detailed original generation or third-party source mapping has not yet been verified per file; no new license assertion."
+      },
+      {
+        "path": "assets/realistic/environments/industrial.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/environments/industrial.jpg",
+        "usage": "ACTIVE_DYNAMIC_ENVIRONMENT",
+        "httpStatus": "200",
+        "available": true,
+        "bytes": 254257,
+        "sha256": "8fa2d24fee40711570d2325831bcde33097b460672b6c95e78b2a23b9a550b69",
+        "width": 1600,
+        "height": 686,
+        "format": "JPEG",
+        "provenanceStatus": "RECOVERED_EXISTING_PRODUCT_ASSET",
+        "provenanceNote": "Exact legacy bytes recovered from the product origin. Detailed original generation or third-party source mapping has not yet been verified per file; no new license assertion."
+      },
+      {
+        "path": "assets/realistic/environments/school.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/environments/school.jpg",
+        "usage": "ACTIVE_DYNAMIC_ENVIRONMENT",
+        "httpStatus": "200",
+        "available": true,
+        "bytes": 213866,
+        "sha256": "ed48dabee5ce1419a5d5836cb7a92a5398b0fb3668b30dc9f48c82a16b154bb7",
+        "width": 1600,
+        "height": 686,
+        "format": "JPEG",
+        "provenanceStatus": "RECOVERED_EXISTING_PRODUCT_ASSET",
+        "provenanceNote": "Exact legacy bytes recovered from the product origin. Detailed original generation or third-party source mapping has not yet been verified per file; no new license assertion."
+      },
+      {
+        "path": "assets/realistic/environments/urban.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/environments/urban.jpg",
+        "usage": "ACTIVE_DYNAMIC_ENVIRONMENT",
+        "httpStatus": "200",
+        "available": true,
+        "bytes": 393636,
+        "sha256": "c6f695625325adc7313b1b2ab5225b4e87fb254893cfdc506ccfe02bcbeea487",
+        "width": 1600,
+        "height": 686,
+        "format": "JPEG",
+        "provenanceStatus": "RECOVERED_EXISTING_PRODUCT_ASSET",
+        "provenanceNote": "Exact legacy bytes recovered from the product origin. Detailed original generation or third-party source mapping has not yet been verified per file; no new license assertion."
+      },
+      {
+        "path": "assets/realistic/panoramas/empty_warehouse_01.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas/empty_warehouse_01.jpg",
+        "usage": "ACTIVE_DYNAMIC_PANORAMA",
+        "httpStatus": "200",
+        "available": true,
+        "bytes": 961665,
+        "sha256": "c59968758404a852a558a73477c7b6b75f12cbb55f31b070afb0a3edf3a4116a",
+        "width": 4096,
+        "height": 2048,
+        "format": "JPEG",
+        "provenanceStatus": "RECOVERED_EXISTING_PRODUCT_ASSET",
+        "provenanceNote": "Historical September 15 download/source note verified; school_hall is renamed Newman Locker Room, recompressed by Pillow. Recovered product bytes unchanged.",
+        "originalSourceUrl": "https://polyhaven.com/a/empty_warehouse_01",
+        "licenseUrl": "https://polyhaven.com/license",
+        "license": "CC0 1.0 Universal"
+      },
+      {
+        "path": "assets/realistic/panoramas/hospital_room.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas/hospital_room.jpg",
+        "usage": "ACTIVE_DYNAMIC_PANORAMA",
+        "httpStatus": "200",
+        "available": true,
+        "bytes": 353637,
+        "sha256": "a2e7e57e6c2b3c4c4fd175968833753e7891b73536831e27bb154de047bfb490",
+        "width": 4096,
+        "height": 2048,
+        "format": "JPEG",
+        "provenanceStatus": "RECOVERED_EXISTING_PRODUCT_ASSET",
+        "provenanceNote": "Historical September 15 download/source note verified; school_hall is renamed Newman Locker Room, recompressed by Pillow. Recovered product bytes unchanged.",
+        "originalSourceUrl": "https://polyhaven.com/a/hospital_room",
+        "licenseUrl": "https://polyhaven.com/license",
+        "license": "CC0 1.0 Universal"
+      },
+      {
+        "path": "assets/realistic/panoramas/school_hall.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas/school_hall.jpg",
+        "usage": "ACTIVE_DYNAMIC_PANORAMA",
+        "httpStatus": "200",
+        "available": true,
+        "bytes": 934936,
+        "sha256": "c85dc927ac565ed863f7f8e0bbaddd0fc66120b542630d3aa57e6163a5684361",
+        "width": 4096,
+        "height": 2048,
+        "format": "JPEG",
+        "provenanceStatus": "RECOVERED_EXISTING_PRODUCT_ASSET",
+        "provenanceNote": "Historical September 15 download/source note verified; school_hall is renamed Newman Locker Room, recompressed by Pillow. Recovered product bytes unchanged.",
+        "originalSourceUrl": "https://polyhaven.com/a/newman_locker_room",
+        "licenseUrl": "https://polyhaven.com/license",
+        "license": "CC0 1.0 Universal"
+      },
+      {
+        "path": "assets/realistic/panoramas/urban_street_01.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas/urban_street_01.jpg",
+        "usage": "ACTIVE_DYNAMIC_PANORAMA",
+        "httpStatus": "200",
+        "available": true,
+        "bytes": 2194103,
+        "sha256": "6dc7dc778dfe3c6a87beaf5b7c8d4bcaa491402f05ea677550f6775b57e815c8",
+        "width": 4096,
+        "height": 2048,
+        "format": "JPEG",
+        "provenanceStatus": "RECOVERED_EXISTING_PRODUCT_ASSET",
+        "provenanceNote": "Historical September 15 download/source note verified; school_hall is renamed Newman Locker Room, recompressed by Pillow. Recovered product bytes unchanged.",
+        "originalSourceUrl": "https://polyhaven.com/a/urban_street_01",
+        "licenseUrl": "https://polyhaven.com/license",
+        "license": "CC0 1.0 Universal"
+      },
+      {
+        "path": "assets/realistic/postures/recovery-floor-patient.png",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/postures/recovery-floor-patient.png",
+        "usage": "STATIC_JS:src/nextgen/posture-map.js",
+        "httpStatus": "200",
+        "available": true,
+        "bytes": 711066,
+        "sha256": "f73fcdebbedc67945094e7ab328cba6ccbd56a85ffd788c3dcc99f1ca3206024",
+        "width": 1418,
+        "height": 564,
+        "format": "PNG",
+        "provenanceStatus": "RECOVERED_EXISTING_PRODUCT_ASSET",
+        "provenanceNote": "Exact legacy bytes recovered from the product origin. Detailed original generation or third-party source mapping has not yet been verified per file; no new license assertion."
+      },
+      {
+        "path": "assets/realistic/postures/seated-chair-patient.png",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/postures/seated-chair-patient.png",
+        "usage": "STATIC_JS:src/nextgen/posture-map.js",
+        "httpStatus": "200",
+        "available": true,
+        "bytes": 1043000,
+        "sha256": "528f30b5ae126419877ee18bb754cb70d82a06b7972dd587c03f7e4b4adfa949",
+        "width": 893,
+        "height": 1576,
+        "format": "PNG",
+        "provenanceStatus": "RECOVERED_EXISTING_PRODUCT_ASSET",
+        "provenanceNote": "Exact legacy bytes recovered from the product origin. Detailed original generation or third-party source mapping has not yet been verified per file; no new license assertion."
+      },
+      {
+        "path": "assets/realistic/postures/seated-floor-patient.png",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/postures/seated-floor-patient.png",
+        "usage": "STATIC_JS:src/nextgen/posture-map.js",
+        "httpStatus": "200",
+        "available": true,
+        "bytes": 835675,
+        "sha256": "4c1d6024cf9947275e43f75ef5c4c59503b784492248ebf2c4c3bc66118066ee",
+        "width": 1284,
+        "height": 1021,
+        "format": "PNG",
+        "provenanceStatus": "RECOVERED_EXISTING_PRODUCT_ASSET",
+        "provenanceNote": "Exact legacy bytes recovered from the product origin. Detailed original generation or third-party source mapping has not yet been verified per file; no new license assertion."
+      },
+      {
+        "path": "assets/realistic/postures/standing-patient.png",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/postures/standing-patient.png",
+        "usage": "STATIC_JS:src/nextgen/posture-map.js",
+        "httpStatus": "200",
+        "available": true,
+        "bytes": 892103,
+        "sha256": "f0a18cdb53dc9ab2d01a366d9f5bdeab7bf943fb7c3e10856dbc6ed113ad4912",
+        "width": 1126,
+        "height": 1488,
+        "format": "PNG",
+        "provenanceStatus": "RECOVERED_EXISTING_PRODUCT_ASSET",
+        "provenanceNote": "Exact legacy bytes recovered from the product origin. Detailed original generation or third-party source mapping has not yet been verified per file; no new license assertion."
+      },
+      {
+        "path": "assets/realistic/postures/supine-floor-patient.png",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/postures/supine-floor-patient.png",
+        "usage": "STATIC_JS:src/nextgen/posture-map.js",
+        "httpStatus": "200",
+        "available": true,
+        "bytes": 712131,
+        "sha256": "2e540bcbe867c741ff0f2f6d96e0644c45b355832093c2d170cdc0bf8fe6f655",
+        "width": 1413,
+        "height": 726,
+        "format": "PNG",
+        "provenanceStatus": "RECOVERED_EXISTING_PRODUCT_ASSET",
+        "provenanceNote": "Exact legacy bytes recovered from the product origin. Detailed original generation or third-party source mapping has not yet been verified per file; no new license assertion."
+      },
+      {
+        "path": "assets/realistic/postures/supine-gurney-patient.png",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/postures/supine-gurney-patient.png",
+        "usage": "STATIC_JS:src/nextgen/posture-map.js",
+        "httpStatus": "200",
+        "available": true,
+        "bytes": 1073292,
+        "sha256": "1c6eb647400adc67519eef1b075bbb850827d4532418068e0c9514817a214f9a",
+        "width": 1251,
+        "height": 951,
+        "format": "PNG",
+        "provenanceStatus": "RECOVERED_EXISTING_PRODUCT_ASSET",
+        "provenanceNote": "Exact legacy bytes recovered from the product origin. Detailed original generation or third-party source mapping has not yet been verified per file; no new license assertion."
+      },
+      {
+        "path": "assets/realistic/witness/caller.png",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/witness/caller.png",
+        "usage": "STATIC_JS:src/nextgen/npc-state.js",
+        "httpStatus": "200",
+        "available": true,
+        "bytes": 702158,
+        "sha256": "e259b2868d00ba210da8f1d3a77fca9fdbb596bec34278c412325b88b6e19712",
+        "width": 576,
+        "height": 1463,
+        "format": "PNG",
+        "provenanceStatus": "RECOVERED_EXISTING_PRODUCT_ASSET",
+        "provenanceNote": "Exact legacy bytes recovered from the product origin. Detailed original generation or third-party source mapping has not yet been verified per file; no new license assertion."
+      },
+      {
+        "path": "assets/realistic/witness/distressed.png",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/witness/distressed.png",
+        "usage": "STATIC_JS:src/nextgen/npc-state.js",
+        "httpStatus": "200",
+        "available": true,
+        "bytes": 734879,
+        "sha256": "ab9aa2c0a1338d1fbe41d510f58e0c07af1752d69e13330a129983c2e1312098",
+        "width": 646,
+        "height": 1457,
+        "format": "PNG",
+        "provenanceStatus": "RECOVERED_EXISTING_PRODUCT_ASSET",
+        "provenanceNote": "Exact legacy bytes recovered from the product origin. Detailed original generation or third-party source mapping has not yet been verified per file; no new license assertion."
+      },
+      {
+        "path": "assets/realistic/witness/kneeling.png",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/witness/kneeling.png",
+        "usage": "STATIC_JS:src/nextgen/npc-state.js",
+        "httpStatus": "200",
+        "available": true,
+        "bytes": 650913,
+        "sha256": "fe23aa549768d72e36b00270b7d8fdd4a05aac30b740df2fb28a2d4f7c656c0a",
+        "width": 869,
+        "height": 942,
+        "format": "PNG",
+        "provenanceStatus": "RECOVERED_EXISTING_PRODUCT_ASSET",
+        "provenanceNote": "Exact legacy bytes recovered from the product origin. Detailed original generation or third-party source mapping has not yet been verified per file; no new license assertion."
+      }
+    ],
+    "unavailableDormant": [
+      {
+        "path": "assets/realistic/panoramas-integrated/clinic-recovery-floor.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas-integrated/clinic-recovery-floor.jpg",
+        "usage": "DORMANT_SUPPORTEDPOSE_FALSE",
+        "httpStatus": "200",
+        "available": false,
+        "error": "NOT_IMAGE"
+      },
+      {
+        "path": "assets/realistic/panoramas-integrated/clinic-recovery.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas-integrated/clinic-recovery.jpg",
+        "usage": "DORMANT_SUPPORTEDPOSE_FALSE",
+        "httpStatus": "200",
+        "available": false,
+        "error": "NOT_IMAGE"
+      },
+      {
+        "path": "assets/realistic/panoramas-integrated/clinic-seated-chair.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas-integrated/clinic-seated-chair.jpg",
+        "usage": "DORMANT_SUPPORTEDPOSE_FALSE",
+        "httpStatus": "200",
+        "available": false,
+        "error": "NOT_IMAGE"
+      },
+      {
+        "path": "assets/realistic/panoramas-integrated/clinic-seated-floor.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas-integrated/clinic-seated-floor.jpg",
+        "usage": "DORMANT_SUPPORTEDPOSE_FALSE",
+        "httpStatus": "200",
+        "available": false,
+        "error": "NOT_IMAGE"
+      },
+      {
+        "path": "assets/realistic/panoramas-integrated/clinic-standing.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas-integrated/clinic-standing.jpg",
+        "usage": "DORMANT_SUPPORTEDPOSE_FALSE",
+        "httpStatus": "200",
+        "available": false,
+        "error": "NOT_IMAGE"
+      },
+      {
+        "path": "assets/realistic/panoramas-integrated/clinic-supine-floor.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas-integrated/clinic-supine-floor.jpg",
+        "usage": "DORMANT_SUPPORTEDPOSE_FALSE",
+        "httpStatus": "200",
+        "available": false,
+        "error": "NOT_IMAGE"
+      },
+      {
+        "path": "assets/realistic/panoramas-integrated/clinic-supine-gurney.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas-integrated/clinic-supine-gurney.jpg",
+        "usage": "DORMANT_SUPPORTEDPOSE_FALSE",
+        "httpStatus": "200",
+        "available": false,
+        "error": "NOT_IMAGE"
+      },
+      {
+        "path": "assets/realistic/panoramas-integrated/clinic-supine.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas-integrated/clinic-supine.jpg",
+        "usage": "DORMANT_SUPPORTEDPOSE_FALSE",
+        "httpStatus": "200",
+        "available": false,
+        "error": "NOT_IMAGE"
+      },
+      {
+        "path": "assets/realistic/panoramas-integrated/industrial-recovery-floor.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas-integrated/industrial-recovery-floor.jpg",
+        "usage": "DORMANT_SUPPORTEDPOSE_FALSE",
+        "httpStatus": "200",
+        "available": false,
+        "error": "NOT_IMAGE"
+      },
+      {
+        "path": "assets/realistic/panoramas-integrated/industrial-recovery.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas-integrated/industrial-recovery.jpg",
+        "usage": "DORMANT_SUPPORTEDPOSE_FALSE",
+        "httpStatus": "200",
+        "available": false,
+        "error": "NOT_IMAGE"
+      },
+      {
+        "path": "assets/realistic/panoramas-integrated/industrial-seated-chair.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas-integrated/industrial-seated-chair.jpg",
+        "usage": "DORMANT_SUPPORTEDPOSE_FALSE",
+        "httpStatus": "200",
+        "available": false,
+        "error": "NOT_IMAGE"
+      },
+      {
+        "path": "assets/realistic/panoramas-integrated/industrial-seated-floor.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas-integrated/industrial-seated-floor.jpg",
+        "usage": "DORMANT_SUPPORTEDPOSE_FALSE",
+        "httpStatus": "200",
+        "available": false,
+        "error": "NOT_IMAGE"
+      },
+      {
+        "path": "assets/realistic/panoramas-integrated/industrial-standing.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas-integrated/industrial-standing.jpg",
+        "usage": "DORMANT_SUPPORTEDPOSE_FALSE",
+        "httpStatus": "200",
+        "available": false,
+        "error": "NOT_IMAGE"
+      },
+      {
+        "path": "assets/realistic/panoramas-integrated/industrial-supine-floor.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas-integrated/industrial-supine-floor.jpg",
+        "usage": "DORMANT_SUPPORTEDPOSE_FALSE",
+        "httpStatus": "200",
+        "available": false,
+        "error": "NOT_IMAGE"
+      },
+      {
+        "path": "assets/realistic/panoramas-integrated/industrial-supine-gurney.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas-integrated/industrial-supine-gurney.jpg",
+        "usage": "DORMANT_SUPPORTEDPOSE_FALSE",
+        "httpStatus": "200",
+        "available": false,
+        "error": "NOT_IMAGE"
+      },
+      {
+        "path": "assets/realistic/panoramas-integrated/industrial-supine.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas-integrated/industrial-supine.jpg",
+        "usage": "DORMANT_SUPPORTEDPOSE_FALSE",
+        "httpStatus": "200",
+        "available": false,
+        "error": "NOT_IMAGE"
+      },
+      {
+        "path": "assets/realistic/panoramas-integrated/school-recovery-floor.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas-integrated/school-recovery-floor.jpg",
+        "usage": "DORMANT_SUPPORTEDPOSE_FALSE",
+        "httpStatus": "200",
+        "available": false,
+        "error": "NOT_IMAGE"
+      },
+      {
+        "path": "assets/realistic/panoramas-integrated/school-recovery.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas-integrated/school-recovery.jpg",
+        "usage": "DORMANT_SUPPORTEDPOSE_FALSE",
+        "httpStatus": "200",
+        "available": false,
+        "error": "NOT_IMAGE"
+      },
+      {
+        "path": "assets/realistic/panoramas-integrated/school-seated-chair.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas-integrated/school-seated-chair.jpg",
+        "usage": "DORMANT_SUPPORTEDPOSE_FALSE",
+        "httpStatus": "200",
+        "available": false,
+        "error": "NOT_IMAGE"
+      },
+      {
+        "path": "assets/realistic/panoramas-integrated/school-seated-floor.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas-integrated/school-seated-floor.jpg",
+        "usage": "DORMANT_SUPPORTEDPOSE_FALSE",
+        "httpStatus": "200",
+        "available": false,
+        "error": "NOT_IMAGE"
+      },
+      {
+        "path": "assets/realistic/panoramas-integrated/school-standing.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas-integrated/school-standing.jpg",
+        "usage": "DORMANT_SUPPORTEDPOSE_FALSE",
+        "httpStatus": "200",
+        "available": false,
+        "error": "NOT_IMAGE"
+      },
+      {
+        "path": "assets/realistic/panoramas-integrated/school-supine-floor.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas-integrated/school-supine-floor.jpg",
+        "usage": "DORMANT_SUPPORTEDPOSE_FALSE",
+        "httpStatus": "200",
+        "available": false,
+        "error": "NOT_IMAGE"
+      },
+      {
+        "path": "assets/realistic/panoramas-integrated/school-supine-gurney.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas-integrated/school-supine-gurney.jpg",
+        "usage": "DORMANT_SUPPORTEDPOSE_FALSE",
+        "httpStatus": "200",
+        "available": false,
+        "error": "NOT_IMAGE"
+      },
+      {
+        "path": "assets/realistic/panoramas-integrated/school-supine.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas-integrated/school-supine.jpg",
+        "usage": "DORMANT_SUPPORTEDPOSE_FALSE",
+        "httpStatus": "200",
+        "available": false,
+        "error": "NOT_IMAGE"
+      },
+      {
+        "path": "assets/realistic/panoramas-integrated/urban-recovery-floor.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas-integrated/urban-recovery-floor.jpg",
+        "usage": "DORMANT_SUPPORTEDPOSE_FALSE",
+        "httpStatus": "200",
+        "available": false,
+        "error": "NOT_IMAGE"
+      },
+      {
+        "path": "assets/realistic/panoramas-integrated/urban-recovery.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas-integrated/urban-recovery.jpg",
+        "usage": "DORMANT_SUPPORTEDPOSE_FALSE",
+        "httpStatus": "200",
+        "available": false,
+        "error": "NOT_IMAGE"
+      },
+      {
+        "path": "assets/realistic/panoramas-integrated/urban-seated-chair.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas-integrated/urban-seated-chair.jpg",
+        "usage": "DORMANT_SUPPORTEDPOSE_FALSE",
+        "httpStatus": "200",
+        "available": false,
+        "error": "NOT_IMAGE"
+      },
+      {
+        "path": "assets/realistic/panoramas-integrated/urban-seated-floor.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas-integrated/urban-seated-floor.jpg",
+        "usage": "DORMANT_SUPPORTEDPOSE_FALSE",
+        "httpStatus": "200",
+        "available": false,
+        "error": "NOT_IMAGE"
+      },
+      {
+        "path": "assets/realistic/panoramas-integrated/urban-standing.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas-integrated/urban-standing.jpg",
+        "usage": "DORMANT_SUPPORTEDPOSE_FALSE",
+        "httpStatus": "200",
+        "available": false,
+        "error": "NOT_IMAGE"
+      },
+      {
+        "path": "assets/realistic/panoramas-integrated/urban-supine-floor.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas-integrated/urban-supine-floor.jpg",
+        "usage": "DORMANT_SUPPORTEDPOSE_FALSE",
+        "httpStatus": "200",
+        "available": false,
+        "error": "NOT_IMAGE"
+      },
+      {
+        "path": "assets/realistic/panoramas-integrated/urban-supine-gurney.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas-integrated/urban-supine-gurney.jpg",
+        "usage": "DORMANT_SUPPORTEDPOSE_FALSE",
+        "httpStatus": "200",
+        "available": false,
+        "error": "NOT_IMAGE"
+      },
+      {
+        "path": "assets/realistic/panoramas-integrated/urban-supine.jpg",
+        "sourceUrl": "https://ko-rishon-first-aid.pages.dev/assets/realistic/panoramas-integrated/urban-supine.jpg",
+        "usage": "DORMANT_SUPPORTEDPOSE_FALSE",
+        "httpStatus": "200",
+        "available": false,
+        "error": "NOT_IMAGE"
+      }
+    ],
+    "dormantReason": "Exact base index.html sets supportedPose=false. Integrated panorama template is not requested by this base. HTTP 200 responses were non-image fallbacks and were not copied."
+  }
 }
