@@ -2,8 +2,10 @@
 // Camera: exact corner-based fit of the casualty world envelope along the
 // authored view direction; never closer than the authored distance. Grounded
 // input is the CERTIFIED casualty world envelope (descriptor-derived).
-// Lighting: day/night/winter are RIGS ONLY (light params); no geometry, no
-// material, no tint pass, no digest-bearing data.
+// Lighting: day/night/winter are RIGS ONLY (light params + an exposure scalar);
+// no geometry, no material, no tint pass, no digest-bearing data.
+// PW-3: each rig adds a clinical ceiling fixture (interior key character) and
+// a tone-mapping exposure - a treatment room reads as interior-lit, not sunlit.
 const sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]];
 const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
 const norm=a=>{const l=Math.hypot(a[0],a[1],a[2]);return[a[0]/l,a[1]/l,a[2]/l]};
@@ -43,7 +45,7 @@ export function projectNdc(point,camPos,lookAt,fovDeg,aspect){
  return [dot(v,right)/(z*tanV*aspect),dot(v,up)/(z*tanV)];
 }
 export const LIGHTING_RIGS=Object.freeze({
- day:Object.freeze({label:'יום',ambient:{colorHex:'0xbfd4e0',intensity:0.55},key:{colorHex:'0xfff2dd',intensity:1.1,positionMicrounits:[3000000,5000000,2000000]},fill:{colorHex:'0xdde8ff',intensity:0.35,positionMicrounits:[-4000000,3500000,4000000]},shadow:{mapSize:2048,bias:-0.0005}}),
- night:Object.freeze({label:'לילה',ambient:{colorHex:'0x2a3a55',intensity:0.28},key:{colorHex:'0xffe0b3',intensity:0.55,positionMicrounits:[2500000,4200000,1800000]},fill:{colorHex:'0x33415e',intensity:0.12,positionMicrounits:[-4000000,3000000,4000000]},shadow:{mapSize:2048,bias:-0.0005}}),
- winter:Object.freeze({label:'חורף',ambient:{colorHex:'0xaec6d8',intensity:0.62},key:{colorHex:'0xeaf2ff',intensity:0.85,positionMicrounits:[3500000,4800000,1500000]},fill:{colorHex:'0xcdd9ea',intensity:0.42,positionMicrounits:[-4000000,3500000,4000000]},shadow:{mapSize:2048,bias:-0.0005}})
+ day:Object.freeze({label:'יום',ambient:{colorHex:'0xbfd4e0',intensity:0.5},key:{colorHex:'0xfff2dd',intensity:0.95,positionMicrounits:[3000000,5000000,2000000]},fill:{colorHex:'0xdde8ff',intensity:0.35,positionMicrounits:[-4000000,3500000,4000000]},ceiling:{colorHex:'0xf2f5f7',intensity:0.85,positionMicrounits:[0,5800000,0]},exposure:1.1,shadow:{mapSize:2048,bias:-0.0005}}),
+ night:Object.freeze({label:'לילה',ambient:{colorHex:'0x2a3a55',intensity:0.22},key:{colorHex:'0xffe0b3',intensity:0.4,positionMicrounits:[2500000,4200000,1800000]},fill:{colorHex:'0x33415e',intensity:0.12,positionMicrounits:[-4000000,3000000,4000000]},ceiling:{colorHex:'0xffd9a8',intensity:0.55,positionMicrounits:[0,5800000,0]},exposure:1.0,shadow:{mapSize:2048,bias:-0.0005}}),
+ winter:Object.freeze({label:'חורף',ambient:{colorHex:'0xaec6d8',intensity:0.55},key:{colorHex:'0xeaf2ff',intensity:0.75,positionMicrounits:[3500000,4800000,1500000]},fill:{colorHex:'0xcdd9ea',intensity:0.42,positionMicrounits:[-4000000,3500000,4000000]},ceiling:{colorHex:'0xe8f0fa',intensity:0.7,positionMicrounits:[0,5800000,0]},exposure:1.05,shadow:{mapSize:2048,bias:-0.0005}})
 });

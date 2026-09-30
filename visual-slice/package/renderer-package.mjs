@@ -76,6 +76,8 @@ export async function mount(container,opts={}){
   // Scene
   const w=opts.width||container.clientWidth||960,h=opts.height||container.clientHeight||600;
   const renderer=new THREE.WebGLRenderer({antialias:true});
+  // PW-3: filmic tone mapping + rig exposure - interior clinical light character.
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=bundle.lighting.exposure??1.0;
   renderer.setSize(w,h);renderer.setPixelRatio(Math.min(devicePixelRatio,2));
   renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
   container.appendChild(renderer.domElement);
@@ -150,6 +152,9 @@ export async function mount(container,opts={}){
   key.position.set(...bundle.lighting.key.positionMicrounits.map(m));key.castShadow=true;scene.add(key);
   const fill=new THREE.DirectionalLight(parseInt(bundle.lighting.fill.colorHex),bundle.lighting.fill.intensity);
   fill.position.set(...bundle.lighting.fill.positionMicrounits.map(m));scene.add(fill);
+  // PW-3: clinical ceiling fixture (visual-only claim from the served rig).
+  if(bundle.lighting.ceiling){const ceil=new THREE.PointLight(parseInt(bundle.lighting.ceiling.colorHex),bundle.lighting.ceiling.intensity,0,1.6);
+   ceil.position.set(...bundle.lighting.ceiling.positionMicrounits.map(m));scene.add(ceil)}
   // Overlay: honesty banner + detailed gate statuses + bounded finding panel.
   const overlay=document.createElement('div');
   overlay.style.cssText='position:absolute;top:0;left:0;right:0;padding:8px 12px;background:rgba(10,16,20,.92);border-bottom:2px solid #b8892d;font:12px/1.5 system-ui;color:#cfe3ee;pointer-events:none;z-index:5';

@@ -11,14 +11,14 @@
 const U=1e6,m=v=>v/U;
 function canvasTex(THREE,w,h,paint,repX=1,repY=1){const c=document.createElement('canvas');c.width=w;c.height=h;paint(c.getContext('2d'),w,h);
  const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(repX,repY);return t}
-function floorTexture(THREE){return canvasTex(THREE,256,256,(x,w,h)=>{x.fillStyle='#8f8a7d';x.fillRect(0,0,w,h);
- for(let i=0;i<4;i++)for(let j=0;j<4;j++){x.fillStyle=(i+j)%2?'#948f82':'#8a8578';x.fillRect(i*64,j*64,64,64)}
+function floorTexture(THREE){return canvasTex(THREE,256,256,(x,w,h)=>{x.fillStyle='#a8a69b';x.fillRect(0,0,w,h);
+ for(let i=0;i<4;i++)for(let j=0;j<4;j++){x.fillStyle=(i+j)%2?'#b0aea3':'#a09e93';x.fillRect(i*64,j*64,64,64)}
  x.strokeStyle='rgba(60,58,50,.55)';x.lineWidth=2;for(let i=0;i<=4;i++){x.beginPath();x.moveTo(i*64,0);x.lineTo(i*64,h);x.stroke();x.beginPath();x.moveTo(0,i*64);x.lineTo(w,i*64);x.stroke()}
  for(let i=0;i<300;i++){x.fillStyle='rgba(70,66,58,'+Math.random()*.08+')';x.fillRect(Math.random()*w,Math.random()*h,2,2)}},10,10)}
 function plasterTexture(THREE,tint){return canvasTex(THREE,128,128,(x,w,h)=>{x.fillStyle=tint;x.fillRect(0,0,w,h);
  for(let i=0;i<900;i++){x.fillStyle='rgba(0,0,0,'+Math.random()*.05+')';x.fillRect(Math.random()*w,Math.random()*h,1,1)}
  for(let i=0;i<400;i++){x.fillStyle='rgba(255,255,255,'+Math.random()*.05+')';x.fillRect(Math.random()*w,Math.random()*h,1,1)}},6,2)}
-function lockerTexture(THREE){return canvasTex(THREE,128,256,(x,w,h)=>{x.fillStyle='#4d7a99';x.fillRect(0,0,w,h);
+function lockerTexture(THREE){return canvasTex(THREE,128,256,(x,w,h)=>{x.fillStyle='#7fa0b4';x.fillRect(0,0,w,h);
  const g=x.createLinearGradient(0,0,w,0);g.addColorStop(0,'rgba(255,255,255,.18)');g.addColorStop(.5,'rgba(255,255,255,0)');g.addColorStop(1,'rgba(0,0,0,.25)');x.fillStyle=g;x.fillRect(0,0,w,h);
  x.strokeStyle='rgba(20,40,55,.8)';x.lineWidth=4;x.strokeRect(8,8,w-16,h-16);
  x.fillStyle='rgba(20,40,55,.85)';for(let i=0;i<5;i++)x.fillRect(24,30+i*14,w-48,6);           // vents
@@ -43,13 +43,13 @@ export function buildProceduralRoom(THREE,room){
  const floor=byId['visual:floor'],back=byId['visual:back-wall'],left=byId['visual:left-wall'],
        right=byId['visual:right-wall'],door=byId['visual:door'];
  const lockers=Object.keys(byId).filter(k=>/^visual:locker-\d+$/.test(k)).sort().map(k=>byId[k]);
- const floorMat=new THREE.MeshStandardMaterial({map:floorTexture(THREE),roughness:.9,metalness:.02});
- const wallMat=new THREE.MeshStandardMaterial({map:plasterTexture(THREE,'#c9c4b4'),roughness:.95});
- const wallMatSide=new THREE.MeshStandardMaterial({map:plasterTexture(THREE,'#c4bfaf'),roughness:.95});
+ const floorMat=new THREE.MeshStandardMaterial({map:floorTexture(THREE),roughness:.55,metalness:.04}); // PW-3: washable clinical vinyl sheen
+ const wallMat=new THREE.MeshStandardMaterial({map:plasterTexture(THREE,'#d8dfd8'),roughness:.95});
+ const wallMatSide=new THREE.MeshStandardMaterial({map:plasterTexture(THREE,'#cdd6cd'),roughness:.95});
  const lockerMat=new THREE.MeshStandardMaterial({map:lockerTexture(THREE),roughness:.55,metalness:.35});
  const doorMat=new THREE.MeshStandardMaterial({map:woodTexture(THREE),roughness:.65,metalness:.05});
- const trimMat=new THREE.MeshStandardMaterial({color:0x8a8578,roughness:.8});
- const ceilMat=new THREE.MeshStandardMaterial({map:plasterTexture(THREE,'#d6d2c6'),roughness:.95});
+ const trimMat=new THREE.MeshStandardMaterial({color:0x9a958a,roughness:.8});
+ const ceilMat=new THREE.MeshStandardMaterial({map:plasterTexture(THREE,'#e4e7e2'),roughness:.95});
  // Certified skins (exact AABB substitution, by certified surface id).
  if(floor)grp.add(box(THREE,floor,floorMat));
  if(back)grp.add(box(THREE,back,wallMat));

@@ -97,7 +97,7 @@ document.getElementById('caveats').innerHTML=
  `<p><b>Status caveats:</b><br>Casualty: ${bundle.statusCaveats.casualty.gate} ${bundle.statusCaveats.casualty.gateResult} &mdash; ${bundle.statusCaveats.casualty.caveat}<br>Chair: ${bundle.statusCaveats.chair.gate} ${bundle.statusCaveats.chair.gateResult} &mdash; ${bundle.statusCaveats.chair.caveat}</p>`+
  `<p><b>Gate D declared unknowns (not certified):</b> ${bundle.declaredUnknowns.join('; ')}</p>`+
  `<p><b>Input digests:</b><br>${Object.entries(bundle.inputs).map(([k,v])=>k+': <code>'+v+'</code>').join('<br>')}</p>`;
-const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;document.body.appendChild(renderer.domElement);
+const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;document.body.appendChild(renderer.domElement);renderer.toneMapping=THREE.ACESFilmicToneMapping;
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x101a20);scene.fog=new THREE.Fog(0x101a20,18,42);
 const camera=new THREE.PerspectiveCamera(bundle.camera.fovDegrees,innerWidth/innerHeight,.05,120);
 const envU=bundle.casualty.worldEnvelopeMicrounits; // casualty world envelope derived from the certified ScenePackage aggregates (data lineage; visuals are never certified physics)
@@ -142,12 +142,15 @@ scene.add(new THREE.AmbientLight(parseInt(bundle.lighting.ambient.colorHex),bund
 const key=new THREE.DirectionalLight(parseInt(bundle.lighting.key.colorHex),bundle.lighting.key.intensity);key.position.set(...bundle.lighting.key.positionMicrounits.map(m));key.castShadow=true;
 key.shadow.mapSize.set(2048,2048);key.shadow.camera.left=-12;key.shadow.camera.right=12;key.shadow.camera.top=12;key.shadow.camera.bottom=-12;key.shadow.camera.far=40;key.shadow.bias=-.0005;scene.add(key);
 const fill=new THREE.DirectionalLight(parseInt(bundle.lighting.fill.colorHex),bundle.lighting.fill.intensity);fill.position.set(...bundle.lighting.fill.positionMicrounits.map(m));scene.add(fill);
+const ceil=new THREE.PointLight(0xf2f5f7,.85,0,1.6);ceil.position.set(0,5.8,0);scene.add(ceil);
 const ambient=scene.children.find(o=>o.isAmbientLight);
 document.querySelectorAll('#rigbar button').forEach(b=>{b.addEventListener('click',()=>applyRig(b.dataset.rig));b.disabled=false});
 function applyRig(name){const rig=LIGHTING_RIGS[name];if(!rig)return;
  ambient.color.set(parseInt(rig.ambient.colorHex));ambient.intensity=rig.ambient.intensity;
  key.color.set(parseInt(rig.key.colorHex));key.intensity=rig.key.intensity;key.position.set(...rig.key.positionMicrounits.map(m));
  fill.color.set(parseInt(rig.fill.colorHex));fill.intensity=rig.fill.intensity;fill.position.set(...rig.fill.positionMicrounits.map(m));
+ ceil.color.set(parseInt(rig.ceiling.colorHex));ceil.intensity=rig.ceiling.intensity;ceil.position.set(...rig.ceiling.positionMicrounits.map(m));
+ renderer.toneMappingExposure=rig.exposure;
  key.shadow.mapSize.set(rig.shadow.mapSize,rig.shadow.mapSize);key.shadow.bias=rig.shadow.bias;
  document.querySelectorAll('#rigbar button').forEach(b=>b.dataset.active=b.dataset.rig===name)}
 // C6 interactive demo (additive): bag placement proposals go ONLY through the

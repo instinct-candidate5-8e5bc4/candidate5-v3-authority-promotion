@@ -29,7 +29,7 @@ const bundle={bundleVersion:'1.0.0',kind:'TRACK_B_VISUAL_SCENE_BUNDLE',generated
  microunitsPerWorldUnit:1000000,
  room:surfaces.surfaces,casualty,equipment,
  camera:{note:'Camera calibration formally belongs in the ScenePackage per the architecture decision; the certified ScenePackage has no camera field and was not modified. These are presentation-only defaults pending a future ScenePackage revision.',positionMicrounits:[4000000,3000000,6000000],lookAtMicrounits:[0,300000,0],fovDegrees:55},
- lighting:{note:'Visual-only claims; never physical evidence.',ambient:{colorHex:'0xbfd4e0',intensity:.55},key:{colorHex:'0xfff2dd',intensity:1.1,positionMicrounits:[3000000,5000000,2000000]},fill:{colorHex:'0xdde8ff',intensity:.35,positionMicrounits:[-4000000,3500000,4000000]}}};
+ lighting:{note:'Visual-only claims; never physical evidence.',ambient:{colorHex:'0xbfd4e0',intensity:.5},key:{colorHex:'0xfff2dd',intensity:.95,positionMicrounits:[3000000,5000000,2000000]},fill:{colorHex:'0xdde8ff',intensity:.35,positionMicrounits:[-4000000,3500000,4000000]},ceiling:{colorHex:'0xf2f5f7',intensity:.85,positionMicrounits:[0,5800000,0]},exposure:1.1}};
 if(!ok){bundle.status='REJECTED';bundle.reason={descriptor:descriptor.status,surfaces:surfaces.status,casualty:casualty.status,equipment:equipment.status}}else bundle.status='READY';
 const out=path.join(__dirname,'../../visual-slice/scene-bundle.json');
 fs.writeFileSync(out,JSON.stringify(bundle,null,1));

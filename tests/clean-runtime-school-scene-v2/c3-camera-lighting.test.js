@@ -11,7 +11,10 @@ test('G8 day/night/winter are lighting RIGS only: light params, zero geometry/ma
  const names=Object.keys(CL.LIGHTING_RIGS).sort();
  assert.deepEqual(names,['day','night','winter']);
  for(const [name,rig] of Object.entries(CL.LIGHTING_RIGS)){
-  assert.deepEqual(Object.keys(rig).sort(),['ambient','fill','key','label','shadow'],name+' touches lights only');
+  assert.deepEqual(Object.keys(rig).sort(),['ambient','ceiling','exposure','fill','key','label','shadow'],name+' touches lights + exposure only');
+  assert.equal(typeof rig.exposure,'number',name+' carries a tone-mapping exposure scalar');
+  assert.equal(typeof rig.ceiling.intensity,'number');
+  assert.ok(Array.isArray(rig.ceiling.positionMicrounits),name+' ceiling position is a light position');
   assert.equal(typeof rig.ambient.intensity,'number');
   assert.equal(typeof rig.key.intensity,'number');
   assert.ok(Array.isArray(rig.key.positionMicrounits),name+' key position is a light position');
@@ -20,6 +23,14 @@ test('G8 day/night/winter are lighting RIGS only: light params, zero geometry/ma
  const d=buildVisualSceneDescriptor();
  assert.equal(d.descriptorDigest,'5f6829b7b10bbbc91ff0bd7e66bd5de3c69473091d56af92f8decbc8cbecaa18');
  assert.equal(buildVisualCasualty(d).visualDigest,'efe6bd00ebbc4aeb13cf219d3aa1a81258b6b2f6ae2f109eb5f4c44850a535d9')});
+test('PW-3 production wiring: bundle lighting carries ceiling+exposure; renderer applies filmic tone mapping + ceiling fixture',()=>{
+ const bundle=JSON.parse(fs.readFileSync(path.join(ROOT,'visual-slice/scene-bundle.json'),'utf8'));
+ assert.equal(typeof bundle.lighting.exposure,'number');
+ assert.ok(bundle.lighting.ceiling&&typeof bundle.lighting.ceiling.intensity==='number'&&Array.isArray(bundle.lighting.ceiling.positionMicrounits),'served lighting carries the clinical ceiling fixture');
+ const rp=fs.readFileSync(path.join(ROOT,'visual-slice/package/renderer-package.mjs'),'utf8');
+ assert(/ACESFilmicToneMapping/.test(rp),'renderer applies filmic tone mapping');
+ assert(/toneMappingExposure=bundle\.lighting\.exposure/.test(rp),'renderer exposure comes from the served rig');
+ assert(/new THREE\.PointLight\(parseInt\(bundle\.lighting\.ceiling/.test(rp),'renderer mounts the ceiling fixture from the served rig')});
 test('G8 page applies rigs to light objects only (no material/scene tint in the rig path)',()=>{
  const html=fs.readFileSync(path.join(ROOT,'visual-slice/index.html'),'utf8');
  const m=html.match(/function applyRig[\s\S]*?rig===name\)\}/);

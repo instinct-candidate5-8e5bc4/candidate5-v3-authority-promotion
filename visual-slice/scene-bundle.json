@@ -1,10 +1,10 @@
 {
  "bundleVersion": "1.0.0",
  "kind": "TRACK_B_VISUAL_SCENE_BUNDLE",
- "generatedAt": "2026-09-30T04:18:48.155Z",
+ "generatedAt": "2026-09-30T00:00:38.077Z",
  "git": {
-  "branch": "rebase-t7",
-  "commit": "4f1f57d146a6d7e2876c7008608d0ffe9c4be654",
+  "branch": "candidate5-track-b-visual-slice",
+  "commit": "3051c9b214991895d7772f53d3c9e5d839157633",
   "base": "7cd96d36"
  },
  "banner": {
@@ -1233,11 +1233,11 @@
   "note": "Visual-only claims; never physical evidence.",
   "ambient": {
    "colorHex": "0xbfd4e0",
-   "intensity": 0.55
+   "intensity": 0.5
   },
   "key": {
    "colorHex": "0xfff2dd",
-   "intensity": 1.1,
+   "intensity": 0.95,
    "positionMicrounits": [
     3000000,
     5000000,
@@ -1252,7 +1252,17 @@
     3500000,
     4000000
    ]
-  }
+  },
+  "ceiling": {
+   "colorHex": "0xf2f5f7",
+   "intensity": 0.85,
+   "positionMicrounits": [
+    0,
+    5800000,
+    0
+   ]
+  },
+  "exposure": 1.1
  },
  "status": "READY"
 }
