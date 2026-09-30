@@ -1,10 +1,10 @@
 {
   "manifestVersion": "1.0.0",
   "kind": "TRACK_B_B7_ENGINE_MANIFEST",
-  "generatedAt": "2026-09-30T10:11:55.244Z",
+  "generatedAt": "2026-09-30T19:54:55.689Z",
   "git": {
-    "branch": "trackb-door-mechanics-transport9",
-    "commit": "c8f8e78f300c4d62bfd2c39b4a32df23493a8536"
+    "branch": "trackb-scene-extension-admission-plumbing",
+    "commit": "df48f8fe255b707ff5d9df535cfafba2846fdad5"
   },
   "inlines": [
     {
@@ -39,7 +39,7 @@
     },
     {
       "check": "bundle built",
-      "target": "653d841d3837648c1d74686f7f2473db43a45ec4ba1de5b9862717e3591a2a46",
+      "target": "08a945a3ce15dcfe5d8f7cf16bfc23a481634282338e58c02cd476abe53a8726",
       "pass": true
     }
   ],
@@ -53,8 +53,8 @@
   "esbuildVersion": "0.25.10",
   "bundle": {
     "path": "visual-slice/engine-bundle.js",
-    "bytes": 180051,
-    "sha256": "653d841d3837648c1d74686f7f2473db43a45ec4ba1de5b9862717e3591a2a46",
+    "bytes": 180415,
+    "sha256": "08a945a3ce15dcfe5d8f7cf16bfc23a481634282338e58c02cd476abe53a8726",
     "minified": false
   }
 }
