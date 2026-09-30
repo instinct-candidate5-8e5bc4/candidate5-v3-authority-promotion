@@ -1,0 +1,3 @@
+# Legacy timer scope correction
+
+The existing unexpected-event engine is created in the module script, while the existing Begin timer callback is defined in a classic script. A module-local binding is not visible to that classic callback, causing `ReferenceError: unexpectedEngine is not defined` after Begin independently of asset loading. This change exports the same existing instance as `window.unexpectedEngine` at its original creation site and makes the timer read that explicit reference. It creates no second engine and changes no event definitions, timing, clinical rule, inventory, score or commit behavior. It is a legacy root-shell boot/runtime repair, not authoritative engine migration or R3 acceptance.
