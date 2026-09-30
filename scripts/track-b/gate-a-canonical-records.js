@@ -16,6 +16,7 @@ const {PACKAGE}=require(path.join(ROOT,'src/clean-runtime/school/scene-v2/packag
 const {instantiate}=require(path.join(ROOT,'src/clean-runtime/school/scene-v2/instantiate.js'));
 const {buildVisualSceneDescriptor}=require(path.join(ROOT,'src/clean-runtime/school/scene-v2/visual-descriptor.js'));
 const {buildV21}=require(path.join(ROOT,'scripts/track-b/gate-a-r1v4-package-builder.js'));
+const R1_ADMISSION=require(path.join(ROOT,'src/clean-runtime/school/definitions/gate-a-r1-admission.js'));
 
 const hex64=v=>typeof v==='string'&&/^[0-9a-f]{64}$/.test(v);
 const need=(cond,msg)=>{if(!cond)throw Error('CANONICAL RECORDS: '+msg)};
@@ -38,6 +39,13 @@ const rows=[
  ['Owner-body binding',D.binding.bindingId,D.binding.bindingRevision,D.binding.canonicalDigest,SYN.OWNER_BODY_BINDING.status],
 ];
 for(const r of rows){need(r[1],'missing id in a record row');need(Number.isInteger(r[2]),'missing revision for '+r[1]);need(hex64(r[3]),'bad digest for '+r[1]);need(r[4]==='VALIDATED','not VALIDATED: '+r[1]);}
+// Registry admission, read live from the runtime module (executes the real
+// envelope lifecycle + A.admit at load; a failed admission throws there).
+const REG={unit:'unitBody',ownerBody:'ownerBody',ownerEntity:'ownerEntity',floor:'interiorFloor',volume:'containmentVolume',binding:'ownerBodyBinding'};
+const rowKeys=['unit','ownerBody','ownerEntity','floor','volume','binding'];
+for(const k of rowKeys)need(R1_ADMISSION.ADMISSIONS[REG[k]].status==='ADMITTED','registry admission not ADMITTED: '+k);
+need(R1_ADMISSION.SCENE_ADMISSION.kind==='REVIEWED_SCENE_ADMISSION','scene admission record missing');
+const ENV_ROWS=rowKeys.map(k=>[rows[rowKeys.indexOf(k)][1],R1_ADMISSION.ENVELOPES[REG[k]].verified.envelopeId,R1_ADMISSION.ENVELOPES[REG[k]].verified.envelopeDigest]);
 
 // Section 2: certified v2.0.0 anchors, derived live (three-entity scene).
 need(PACKAGE.scenePackageVersion==='2.0.0','certified PACKAGE is not v2.0.0');
@@ -87,12 +95,33 @@ evidence/track-b/r1-owner-signoff.json, wamid provenance recorded there).
 Explicitly NOT approved by that signoff: visual asset admission, renderer
 before/after committed consumption proof (both R2/R3), production promotion,
 and the unit-1 cross-domain binding (R2).
+Registry admission (added after signoff, executor requirement 2026-09-30):
+the six records are ADMITTED through the runtime's own envelope lifecycle and
+A.admit with review pins to the owner's original reply and question
+(wamid...JVEAA== / wamid...021A) and the approved digests; the v2.1.0 scene
+carries a dedicated REVIEWED_SCENE_ADMISSION record. Scope unchanged - the
+exclusions above still hold.
 
 ## 1. Proposed records (validated at module load; a broken record throws)
 
-| Record | Id | Revision | Digest (sha256, full) | Validator status | Admission |
-|---|---|---|---|---|---|
-${rows.map(r=>'| '+r[0]+' | \`'+r[1]+'\` | '+r[2]+' | \`'+r[3]+'\` | '+r[4]+' | '+ADMIT+' |').join('\n')}
+| Record | Id | Revision | Digest (sha256, full) | Validator status | Owner decision | Registry admission |
+|---|---|---|---|---|---|---|
+${rows.map(r=>'| '+r[0]+' | \`'+r[1]+'\` | '+r[2]+' | \`'+r[3]+'\` | '+r[4]+' | '+ADMIT+' | ADMITTED (real A.admit) |').join('\n')}
+
+## 1a. Registry admission envelopes (runtime admission, executor requirement 2026-09-30)
+
+ADMITTED_BY_OWNER_R1 is the owner-decision status only. Technical admission
+lives in src/clean-runtime/school/definitions/gate-a-r1-admission.js: each
+record carries a reviewed envelope executed through the runtime's own
+lifecycle (AUTHORED_NEW_DRAFT->VALIDATED->REVIEWED->VERIFIED_FOR_SLICE,
+reviewId r1-owner-signoff, reviewScope '+R1_ADMISSION.SCOPE+') and is admitted
+by the real A.admit at module load - any rejection throws. Evidence:
+scripts/track-b/gate-a-r1-admission-check.mjs (43/43: live admission, the
+four rejection paths, scene re-derivation, signoff-record cross-checks).
+
+| Record id | Verified envelope id | Envelope digest (sha256, full) |
+|---|---|---|
+${ENV_ROWS.map(r=>'| \`'+r[0]+'\` | \`'+r[1]+'\` | \`'+r[2]+'\` |').join('\n')}
 
 ## 2. Certified v2.0.0 anchors (prior three-entity scene ONLY, read-only)
 
@@ -110,7 +139,11 @@ certifying it. There is NOT yet a certified v2.1.0 world.
 ## 3. Proposed v2.1.0 anchors (four-entity scene, `+ADMIT+` as the exact proposed bytes)
 
 Computed by executing the R1 proposal builder and a throwaway instantiation.
-Neither value is certified; admission is the formal review's call.
+Neither value is certified. The v2.1.0 scene additionally carries a
+DEDICATED reviewed scene-admission record (REVIEWED_SCENE_ADMISSION,
+admissionDigest \`${R1_ADMISSION.SCENE_ADMISSION.admissionDigest}\`)
+that pins these exact approved digests and re-derives both at module load -
+the approved bytes are never mutated.
 
 | Anchor | Digest (sha256, full) | Status |
 |---|---|---|
@@ -124,7 +157,7 @@ Neither value is certified; admission is the formal review's call.
 | World entity id | \`${unitEntity.entityId}\` (entityTypeId \`${unitEntity.entityTypeId}\`, revision ${unitEntity.revision}) | '+ADMIT+' |
 | Support relation id | \`${unitRel.relationId}\` (${unitRel.supportSourceKind}, ownerEntityRef ${unitRel.ownerEntityRef.id}) | '+ADMIT+' |
 | Containment volume (executable) | \`${D.volume.supportVolumeId}\` revision ${D.volume.volumeRevision} | '+ADMIT+' |
-| Gate A runtime status | '+ADMIT+' (host table reads entity-body-map; renderer tracks the unit separately, presentationOnly until R2/R3 visual admission) | current |
+| Gate A runtime status | '+ADMIT+' (owner-decision status) + registry ADMITTED via gate-a-r1-admission.js (host table surfaces both from entity-body-map; renderer tracks the unit separately, presentationOnly until R2/R3 visual admission) | current |
 
 ## 5. Cross-domain identity binding (PROPOSED - NOT a committed engine fact)
 
@@ -133,8 +166,9 @@ Neither value is certified; admission is the formal review's call.
 | \`unit-1\` / \`SYNTHETIC_ITEM_A\` (existing V2, engine-owned) | \`${unitEntity.entityId}\` | PROPOSED relation. R2 implements and verifies this cross-domain binding; it is not claimed as a committed engine fact here. |
 
 Review rule: sign off only against this list plus the R1 v7 harness
-(scripts/track-b/gate-a-r1v7-contract-check.mjs, 38/38) and the v7 contract
-additions doc (docs/track-b/gate-a-r1-v7-contract-additions.md).
+(scripts/track-b/gate-a-r1v7-contract-check.mjs, 38/38), the R1 registry
+admission harness (scripts/track-b/gate-a-r1-admission-check.mjs, 43/43) and
+the v7 contract additions doc (docs/track-b/gate-a-r1-v7-contract-additions.md).
 `;
 const out=path.join(ROOT,'docs/track-b/gate-a-r1-canonical-review-records.md');
 if(process.argv.includes('--check')){

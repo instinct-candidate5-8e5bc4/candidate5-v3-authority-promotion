@@ -49,6 +49,7 @@ export async function mount(container,opts={}){
   const mapCheck=validateMap(map);
   if(!mapCheck.ok)return{ok:false,reason:'entity-body-map invalid: '+mapCheck.errors[0]};
   const syntheticUnitGateA=(map.entities['synthetic-training-unit-v1']||{}).gateAStatus||'UNKNOWN';
+  const syntheticUnitRegistryAdmission=(map.entities['synthetic-training-unit-v1']||{}).registryAdmission||'UNKNOWN';
   if(build.apiVersion!==PACKAGE_API_VERSION)return{ok:false,reason:'package build/api version mismatch'};
   // Same fail-closed engine gates as the standalone demo: the package renders
   // ONLY from the certified committed state.
@@ -170,7 +171,7 @@ export async function mount(container,opts={}){
   if(getComputedStyle(container).position==='static')container.style.position='relative';
   container.appendChild(overlay);container.appendChild(finding);
   const bagInitialPos=bundle.equipment.bag.authoritativeTransformMicrounits.positionMicrounits;
-  const state={container,opts,renderer,scene,camera,controls,layout,map,statuses,manifest,build,manifestOk,manifestDetail,syntheticUnitGateA,pm:{ok:pmCheck.ok,bound:pmCheck.bound||null,reason:pmCheck.reason||null},
+  const state={container,opts,renderer,scene,camera,controls,layout,map,statuses,manifest,build,manifestOk,manifestDetail,syntheticUnitGateA,syntheticUnitRegistryAdmission,pm:{ok:pmCheck.ok,bound:pmCheck.bound||null,reason:pmCheck.reason||null},
    bindings,finding,overlay,bagLocation:'INITIAL',bagInitialPos,lastCue:'NONE',disposed:false,
    loop:()=>{if(state.disposed)return;renderer.render(scene,camera)}};
   renderer.setAnimationLoop(state.loop);
@@ -245,6 +246,6 @@ export function status(){
   statuses:inst.statuses,
   boundEntities:Object.keys(inst.bindings),
   bagLocation:inst.bagLocation,lastCue:inst.lastCue,
-  syntheticUnit:syn?{bound:true,useState:syn.useState,gateAStatus:inst.syntheticUnitGateA||'UNKNOWN',note:'presentation bridge (B-W11); physical records ADMITTED_BY_OWNER_R1 (r1-owner-signoff); visual admission R2/R3'}:{bound:false},
+  syntheticUnit:syn?{bound:true,useState:syn.useState,gateAStatus:inst.syntheticUnitGateA||'UNKNOWN',registryAdmission:inst.syntheticUnitRegistryAdmission||'UNKNOWN',note:'presentation bridge (B-W11); physical records ADMITTED_BY_OWNER_R1 (r1-owner-signoff, owner-decision status) + registry-ADMITTED (gate-a-r1-admission.js); visual admission R2/R3'}:{bound:false},
   presentation:inst.pm?{active:inst.pm.ok,bound:inst.pm.ok?inst.pm.bound:null,reason:inst.pm.ok?null:inst.pm.reason}:null,
   claimGate:'SLICE-PACKAGE ONLY: not "connected" until the running shell consumes this package'}}

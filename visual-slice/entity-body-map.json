@@ -1,10 +1,10 @@
 {
  "mapVersion": "1.0.0",
  "kind": "TRACK_B_ENTITY_BODY_MAP",
- "generatedAt": "2026-09-30T04:18:50.105Z",
+ "generatedAt": "2026-09-30T00:22:35.029Z",
  "git": {
-  "branch": "rebase-t7",
-  "commit": "3cbba610a134ed83ffbbaafc16ba8ee4d80520da"
+  "branch": "candidate5-track-b-visual-slice",
+  "commit": "50eb37e6a469bb35ac792c110222cef2d8b38a91"
  },
  "policy": "Every visual entity resolves through this table ONLY. Unknown or unmapped entity = NO VISUAL ACTION (fail-closed). No default mapping, no substitution, no inference from names or meshes.",
  "anchors": {
@@ -131,8 +131,10 @@
    },
    "gateAStatus": "ADMITTED_BY_OWNER_R1",
    "admissionEvidenceRef": "evidence/track-b/r1-owner-signoff.json",
+   "registryAdmission": "ADMITTED",
+   "registryAdmissionEvidenceRef": "src/clean-runtime/school/definitions/gate-a-r1-admission.js",
    "presentationOnly": true,
-   "note": "B-W11 presentation bridge (contract v0.3). Bounds are the Gate A unit body aggregate (owner R1 signoff 2026-09-30); the six physical records are ADMITTED_BY_OWNER_R1 while this entry itself stays presentation-only - visual asset admission is R2/R3 scope; this entry carries no physical authority and zero clinical fields. publicUseState AVAILABLE/RESERVED/CONSUMED present committed projections, never decide them."
+   "note": "B-W11 presentation bridge (contract v0.3). Bounds are the Gate A unit body aggregate (owner R1 signoff 2026-09-30); the six physical records are ADMITTED_BY_OWNER_R1 (owner-decision status) and registry-ADMITTED via gate-a-r1-admission.js (runtime admission, VERIFIED_FOR_SLICE envelopes + reviewed scene-admission record) while this entry itself stays presentation-only - visual asset admission is R2/R3 scope; this entry carries no physical authority and zero clinical fields. publicUseState AVAILABLE/RESERVED/CONSUMED present committed projections, never decide them."
   }
  }
 }

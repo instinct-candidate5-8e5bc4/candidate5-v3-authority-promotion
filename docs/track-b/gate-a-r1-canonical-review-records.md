@@ -17,17 +17,43 @@ evidence/track-b/r1-owner-signoff.json, wamid provenance recorded there).
 Explicitly NOT approved by that signoff: visual asset admission, renderer
 before/after committed consumption proof (both R2/R3), production promotion,
 and the unit-1 cross-domain binding (R2).
+Registry admission (added after signoff, executor requirement 2026-09-30):
+the six records are ADMITTED through the runtime's own envelope lifecycle and
+A.admit with review pins to the owner's original reply and question
+(wamid...JVEAA== / wamid...021A) and the approved digests; the v2.1.0 scene
+carries a dedicated REVIEWED_SCENE_ADMISSION record. Scope unchanged - the
+exclusions above still hold.
 
 ## 1. Proposed records (validated at module load; a broken record throws)
 
-| Record | Id | Revision | Digest (sha256, full) | Validator status | Admission |
-|---|---|---|---|---|---|
-| Physical body (unit) | `synthetic-training-unit-body-v1` | 1 | `ddd80d4c6fd66ae59ab9b9d4deb33f0a453cde069c184582963d73a8472bc94c` | VALIDATED | ADMITTED_BY_OWNER_R1 |
-| Bag owner body | `school/medical-bag-owner-body` | 1 | `2409eedc6840f26c886128c0698c35cee266a087f1fca46f1b676a582514e070` | VALIDATED | ADMITTED_BY_OWNER_R1 |
-| Bag owner entity | `school/medical-bag-entity` | 1 | `6747aebe3b4e0df13ed4a6506320bed79935ccacb0e3355f9a55d1f3700e2c3b` | VALIDATED | ADMITTED_BY_OWNER_R1 |
-| Interior support floor (layer 1) | `school/medical-bag-interior-floor` | 1 | `d41d496181c4554f3dd9a7c01f2b408b4a4c2c1ae50d0af76fe0f574e2ee2427` | VALIDATED | ADMITTED_BY_OWNER_R1 |
-| Containment volume (layer 2) | `school/medical-bag-containment-interior` | 2 | `e0af9d06c4b2956abf6ea3f733db9fce7862e221b532e4f4ec095925db35ec6d` | VALIDATED | ADMITTED_BY_OWNER_R1 |
-| Owner-body binding | `school/medical-bag-owner-body-binding` | 1 | `119b9e296c84df01193d86c129be9c579071a5cbc6714abbd7ec38a1e281ae25` | VALIDATED | ADMITTED_BY_OWNER_R1 |
+| Record | Id | Revision | Digest (sha256, full) | Validator status | Owner decision | Registry admission |
+|---|---|---|---|---|---|---|
+| Physical body (unit) | `synthetic-training-unit-body-v1` | 1 | `ddd80d4c6fd66ae59ab9b9d4deb33f0a453cde069c184582963d73a8472bc94c` | VALIDATED | ADMITTED_BY_OWNER_R1 | ADMITTED (real A.admit) |
+| Bag owner body | `school/medical-bag-owner-body` | 1 | `2409eedc6840f26c886128c0698c35cee266a087f1fca46f1b676a582514e070` | VALIDATED | ADMITTED_BY_OWNER_R1 | ADMITTED (real A.admit) |
+| Bag owner entity | `school/medical-bag-entity` | 1 | `6747aebe3b4e0df13ed4a6506320bed79935ccacb0e3355f9a55d1f3700e2c3b` | VALIDATED | ADMITTED_BY_OWNER_R1 | ADMITTED (real A.admit) |
+| Interior support floor (layer 1) | `school/medical-bag-interior-floor` | 1 | `d41d496181c4554f3dd9a7c01f2b408b4a4c2c1ae50d0af76fe0f574e2ee2427` | VALIDATED | ADMITTED_BY_OWNER_R1 | ADMITTED (real A.admit) |
+| Containment volume (layer 2) | `school/medical-bag-containment-interior` | 2 | `e0af9d06c4b2956abf6ea3f733db9fce7862e221b532e4f4ec095925db35ec6d` | VALIDATED | ADMITTED_BY_OWNER_R1 | ADMITTED (real A.admit) |
+| Owner-body binding | `school/medical-bag-owner-body-binding` | 1 | `119b9e296c84df01193d86c129be9c579071a5cbc6714abbd7ec38a1e281ae25` | VALIDATED | ADMITTED_BY_OWNER_R1 | ADMITTED (real A.admit) |
+
+## 1a. Registry admission envelopes (runtime admission, executor requirement 2026-09-30)
+
+ADMITTED_BY_OWNER_R1 is the owner-decision status only. Technical admission
+lives in src/clean-runtime/school/definitions/gate-a-r1-admission.js: each
+record carries a reviewed envelope executed through the runtime's own
+lifecycle (AUTHORED_NEW_DRAFT->VALIDATED->REVIEWED->VERIFIED_FOR_SLICE,
+reviewId r1-owner-signoff, reviewScope '+R1_ADMISSION.SCOPE+') and is admitted
+by the real A.admit at module load - any rejection throws. Evidence:
+scripts/track-b/gate-a-r1-admission-check.mjs (43/43: live admission, the
+four rejection paths, scene re-derivation, signoff-record cross-checks).
+
+| Record id | Verified envelope id | Envelope digest (sha256, full) |
+|---|---|---|
+| `synthetic-training-unit-body-v1` | `gate-a-r1-unit-body-admission-v1` | `d47ed7a48c049ced9df75ba5e1633d5e415b87b01be957011212e849d52fb835` |
+| `school/medical-bag-owner-body` | `gate-a-r1-owner-body-admission-v1` | `fe7c09bf3564d11742c19f464803c0c590e646e667d48de371058d556d962ff2` |
+| `school/medical-bag-entity` | `gate-a-r1-owner-entity-admission-v1` | `fcda61693563fa03a955594d1993d37344217c4c4f1c8f624caaabedde45449d` |
+| `school/medical-bag-interior-floor` | `gate-a-r1-interior-floor-admission-v1` | `c822af9c3a51b049dbf75591fc23e607609c793fa8ef5c6635911be77595b73c` |
+| `school/medical-bag-containment-interior` | `gate-a-r1-containment-volume-admission-v1` | `812820abb23c608774a5fba2d77eff4687566577019fa3464cac2d0670f5fb6a` |
+| `school/medical-bag-owner-body-binding` | `gate-a-r1-owner-body-binding-admission-v1` | `840f6bf6ea30f9dfb96ea85fb8857110704660078d451e2a7111e9ed09174e7c` |
 
 ## 2. Certified v2.0.0 anchors (prior three-entity scene ONLY, read-only)
 
@@ -45,7 +71,11 @@ certifying it. There is NOT yet a certified v2.1.0 world.
 ## 3. Proposed v2.1.0 anchors (four-entity scene, ADMITTED_BY_OWNER_R1 as the exact proposed bytes)
 
 Computed by executing the R1 proposal builder and a throwaway instantiation.
-Neither value is certified; admission is the formal review's call.
+Neither value is certified. The v2.1.0 scene additionally carries a
+DEDICATED reviewed scene-admission record (REVIEWED_SCENE_ADMISSION,
+admissionDigest `843ba3b12ea38edda32c811a7be00586ba9bd16da116bf83904b7d395a9316b1`)
+that pins these exact approved digests and re-derives both at module load -
+the approved bytes are never mutated.
 
 | Anchor | Digest (sha256, full) | Status |
 |---|---|---|
@@ -59,7 +89,7 @@ Neither value is certified; admission is the formal review's call.
 | World entity id | `synthetic-training-unit-v1` (entityTypeId `synthetic/training-unit`, revision 1) | '+ADMIT+' |
 | Support relation id | `synthetic:unit:bag-interior-floor` (ENTITY_OWNED, ownerEntityRef school-medical-bag) | '+ADMIT+' |
 | Containment volume (executable) | `school/medical-bag-containment-interior` revision 2 | '+ADMIT+' |
-| Gate A runtime status | '+ADMIT+' (host table reads entity-body-map; renderer tracks the unit separately, presentationOnly until R2/R3 visual admission) | current |
+| Gate A runtime status | '+ADMIT+' (owner-decision status) + registry ADMITTED via gate-a-r1-admission.js (host table surfaces both from entity-body-map; renderer tracks the unit separately, presentationOnly until R2/R3 visual admission) | current |
 
 ## 5. Cross-domain identity binding (PROPOSED - NOT a committed engine fact)
 
@@ -68,5 +98,6 @@ Neither value is certified; admission is the formal review's call.
 | `unit-1` / `SYNTHETIC_ITEM_A` (existing V2, engine-owned) | `synthetic-training-unit-v1` | PROPOSED relation. R2 implements and verifies this cross-domain binding; it is not claimed as a committed engine fact here. |
 
 Review rule: sign off only against this list plus the R1 v7 harness
-(scripts/track-b/gate-a-r1v7-contract-check.mjs, 38/38) and the v7 contract
-additions doc (docs/track-b/gate-a-r1-v7-contract-additions.md).
+(scripts/track-b/gate-a-r1v7-contract-check.mjs, 38/38), the R1 registry
+admission harness (scripts/track-b/gate-a-r1-admission-check.mjs, 43/43) and
+the v7 contract additions doc (docs/track-b/gate-a-r1-v7-contract-additions.md).

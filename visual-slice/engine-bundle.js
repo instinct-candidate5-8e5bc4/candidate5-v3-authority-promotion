@@ -748,12 +748,13 @@ var require_definition_ref = __commonJS({
     "use strict";
     init_buffer_inject();
     var { MACHINE_ID } = require_semantics();
-    var TYPES = Object.freeze(["PHYSICAL_BODY", "PROFILE", "POSTURE", "SUPPORT_SURFACE", "ENTITY", "SUPPORT_VOLUME"]);
+    var TYPES = Object.freeze(["PHYSICAL_BODY", "PROFILE", "POSTURE", "SUPPORT_SURFACE", "ENTITY", "SUPPORT_VOLUME", "OWNER_BODY_BINDING"]);
     function definitionRef({ definitionType, definitionId, revision, definitionDigest }) {
       if (!TYPES.includes(definitionType) || !MACHINE_ID.test(definitionId || "") || !Number.isInteger(revision) || revision < 1 || !/^[a-f0-9]{64}$/.test(definitionDigest || "")) throw Object.assign(Error("INVALID_DEFINITION_REF"), { code: "INVALID_DEFINITION_REF" });
       return Object.freeze({ definitionType, definitionId, revision, definitionDigest });
     }
     function refFor(type, definition) {
+      if (type === "OWNER_BODY_BINDING") return definitionRef({ definitionType: type, definitionId: definition.bindingId, revision: definition.bindingRevision, definitionDigest: definition.canonicalDigest });
       if (type === "PHYSICAL_BODY") return definitionRef({ definitionType: type, definitionId: definition.bodyDefinitionId, revision: definition.bodyRevision, definitionDigest: definition.canonicalDigest });
       if (type === "PROFILE") return definitionRef({ definitionType: type, definitionId: definition.profileDefinitionId, revision: definition.profileRevision, definitionDigest: definition.profileDigest });
       if (type === "SUPPORT_SURFACE") return definitionRef({ definitionType: type, definitionId: definition.supportSurfaceId, revision: definition.surfaceRevision, definitionDigest: definition.canonicalDigest });
