@@ -1,0 +1,89 @@
+{
+  "status": "SEMANTIC_CONTENT_EQUAL_EVIDENCE_REUSE_DECISION_PENDING_NOT_ADMITTED",
+  "packetDigest": "0a5c07f33acc94731c6fa01e05a46abf1632dc1f2ebe1e8a413feb4886606735",
+  "originalCapturedWorldDigest": "c719e83456b3486f56e08588c60e8ec89186652d39c579ad71b7c78131b46513",
+  "candidateGenesisDigest": "cc2f27801d48bb1b9a8b813c78a413e50c552d6f11c103843b6acb7afe9bb887",
+  "candidateWorldDigest": "88b6e0190469a8ba32e02b83bb36d815c90532b889a9ad4786978b3ac1b90385",
+  "comparisons": [
+    {
+      "field": "stateSchemaVersion",
+      "overlayDigest": "0175d86befbe75525f132794baff42abbf4e2a659aa20f2baec341740a9573e7",
+      "replayDigest": "0175d86befbe75525f132794baff42abbf4e2a659aa20f2baec341740a9573e7",
+      "equal": true
+    },
+    {
+      "field": "worldId",
+      "overlayDigest": "dd2711c71f83fd6ac805eefc737f5f62d00e627f6d9595f5bf51dda52c2b008f",
+      "replayDigest": "dd2711c71f83fd6ac805eefc737f5f62d00e627f6d9595f5bf51dda52c2b008f",
+      "equal": true
+    },
+    {
+      "field": "sceneDefinitionRef",
+      "overlayDigest": "fd265c0beb88875567d01632849e6ea999a832cfe60b85ebbb54aa7c6e8d3189",
+      "replayDigest": "fd265c0beb88875567d01632849e6ea999a832cfe60b85ebbb54aa7c6e8d3189",
+      "equal": true
+    },
+    {
+      "field": "revision",
+      "overlayDigest": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+      "replayDigest": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+      "equal": true
+    },
+    {
+      "field": "lifecycleState",
+      "overlayDigest": "77ff42a3ee266d7bdd15afca0b44c7ae71d875464026dcf96b158e450c797a93",
+      "replayDigest": "77ff42a3ee266d7bdd15afca0b44c7ae71d875464026dcf96b158e450c797a93",
+      "equal": true
+    },
+    {
+      "field": "entities",
+      "overlayDigest": "c9a5f11cde51cc68b4401cf20f33e9f678d7a56be343834f0070eddf35b9f727",
+      "replayDigest": "c9a5f11cde51cc68b4401cf20f33e9f678d7a56be343834f0070eddf35b9f727",
+      "equal": true
+    },
+    {
+      "field": "physicalRelations",
+      "overlayDigest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "replayDigest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "equal": true
+    },
+    {
+      "field": "supportRelations",
+      "overlayDigest": "f396ad618c591805f0b487143df99492e9f504eef8359e6afff71c3af8ee0ba8",
+      "replayDigest": "f396ad618c591805f0b487143df99492e9f504eef8359e6afff71c3af8ee0ba8",
+      "equal": true
+    },
+    {
+      "field": "surfaces",
+      "overlayDigest": "36b42bd40803230b73571ab858ccab9354513979ac0ec1c73073f918a98dbf50",
+      "replayDigest": "36b42bd40803230b73571ab858ccab9354513979ac0ec1c73073f918a98dbf50",
+      "equal": true
+    },
+    {
+      "field": "environmentPhysicalState",
+      "overlayDigest": "9b2659ed5ede96488bdb555925b120bd95506f61e234f34e3058ddfd9c98a6eb",
+      "replayDigest": "9b2659ed5ede96488bdb555925b120bd95506f61e234f34e3058ddfd9c98a6eb",
+      "equal": true
+    },
+    {
+      "field": "committedEventSequence",
+      "overlayDigest": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+      "replayDigest": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+      "equal": true
+    }
+  ],
+  "historyIdentity": {
+    "equal": false,
+    "overlayPriorStateDigest": "5800a7574564c767a8c4a93acaa808fd59064416b391d1be1dd566e55fcc3a2f",
+    "candidatePriorStateDigest": "cc2f27801d48bb1b9a8b813c78a413e50c552d6f11c103843b6acb7afe9bb887"
+  },
+  "captureRemainsBoundToOriginalWorld": true,
+  "limitations": [
+    "COMPARISON_NOT_REVIEW_OR_OWNER_DECISION",
+    "NO_CAPTURE_REBINDING_OR_GENERIC_HASH_EXEMPTION",
+    "REVIEWER_MUST_DECIDE_WHETHER_EXISTING_PIXELS_CAN_SUPPORT_NEW_EXACT_RECORD",
+    "NEW_WORLD_REQUIRES_OWN_REVIEW_AND_RECORD_BEFORE_CONSUMPTION",
+    "NO_OPERATIONAL_ACTIVATION_RENDER_DOOR_GAMEPLAY_CLINICAL_PRODUCTION_UNLOCK",
+    "A8_REALISTIC_MESH_AND_B7_GAMEPLAY_MODES_OWNER_RESERVED"
+  ]
+}
