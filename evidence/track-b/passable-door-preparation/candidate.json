@@ -1,0 +1,250 @@
+{
+  "proposal": {
+    "kind": "NEW_PASSABLE_DOOR_SURFACE_PROPOSAL_NOT_ADMITTED",
+    "originalSurfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+    "packetDigest": "0a5c07f33acc94731c6fa01e05a46abf1632dc1f2ebe1e8a413feb4886606735",
+    "designDimensionsMicrounits": {
+      "frameThickness": 80000,
+      "oppositeAndHeaderMargin": 100000,
+      "hingeSideMargin": 160000,
+      "openLeafToJambClearance": 20000
+    },
+    "opening": {
+      "minX": 4565000,
+      "maxX": 6175000,
+      "minY": 0,
+      "maxY": 3000000,
+      "minZ": -4080000,
+      "maxZ": -3920000
+    },
+    "wallSegments": [
+      {
+        "minX": -9000000,
+        "maxX": 4565000,
+        "minY": 0,
+        "maxY": 6000000,
+        "minZ": -4080000,
+        "maxZ": -3920000
+      },
+      {
+        "minX": 6175000,
+        "maxX": 9000000,
+        "minY": 0,
+        "maxY": 6000000,
+        "minZ": -4080000,
+        "maxZ": -3920000
+      },
+      {
+        "minX": 4565000,
+        "maxX": 6175000,
+        "minY": 3000000,
+        "maxY": 6000000,
+        "minZ": -4080000,
+        "maxZ": -3920000
+      }
+    ],
+    "frame": [
+      {
+        "minX": 4565000,
+        "maxX": 4645000,
+        "minY": 0,
+        "maxY": 3000000,
+        "minZ": -4080000,
+        "maxZ": -3920000
+      },
+      {
+        "minX": 6095000,
+        "maxX": 6175000,
+        "minY": 0,
+        "maxY": 3000000,
+        "minZ": -4080000,
+        "maxZ": -3920000
+      },
+      {
+        "minX": 4565000,
+        "maxX": 6175000,
+        "minY": 2920000,
+        "maxY": 3000000,
+        "minZ": -4080000,
+        "maxZ": -3920000
+      }
+    ],
+    "pivot": {
+      "xMicrounits": 4725000,
+      "yMicrounits": 0,
+      "zMicrounits": -4000000
+    },
+    "closedLeaf": {
+      "minX": 4725000,
+      "maxX": 6075000,
+      "minY": 0,
+      "maxY": 2900000,
+      "minZ": -4060000,
+      "maxZ": -3940000
+    },
+    "openLeaf": {
+      "minX": 4665000,
+      "maxX": 4785000,
+      "minY": 0,
+      "maxY": 2900000,
+      "minZ": -4000000,
+      "maxZ": -2650000
+    },
+    "landingApron": {
+      "kind": "NEW_BOUNDED_LANDING_APRON_NOT_EXISTING_CORRIDOR",
+      "minX": 4565000,
+      "maxX": 6175000,
+      "minZ": -5690000,
+      "maxZ": -3920000,
+      "planeYMicrounits": 0,
+      "depthRule": "OPENING_WIDTH_BEYOND_OUTER_WALL_FACE"
+    },
+    "retainedStaticSolids": [
+      {
+        "surfaceId": "left-wall",
+        "bounds": {
+          "minX": -7080000,
+          "maxX": -6920000,
+          "minY": 0,
+          "maxY": 6000000,
+          "minZ": -6000000,
+          "maxZ": 6000000
+        }
+      },
+      {
+        "surfaceId": "right-wall",
+        "bounds": {
+          "minX": 6920000,
+          "maxX": 7080000,
+          "minY": 0,
+          "maxY": 6000000,
+          "minZ": -6000000,
+          "maxZ": 6000000
+        }
+      },
+      {
+        "surfaceId": "locker-0",
+        "bounds": {
+          "minX": -4500000,
+          "maxX": -3500000,
+          "minY": 0,
+          "maxY": 2400000,
+          "minZ": -3775000,
+          "maxZ": -3225000
+        }
+      },
+      {
+        "surfaceId": "locker-1",
+        "bounds": {
+          "minX": -2500000,
+          "maxX": -1500000,
+          "minY": 0,
+          "maxY": 2400000,
+          "minZ": -3775000,
+          "maxZ": -3225000
+        }
+      },
+      {
+        "surfaceId": "locker-2",
+        "bounds": {
+          "minX": -500000,
+          "maxX": 500000,
+          "minY": 0,
+          "maxY": 2400000,
+          "minZ": -3775000,
+          "maxZ": -3225000
+        }
+      },
+      {
+        "surfaceId": "locker-3",
+        "bounds": {
+          "minX": 1500000,
+          "maxX": 2500000,
+          "minY": 0,
+          "maxY": 2400000,
+          "minZ": -3775000,
+          "maxZ": -3225000
+        }
+      },
+      {
+        "surfaceId": "locker-4",
+        "bounds": {
+          "minX": 3500000,
+          "maxX": 4500000,
+          "minY": 0,
+          "maxY": 2400000,
+          "minZ": -3775000,
+          "maxZ": -3225000
+        }
+      }
+    ],
+    "declaredDoorStates": [
+      "CLOSED",
+      "OPEN"
+    ],
+    "limitations": [
+      "NEW_SCENE_GEOMETRY_REQUIRES_OWN_REVIEW_WORLD_AND_ADMISSION",
+      "LEAF_RELOCATED_TO_WALL_PLANE_NEW_GEOMETRY_NOT_OLD_SWEEP_PROOF",
+      "NO_SETDOORSTATE_COMMIT_REPLAY_OR_CONSUMER",
+      "DISCRETE_STATES_ONLY_NO_SWING_CONCURRENT_CAMERA_PROOF",
+      "APRON_IS_PROPOSED_DESTINATION_OWNER_ACTIVATION_DECISION_REQUIRED",
+      "NO_RENDER_GAMEPLAY_CLINICAL_PRODUCTION_ACTIVATION_A8_SEPARATE"
+    ],
+    "proposalDigest": "ecdab627b32dc39655c78538fb8bdf9ee89ce53ae54623124593265531a17ccf"
+  },
+  "open": {
+    "status": "DISCRETE_OPEN_PASSAGE_EVIDENCE_NOT_ADMITTED",
+    "doorState": "OPEN",
+    "proposalDigest": "ecdab627b32dc39655c78538fb8bdf9ee89ce53ae54623124593265531a17ccf",
+    "pathBoundsMicrounits": {
+      "minX": 4965049,
+      "maxX": 5774951,
+      "minY": 1195049,
+      "maxY": 2004951,
+      "minZ": -5285049,
+      "maxZ": -2395049
+    },
+    "cameraEnvelopeRadiusMicrounits": 404951,
+    "collisions": [],
+    "floorPlaneMicrounits": 0,
+    "operationalStatus": "UNKNOWN",
+    "limitations": [
+      "NEW_SCENE_GEOMETRY_REQUIRES_OWN_REVIEW_WORLD_AND_ADMISSION",
+      "LEAF_RELOCATED_TO_WALL_PLANE_NEW_GEOMETRY_NOT_OLD_SWEEP_PROOF",
+      "NO_SETDOORSTATE_COMMIT_REPLAY_OR_CONSUMER",
+      "DISCRETE_STATES_ONLY_NO_SWING_CONCURRENT_CAMERA_PROOF",
+      "APRON_IS_PROPOSED_DESTINATION_OWNER_ACTIVATION_DECISION_REQUIRED",
+      "NO_RENDER_GAMEPLAY_CLINICAL_PRODUCTION_ACTIVATION_A8_SEPARATE"
+    ]
+  },
+  "closed": {
+    "status": "DISCRETE_CLOSED_LEAF_BLOCKS_PASSAGE_EVIDENCE_NOT_ADMITTED",
+    "doorState": "CLOSED",
+    "proposalDigest": "ecdab627b32dc39655c78538fb8bdf9ee89ce53ae54623124593265531a17ccf",
+    "pathBoundsMicrounits": {
+      "minX": 4965049,
+      "maxX": 5774951,
+      "minY": 1195049,
+      "maxY": 2004951,
+      "minZ": -5285049,
+      "maxZ": -2395049
+    },
+    "cameraEnvelopeRadiusMicrounits": 404951,
+    "collisions": [
+      {
+        "index": 17,
+        "clear": false
+      }
+    ],
+    "floorPlaneMicrounits": 0,
+    "operationalStatus": "UNKNOWN",
+    "limitations": [
+      "NEW_SCENE_GEOMETRY_REQUIRES_OWN_REVIEW_WORLD_AND_ADMISSION",
+      "LEAF_RELOCATED_TO_WALL_PLANE_NEW_GEOMETRY_NOT_OLD_SWEEP_PROOF",
+      "NO_SETDOORSTATE_COMMIT_REPLAY_OR_CONSUMER",
+      "DISCRETE_STATES_ONLY_NO_SWING_CONCURRENT_CAMERA_PROOF",
+      "APRON_IS_PROPOSED_DESTINATION_OWNER_ACTIVATION_DECISION_REQUIRED",
+      "NO_RENDER_GAMEPLAY_CLINICAL_PRODUCTION_ACTIVATION_A8_SEPARATE"
+    ]
+  }
+}
