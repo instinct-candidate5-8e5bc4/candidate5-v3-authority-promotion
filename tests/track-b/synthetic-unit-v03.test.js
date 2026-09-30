@@ -36,7 +36,7 @@ test('synthetic unit map entry: presentation-only, zero clinical fields, bounds 
  const map=JSON.parse(fs.readFileSync(path.join(VS,'entity-body-map.json'),'utf8'));
  const e=map.entities['synthetic-training-unit-v1'];
  assert.equal(e.entryType,'SYNTHETIC_TRAINING');
- assert.equal(e.gateAStatus,'PROPOSED_NOT_ADMITTED');
+ assert.equal(e.gateAStatus,'ADMITTED_BY_OWNER_R1');
  assert.equal(e.presentationOnly,true);
  assert.equal(e.physicalBodyRef,null);
  for(const f of['clinicalBodyRegion','bodyRegions','clinicalSubject'])assert(!(f in e),'forbidden clinical field '+f);

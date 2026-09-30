@@ -48,6 +48,7 @@ export async function mount(container,opts={}){
    fetchJson(new URL('package/package-build.json',base))]);
   const mapCheck=validateMap(map);
   if(!mapCheck.ok)return{ok:false,reason:'entity-body-map invalid: '+mapCheck.errors[0]};
+  const syntheticUnitGateA=(map.entities['synthetic-training-unit-v1']||{}).gateAStatus||'UNKNOWN';
   if(build.apiVersion!==PACKAGE_API_VERSION)return{ok:false,reason:'package build/api version mismatch'};
   // Same fail-closed engine gates as the standalone demo: the package renders
   // ONLY from the certified committed state.
@@ -112,9 +113,10 @@ export async function mount(container,opts={}){
   bindGroup('school-treatment-chair','chair',.55);
   bindGroup('school-medical-bag','bag',.5);
 
-  // B-W11 interim bridge (contract v0.3): parametric synthetic training unit.
-  // Presentation-only, explicitly UNCERTIFIED until Gate A admission (entry
-  // gateAStatus PROPOSED_NOT_ADMITTED). Renders at the PROPOSED R1 v3 anchor
+  // B-W11 bridge (contract v0.3): parametric synthetic training unit.
+  // Presentation-only: the six physical records are ADMITTED_BY_OWNER_R1
+  // (evidence r1-owner-signoff); visual asset admission stays R2/R3 (entry
+  // presentationOnly). Renders at the proposed R1 v3 anchor
   // (bag top, bag-local [0,235000,0] from committed bag position). The unit
   // FOLLOWS the bag on location actions. Its materials are authored per
   // render call and never cache committed truth.
@@ -168,7 +170,7 @@ export async function mount(container,opts={}){
   if(getComputedStyle(container).position==='static')container.style.position='relative';
   container.appendChild(overlay);container.appendChild(finding);
   const bagInitialPos=bundle.equipment.bag.authoritativeTransformMicrounits.positionMicrounits;
-  const state={container,opts,renderer,scene,camera,controls,layout,map,statuses,manifest,build,manifestOk,manifestDetail,pm:{ok:pmCheck.ok,bound:pmCheck.bound||null,reason:pmCheck.reason||null},
+  const state={container,opts,renderer,scene,camera,controls,layout,map,statuses,manifest,build,manifestOk,manifestDetail,syntheticUnitGateA,pm:{ok:pmCheck.ok,bound:pmCheck.bound||null,reason:pmCheck.reason||null},
    bindings,finding,overlay,bagLocation:'INITIAL',bagInitialPos,lastCue:'NONE',disposed:false,
    loop:()=>{if(state.disposed)return;renderer.render(scene,camera)}};
   renderer.setAnimationLoop(state.loop);
@@ -243,6 +245,6 @@ export function status(){
   statuses:inst.statuses,
   boundEntities:Object.keys(inst.bindings),
   bagLocation:inst.bagLocation,lastCue:inst.lastCue,
-  syntheticUnit:syn?{bound:true,useState:syn.useState,gateAStatus:'PROPOSED_NOT_ADMITTED',note:'UNCERTIFIED presentation bridge (B-W11 interim, Gate A in flight)'}:{bound:false},
+  syntheticUnit:syn?{bound:true,useState:syn.useState,gateAStatus:inst.syntheticUnitGateA||'UNKNOWN',note:'presentation bridge (B-W11); physical records ADMITTED_BY_OWNER_R1 (r1-owner-signoff); visual admission R2/R3'}:{bound:false},
   presentation:inst.pm?{active:inst.pm.ok,bound:inst.pm.ok?inst.pm.bound:null,reason:inst.pm.ok?null:inst.pm.reason}:null,
   claimGate:'SLICE-PACKAGE ONLY: not "connected" until the running shell consumes this package'}}

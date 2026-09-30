@@ -1,0 +1,35 @@
+{
+ "reviewId": "r1-owner-signoff",
+ "authority": "USER_GATE_REVIEW",
+ "decision": "R1 APPROVED - OWNER SIGNOFF",
+ "admissionStatus": "ADMITTED_BY_OWNER_R1",
+ "verbatim": "מאשר r1",
+ "provenance": {
+  "channel": "whatsapp",
+  "wamid": "wamid.HBgMOTcyNTMyNDkwMzUxFQIAEhgUM0EyRThERTVDOTY4QTMzNUYwMjEA",
+  "receivedAt": "2026-09-30T03:12:41+03:00",
+  "inReplyTo": "R1 signoff ask wamid.HBgMOTcyNTMyNDkwMzUxFQIAERgSMkRBNTcxMEY3MzRBNURDRjVEAA== defining the exact scope below"
+ },
+ "approvedScope": {
+  "records": [
+   "synthetic-training-unit-body-v1 revision 1",
+   "school/medical-bag-owner-body revision 1",
+   "school/medical-bag-entity revision 1",
+   "school/medical-bag-interior-floor revision 1",
+   "school/medical-bag-containment-interior revision 2",
+   "school/medical-bag-owner-body-binding revision 1"
+  ],
+  "proposedScene": {
+   "scenePackageVersion": "2.1.0",
+   "packageDigest": "5ba7ce47c9ff3a105a5636fda858d374bbdadcdedc41af3379d6fb2d54a989d8",
+   "worldDigest": "e3b493a45a9ba7ed04dd3c2a5361f6219f5d00938334eb53771fd87757d39009",
+   "note": "Approved AS the exact proposed bytes. Admission changes record status, never the digested bytes; these digests remain the approved identity of the v2.1.0 proposal."
+  }
+ },
+ "explicitlyNotApproved": [
+  "visual asset admission (R2/R3 scope)",
+  "renderer before/after committed consumption proof (R2/R3 scope)",
+  "production promotion",
+  "unit-1 -> synthetic-training-unit-v1 cross-domain identity binding (R2 scope)"
+ ]
+}

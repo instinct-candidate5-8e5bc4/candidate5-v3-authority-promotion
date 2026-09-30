@@ -11,19 +11,23 @@ section-4 record identity in docs/track-b/gate-a-synthetic-unit-visual-asset-pro
 (that document remains the design history; its stale rows named
 synthetic-training-unit-1 and school/medical-bag-interior-volume-v1 rev 1).
 
-Status vocabulary: every proposed record below is PROPOSED_NOT_ADMITTED.
-Admission is the formal Gate A review's call; nothing here asserts admission.
+Status vocabulary: the six records and the v2.1.0 proposal bytes below are
+ADMITTED_BY_OWNER_R1 (owner signoff 2026-09-30, evidence
+evidence/track-b/r1-owner-signoff.json, wamid provenance recorded there).
+Explicitly NOT approved by that signoff: visual asset admission, renderer
+before/after committed consumption proof (both R2/R3), production promotion,
+and the unit-1 cross-domain binding (R2).
 
 ## 1. Proposed records (validated at module load; a broken record throws)
 
 | Record | Id | Revision | Digest (sha256, full) | Validator status | Admission |
 |---|---|---|---|---|---|
-| Physical body (unit) | `synthetic-training-unit-body-v1` | 1 | `ddd80d4c6fd66ae59ab9b9d4deb33f0a453cde069c184582963d73a8472bc94c` | VALIDATED | PROPOSED_NOT_ADMITTED |
-| Bag owner body | `school/medical-bag-owner-body` | 1 | `2409eedc6840f26c886128c0698c35cee266a087f1fca46f1b676a582514e070` | VALIDATED | PROPOSED_NOT_ADMITTED |
-| Bag owner entity | `school/medical-bag-entity` | 1 | `6747aebe3b4e0df13ed4a6506320bed79935ccacb0e3355f9a55d1f3700e2c3b` | VALIDATED | PROPOSED_NOT_ADMITTED |
-| Interior support floor (layer 1) | `school/medical-bag-interior-floor` | 1 | `d41d496181c4554f3dd9a7c01f2b408b4a4c2c1ae50d0af76fe0f574e2ee2427` | VALIDATED | PROPOSED_NOT_ADMITTED |
-| Containment volume (layer 2) | `school/medical-bag-containment-interior` | 2 | `e0af9d06c4b2956abf6ea3f733db9fce7862e221b532e4f4ec095925db35ec6d` | VALIDATED | PROPOSED_NOT_ADMITTED |
-| Owner-body binding | `school/medical-bag-owner-body-binding` | 1 | `119b9e296c84df01193d86c129be9c579071a5cbc6714abbd7ec38a1e281ae25` | VALIDATED | PROPOSED_NOT_ADMITTED |
+| Physical body (unit) | `synthetic-training-unit-body-v1` | 1 | `ddd80d4c6fd66ae59ab9b9d4deb33f0a453cde069c184582963d73a8472bc94c` | VALIDATED | ADMITTED_BY_OWNER_R1 |
+| Bag owner body | `school/medical-bag-owner-body` | 1 | `2409eedc6840f26c886128c0698c35cee266a087f1fca46f1b676a582514e070` | VALIDATED | ADMITTED_BY_OWNER_R1 |
+| Bag owner entity | `school/medical-bag-entity` | 1 | `6747aebe3b4e0df13ed4a6506320bed79935ccacb0e3355f9a55d1f3700e2c3b` | VALIDATED | ADMITTED_BY_OWNER_R1 |
+| Interior support floor (layer 1) | `school/medical-bag-interior-floor` | 1 | `d41d496181c4554f3dd9a7c01f2b408b4a4c2c1ae50d0af76fe0f574e2ee2427` | VALIDATED | ADMITTED_BY_OWNER_R1 |
+| Containment volume (layer 2) | `school/medical-bag-containment-interior` | 2 | `e0af9d06c4b2956abf6ea3f733db9fce7862e221b532e4f4ec095925db35ec6d` | VALIDATED | ADMITTED_BY_OWNER_R1 |
+| Owner-body binding | `school/medical-bag-owner-body-binding` | 1 | `119b9e296c84df01193d86c129be9c579071a5cbc6714abbd7ec38a1e281ae25` | VALIDATED | ADMITTED_BY_OWNER_R1 |
 
 ## 2. Certified v2.0.0 anchors (prior three-entity scene ONLY, read-only)
 
@@ -38,24 +42,24 @@ certifying it. There is NOT yet a certified v2.1.0 world.
 | Certified v2.0.0 node descriptor | `5f6829b7b10bbbc91ff0bd7e66bd5de3c69473091d56af92f8decbc8cbecaa18` | buildVisualSceneDescriptor() |
 | Certified bag body (recovered) | `f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a` | school-medical-bag-body revision 1 |
 
-## 3. Proposed v2.1.0 anchors (four-entity scene, PROPOSED_NOT_ADMITTED)
+## 3. Proposed v2.1.0 anchors (four-entity scene, ADMITTED_BY_OWNER_R1 as the exact proposed bytes)
 
 Computed by executing the R1 proposal builder and a throwaway instantiation.
 Neither value is certified; admission is the formal review's call.
 
 | Anchor | Digest (sha256, full) | Status |
 |---|---|---|
-| Proposed v2.1.0 scene package | `5ba7ce47c9ff3a105a5636fda858d374bbdadcdedc41af3379d6fb2d54a989d8` | PROPOSED_NOT_ADMITTED |
-| Proposed v2.1.0 world state (throwaway instantiation) | `e3b493a45a9ba7ed04dd3c2a5361f6219f5d00938334eb53771fd87757d39009` | PROPOSED_NOT_ADMITTED |
+| Proposed v2.1.0 scene package | `5ba7ce47c9ff3a105a5636fda858d374bbdadcdedc41af3379d6fb2d54a989d8` | '+ADMIT+' |
+| Proposed v2.1.0 world state (throwaway instantiation) | `e3b493a45a9ba7ed04dd3c2a5361f6219f5d00938334eb53771fd87757d39009` | '+ADMIT+' |
 
 ## 4. World-level identity refs (read from the built v2.1.0 package)
 
 | Ref | Value | Status |
 |---|---|---|
-| World entity id | `synthetic-training-unit-v1` (entityTypeId `synthetic/training-unit`, revision 1) | PROPOSED_NOT_ADMITTED |
-| Support relation id | `synthetic:unit:bag-interior-floor` (ENTITY_OWNED, ownerEntityRef school-medical-bag) | PROPOSED_NOT_ADMITTED |
-| Containment volume (executable) | `school/medical-bag-containment-interior` revision 2 | PROPOSED_NOT_ADMITTED |
-| Gate A runtime status | PROPOSED_NOT_ADMITTED (host table; renderer tracks the unit separately) | current |
+| World entity id | `synthetic-training-unit-v1` (entityTypeId `synthetic/training-unit`, revision 1) | '+ADMIT+' |
+| Support relation id | `synthetic:unit:bag-interior-floor` (ENTITY_OWNED, ownerEntityRef school-medical-bag) | '+ADMIT+' |
+| Containment volume (executable) | `school/medical-bag-containment-interior` revision 2 | '+ADMIT+' |
+| Gate A runtime status | '+ADMIT+' (host table reads entity-body-map; renderer tracks the unit separately, presentationOnly until R2/R3 visual admission) | current |
 
 ## 5. Cross-domain identity binding (PROPOSED - NOT a committed engine fact)
 

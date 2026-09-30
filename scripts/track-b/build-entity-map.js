@@ -13,6 +13,8 @@ const fs=require('node:fs'),path=require('node:path'),{execSync}=require('node:c
  {buildVisualCasualty}=require('../../src/clean-runtime/school/scene-v2/visual-casualty'),
  {buildVisualEquipment}=require('../../src/clean-runtime/school/scene-v2/visual-equipment'),
  {buildVisualSurfaceSet}=require('../../src/clean-runtime/school/scene-v2/visual-surfaces');
+const SIGNOFF=JSON.parse(fs.readFileSync(path.join(__dirname,'../../evidence/track-b/r1-owner-signoff.json'),'utf8'));
+if(SIGNOFF.admissionStatus!=='ADMITTED_BY_OWNER_R1'||SIGNOFF.authority!=='USER_GATE_REVIEW'){console.error('REJECTED: r1-owner-signoff record missing/invalid');process.exit(1)}
 function git(cmd){try{return execSync('git '+cmd,{encoding:'utf8'}).trim()}catch{return 'UNKNOWN'}}
 const descriptor=buildVisualSceneDescriptor(),casualty=buildVisualCasualty(descriptor),equipment=buildVisualEquipment(descriptor),surfaces=buildVisualSurfaceSet();
 const ok=descriptor.status==='COMMITTED'&&casualty.status==='DIMENSIONED_TO_CERTIFIED_ENVELOPE'&&equipment.status==='DIMENSIONED_TO_CERTIFIED_BODIES';
@@ -53,9 +55,10 @@ const map={mapVersion:'1.0.0',kind:'TRACK_B_ENTITY_BODY_MAP',generatedAt:new Dat
    physicalBodyRef:null,
    boundsMicrounits:{minX:-100000,maxX:100000,minY:0,maxY:120000,minZ:-40000,maxZ:40000},
    sourceAnchor:{proposalDoc:'docs/track-b/gate-a-synthetic-unit-visual-asset-proposal.md'},
-   gateAStatus:'PROPOSED_NOT_ADMITTED',
+   gateAStatus:SIGNOFF.admissionStatus,
+   admissionEvidenceRef:'evidence/track-b/r1-owner-signoff.json',
    presentationOnly:true,
-   note:'B-W11 interim presentation bridge (contract v0.3). Bounds are the PROPOSED Gate A draft (R1 v3) - presentation-only until Gate A admission; this entry carries no physical authority and zero clinical fields. publicUseState AVAILABLE/RESERVED/CONSUMED present committed projections, never decide them.'}}};
+   note:'B-W11 presentation bridge (contract v0.3). Bounds are the Gate A unit body aggregate (owner R1 signoff 2026-09-30); the six physical records are ADMITTED_BY_OWNER_R1 while this entry itself stays presentation-only - visual asset admission is R2/R3 scope; this entry carries no physical authority and zero clinical fields. publicUseState AVAILABLE/RESERVED/CONSUMED present committed projections, never decide them.'}}};
 if(!ok){console.error('REJECTED: builders not in expected status');process.exit(1)}
 const out=path.join(__dirname,'../../visual-slice/entity-body-map.json');
 fs.writeFileSync(out,JSON.stringify(map,null,1));

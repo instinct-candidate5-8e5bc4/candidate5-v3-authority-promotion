@@ -26,7 +26,7 @@ function loadPuppeteer(){try{return require('puppeteer')}catch{}
  c('gate statuses detailed (reviewIds)',st.statuses.statuses.casualty.reviewId==='gate-b-user-review-ee04481'&&st.statuses.statuses.chair.reviewId==='gate-c-user-review-0c27c92');
  c('stale casualty label marked superseded',st.statuses.superseded.length===1&&st.statuses.superseded[0].entityId==='school-casualty-adult-v1');
  c('3 certified entities bound in registry (synthetic unit tracked separately)',st.boundEntities.length===3);
- c('synthetic unit bound via host table',st.syntheticUnit&&st.syntheticUnit.bound===true&&st.syntheticUnit.gateAStatus==='PROPOSED_NOT_ADMITTED');
+ c('synthetic unit bound via host table (ADMITTED_BY_OWNER_R1)',st.syntheticUnit&&st.syntheticUnit.bound===true&&st.syntheticUnit.gateAStatus==='ADMITTED_BY_OWNER_R1');
  // Projection: examine-style highlight + bounded finding text.
  const proj=await page.evaluate(()=>window.__smoke.pkg.renderFromProjection({
   kind:'TRACK_B_PUBLIC_PROJECTION',contractVersion:'0.2',cue:'SYNTHETIC_ACTION_COMPLETED',
@@ -56,7 +56,7 @@ function loadPuppeteer(){try{return require('puppeteer')}catch{}
  const syn=await page.evaluate(()=>window.__smoke.pkg.renderFromProjection({kind:'TRACK_B_PUBLIC_PROJECTION',contractVersion:'0.3',entities:[{publicRef:'pub-synthetic-unit-1',publicUseState:'RESERVED'}]}));
  c('v0.3 use-state projection applied to synthetic unit',syn.applied===true);
  const synSt=await page.evaluate(()=>window.__smoke.pkg.status().syntheticUnit);
- c('status reports synthetic unit RESERVED, still PROPOSED_NOT_ADMITTED',synSt.bound===true&&synSt.useState==='RESERVED'&&synSt.gateAStatus==='PROPOSED_NOT_ADMITTED');
+ c('status reports synthetic unit RESERVED, ADMITTED_BY_OWNER_R1',synSt.bound===true&&synSt.useState==='RESERVED'&&synSt.gateAStatus==='ADMITTED_BY_OWNER_R1');
  const rej3=await page.evaluate(()=>[
   window.__smoke.pkg.renderFromProjection({kind:'TRACK_B_PUBLIC_PROJECTION',contractVersion:'9.9',entities:[]}),
   window.__smoke.pkg.renderFromProjection({kind:'TRACK_B_PUBLIC_PROJECTION',contractVersion:'0.3',entities:[{publicRef:'pub-casualty-1',publicUseState:'RESERVED'}]}),

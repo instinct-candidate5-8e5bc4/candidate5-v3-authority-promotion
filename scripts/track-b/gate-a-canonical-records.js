@@ -55,6 +55,15 @@ const w21=instantiate(v21);
 need(w21.status==='COMMITTED','v2.1.0 instantiation did not COMMIT');
 need(hex64(w21.after.stateDigest),'v2.1.0 world digest malformed');
 need(w21.after.entities['synthetic-training-unit-v1'],'unit missing from v2.1.0 world');
+
+// Owner R1 signoff record: the admission status source of truth. The record's
+// approved scene digests must equal the live computed proposal digests - any
+// drift between the approved bytes and the current bytes fails closed.
+const SIGNOFF=JSON.parse(fs.readFileSync(path.join(ROOT,'evidence/track-b/r1-owner-signoff.json'),'utf8'));
+need(SIGNOFF.authority==='USER_GATE_REVIEW'&&SIGNOFF.admissionStatus==='ADMITTED_BY_OWNER_R1','r1-owner-signoff record missing/invalid');
+need(SIGNOFF.approvedScope.proposedScene.packageDigest===v21.scenePackageDigest,'approved package digest != live v2.1.0 package digest - bytes drifted after signoff');
+need(SIGNOFF.approvedScope.proposedScene.worldDigest===w21.after.stateDigest,'approved world digest != live v2.1.0 world digest - bytes drifted after signoff');
+const ADMIT=SIGNOFF.admissionStatus;
 const unitEntity=v21.entities.find(e=>e.entityId==='synthetic-training-unit-v1');
 const unitRel=v21.supportRelations.find(r=>r.supportedEntityId==='synthetic-training-unit-v1');
 need(unitEntity&&unitRel,'unit entity/relation missing from v2.1.0 package');
@@ -72,14 +81,18 @@ section-4 record identity in docs/track-b/gate-a-synthetic-unit-visual-asset-pro
 (that document remains the design history; its stale rows named
 synthetic-training-unit-1 and school/medical-bag-interior-volume-v1 rev 1).
 
-Status vocabulary: every proposed record below is PROPOSED_NOT_ADMITTED.
-Admission is the formal Gate A review's call; nothing here asserts admission.
+Status vocabulary: the six records and the v2.1.0 proposal bytes below are
+ADMITTED_BY_OWNER_R1 (owner signoff 2026-09-30, evidence
+evidence/track-b/r1-owner-signoff.json, wamid provenance recorded there).
+Explicitly NOT approved by that signoff: visual asset admission, renderer
+before/after committed consumption proof (both R2/R3), production promotion,
+and the unit-1 cross-domain binding (R2).
 
 ## 1. Proposed records (validated at module load; a broken record throws)
 
 | Record | Id | Revision | Digest (sha256, full) | Validator status | Admission |
 |---|---|---|---|---|---|
-${rows.map(r=>'| '+r[0]+' | \`'+r[1]+'\` | '+r[2]+' | \`'+r[3]+'\` | '+r[4]+' | PROPOSED_NOT_ADMITTED |').join('\n')}
+${rows.map(r=>'| '+r[0]+' | \`'+r[1]+'\` | '+r[2]+' | \`'+r[3]+'\` | '+r[4]+' | '+ADMIT+' |').join('\n')}
 
 ## 2. Certified v2.0.0 anchors (prior three-entity scene ONLY, read-only)
 
@@ -94,24 +107,24 @@ certifying it. There is NOT yet a certified v2.1.0 world.
 | Certified v2.0.0 node descriptor | \`${descriptor.descriptorDigest}\` | buildVisualSceneDescriptor() |
 | Certified bag body (recovered) | \`${D.binding.recoveredBodyRef.digest}\` | school-medical-bag-body revision ${D.binding.recoveredBodyRef.revision} |
 
-## 3. Proposed v2.1.0 anchors (four-entity scene, PROPOSED_NOT_ADMITTED)
+## 3. Proposed v2.1.0 anchors (four-entity scene, `+ADMIT+` as the exact proposed bytes)
 
 Computed by executing the R1 proposal builder and a throwaway instantiation.
 Neither value is certified; admission is the formal review's call.
 
 | Anchor | Digest (sha256, full) | Status |
 |---|---|---|
-| Proposed v2.1.0 scene package | \`${v21.scenePackageDigest}\` | PROPOSED_NOT_ADMITTED |
-| Proposed v2.1.0 world state (throwaway instantiation) | \`${w21.after.stateDigest}\` | PROPOSED_NOT_ADMITTED |
+| Proposed v2.1.0 scene package | \`${v21.scenePackageDigest}\` | '+ADMIT+' |
+| Proposed v2.1.0 world state (throwaway instantiation) | \`${w21.after.stateDigest}\` | '+ADMIT+' |
 
 ## 4. World-level identity refs (read from the built v2.1.0 package)
 
 | Ref | Value | Status |
 |---|---|---|
-| World entity id | \`${unitEntity.entityId}\` (entityTypeId \`${unitEntity.entityTypeId}\`, revision ${unitEntity.revision}) | PROPOSED_NOT_ADMITTED |
-| Support relation id | \`${unitRel.relationId}\` (${unitRel.supportSourceKind}, ownerEntityRef ${unitRel.ownerEntityRef.id}) | PROPOSED_NOT_ADMITTED |
-| Containment volume (executable) | \`${D.volume.supportVolumeId}\` revision ${D.volume.volumeRevision} | PROPOSED_NOT_ADMITTED |
-| Gate A runtime status | PROPOSED_NOT_ADMITTED (host table; renderer tracks the unit separately) | current |
+| World entity id | \`${unitEntity.entityId}\` (entityTypeId \`${unitEntity.entityTypeId}\`, revision ${unitEntity.revision}) | '+ADMIT+' |
+| Support relation id | \`${unitRel.relationId}\` (${unitRel.supportSourceKind}, ownerEntityRef ${unitRel.ownerEntityRef.id}) | '+ADMIT+' |
+| Containment volume (executable) | \`${D.volume.supportVolumeId}\` revision ${D.volume.volumeRevision} | '+ADMIT+' |
+| Gate A runtime status | '+ADMIT+' (host table reads entity-body-map; renderer tracks the unit separately, presentationOnly until R2/R3 visual admission) | current |
 
 ## 5. Cross-domain identity binding (PROPOSED - NOT a committed engine fact)
 
