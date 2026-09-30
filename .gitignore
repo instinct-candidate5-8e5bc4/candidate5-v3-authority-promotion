@@ -1,0 +1,12 @@
+assets/*
+!assets/realistic/
+assets/realistic/*
+!assets/realistic/final-composites/
+assets/realistic/final-composites/*
+!assets/realistic/final-composites/bag.png
+!assets/realistic/final-composites/recovery-v33.png
+!assets/realistic/final-composites/seated.png
+!assets/realistic/final-composites/supine-v33.png
+!assets/realistic/final-composites/witness-older.png
+!assets/realistic/final-composites/witness-third.png
+!assets/realistic/final-composites/witness-young.png
