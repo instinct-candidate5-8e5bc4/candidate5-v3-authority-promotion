@@ -1,0 +1,112 @@
+{
+  "kind": "CONTROLLED_GENUINE_AUTOPLAY_SLOW_BOOT_EVIDENCE",
+  "runAt": "2026-09-30T07:07:59+03:00",
+  "scope": "Local loopback run on exact final deployed-asset tree, not a deployed network run",
+  "sourceCommit": "4682a4776362e20d7fb9edd00badd51ec32a0897",
+  "sourceTree": "196d4293be306f5702157acfc36d10e7bfa0a698",
+  "sourceByteSha256": {
+    "index.html": "b54f787ee3877adce1c17ce5c939ea1a37d1d5291aacf66096e363895271b3f4",
+    "src/nextgen/unexpected-events.js": "bef528c20645d7e2ba9fa9197033fe015e009191af8215cc66f6a2f31328d7b9",
+    "human-clothed-rig.glb": "964dcc0eaf004d09ae02ebe4c1b6a2bfa4755394a02847f2c62f925bb9dbddca"
+  },
+  "route": "?scene=0&seed=1&play=1&case=cardiac",
+  "viewport": "1100x780",
+  "method": "Intercept request, wait12s, continue original unchanged response. Delay scene module dependency rather than parser-blocking classic script. No code/time/engine replacement. Real autoplay starts before engine assignment.",
+  "delayedRequest": {
+    "url": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+    "delayMs": 12000,
+    "startedAt": "2026-09-30T04:07:59.899Z"
+  },
+  "guardWindow": {
+    "first": {
+      "wall": 1790741280126,
+      "clock": "00:00",
+      "started": true,
+      "engineAssigned": false
+    },
+    "last": {
+      "wall": 1790741291637,
+      "clock": "00:11",
+      "started": true,
+      "engineAssigned": false
+    },
+    "sampleCount": 24
+  },
+  "firstAssigned": {
+    "wall": 1790741292172,
+    "clock": "00:12",
+    "started": true,
+    "engineAssigned": true
+  },
+  "final": {
+    "initial": {
+      "pending": 2,
+      "fired": []
+    },
+    "result": {
+      "boot": "pass",
+      "failures": "",
+      "ready": true,
+      "coverDone": true,
+      "canvasCount": 1,
+      "started": true,
+      "unexpected": true,
+      "clock": "01:06",
+      "unexpectedAudit": {
+        "pending": 1,
+        "fired": [
+          {
+            "id": "unexpected:0",
+            "type": "noise-started",
+            "atMs": 45767,
+            "payload": {
+              "level": 0.75
+            }
+          }
+        ]
+      },
+      "worldEvents": [
+        {
+          "id": "world:00001",
+          "atMs": 45767,
+          "cause": "noise-started",
+          "before": {
+            "hazard": {
+              "active": false,
+              "kind": "\u05d0\u05d9\u05df \u05e1\u05db\u05e0\u05d4 \u05de\u05d9\u05d9\u05d3\u05d9\u05ea",
+              "intensity": 0
+            },
+            "noise": 0.15,
+            "door": "open",
+            "people": {
+              "witness": "present",
+              "additional": 0
+            },
+            "dispatcherGuidance": null,
+            "revision": 0
+          },
+          "after": {
+            "hazard": {
+              "active": false,
+              "kind": "\u05d0\u05d9\u05df \u05e1\u05db\u05e0\u05d4 \u05de\u05d9\u05d9\u05d3\u05d9\u05ea",
+              "intensity": 0
+            },
+            "noise": 0.75,
+            "door": "open",
+            "people": {
+              "witness": "present",
+              "additional": 0
+            },
+            "dispatcherGuidance": null,
+            "revision": 1
+          },
+          "caseKey": "cardiac",
+          "environment": "clinic"
+        }
+      ]
+    },
+    "errors": []
+  },
+  "visualInspection": "Screenshot inspected: root scene loaded, patient/witness/bag visible, boot cover absent, noise ring present, no character-model warning. Legacy rendering, not posture certification.",
+  "result": "PASS"
+}
