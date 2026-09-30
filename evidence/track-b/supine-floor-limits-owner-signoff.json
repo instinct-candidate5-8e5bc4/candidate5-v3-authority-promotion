@@ -1,0 +1,80 @@
+{
+ "reviewId": "supine-floor-limits-owner-signoff",
+ "authority": "USER_GATE_REVIEW",
+ "decision": "SUPINE_FLOOR PER-REGION DEVIATION LIMITS APPROVED + v14 CANDIDATE LOCK AUTHORIZED",
+ "scope": "SUPINE_FLOOR ONLY - not a default for any other posture",
+ "verbatim": "מאשר את גבולות הסטייה המוצעים עבור SUPINE_FLOOR בלבד.\n\nהאישור חל על המועמד והגרסה המדויקים שנבדקו, ואינו הופך את הערכים האלה לברירת מחדל לתנוחות אחרות.\n\nמאושרים:\n\nHEAD — 98% בתחום, contact deviation עד 9mm כפי שנמדד.\n\nUPPER BODY — 100% בתחום, כולל המרווח האנטומי הטבעי המתועד של עד 55mm באזור הגב התחתון.\n\nLEGS — 97% בתחום, zero-contact deviation כפי שנמדד.\n\nHANDS/ARMS — מאשר את מגבלת ה-60% המוצעת כחריגה מבנית מתועדת הנובעת מהפער בין מעטפת היד הפיזיקלית המוסמכת (~50mm) לבין האנטומיה הוויזואלית (~100mm).\n\nהאישור לידיים אינו היתר כללי לחריגה.\n\nה-Bone ↔ Certified Body Region binding נשאר מחייב, והחריגה חייבת להישאר דטרמיניסטית, מדידה ובתוך הגבול שנבדק.\n\nכל אחד מהבאים עדיין FAIL ללא קשר לאחוז ההתאמה:\n\n- חדירה לרצפה\n- חדירה לתומך/כיסא/תיק/גוף אחר\n- ריחוף שמוסתר ע\"י mesh/IK\n- שינוי ויזואלי שמסתיר מצב פיזיקלי לא חוקי\n- חריגה מעבר לגבול המאושר\n- שינוי binding ללא version/evidence חדש\n\nהאישור הוא ל-SUPINE_FLOOR בלבד.\n\nSTANDING וכל תנוחה עתידית — SEATED, RECOVERY, SUPPORTED וכו' — מקבלות מדידה וגבולות משלהן ולא יורשות אוטומטית את הספים האלה.\n\nאפשר לנעול את SUPINE_FLOOR candidate לפי הגבולות האלה ולהמשיך.\n\nאל תעצור R2/R3 או את המסלולים המקבילים.",
+ "provenance": {
+  "channel": "whatsapp",
+  "wamid": "wamid.HBgMOTcyNTMyNDkwMzUxFQIAEhgUM0E2QzkxOTJGNTYwQkQzQ0M2OUQA",
+  "receivedAt": "2026-09-30T12:31:12+03:00",
+  "from": "+972532490351",
+  "inReplyTo": "limits proposal ask wamid.HBgMOTcyNTMyNDkwMzUxFQIAERgSQ0U1ODBCQjg4NTg3QUI4QTg4AA== (2026-09-30T05:17:30+03:00, plain-language per-region summary of the measured v14 values), itself replying to owner wamid.HBgMOTcyNTMyNDkwMzUxFQIAEhgUM0FGNkU2NEZENDlDRDA5MjFCRTAA"
+ },
+ "lockedCandidate": {
+  "id": "makehuman-male-v4-supine-candidate-v14",
+  "asset": "makehuman-male-v4-supine-candidate-v14.glb",
+  "optState": "pipeline/opt-state-v14.json",
+  "renders": [
+   "mh-v14-supine-candidate-side.png",
+   "mh-v14-supine-candidate-top.png"
+  ],
+  "assetProvenance": "asset-provenance.md (standing SHAs recorded there)"
+ },
+ "approvedLimits": {
+  "precisionNote": "The ask summarized the MEASURED v14 values rounded to integers (head 97.8->98, legs 96.9->97, arms ~59.7->60 with the structural-cap explanation); the owner approved those stated values for the exact reviewed candidate+version. The approved bound is therefore the candidate's deterministic measured values; the integers below are the owner's stated rounded expression of that same bound. Any regression beyond the measured values is חריגה מעבר לגבול המאושר = FAIL. Per his clause: the exception must remain deterministic, measurable, and within the reviewed bound.",
+  "head": {
+   "stated": "98% in-region, contact deviation <= 9mm as measured",
+   "measured": {
+    "inPct": 97.8,
+    "contactMm": 9,
+    "overshootMm": 62
+   }
+  },
+  "upperBody": {
+   "stated": "100% in-region, documented natural lumbar gap up to 55mm allowed",
+   "measured": {
+    "inPct": 100,
+    "lumbarClearanceMm": 55,
+    "overshootMm": 0
+   }
+  },
+  "legs": {
+   "stated": "97% in-region, zero-contact deviation as measured",
+   "measured": {
+    "inPct": 96.9,
+    "contactMm": 0,
+    "overshootMm": 153
+   }
+  },
+  "handsArms": {
+   "stated": "60% limit as documented STRUCTURAL EXCEPTION ONLY (certified physical hand shell ~50mm vs visual anatomy ~100mm) - never a general license",
+   "measured": {
+    "inPct": [
+     59.5,
+     59.8
+    ],
+    "overshootMm": [
+     171,
+     153
+    ],
+    "structural": "shoulder column at |X| 0.157 can never enter slab inner edge |X| 0.28; 50mm slab vs ~100mm anatomical arm caps occupancy near ~50-60%"
+   }
+  }
+ },
+ "hardFailUnchanged": [
+  "penetration of the floor",
+  "penetration of a support/chair/bag/other body",
+  "floating hidden by mesh/IK",
+  "visual change that conceals an illegal physical state",
+  "deviation beyond the approved bound",
+  "binding change without new version+evidence"
+ ],
+ "bindingClause": "Bone <-> Certified Body Region binding remains mandatory; the exception must remain deterministic, measurable, and within the reviewed bound.",
+ "noInheritance": "STANDING and every future posture (SEATED, RECOVERY, SUPPORTED, ...) gets its own measurement and limits; nothing inherits these thresholds.",
+ "continuation": "Lock the SUPINE_FLOOR candidate under these limits and continue; do not stop R2/R3 or the parallel tracks.",
+ "crossRefs": [
+  "r1-owner-signoff (evidence/track-b/r1-owner-signoff.json in the venue repo)",
+  "owner R3 no-2D-sprite directive 2026-09-30T12:32:34+03:00 wamid.HBgMOTcyNTMyNDkwMzUxFQIAEhgUM0EwOTA0ODVCRDZFODlCMUI3NDMA"
+ ]
+}
