@@ -1,0 +1,65 @@
+{
+  "kind": "REVIEWED_NON_GEOMETRY_SOURCE_REVISION_CANDIDATE",
+  "version": "1.0.0",
+  "status": "APPROVED_FOR_NON_GEOMETRY_REVISION",
+  "originalSha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+  "currentSha256": "3e78e97f85d7b9ea06cbbdc9ba3e8364b50ae0f261e04949f52f7c098eb9cfab",
+  "substitutions": [
+    {
+      "original": "unexpectedEngine.advance(",
+      "current": "window.unexpectedEngine.advance(",
+      "count": 1
+    },
+    {
+      "original": "window.exportUnexpectedAudit=()=>unexpectedEngine.snapshot();",
+      "current": "window.unexpectedEngine=unexpectedEngine;window.exportUnexpectedAudit=()=>unexpectedEngine.snapshot();",
+      "count": 1
+    }
+  ],
+  "ranges": [
+    {
+      "id": "base-room",
+      "originalOffset": 150965,
+      "currentOffset": 150972,
+      "sha256": "af6d27f191a1e108d30a8869e27296ab1841b51d5196b8d562b8f47231839eed"
+    },
+    {
+      "id": "school-bag-lockers",
+      "originalOffset": 164008,
+      "currentOffset": 164015,
+      "sha256": "21ba7567961cbb9c022ab8a1f11359bf07049c506519a7656394cfc48fcc11ea"
+    },
+    {
+      "id": "clinic-cart",
+      "originalOffset": 165275,
+      "currentOffset": 165282,
+      "sha256": "aee0b75f652c046f87378958ed2b11ca9923da8bae9b2f7d3f4a31e7cb809650"
+    },
+    {
+      "id": "outdoor-surfaces",
+      "originalOffset": 166548,
+      "currentOffset": 166555,
+      "sha256": "e0b51abdc88ad0d44715a2bc441bc7d2778c244b1cda415135a03fecc9cc856e"
+    },
+    {
+      "id": "door",
+      "originalOffset": 167869,
+      "currentOffset": 167876,
+      "sha256": "2d2996bd9385e6963993154e655cc75c5549b05e14a7d52fbec26d266c2a01a8"
+    }
+  ],
+  "scope": "Only classic/module engine-reference bridge; physical geometry and original source evidence unchanged.",
+  "reviewEvidence": {
+    "reviewRound": "ROOT_SCOPE_LINEAGE_2026-09-30_0444",
+    "independentVerdict": "Track B accepted exact reconstruction mechanism, requiring approved-status gate and negative staleness tests.",
+    "verifiedOriginalSha": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+    "verifiedCurrentSha": "3e78e97f85d7b9ea06cbbdc9ba3e8364b50ae0f261e04949f52f7c098eb9cfab",
+    "geometryRangesUnchanged": true,
+    "rangeOffsetShiftBytes": 7,
+    "positiveTests": "five visual-surface checks plus classic/module scope bridge test",
+    "negativeTestFile": "tests/engine-stage1/playable/root-source-revision.test.js",
+    "artifact": "evidence/root-shell/lineage-review-verdict-root-revision.md",
+    "artifactSha256": "06143849a872be42453a25c5095b27f3faba97ea10a43ea77816daaeb2bfe004",
+    "transportCondition": "Final ship commit must be applied to current branch HEAD, B2 lineage tests pass and original/current root SHAs re-confirm; failure voids this verdict for that commit."
+  }
+}
