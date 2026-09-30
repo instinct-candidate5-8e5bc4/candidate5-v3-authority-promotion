@@ -1,6 +1,6 @@
 {
  "kind": "TRACK_B_PRESENTATION_MANIFEST",
- "manifestVersion": "0.1.0",
+ "manifestVersion": "0.2.0",
  "sceneRef": {
   "definitionId": "SCHOOL_TREATMENT_ROOM",
   "authoritativeWorldDigest": "fa1bbaa985a63a8bfa30c2bbd7fbaf14b2c4972d985815a093bdd68f7fe954ea"
@@ -52,7 +52,12 @@
    "visualEntityId": "vw-synthetic-training-unit",
    "assetRef": {
     "kind": "procedural",
-    "source": "renderer-package.mjs#mountSyntheticUnit"
+    "source": "renderer-package.mjs#mountSyntheticUnit",
+    "pinned": {
+     "assetBindingVersion": "1.0.0",
+     "unitDefinitionSha256": "53f2376d576395d2a6f22dcd750c8e5acc77b6aa4614a1d0b32c210ff638e12f",
+     "bindingDigest": "97c9b7d71ee3af41e47f56238df919420ae4b45bb7589264f0c241bd385d575a"
+    }
    },
    "transformSource": "authoritative",
    "physicsAuthoritative": false
@@ -62,5 +67,5 @@
   "rigRef": "procedural:renderer-package.mjs#lighting",
   "shadowPolicy": "PCFSoftShadowMap"
  },
- "manifestDigest": "da2311bf6991677796151833520c149e68c009628b73afb3d78fcd8f87d2393e"
+ "manifestDigest": "e32fb783833af0a6d83a519217c5bb473c258519f26bacce1ccabaea596bd516"
 }

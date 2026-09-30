@@ -15,8 +15,9 @@ import {buildArticulatedLayout} from '../articulated-layout.mjs';
 import {fitCameraToAabb} from '../camera-lighting.mjs';
 import {validateMap,resolveEntity} from '../entity-map.mjs';
 import {validateProjection} from './projection-guard.mjs';
+import {validateCommittedWorldProjection} from './committed-world-guard.mjs';
 import {sha256} from '../engine/vendor/js-sha256.mjs';
-export const PACKAGE_API_VERSION='1.0.0';
+export const PACKAGE_API_VERSION='1.1.0';
 const U=1e6,m=v=>v/U;
 const LOCATION_TARGETS=Object.freeze({INITIAL:null,FLOOR_BESIDE_CHAIR:[-1200000,175000,1000000]});
 let inst=null;
@@ -220,6 +221,31 @@ export function renderFromProjection(projection){
  }
  inst.lastCue=v.cue;
  return{applied:true,cue:v.cue,actions:v.actions.map(a=>a.type+':'+a.entityId)}}
+
+// renderPhysicalProjection(projection): R3 root-shell PHYSICAL session route.
+// Accepts ONLY a committed-world projection (committed-world-guard.mjs,
+// contract 1.0): whitelist-only, no cues, no inventory, no visual shaping.
+// Applies committed transforms/use-states for entities on the guard's apply
+// allowlist, cross-checked against the PINNED presentation-manifest binding.
+// Fail-closed: any violation -> no visual action at all.
+export function renderPhysicalProjection(projection){
+ if(!inst)return{applied:false,reason:'not mounted'};
+ const v=validateCommittedWorldProjection(projection,{bindingTable:inst.opts.bindingTable,map:inst.map,boundEntities:inst.pm&&inst.pm.ok?inst.pm.bound:null});
+ if(!v.ok)return{applied:false,reason:v.reason};
+ const applied=[];
+ for(const a of v.actions){
+  if(a.type==='committedTransform'&&a.entityId==='synthetic-training-unit-v1'&&syn){
+   const entry=inst.map.entities['synthetic-training-unit-v1'];
+   const b=entry.boundsMicrounits;
+   syn.group.position.set(m(a.positionMicrounits[0]),m(a.positionMicrounits[1])+(b.minY+b.maxY)/2/1e6,m(a.positionMicrounits[2]));
+   applied.push('committedTransform:'+a.entityId)}
+  else if(a.type==='useState'&&a.entityId==='synthetic-training-unit-v1'&&syn){
+   syn.useState=a.code;
+   syn.mesh.material.color.setHex(a.code==='AVAILABLE'?0x22cc55:a.code==='RESERVED'?0xcc7722:0x333333);
+   syn.marker.visible=a.code!=='AVAILABLE';
+   applied.push('useState:'+a.entityId)}}
+ inst.committedWorld={worldDigest:v.worldDigest,transactionId:v.transactionId,appliedEntities:applied.slice()};
+ return{applied:true,worldDigest:v.worldDigest,transactionId:v.transactionId,actions:applied}}
 // validatePlacement(placement): PROPOSE-ONLY geometry check through the
 // certified gate. Runs in a throwaway in-memory session that is discarded
 // immediately; nothing is retained, persisted or exported. A "valid" result
@@ -246,6 +272,7 @@ export function status(){
   statuses:inst.statuses,
   boundEntities:Object.keys(inst.bindings),
   bagLocation:inst.bagLocation,lastCue:inst.lastCue,
+  committedWorld:inst.committedWorld||null,
   syntheticUnit:syn?{bound:true,useState:syn.useState,gateAStatus:inst.syntheticUnitGateA||'UNKNOWN',registryAdmission:inst.syntheticUnitRegistryAdmission||'UNKNOWN',note:'presentation bridge (B-W11); physical records ADMITTED_BY_OWNER_R1 (r1-owner-signoff, owner-decision status) + registry-ADMITTED (gate-a-r1-admission.js); visual admission R2/R3'}:{bound:false},
   presentation:inst.pm?{active:inst.pm.ok,bound:inst.pm.ok?inst.pm.bound:null,reason:inst.pm.ok?null:inst.pm.reason}:null,
   claimGate:'SLICE-PACKAGE ONLY: not "connected" until the running shell consumes this package'}}

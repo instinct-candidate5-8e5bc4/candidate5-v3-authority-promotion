@@ -6,7 +6,7 @@ const sha=p=>crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex'
 test('API surface is exactly the ordered read-only set - no mutation/commit exports',()=>{
  const src=fs.readFileSync(path.join(PKG,'renderer-package.mjs'),'utf8');
  const names=[...src.matchAll(/^export (?:async function|function|const) (\w+)/gm)].map(x=>x[1]).sort();
- assert.deepEqual(names,['PACKAGE_API_VERSION','mount','renderFromProjection','status','unmount','validatePlacement']);
+ assert.deepEqual(names,['PACKAGE_API_VERSION','mount','renderFromProjection','renderPhysicalProjection','status','unmount','validatePlacement']);
  for(const n of names)assert(!/commit|mutate|propose|session|world/i.test(n),'forbidden export '+n);
  assert(!src.includes('export function createDemoSession')&&!src.includes('export const createDemoSession'),'demo commit path must not be re-exported')});
 test('asset manifest is byte-exact against the COMMITTED tree (what Pages serves) and covers every package asset',()=>{

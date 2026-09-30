@@ -27,7 +27,7 @@ const gateStatuses={kind:'TRACK_B_PACKAGE_GATE_STATUSES',correctionVersion:corr.
  policy:'Statuses come ONLY from the detailed correction record. Banner text and registry notes are never a status source.'};
 fs.writeFileSync(path.join(PKG,'gate-statuses.json'),JSON.stringify(gateStatuses,null,1));
 // 2. Asset manifest: every asset the package loads/serves, byte-exact.
-const LOCAL=['package/renderer-package.mjs','package/projection-guard.mjs','package/presentation-guard.mjs','package/procedural-room.mjs','package/gate-statuses.json','presentation-manifest.json',
+const LOCAL=['package/renderer-package.mjs','package/projection-guard.mjs','package/committed-world-guard.mjs','package/presentation-guard.mjs','package/procedural-room.mjs','package/gate-statuses.json','presentation-manifest.json',
  'entity-map.mjs','entity-body-map.json','articulated-layout.mjs','camera-lighting.mjs',
  'engine-bundle.js','scene-bundle.json','engine/pins.json',
  'engine/vendor/js-sha256.mjs','engine/vendor/js-sha256.LICENSE.txt'];
