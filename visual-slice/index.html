@@ -35,7 +35,8 @@
  <b class="t">SCHOOL TREATMENT ROOM &mdash; VISUAL PREVIEW</b> &nbsp;<span class="warn">VISUALS ARE NOT CERTIFIED PHYSICS</span><br>
  <span id="distinction"></span><br>
  <span id="meta"></span>
- <span id="engine"></span>
+ <span id="engine"></span><br>
+ <span id="pmstatus"></span>
  <details><summary>Status caveats, declared unknowns, digests</summary><div id="caveats"></div></details>
 </div>
 <div id="rigbar" dir="rtl" style="position:fixed;right:10px;bottom:10px;z-index:6;background:rgba(8,14,18,.85);border:1px solid #2a3f4a;border-radius:8px;padding:8px 10px;color:#cfe3ee;font:13px/1.5 system-ui">
@@ -57,6 +58,9 @@ import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import * as ENGINE from './engine-bundle.js';
 import {buildArticulatedLayout} from './articulated-layout.mjs';
 import {fitCameraToAabb,LIGHTING_RIGS} from './camera-lighting.mjs';
+import {buildProceduralRoom} from './package/procedural-room.mjs';
+import {validatePresentationManifest} from './package/presentation-guard.mjs';
+import {sha256} from './engine/vendor/js-sha256.mjs';
 const U=1e6, m=v=>v/U; // ED-P2-02 downstream-only conversion: microunits -> meters for display. Never feeds authoritative state.
 // C1 scene-family registry: the requested family (?scene=<family>, default
 // school-treatment-room) resolves through scene-registry.json ONLY. UNAVAILABLE
@@ -108,8 +112,24 @@ frameForViewport();
 window.__c3={camera,casualtyEnv,lookAt,fov:bundle.camera.fovDegrees}; // read-only verification hook
 const controls=new OrbitControls(camera,renderer.domElement);controls.target.set(...bundle.camera.lookAtMicrounits.map(m));controls.update();
 function box(aabb,colorHex,opts={}){const sx=m(aabb.maxX-aabb.minX),sy=m(aabb.maxY-aabb.minY),sz=m(aabb.maxZ-aabb.minZ);const mesh=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),new THREE.MeshStandardMaterial({color:parseInt(colorHex),roughness:opts.roughness??.85,metalness:opts.metalness??.05}));mesh.position.set(m(aabb.minX)+sx/2,m(aabb.minY)+sy/2,m(aabb.minZ)+sz/2);mesh.castShadow=opts.cast??true;mesh.receiveShadow=true;return mesh}
-// Room surfaces (B2, lineage-evidenced against certified physical surfaces)
-for(const s of bundle.room)scene.add(box(s.geometryMicrounits,s.visualOnlyClaims.colorHex,{cast:false}));
+// Room surfaces (B2, lineage-evidenced against certified physical surfaces).
+// PW-2 page wiring: the production room skin renders ONLY when the presentation
+// manifest validates through the same fail-closed pmCheck as the embeddable
+// package (manifest + entity-body-map + committed world digest + pinned unit
+// definition). Any failure keeps the certified debug boxes with a LOUD
+// placeholder line - never a silent fallback, never a blocking failure.
+const fetchJsonOrNull=async u=>{try{const r=await fetch(u);return r.ok?await r.json():null}catch(e){return null}};
+const [presentationManifest,map,build]=await Promise.all([
+ fetchJsonOrNull('./presentation-manifest.json'),fetchJsonOrNull('./entity-body-map.json'),fetchJsonOrNull('./package/package-build.json')]);
+const pmCheck=(presentationManifest&&map&&build)
+ ?validatePresentationManifest(presentationManifest,{map,worldDigest:bundle.inputs.worldStateDigest,expectedUnitDefinitionSha256:build.committedWorldPins&&build.committedWorldPins.unitDefinitionSha256,sha256hex:s=>sha256.hex(s)})
+ :{ok:false,reason:!presentationManifest?'presentation-manifest.json unavailable':!map?'entity-body-map.json unavailable':'package/package-build.json unavailable'};
+if(pmCheck.ok){scene.add(buildProceduralRoom(THREE,bundle.room))}
+else{for(const s of bundle.room)scene.add(box(s.geometryMicrounits,s.visualOnlyClaims.colorHex,{cast:false}))}
+document.getElementById('pmstatus').innerHTML=pmCheck.ok
+ ?'<span style="color:#7dc4ff">PRESENTATION LAYER (PW-2 room architecture) - bound to authoritative geometry; physics authority unchanged</span>'
+ :'<span style="color:#ff6a5e">PRESENTATION MANIFEST PLACEHOLDER: '+pmCheck.reason+' - rendering certified debug geometry</span>';
+document.body.dataset.presentationLayer=pmCheck.ok?'pw2-procedural-room':'placeholder:'+pmCheck.reason;
 // C2 articulated visuals: every part is built from the shared layout module
 // (pure integer-microunit math) and is G13-verified to sit fully INSIDE its
 // certified component envelope. Certified colors stay dominant; accent parts
