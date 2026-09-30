@@ -1,5 +1,13 @@
 # Gate A Proposal: Synthetic Training Unit - Authoring + Certified Support Path
 
+> SUPERSEDED IDENTITY TABLE: the exact ids/revisions/digests for review now
+> live in docs/track-b/gate-a-r1-canonical-review-records.md (generated from
+> the executable sources). The identity rows below (synthetic-training-unit-1,
+> school/medical-bag-interior-volume-v1 rev 1) are stale design history -
+> the executable package uses synthetic-training-unit-v1 and
+> school/medical-bag-containment-interior revision 2.
+
+
 Status: PROPOSED (R1 v3). Nothing here is admitted. Owner decision authorizing
 the certification work: Option A (full Gate A certification of this ONE
 synthetic unit, minimal scope), WhatsApp 2026-09-30. The owner authorized the
@@ -36,12 +44,12 @@ explicitly.
 | Layer | Proposed id | Notes |
 |---|---|---|
 | Engine inventory identity | `unit-1` / `SYNTHETIC_ITEM_A` (existing V2) | unchanged, engine-owned |
-| World entity | `synthetic-training-unit-1` | entityTypeId `synthetic/training-unit` |
+| World entity | `synthetic-training-unit-v1` (stale row corrected; canonical list: gate-a-r1-canonical-review-records.md) | entityTypeId `synthetic/training-unit` |
 | Physical body record | `synthetic-training-unit-body-v1` revision 1 | section 2 |
 | Bag owner body definition | `school/medical-bag-owner-body` revision 1 | section 3a |
 | Bag owner entity definition | `school/medical-bag-entity` revision 1 | section 3a |
 | Interior support floor (layer 1) | `school/medical-bag-interior-floor` revision 1 | entity-owned SUPPORT_SURFACE, chair-seat pattern |
-| Containment volume (layer 2) | `school/medical-bag-interior-volume-v1` revision 1 | new authored record, section 4 |
+| Containment volume (layer 2) | `school/medical-bag-containment-interior` revision 2 (stale row corrected; canonical list: gate-a-r1-canonical-review-records.md) | new authored record, section 4 |
 | Renderer map entry (B-W5) | `synthetic-training-unit-v1` | SYNTHETIC_TRAINING, zero clinical fields |
 
 ## 2. Authored physical body (draft; EXECUTED through the real validator: PASS B6)
@@ -131,8 +139,9 @@ generalized contract. Record: evidence/track-b/r1-q1-semantic-authorization.json
 
 ## 4. Containment volume (draft record - corrected geometry)
 
-- supportVolumeId school/medical-bag-interior-volume-v1, revision 1,
+- supportVolumeId school/medical-bag-containment-interior, revision 2,
   AUTHORED_NEW; ownerDefinitionRef pins the section-3a owner entity/body.
+  (Stale id/revision corrected; canonical list: gate-a-r1-canonical-review-records.md.)
 - Interior region (bag-local, 25mm inset on all six certified faces):
   X [-250000,+250000], Y [-150000,+150000], Z [-150000,+150000]
   (harness A1: strictly inside the certified bounds).
