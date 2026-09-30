@@ -1,11 +1,11 @@
 {
  "kind": "TRACK_B_PACKAGE_BUILD",
  "apiVersion": "1.1.0",
- "commit": "614a7f5e4dffe95b5ba2e4ddd7f442714daf9ec5",
+ "commit": "e7c9bef71cb6c4174b3ea9285164022898c85d9f",
  "branch": "trackb-door-mechanics-transport9",
- "builtAt": "2026-09-30T10:11:55.841Z",
+ "builtAt": "2026-09-30T10:11:56.085Z",
  "moduleSha256": "8d4273b520c49acf87fa8fd1a7ed65b8c1d7cd50252ad61a254c732d99a03d74",
- "manifestSha256": "fd179ff63f1a061dc388adf117c1db09cb142d025e883cd110b7cb328bae4a71",
+ "manifestSha256": "fe616e0ab470edcf1fe5c79f599fd61eb5d84cc0c090297f78b1fdf4e83522a2",
  "committedWorldPins": {
   "unitDefinitionSha256": "53f2376d576395d2a6f22dcd750c8e5acc77b6aa4614a1d0b32c210ff638e12f",
   "note": "Runtime recompute anchor for the presentation-guard: a manifest pin that does not match these definition bytes is refused (executor review R3-1)."
