@@ -5,8 +5,8 @@
  "assets": [
   {
    "path": "package/renderer-package.mjs",
-   "bytes": 19159,
-   "sha256": "bcf499027f507cbb8dbbf51ba3e40214060863617be479aa6782494475ec64e6"
+   "bytes": 19441,
+   "sha256": "1a5c530bd807f393bc4c132b381d91d7c31db8ea2e781f83aae90ef933ac6392"
   },
   {
    "path": "package/projection-guard.mjs",
@@ -40,8 +40,8 @@
   },
   {
    "path": "entity-body-map.json",
-   "bytes": 5830,
-   "sha256": "0ab2233eb12f9d332d1c2536dba1a95e9b7f4df516b60b51fc6f21a062642e39"
+   "bytes": 6143,
+   "sha256": "02b2a220fb9148aba4fa629c744da93a9d8e24a288705263a7a9b7e5f47bc811"
   },
   {
    "path": "articulated-layout.mjs",
@@ -55,13 +55,13 @@
   },
   {
    "path": "engine-bundle.js",
-   "bytes": 177481,
-   "sha256": "d8125b15ffc531500be2ce7ee4023413448637e397556039eff094bff8047cf9"
+   "bytes": 177712,
+   "sha256": "4aebcaf9106cbe5c6d46fd98004afcc327bcf1f5a3a155cb3e94be1b15240e3a"
   },
   {
    "path": "scene-bundle.json",
    "bytes": 31968,
-   "sha256": "43831b5676a4ccb858aa53473111c495a9c7f4f812f2336678dc0df6fd88cadd"
+   "sha256": "aafa587f16fabcfb8e69921842f4b75e8e4602523bac1a1b84384844bf58d461"
   },
   {
    "path": "engine/pins.json",
