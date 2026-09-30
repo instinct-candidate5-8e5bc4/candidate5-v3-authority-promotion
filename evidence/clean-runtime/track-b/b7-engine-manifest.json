@@ -1,10 +1,10 @@
 {
   "manifestVersion": "1.0.0",
   "kind": "TRACK_B_B7_ENGINE_MANIFEST",
-  "generatedAt": "2026-09-24T22:33:06.776Z",
+  "generatedAt": "2026-09-30T01:02:27.821Z",
   "git": {
     "branch": "candidate5-track-b-visual-slice",
-    "commit": "ebc159aa8d443efd9e798ede7cb10fcf7b584e4a"
+    "commit": "e340cc70136579036701dd1de97714fbe0b2899f"
   },
   "inlines": [
     {
@@ -39,7 +39,7 @@
     },
     {
       "check": "bundle built",
-      "target": "c718dcee047177a61f78b0e9fc3890427707c14fe976b1b79ac704a3d5c6959b",
+      "target": "05591546335405e781c4993dac88c8c0b33948528470af050c8975135369be35",
       "pass": true
     }
   ],
@@ -53,8 +53,8 @@
   "esbuildVersion": "0.28.2",
   "bundle": {
     "path": "visual-slice/engine-bundle.js",
-    "bytes": 145740,
-    "sha256": "c718dcee047177a61f78b0e9fc3890427707c14fe976b1b79ac704a3d5c6959b",
+    "bytes": 165678,
+    "sha256": "05591546335405e781c4993dac88c8c0b33948528470af050c8975135369be35",
     "minified": false
   }
 }
