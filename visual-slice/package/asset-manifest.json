@@ -5,8 +5,8 @@
  "assets": [
   {
    "path": "package/renderer-package.mjs",
-   "bytes": 18937,
-   "sha256": "8ce464c72233c66cc3d9ce71b11e39f84ef784d9cf8aa5368801269d5cb2f7d6"
+   "bytes": 19159,
+   "sha256": "bcf499027f507cbb8dbbf51ba3e40214060863617be479aa6782494475ec64e6"
   },
   {
    "path": "package/projection-guard.mjs",
@@ -40,8 +40,8 @@
   },
   {
    "path": "entity-body-map.json",
-   "bytes": 5647,
-   "sha256": "4c3b308468b037e128dd0a2b5cccea03d73cc5d1708610006b876de56c9fd5e6"
+   "bytes": 5852,
+   "sha256": "812daca3c4c7d2d3b562ca173c60c058a11bdf2f501d08bc89bdc365c2f81512"
   },
   {
    "path": "articulated-layout.mjs",
@@ -61,7 +61,7 @@
   {
    "path": "scene-bundle.json",
    "bytes": 31968,
-   "sha256": "6224b2e58a13c936cfa698ae86e793f413cb2f8d97f387bdb2d493440ab6991f"
+   "sha256": "8bcedd69ec2c78cac2663662e43484ccb20a61bcd9d899b8ba154eb069b78ebb"
   },
   {
    "path": "engine/pins.json",
