@@ -1,0 +1,5 @@
+'use strict';const {digest}=require('../../contracts/canonical');const SCOPE='SCHOOL_SCENE_EXTENSION_V1_3_EVIDENCE_CAMERA_ONLY';const EFFECTS=Object.freeze(['EVIDENCE_ONLY_CAMERA_COVERAGE','OPERATIONAL']);
+// Same review-evidence standard as R1. Original owner exchange is inspected
+// independently by the reviewer; strings here do not authenticate a human.
+function verifyReviewRecord({packet,reviewRecord:r}){return !!r&&r.scope===SCOPE&&r.effectScope==='EVIDENCE_ONLY_CAMERA_COVERAGE'&&r.packetDigest===digest(packet)&&r.worldDigest===packet.extension.worldDigest&&r.reviewDecision==='APPROVED_FOR_SLICE'&&r.ownerDecision==='ADMIT'&&!!r.reviewId&&Array.isArray(r.reviewEvidenceRefs)&&r.reviewEvidenceRefs.length>0&&typeof r.ownerMessageRef==='string'&&r.ownerMessageRef.length>0&&typeof r.ownerQuestionRef==='string'&&r.ownerQuestionRef.length>0&&r.ownerMessageRef!==r.ownerQuestionRef&&r.questionPacketDigest===r.packetDigest&&r.questionEffectScope===r.effectScope&&r.reviewRecordDigest===digest({...r,reviewRecordDigest:undefined})}
+module.exports={SCOPE,EFFECTS,verifyReviewRecord};

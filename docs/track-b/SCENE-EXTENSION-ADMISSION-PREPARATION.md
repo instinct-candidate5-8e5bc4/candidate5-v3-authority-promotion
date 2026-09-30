@@ -1,0 +1,13 @@
+# Scene-extension admission plumbing preparation
+
+reviewable prep only. Nothing admits anything; candidate stays AUTHORED_CANDIDATE_NOT_ADMITTED; no execute() on anything real; durable registry/consumer, extended-world replay, door OPEN, display optics remain unimplemented operational items; instance-local registry claims no durable revocation authority.
+
+This candidate implements a possible future exact-record executor, not a real approval or activated registry. The owner question is separate and must identify the final67-file source pin set in evidence/track-b/scene-extension-admission/preparation-source-pins.json. Surface-model JSON is digest-pinned (via packet surfaceModelDigest), not path-pinned, accepted by technical review. A source edit invalidates existing record pins; newly generated pins cannot silently replace an approved record.
+
+SCENE_EXTENSION refs/envelopes reuse the existing lifecycle; raw generic admit rejects this type with SCENE_EXTENSION_EXECUTOR_REQUIRED. The executor privately prepares/validates with its own imported sweep/review verifiers; extra caller inputs are rejected. The review record and envelope digest-cover/cross-check original owner question/message refs. Authority standard is same as R1: reviewed exact record plus original owner's message, independently inspected, not code-level authentication of a person.
+
+Explicit effectScope: EVIDENCE_ONLY_CAMERA_COVERAGE or OPERATIONAL. Operational is unsupported and fails closed. Evidence-only cannot unlock render, door, clinical actions, A8 mesh or B7 gameplay modes. New exact id@revision can be reviewed later after DEFERRED; same revision remains inert. History append-only, superseded envelope preserved. Isolated instance history is not durable revocation and must not be used as operational authority.
+
+Mandatory sweep verifier consumes the landed17-frame PNG/ID proof using actual pixel inspection, manifest/source hashes, exact wrapper pins, sample names, invariant authority transforms/body bounds, perspective change and deterministic negative FAIL/no-render. Python3/Pillow required; getdata fallback supports older Pillow. Dependency failure returns UNKNOWN. Synthetic test approvals are test-only validator fixtures, never permission.
+
+Transport based on04f6a724, unadmitted. No owner admission record is included. No module-load extension activation. Full regressions generate existing scene bundles/manifests; restore those after verification and exclude them from transport. Pin closure recursively follows literal relative require dependencies and includes evaluator, checker, verifiers, canonical digest functions, authoring lifecycle/wiring, scene package/instantiate and R1 builder. Future dynamic import changes require explicit review of closure.
