@@ -5,8 +5,8 @@
  "assets": [
   {
    "path": "package/renderer-package.mjs",
-   "bytes": 19441,
-   "sha256": "1a5c530bd807f393bc4c132b381d91d7c31db8ea2e781f83aae90ef933ac6392"
+   "bytes": 21235,
+   "sha256": "c26afd7d322106c56ef0026ed3482e0790e8d7e02f0e4dce0d65272c0966ad96"
   },
   {
    "path": "package/projection-guard.mjs",
@@ -14,9 +14,14 @@
    "sha256": "b4a4bcdb52cceab05357949cf2147e3a046fa60d851bea57f30bc594125c49e2"
   },
   {
+   "path": "package/committed-world-guard.mjs",
+   "bytes": 5591,
+   "sha256": "6ca7f79de2c1845325a1905c33281329730b259f9f802a36cd5ca1c31f5e8482"
+  },
+  {
    "path": "package/presentation-guard.mjs",
-   "bytes": 2749,
-   "sha256": "8c7b8309c17c4e8a6b6e8f8cf9273e853f33429f05975a06875d8deb93c1fdf2"
+   "bytes": 3444,
+   "sha256": "6f494446906086d397693ca6b72fd74192c4d27b66c29d503d7c8f1095edb812"
   },
   {
    "path": "package/procedural-room.mjs",
@@ -30,8 +35,8 @@
   },
   {
    "path": "presentation-manifest.json",
-   "bytes": 2458,
-   "sha256": "b2fe7d364b29761776e5ca4ddd590babb3ffa129b97ae6889007261f006d8ff9"
+   "bytes": 2704,
+   "sha256": "11b4ed3b71b431e554a63fe35ebf3fcefa54a628e9a1e3b030f9e412fa70be22"
   },
   {
    "path": "entity-map.mjs",
@@ -41,7 +46,7 @@
   {
    "path": "entity-body-map.json",
    "bytes": 6121,
-   "sha256": "d830f2b9b98d136ad32b10bd736dc4885e1a2176255b7b81827656d4ae82b452"
+   "sha256": "0a112090d3b5cf46690a9b6d3600ddbb2e5abf2e9086c7cb94ceaaf0821d8d51"
   },
   {
    "path": "articulated-layout.mjs",
@@ -61,7 +66,7 @@
   {
    "path": "scene-bundle.json",
    "bytes": 31968,
-   "sha256": "3546b8df70ac2e1f52059d4e81fe2108a091077359185f7a0a650766fdd27fc0"
+   "sha256": "94a1752c590412559367d57782fa49a4c235bfa320162b37847fdf556bb49ace"
   },
   {
    "path": "engine/pins.json",
