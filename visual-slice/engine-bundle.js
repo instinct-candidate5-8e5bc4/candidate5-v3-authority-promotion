@@ -1500,6 +1500,13 @@ var require_school_geometry_adapter = __commonJS({
       return Object.freeze({ kind: "SCHOOL_PHASE2_GEOMETRY_ADAPTER", evaluate(input) {
         const entityId = input.command.entityId || input.command.entity?.entityId, entity = input.proposedState.entities[entityId];
         if (input.proposedState.sceneDefinitionRef?.sceneId !== SCHOOL_SCENE.sceneId || !entity) return Object.freeze({ outcome: "UNKNOWN", evidence: { adapterReason: "UNSUPPORTED_SCENE_OR_ENTITY", sceneId: input.proposedState.sceneDefinitionRef?.sceneId || null, entityId: entityId || null } });
+        const staticRelations = (input.proposedState.supportRelations || []).filter((r2) => r2.supportedEntityId === entityId && r2.supportSourceKind === "STATIC_WORLD");
+        for (const relation of staticRelations) {
+          const selected = entity.physicalState?.surfaceId || entity.supportRelation?.surfaceId;
+          const actual = surfaceModel.surfaces.find((s2) => s2.surfaceId === relation.surfaceId);
+          if (!selected || relation.surfaceId !== selected) return Object.freeze({ outcome: "UNKNOWN", evidence: { adapterReason: "SUPPORT_SELECTED_SURFACE_MISMATCH", entityId, selectedSurfaceId: selected || null, relationSurfaceId: relation.surfaceId } });
+          if (!actual || actual.type !== relation.expectedSurfaceType || !["FLOOR", "SUPPORT_SURFACE"].includes(actual.type)) return Object.freeze({ outcome: "UNKNOWN", evidence: { adapterReason: "SUPPORT_SURFACE_SEMANTIC_MISMATCH", entityId, surfaceId: relation.surfaceId } });
+        }
         const body = entity.physicalBodyRef, position = entity.transform?.positionMicrounits, isBag = body?.recordId === SCHOOL_BAG_BODY.bodyId, isCasualty = body?.recordId === BODY.bodyDefinitionId, isChair = body?.recordId === CHAIR.BODY.bodyDefinitionId, isSynthetic = body?.recordId === "synthetic/gate-c-supported-box-body", isTrainingUnit = body?.recordId === SYN.UNIT_BODY.definition.bodyDefinitionId;
         let containmentProof = null;
         let dynamicModel = surfaceModel, surface = entity.supportRelation?.surfaceModelRef || ((isCasualty || isChair) && entity.physicalState?.surfaceId || isBag && input.proposedState.supportRelations?.some((r2) => r2.supportedEntityId === entityId) ? SCHOOL_SURFACE_MODEL_REF : null);
