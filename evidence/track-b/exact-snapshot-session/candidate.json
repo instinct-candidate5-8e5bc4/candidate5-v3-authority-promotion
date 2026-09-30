@@ -1,0 +1,38 @@
+{
+  "creationStatus": "ISOLATED_EXACT_SNAPSHOT_SESSION_CREATED_NOT_OPERATIONAL",
+  "reuse": {
+    "status": "EXACT_SNAPSHOT_REUSED_EVIDENCE_ONLY_NOT_OPERATIONALLY_ADMITTED",
+    "identity": {
+      "inputDigest": "7ae9062c6797f684c512540d40fdfdc41d118584a4e24132d5e7ad077ee68d6b",
+      "sourceDigest": "aca4b915e5864089fc37011b23169f6de1d28c57c433303033dd2863c737a173",
+      "worldDigest": "88b6e0190469a8ba32e02b83bb36d815c90532b889a9ad4786978b3ac1b90385",
+      "genesisDigest": "cc2f27801d48bb1b9a8b813c78a413e50c552d6f11c103843b6acb7afe9bb887",
+      "eventLogDigest": "f5af2966793abf956b20dde7523954ff7530d663913290ddaeca224569800d8a",
+      "definitionDigest": "15dbeb94e317c32f4dd63dd595c465bcc744254c24c389c85b7a0ef8a8756e58",
+      "reviewRecordDigest": "2bab6dd7327536cd03c2c36f0f755a56d61e946601dd408171d2ec246c46d0d4",
+      "historyDigest": "c4d868f7737de7f8a6960e1892c81becfe303f7c01bb7ce2a4884565c2e3178c",
+      "cameraEvidenceDigest": "17395af7e4936f2d14f0837cadae35a8649253bad4a633f72513836b4407d42a"
+    },
+    "underlyingCameraOutcome": "UNKNOWN",
+    "underlyingCameraReason": "SCENE_ADMISSION_PENDING",
+    "operationalStatus": "UNKNOWN",
+    "captureRemainsBoundToOriginalWorld": true,
+    "limitations": [
+      "NO_LIVE_AUTHORITATIVE_REVOCATION_FEED_THIS_IS_ISOLATED_PREPARATION",
+      "CALLER_CONTEXT_EQUALITY_NOT_FRESHNESS_OR_AUTHORITY",
+      "EXACT_ORIGINAL_POSE_ONLY_NO_OTHER_WAYPOINT_OR_FIRST_PERSON",
+      "NO_TIME_BASED_EXPIRY_OR_GENERIC_EVIDENCE_DIGEST_GRANT",
+      "NO_RENDER_MOVEMENT_DOOR_GAMEPLAY_CLINICAL_PRODUCTION_ACTIVATION"
+    ]
+  },
+  "invalidation": {
+    "status": "UNKNOWN",
+    "reason": "SESSION_INVALIDATED",
+    "operationalStatus": "UNKNOWN"
+  },
+  "afterInvalidation": {
+    "status": "UNKNOWN",
+    "reason": "SESSION_INVALIDATED",
+    "operationalStatus": "UNKNOWN"
+  }
+}
