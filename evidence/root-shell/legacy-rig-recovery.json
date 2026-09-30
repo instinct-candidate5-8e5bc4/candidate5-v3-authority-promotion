@@ -1,0 +1,22 @@
+{
+  "kind": "LEGACY_ROOT_SHELL_RIG_RECOVERY",
+  "version": "1.0.0",
+  "sourceUrl": "https://ko-rishon-first-aid.pages.dev/human-clothed-rig.glb",
+  "path": "human-clothed-rig.glb",
+  "bytes": 6148224,
+  "sha256": "964dcc0eaf004d09ae02ebe4c1b6a2bfa4755394a02847f2c62f925bb9dbddca",
+  "recoveryStatus": "HTTP_200_GLB_V2_MAGIC_LENGTH_JSON_CHUNK_VERIFIED",
+  "contentType": "model/gltf-binary",
+  "provenance": "Exact bytes recovered from existing product origin with browser User-Agent. Original authorship and license not independently verified; file metadata is not proof of authorship. No new asset or purchase.",
+  "purpose": "Restore existing GLTF loader-success branch, not certify posture or promote production",
+  "sourceRootSha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+  "shippedRootSha256": "b54f787ee3877adce1c17ce5c939ea1a37d1d5291aacf66096e363895271b3f4",
+  "sourceCodeUnchanged": true,
+  "gateClaims": "No new physical/posture admission or R3 visual acceptance",
+  "verification": {
+    "suite": "672 total / 669 pass / 0 fail / 3 skip",
+    "bW10": "PASS",
+    "desktopAndMobile": "boot pass, spatial pass, no character warning, pageerrors[], one noise event in each audit at01:00 and01:05",
+    "canonicalComparison": "Matched-time desktop and mobile screenshots compared: patient/bag/backdrop and moving witness match legacy loader-success layout; expected noise-ring difference from previous reviewed timer repair"
+  }
+}
