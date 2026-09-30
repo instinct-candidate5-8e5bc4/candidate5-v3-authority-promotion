@@ -1,0 +1,49 @@
+{
+  "envelopeSchemaVersion": "1.0.0",
+  "envelopeId": "exact-world-88b6e019:camera:r1",
+  "definitionRef": {
+    "definitionType": "SCENE_EXTENSION",
+    "definitionId": "school-world-88b6e019-camera-evidence",
+    "revision": 1,
+    "definitionDigest": "15dbeb94e317c32f4dd63dd595c465bcc744254c24c389c85b7a0ef8a8756e58"
+  },
+  "lifecycleState": "VERIFIED_FOR_SLICE",
+  "validationEvidenceRefs": [
+    "evidence:track-b/world-evidence-equivalence/candidate.json",
+    "evidence:track-b/exact-world-record-preparation/candidate.json",
+    "owner-body-sha256:a18bb937a35118e690102b6ccaab929d4e994af34218eb79f992bf27b1fb6ba8"
+  ],
+  "reviewEvidenceRefs": [
+    "whatsapp:wamid.HBgMOTcyNTMyNDkwMzUxFQIAEhgUM0FBOUNDRkQ2QzU2REJFREFFMTkA",
+    "whatsapp:wamid.HBgMOTcyNTMyNDkwMzUxFQIAERgSMzkwMEE2QUYzMDgxMENBQzg1AA==",
+    "whatsapp:wamid.HBgMOTcyNTMyNDkwMzUxFQIAERgSMENENzZCMEVCMkEwRkEyNEY5AA==",
+    "owner-body-sha256:a18bb937a35118e690102b6ccaab929d4e994af34218eb79f992bf27b1fb6ba8",
+    "evidence:track-b/world-evidence-equivalence/candidate.json",
+    "evidence:track-b/exact-world-record-preparation/candidate.json",
+    "track-b-technical-review:world-evidence-equivalence-transport17-ACCEPT",
+    "track-b-technical-review:exact-world-record-preparation-transport18-ACCEPT",
+    "track-b-technical-review:exact-world-admission-mechanics-input-ACCEPT",
+    "definition-sha256:15dbeb94e317c32f4dd63dd595c465bcc744254c24c389c85b7a0ef8a8756e58",
+    "review-record-sha256:2bab6dd7327536cd03c2c36f0f755a56d61e946601dd408171d2ec246c46d0d4"
+  ],
+  "reviewId": "school-world-88b6e019-camera-evidence-owner-20261001",
+  "reviewDecision": "APPROVED_FOR_SLICE",
+  "reviewedDefinitionDigest": "15dbeb94e317c32f4dd63dd595c465bcc744254c24c389c85b7a0ef8a8756e58",
+  "reviewedDefinitionRevision": 1,
+  "reviewScope": "EXACT_WORLD_88B6E019_CAMERA_EVIDENCE_ONLY",
+  "limitations": [
+    "NO_EXECUTE_OR_ADMIT_OR_REGISTRY_WRITE",
+    "ORIGINAL_OWNER_APPROVAL_DOES_NOT_AUTHORIZE_NEW_WORLD",
+    "SEPARATE_AUTHENTICATED_OWNER_DECISION_AND_EXACT_REVIEW_REQUIRED",
+    "NO_CONSUMPTION_OF_88B6E019",
+    "NO_R3_GAMEPLAY_DOOR_CLINICAL_PRODUCTION_OR_AUTHORITY_EXPANSION",
+    "A8_REALISTIC_MESH_AND_B7_GAMEPLAY_MODES_OWNER_RESERVED",
+    "כל ההחרגות מהאישור הקודם נשארות במלואן:\n\n- לא אישור R3.\n- לא אישור להפעלה במשחק.\n- לא אישור לדלת או לפתיחתה.\n- לא אישור Production World / Production Visual.\n- לא אישור תוכן רפואי.\n- לא Production Promotion.\n- לא הרחבת סמכות.\n- לא אישור אוטומטי לגרסה/זהות עתידית אחרת.\n\n",
+    "ראיות העולם המקורי והלכידות ביניהם מתקבלות כתמיכה בשקילות הסמנטית בלבד; הן אינן מעבירות או מרחיבות אוטומטית סמכות בין זהויות היסטוריות.",
+    "האישור חל על CAMERA-EVIDENCE ONLY של העולם 88b6e019."
+  ],
+  "supersession": null,
+  "ownerDecisionMessageRef": "whatsapp:wamid.HBgMOTcyNTMyNDkwMzUxFQIAEhgUM0FBOUNDRkQ2QzU2REJFREFFMTkA",
+  "ownerDecisionQuestionRef": "whatsapp:wamid.HBgMOTcyNTMyNDkwMzUxFQIAERgSMzkwMEE2QUYzMDgxMENBQzg1AA==",
+  "envelopeDigest": "f9eacff15430c537a9ed7cf89de27b60a5c08ceef50981e6d467a69f77750c3d"
+}

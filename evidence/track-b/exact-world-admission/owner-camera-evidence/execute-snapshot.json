@@ -1,0 +1,761 @@
+{
+  "sourceCommit": "d41511fcb475040a06a253cb8dbfde5403745db8",
+  "sourceTree": "2576f222e0162c128862405b06ee7c5a6d3f72a6",
+  "originalExecutionCount": 1,
+  "landedPreexecuteRechecks": {
+    "landedHead": "d41511fcb475040a06a253cb8dbfde5403745db8",
+    "landedTree": "2576f222e0162c128862405b06ee7c5a6d3f72a6",
+    "definitionDigest": "15dbeb94e317c32f4dd63dd595c465bcc744254c24c389c85b7a0ef8a8756e58",
+    "pinsVerified": 71,
+    "ownerBodySha256": "a18bb937a35118e690102b6ccaab929d4e994af34218eb79f992bf27b1fb6ba8",
+    "envelopeFilesSha256Unchanged": true,
+    "executeCalled": false
+  },
+  "preExecuteInspection": {
+    "status": "PREPARED_NOT_ADMITTED",
+    "effectScope": "EVIDENCE_ONLY_CAMERA_COVERAGE",
+    "worldDigest": "88b6e0190469a8ba32e02b83bb36d815c90532b889a9ad4786978b3ac1b90385",
+    "genesisDigest": "cc2f27801d48bb1b9a8b813c78a413e50c552d6f11c103843b6acb7afe9bb887",
+    "operationalStatus": "UNKNOWN",
+    "captureRemainsBoundToOriginalWorld": true
+  },
+  "history": [
+    {
+      "key": "school-world-88b6e019-camera-evidence@1",
+      "decision": "ADMITTED",
+      "effectScope": "EVIDENCE_ONLY_CAMERA_COVERAGE",
+      "definitionDigest": "15dbeb94e317c32f4dd63dd595c465bcc744254c24c389c85b7a0ef8a8756e58",
+      "worldDigest": "88b6e0190469a8ba32e02b83bb36d815c90532b889a9ad4786978b3ac1b90385",
+      "genesisDigest": "cc2f27801d48bb1b9a8b813c78a413e50c552d6f11c103843b6acb7afe9bb887",
+      "admission": {
+        "status": "ADMITTED",
+        "definition": {
+          "extensionId": "school-world-88b6e019-camera-evidence",
+          "extensionRevision": 1,
+          "effectScope": "EVIDENCE_ONLY_CAMERA_COVERAGE",
+          "proposedRecord": {
+            "kind": "PROPOSED_EXACT_WORLD_CAMERA_EVIDENCE_RECORD_NOT_ADMISSION",
+            "effectScope": "EVIDENCE_ONLY_CAMERA_COVERAGE",
+            "packetDigest": "0a5c07f33acc94731c6fa01e05a46abf1632dc1f2ebe1e8a413feb4886606735",
+            "genesisDigest": "cc2f27801d48bb1b9a8b813c78a413e50c552d6f11c103843b6acb7afe9bb887",
+            "worldDigest": "88b6e0190469a8ba32e02b83bb36d815c90532b889a9ad4786978b3ac1b90385",
+            "eventLogDigest": "f5af2966793abf956b20dde7523954ff7530d663913290ddaeca224569800d8a",
+            "comparisonDigest": "2c38828c35ec4d9400616d5b2e44a3dd535ac7d49a4c7cf5f0b04997ea73f75d",
+            "sourcePins": [
+              {
+                "path": "scripts/track-b/gate-a-r1v4-package-builder.js",
+                "sha256": "58236e334093244cd96adbebbb8a504fe8504d145698196fb4f9ae418d2dbd92"
+              },
+              {
+                "path": "src/clean-runtime/authoring/admission/definition-ref.js",
+                "sha256": "9447579ea05573d9bbfaf1d23003fb936f243eca23310c67ee5ba653dc8ef17f"
+              },
+              {
+                "path": "src/clean-runtime/authoring/admission/envelope.js",
+                "sha256": "683f76de802e7c800b29750566ed3c58923ede2e0f138b8c8b186de7ebd56d52"
+              },
+              {
+                "path": "src/clean-runtime/authoring/admission/registry.js",
+                "sha256": "db26e5d72c2ae136214816c4b297030ba3d5a1e717d6a9150ec54512d17a8a48"
+              },
+              {
+                "path": "src/clean-runtime/authoring/contracts/canonical.js",
+                "sha256": "d8db3f73915950d6a774917a8ed76212d3f9f6e05c6612d7e58780a2358202a3"
+              },
+              {
+                "path": "src/clean-runtime/authoring/contracts/constants.js",
+                "sha256": "cd3b33750416635963176cc7c3653c539dbdfe2762ff07f59c11f1674356c8af"
+              },
+              {
+                "path": "src/clean-runtime/authoring/contracts/geometry.js",
+                "sha256": "9644016ea267f4958a73d9d626de7742634c9928f03012d1e928910bbb6a694d"
+              },
+              {
+                "path": "src/clean-runtime/authoring/contracts/lifecycle.js",
+                "sha256": "9e9eff4ccffe4ca7c0c333c728ab70541dc0350d17b6d8a9029da8ab698092e4"
+              },
+              {
+                "path": "src/clean-runtime/authoring/contracts/materialize-support.js",
+                "sha256": "07107780a5d3b221dea7bfd7de65380f27b3c437f7949d4a31b0159d022dfe9e"
+              },
+              {
+                "path": "src/clean-runtime/authoring/contracts/review.js",
+                "sha256": "7991de67b7a084f3401522c5be2223c3cf2ed9ff214cefeaa7658c12dcb9caa5"
+              },
+              {
+                "path": "src/clean-runtime/authoring/contracts/semantics.js",
+                "sha256": "9fc35de83b34f821dc3c25bc98de09fa519cca364104bdbb3c64a336ec8edd55"
+              },
+              {
+                "path": "src/clean-runtime/authoring/index.js",
+                "sha256": "5cb0f4ab5b3acf10bde0d184f7bcfe15f9b536acd31df581fd446c6d1cc32a51"
+              },
+              {
+                "path": "src/clean-runtime/authoring/validators/physical-body-validator.js",
+                "sha256": "f257ba48388faf967048a423e2db0fbf89bafd4f5d901840efc2a1719d2afe2d"
+              },
+              {
+                "path": "src/clean-runtime/authoring/validators/posture-validator.js",
+                "sha256": "3ca808145d9f616b1dd9cacc0e835794ca7f5dec8d90f73d73c6c54fccbe6db3"
+              },
+              {
+                "path": "src/clean-runtime/authoring/validators/support-validator.js",
+                "sha256": "608b596ecbf405d4c83ea34364da11d4a097d7d515a8bfe25da27c74467ba914"
+              },
+              {
+                "path": "src/clean-runtime/authoring/validators/support-volume-validator.js",
+                "sha256": "3b12665313f5315c7792ddcb60da19871aebc136c6b324a3fa55ad8032416a19"
+              },
+              {
+                "path": "src/clean-runtime/contracts/canonical.js",
+                "sha256": "ba186cff7df930a7654cd78e0e5399e1a4bee7e64a37ada76c12e4e4a4f06284"
+              },
+              {
+                "path": "src/clean-runtime/contracts/failures.js",
+                "sha256": "bf0edf990b62b454b3e280b4062d9b1e46e0775d7c62db518d73278196a03507"
+              },
+              {
+                "path": "src/clean-runtime/contracts/world-state.js",
+                "sha256": "9090866e0b47a0a2d33dd5506f6b76f96fe602994b465e2c4612a0886704d1e2"
+              },
+              {
+                "path": "src/clean-runtime/events/event-log.js",
+                "sha256": "678980d54002137388cb3fb7abd576d8ce68cb0526da7cd7347d7f88acb27ce5"
+              },
+              {
+                "path": "src/clean-runtime/events/replay.js",
+                "sha256": "c9b7ae3213c38087e761c4dad52b4f0d3aeb9dc97cd7bafa4b94e24097446cf1"
+              },
+              {
+                "path": "src/clean-runtime/multi-support/owner-body-binding.js",
+                "sha256": "28b98d42d08e76a1a5f2a8108624ba5bd738250dba2b0574ed9fdd835b5eeb27"
+              },
+              {
+                "path": "src/clean-runtime/multi-support/relations.js",
+                "sha256": "4165b79e97844266bc9c697626ccbe99b888cf7fb431d810db1e6543d53dfce1"
+              },
+              {
+                "path": "src/clean-runtime/multi-support/runtime.js",
+                "sha256": "fcb14cd7cc039eeb7a8aba35a0128ab0b735681fe60be900b8e1ac187b8d81bc"
+              },
+              {
+                "path": "src/clean-runtime/mutation/phase2-gateway.js",
+                "sha256": "e67453498fc44fedceab04dec24a07ea0fc7fd0e333da6ee0f681a653a70a353"
+              },
+              {
+                "path": "src/clean-runtime/school/definitions/adult-v1-male-supine-floor.js",
+                "sha256": "88c862b242958c9204f82c3e12065ad1e744ab3b0443ea12eac08485f7fa282a"
+              },
+              {
+                "path": "src/clean-runtime/school/definitions/synthetic-training-unit-v1.js",
+                "sha256": "53f2376d576395d2a6f22dcd750c8e5acc77b6aa4614a1d0b32c210ff638e12f"
+              },
+              {
+                "path": "src/clean-runtime/school/definitions/treatment-chair.js",
+                "sha256": "ff7d2e1351cb25bcf174833a3a1f5f7e17999a5beda7cd15d55aa17d8870f140"
+              },
+              {
+                "path": "src/clean-runtime/school/door-legality-adapter.js",
+                "sha256": "5dd33ad759a19d8a2c77f8ba5ff61be86163487634542e5a28e80170bbd5b2ec"
+              },
+              {
+                "path": "src/clean-runtime/school/scene-camera-geometry.js",
+                "sha256": "8ffe3cc74e12905d6783956642c781612e642608202c5dd0ccdb1f4dce3a3d24"
+              },
+              {
+                "path": "src/clean-runtime/school/scene-extension-admission-evidence.js",
+                "sha256": "80d05a1dce89152a41501d64c0d46f09ec50490803a4d778271290ed4a1fe26a"
+              },
+              {
+                "path": "src/clean-runtime/school/scene-extension-admission/executor.js",
+                "sha256": "10c4b70af1b8183bb4bbb64abb8d5835cf7ccaa14e5a07a7aedf72d43e87185b"
+              },
+              {
+                "path": "src/clean-runtime/school/scene-extension-admission/pins.js",
+                "sha256": "bf3be93cf61f15642cdd0f7189f33759c2a3a49b8e97b69763ab2772b2407228"
+              },
+              {
+                "path": "src/clean-runtime/school/scene-extension-admission/pixel-verifier.py",
+                "sha256": "10555c36ab481c2f745e5757dc5b5f8c31d4a879166fd52380729f6c9efa99af"
+              },
+              {
+                "path": "src/clean-runtime/school/scene-extension-admission/review-verifier.js",
+                "sha256": "2d1797b3cec50f634bb871b186552650114cfc428f2eb20d070a1b221a53ace7"
+              },
+              {
+                "path": "src/clean-runtime/school/scene-extension-admission/sweep-verifier.js",
+                "sha256": "39411a21176757ba9f5da4d494f12dda7f0323dff9979c81d39f40c4c85c7d22"
+              },
+              {
+                "path": "src/clean-runtime/school/scene-v2/instantiate.js",
+                "sha256": "e8c6dbfb815bb766e0a51df6a31a9cce52fd9d33818d08e5cf5408fafbc68d37"
+              },
+              {
+                "path": "src/clean-runtime/school/scene-v2/package.js",
+                "sha256": "bd87c69389d892a553cb17c2e8223c7348610d94d091f6dc90b226e08d6a3848"
+              },
+              {
+                "path": "src/clean-runtime/school/scene-v2/validate.js",
+                "sha256": "63fbf32834a0b62256ca10d1e610d9c0ad42ff3db94985fbecaf5e7217f86f6d"
+              },
+              {
+                "path": "src/clean-runtime/school/school-geometry-adapter.js",
+                "sha256": "5f3f817de1cc29b73558825b2c08892722b2d071b28a5de583896ecc6a786224"
+              },
+              {
+                "path": "src/clean-runtime/school/school-physical-contract.js",
+                "sha256": "593a086a27dee17ba27231a2d69c8d06931d3abde4579be8d536478ca273e652"
+              },
+              {
+                "path": "src/clean-runtime/school/treatment-chair-runtime.js",
+                "sha256": "42fe23e401a175d87c3266bfe1643a20b97e65a7fd0a99797c2d94032ba474d9"
+              },
+              {
+                "path": "src/numeric-frame-rotation/graph.js",
+                "sha256": "9b54f23c94d0d727cd2161f3ba2f6a1418127bedf671988da3887c9096581e5a"
+              },
+              {
+                "path": "src/numeric-frame-rotation/integer.js",
+                "sha256": "14a82e5f711eb977d55cdbbe05098776548501c39038ef6ee40852871cb905fc"
+              },
+              {
+                "path": "src/numeric-frame-rotation/materialize.js",
+                "sha256": "5e76114df80c094619c497841cfb8ccae8cfd5b08b2277510b96310b50be8768"
+              },
+              {
+                "path": "src/numeric-frame-rotation/rational.js",
+                "sha256": "02e3d7e8de9b8b7b55763046d9674aacd873507fe1391871e7b191dec986edd9"
+              },
+              {
+                "path": "src/numeric-frame-rotation/rotation.js",
+                "sha256": "43cc54cae4101ed3ec75336e5e678cea8f104a953f29fda2a43c46b85bc546f6"
+              },
+              {
+                "path": "src/verified-architecture-phase2-v3/closure-legality.js",
+                "sha256": "c1a71c03e0384c0e0b392233bbd5327a1a78d2e6ca77d6ad8f3dfa6e5c7efa80"
+              },
+              {
+                "path": "src/verified-architecture-phase2-v3/closure-preflight.js",
+                "sha256": "f6cf9aea8c7874d4d67cde79268005143415150055566b60b8e518a489365670"
+              },
+              {
+                "path": "src/verified-architecture-phase2-v3/definitions.js",
+                "sha256": "456c11e73300b6924561713871f35025623a5c3a26c24786c6ff78abcfec0679"
+              },
+              {
+                "path": "src/verified-architecture-phase2-v3/evaluate.js",
+                "sha256": "9901235190625c80c806cde39a6b9118ba011afbed0287dbd42fc387859496ee"
+              },
+              {
+                "path": "src/verified-architecture-phase2-v3/fraction.js",
+                "sha256": "717df841c20c1c0fcadbd8d9f388e6f1b448e04b3f686110403b6fc134acc2db"
+              },
+              {
+                "path": "src/verified-architecture-phase2-v3/geometry.js",
+                "sha256": "5cae6009091ce9ea3fd7f327fa615b094649e090687a8e3362b9a44655b25445"
+              },
+              {
+                "path": "src/verified-architecture-phase2-v3/interval.js",
+                "sha256": "93240d9593b240b91c7d0638931894f64e133c857bb0b85f18b4539eb8f000be"
+              },
+              {
+                "path": "src/verified-architecture-phase2-v3/legality.js",
+                "sha256": "b55e22dfe0b8ebdf3515d77722f8a33caf88c1d2962be6c6444cd47e583b3ddb"
+              },
+              {
+                "path": "src/verified-architecture-phase2-v3/materialized.js",
+                "sha256": "cc9a8bf2b7e7b5045c1a0e63f8957fbaa1ff0cb3efeff27f48d1ad99811b80dc"
+              },
+              {
+                "path": "src/verified-architecture-phase2-v3/sat-interval.js",
+                "sha256": "568a0890d81cac07f9f36187a8853a94bd0286b1719c42a27b6709812db7f7b9"
+              },
+              {
+                "path": "src/verified-architecture-phase2-v3/topology.js",
+                "sha256": "58f9b0541020a7de1158295223ce42edcc84787bd55861dc29ad693df7538aed"
+              },
+              {
+                "path": "src/verified-architecture-phase2-v3/vectors.js",
+                "sha256": "d65c30e029a041bf2eb090679721f7093cf31f2644e4a06e3ebd01f6e9e85214"
+              },
+              {
+                "path": "src/verified-architecture-phase2/canonical.js",
+                "sha256": "a9087018e4ba0ea0c539148b18a63faf5e7f3cfb48cff9a13f490d515c4e91c8"
+              },
+              {
+                "path": "src/verified-architecture-phase2/evidence-loader.js",
+                "sha256": "0ccc115d7d82811539c95585af35ffebf7ae9c95d38a8ea69a4a6ed1efd50a8d"
+              },
+              {
+                "path": "src/verified-architecture-phase2/fixed-point.js",
+                "sha256": "88c654f38f8c8df7cd514ab4c6adedd313e723f4e730bef1c6340b3b1e90676d"
+              },
+              {
+                "path": "src/verified-architecture-phase2/geometry-gate-v2.js",
+                "sha256": "b6df4b3df8be45b8d9c2089791ad31c3d0dc0bd8ccd0d358b38be267b0d52889"
+              },
+              {
+                "path": "src/verified-architecture-phase2/geometry-gate.js",
+                "sha256": "d5953ce9505aa9d97cee38c4b82ae2c2dbe6cf36d0221514f1b3598694ec3e80"
+              },
+              {
+                "path": "src/verified-architecture-phase2/index.js",
+                "sha256": "e09a615c1954c01e5b3e9ce27d8e743c451418cb683a2bd2453f8b68c81b1071"
+              },
+              {
+                "path": "src/verified-architecture-phase2/reason-codes.js",
+                "sha256": "e3c9ef08bb74adbe4e56f848d07f02c728f2218f6393f469f44595394ff44672"
+              },
+              {
+                "path": "src/verified-architecture-phase2/surface-model.js",
+                "sha256": "2882791ec23da3623c535cf6ccacd062d765baef9357b4be731627f1f2b80632"
+              }
+            ],
+            "semanticEqualityCitation": {
+              "originalCapturedWorldDigest": "c719e83456b3486f56e08588c60e8ec89186652d39c579ad71b7c78131b46513",
+              "newComparedWorldDigest": "88b6e0190469a8ba32e02b83bb36d815c90532b889a9ad4786978b3ac1b90385",
+              "originalReviewRecordDigest": "3d66af4f355e6d8a9e98af72796132b89cd7a20e6036c0eb4111db057d0092aa",
+              "captureRemainsBoundToOriginalWorld": true,
+              "citationRole": "SUPPORTING_EVIDENCE_ONLY_NOT_INHERITED_ADMISSION"
+            },
+            "ownerDecisionStatus": "PENDING_SEPARATE_OWNER_DECISION",
+            "limitations": [
+              "NO_EXECUTE_OR_ADMIT_OR_REGISTRY_WRITE",
+              "ORIGINAL_OWNER_APPROVAL_DOES_NOT_AUTHORIZE_NEW_WORLD",
+              "SEPARATE_AUTHENTICATED_OWNER_DECISION_AND_EXACT_REVIEW_REQUIRED",
+              "NO_CONSUMPTION_OF_88B6E019",
+              "NO_R3_GAMEPLAY_DOOR_CLINICAL_PRODUCTION_OR_AUTHORITY_EXPANSION",
+              "A8_REALISTIC_MESH_AND_B7_GAMEPLAY_MODES_OWNER_RESERVED"
+            ]
+          },
+          "sourcePins": [
+            {
+              "path": "scripts/track-b/gate-a-r1v4-package-builder.js",
+              "sha256": "58236e334093244cd96adbebbb8a504fe8504d145698196fb4f9ae418d2dbd92"
+            },
+            {
+              "path": "src/clean-runtime/authoring/admission/definition-ref.js",
+              "sha256": "9447579ea05573d9bbfaf1d23003fb936f243eca23310c67ee5ba653dc8ef17f"
+            },
+            {
+              "path": "src/clean-runtime/authoring/admission/envelope.js",
+              "sha256": "683f76de802e7c800b29750566ed3c58923ede2e0f138b8c8b186de7ebd56d52"
+            },
+            {
+              "path": "src/clean-runtime/authoring/admission/registry.js",
+              "sha256": "db26e5d72c2ae136214816c4b297030ba3d5a1e717d6a9150ec54512d17a8a48"
+            },
+            {
+              "path": "src/clean-runtime/authoring/contracts/canonical.js",
+              "sha256": "d8db3f73915950d6a774917a8ed76212d3f9f6e05c6612d7e58780a2358202a3"
+            },
+            {
+              "path": "src/clean-runtime/authoring/contracts/constants.js",
+              "sha256": "cd3b33750416635963176cc7c3653c539dbdfe2762ff07f59c11f1674356c8af"
+            },
+            {
+              "path": "src/clean-runtime/authoring/contracts/geometry.js",
+              "sha256": "9644016ea267f4958a73d9d626de7742634c9928f03012d1e928910bbb6a694d"
+            },
+            {
+              "path": "src/clean-runtime/authoring/contracts/lifecycle.js",
+              "sha256": "9e9eff4ccffe4ca7c0c333c728ab70541dc0350d17b6d8a9029da8ab698092e4"
+            },
+            {
+              "path": "src/clean-runtime/authoring/contracts/materialize-support.js",
+              "sha256": "07107780a5d3b221dea7bfd7de65380f27b3c437f7949d4a31b0159d022dfe9e"
+            },
+            {
+              "path": "src/clean-runtime/authoring/contracts/review.js",
+              "sha256": "7991de67b7a084f3401522c5be2223c3cf2ed9ff214cefeaa7658c12dcb9caa5"
+            },
+            {
+              "path": "src/clean-runtime/authoring/contracts/semantics.js",
+              "sha256": "9fc35de83b34f821dc3c25bc98de09fa519cca364104bdbb3c64a336ec8edd55"
+            },
+            {
+              "path": "src/clean-runtime/authoring/index.js",
+              "sha256": "5cb0f4ab5b3acf10bde0d184f7bcfe15f9b536acd31df581fd446c6d1cc32a51"
+            },
+            {
+              "path": "src/clean-runtime/authoring/validators/physical-body-validator.js",
+              "sha256": "f257ba48388faf967048a423e2db0fbf89bafd4f5d901840efc2a1719d2afe2d"
+            },
+            {
+              "path": "src/clean-runtime/authoring/validators/posture-validator.js",
+              "sha256": "3ca808145d9f616b1dd9cacc0e835794ca7f5dec8d90f73d73c6c54fccbe6db3"
+            },
+            {
+              "path": "src/clean-runtime/authoring/validators/support-validator.js",
+              "sha256": "608b596ecbf405d4c83ea34364da11d4a097d7d515a8bfe25da27c74467ba914"
+            },
+            {
+              "path": "src/clean-runtime/authoring/validators/support-volume-validator.js",
+              "sha256": "3b12665313f5315c7792ddcb60da19871aebc136c6b324a3fa55ad8032416a19"
+            },
+            {
+              "path": "src/clean-runtime/contracts/canonical.js",
+              "sha256": "ba186cff7df930a7654cd78e0e5399e1a4bee7e64a37ada76c12e4e4a4f06284"
+            },
+            {
+              "path": "src/clean-runtime/contracts/failures.js",
+              "sha256": "bf0edf990b62b454b3e280b4062d9b1e46e0775d7c62db518d73278196a03507"
+            },
+            {
+              "path": "src/clean-runtime/contracts/world-state.js",
+              "sha256": "9090866e0b47a0a2d33dd5506f6b76f96fe602994b465e2c4612a0886704d1e2"
+            },
+            {
+              "path": "src/clean-runtime/events/event-log.js",
+              "sha256": "678980d54002137388cb3fb7abd576d8ce68cb0526da7cd7347d7f88acb27ce5"
+            },
+            {
+              "path": "src/clean-runtime/events/replay.js",
+              "sha256": "c9b7ae3213c38087e761c4dad52b4f0d3aeb9dc97cd7bafa4b94e24097446cf1"
+            },
+            {
+              "path": "src/clean-runtime/multi-support/owner-body-binding.js",
+              "sha256": "28b98d42d08e76a1a5f2a8108624ba5bd738250dba2b0574ed9fdd835b5eeb27"
+            },
+            {
+              "path": "src/clean-runtime/multi-support/relations.js",
+              "sha256": "4165b79e97844266bc9c697626ccbe99b888cf7fb431d810db1e6543d53dfce1"
+            },
+            {
+              "path": "src/clean-runtime/multi-support/runtime.js",
+              "sha256": "fcb14cd7cc039eeb7a8aba35a0128ab0b735681fe60be900b8e1ac187b8d81bc"
+            },
+            {
+              "path": "src/clean-runtime/mutation/phase2-gateway.js",
+              "sha256": "e67453498fc44fedceab04dec24a07ea0fc7fd0e333da6ee0f681a653a70a353"
+            },
+            {
+              "path": "src/clean-runtime/school/definitions/adult-v1-male-supine-floor.js",
+              "sha256": "88c862b242958c9204f82c3e12065ad1e744ab3b0443ea12eac08485f7fa282a"
+            },
+            {
+              "path": "src/clean-runtime/school/definitions/synthetic-training-unit-v1.js",
+              "sha256": "53f2376d576395d2a6f22dcd750c8e5acc77b6aa4614a1d0b32c210ff638e12f"
+            },
+            {
+              "path": "src/clean-runtime/school/definitions/treatment-chair.js",
+              "sha256": "ff7d2e1351cb25bcf174833a3a1f5f7e17999a5beda7cd15d55aa17d8870f140"
+            },
+            {
+              "path": "src/clean-runtime/school/door-legality-adapter.js",
+              "sha256": "5dd33ad759a19d8a2c77f8ba5ff61be86163487634542e5a28e80170bbd5b2ec"
+            },
+            {
+              "path": "src/clean-runtime/school/exact-world-admission/executor.js",
+              "sha256": "a4db48ae68da63b3c6d2cb6c7228ac17731c5397422bf0855ebff4c152489440"
+            },
+            {
+              "path": "src/clean-runtime/school/exact-world-record-preparation/candidate.js",
+              "sha256": "ebbb5869d16108f14da6a4358e96300bc555108c3f649d9561fc35c14df5ce2d"
+            },
+            {
+              "path": "src/clean-runtime/school/scene-camera-geometry.js",
+              "sha256": "8ffe3cc74e12905d6783956642c781612e642608202c5dd0ccdb1f4dce3a3d24"
+            },
+            {
+              "path": "src/clean-runtime/school/scene-extension-admission-evidence.js",
+              "sha256": "80d05a1dce89152a41501d64c0d46f09ec50490803a4d778271290ed4a1fe26a"
+            },
+            {
+              "path": "src/clean-runtime/school/scene-extension-admission/executor.js",
+              "sha256": "10c4b70af1b8183bb4bbb64abb8d5835cf7ccaa14e5a07a7aedf72d43e87185b"
+            },
+            {
+              "path": "src/clean-runtime/school/scene-extension-admission/pins.js",
+              "sha256": "bf3be93cf61f15642cdd0f7189f33759c2a3a49b8e97b69763ab2772b2407228"
+            },
+            {
+              "path": "src/clean-runtime/school/scene-extension-admission/pixel-verifier.py",
+              "sha256": "10555c36ab481c2f745e5757dc5b5f8c31d4a879166fd52380729f6c9efa99af"
+            },
+            {
+              "path": "src/clean-runtime/school/scene-extension-admission/review-verifier.js",
+              "sha256": "2d1797b3cec50f634bb871b186552650114cfc428f2eb20d070a1b221a53ace7"
+            },
+            {
+              "path": "src/clean-runtime/school/scene-extension-admission/sweep-verifier.js",
+              "sha256": "39411a21176757ba9f5da4d494f12dda7f0323dff9979c81d39f40c4c85c7d22"
+            },
+            {
+              "path": "src/clean-runtime/school/scene-extension-replay/candidate.js",
+              "sha256": "955b1f372c4905333e6e4921c6f178021eb41453bfee1474ea20278ad3e0c1b0"
+            },
+            {
+              "path": "src/clean-runtime/school/scene-v2/instantiate.js",
+              "sha256": "e8c6dbfb815bb766e0a51df6a31a9cce52fd9d33818d08e5cf5408fafbc68d37"
+            },
+            {
+              "path": "src/clean-runtime/school/scene-v2/package.js",
+              "sha256": "bd87c69389d892a553cb17c2e8223c7348610d94d091f6dc90b226e08d6a3848"
+            },
+            {
+              "path": "src/clean-runtime/school/scene-v2/validate.js",
+              "sha256": "63fbf32834a0b62256ca10d1e610d9c0ad42ff3db94985fbecaf5e7217f86f6d"
+            },
+            {
+              "path": "src/clean-runtime/school/school-geometry-adapter.js",
+              "sha256": "5f3f817de1cc29b73558825b2c08892722b2d071b28a5de583896ecc6a786224"
+            },
+            {
+              "path": "src/clean-runtime/school/school-physical-contract.js",
+              "sha256": "593a086a27dee17ba27231a2d69c8d06931d3abde4579be8d536478ca273e652"
+            },
+            {
+              "path": "src/clean-runtime/school/treatment-chair-runtime.js",
+              "sha256": "42fe23e401a175d87c3266bfe1643a20b97e65a7fd0a99797c2d94032ba474d9"
+            },
+            {
+              "path": "src/clean-runtime/school/world-evidence-equivalence/candidate.js",
+              "sha256": "444de47ed8d81a5578c9675b50f9c1f23d8e099b47a510558e3ee037ea8aba56"
+            },
+            {
+              "path": "src/numeric-frame-rotation/graph.js",
+              "sha256": "9b54f23c94d0d727cd2161f3ba2f6a1418127bedf671988da3887c9096581e5a"
+            },
+            {
+              "path": "src/numeric-frame-rotation/integer.js",
+              "sha256": "14a82e5f711eb977d55cdbbe05098776548501c39038ef6ee40852871cb905fc"
+            },
+            {
+              "path": "src/numeric-frame-rotation/materialize.js",
+              "sha256": "5e76114df80c094619c497841cfb8ccae8cfd5b08b2277510b96310b50be8768"
+            },
+            {
+              "path": "src/numeric-frame-rotation/rational.js",
+              "sha256": "02e3d7e8de9b8b7b55763046d9674aacd873507fe1391871e7b191dec986edd9"
+            },
+            {
+              "path": "src/numeric-frame-rotation/rotation.js",
+              "sha256": "43cc54cae4101ed3ec75336e5e678cea8f104a953f29fda2a43c46b85bc546f6"
+            },
+            {
+              "path": "src/verified-architecture-phase2-v3/closure-legality.js",
+              "sha256": "c1a71c03e0384c0e0b392233bbd5327a1a78d2e6ca77d6ad8f3dfa6e5c7efa80"
+            },
+            {
+              "path": "src/verified-architecture-phase2-v3/closure-preflight.js",
+              "sha256": "f6cf9aea8c7874d4d67cde79268005143415150055566b60b8e518a489365670"
+            },
+            {
+              "path": "src/verified-architecture-phase2-v3/definitions.js",
+              "sha256": "456c11e73300b6924561713871f35025623a5c3a26c24786c6ff78abcfec0679"
+            },
+            {
+              "path": "src/verified-architecture-phase2-v3/evaluate.js",
+              "sha256": "9901235190625c80c806cde39a6b9118ba011afbed0287dbd42fc387859496ee"
+            },
+            {
+              "path": "src/verified-architecture-phase2-v3/fraction.js",
+              "sha256": "717df841c20c1c0fcadbd8d9f388e6f1b448e04b3f686110403b6fc134acc2db"
+            },
+            {
+              "path": "src/verified-architecture-phase2-v3/geometry.js",
+              "sha256": "5cae6009091ce9ea3fd7f327fa615b094649e090687a8e3362b9a44655b25445"
+            },
+            {
+              "path": "src/verified-architecture-phase2-v3/interval.js",
+              "sha256": "93240d9593b240b91c7d0638931894f64e133c857bb0b85f18b4539eb8f000be"
+            },
+            {
+              "path": "src/verified-architecture-phase2-v3/legality.js",
+              "sha256": "b55e22dfe0b8ebdf3515d77722f8a33caf88c1d2962be6c6444cd47e583b3ddb"
+            },
+            {
+              "path": "src/verified-architecture-phase2-v3/materialized.js",
+              "sha256": "cc9a8bf2b7e7b5045c1a0e63f8957fbaa1ff0cb3efeff27f48d1ad99811b80dc"
+            },
+            {
+              "path": "src/verified-architecture-phase2-v3/sat-interval.js",
+              "sha256": "568a0890d81cac07f9f36187a8853a94bd0286b1719c42a27b6709812db7f7b9"
+            },
+            {
+              "path": "src/verified-architecture-phase2-v3/topology.js",
+              "sha256": "58f9b0541020a7de1158295223ce42edcc84787bd55861dc29ad693df7538aed"
+            },
+            {
+              "path": "src/verified-architecture-phase2-v3/vectors.js",
+              "sha256": "d65c30e029a041bf2eb090679721f7093cf31f2644e4a06e3ebd01f6e9e85214"
+            },
+            {
+              "path": "src/verified-architecture-phase2/canonical.js",
+              "sha256": "a9087018e4ba0ea0c539148b18a63faf5e7f3cfb48cff9a13f490d515c4e91c8"
+            },
+            {
+              "path": "src/verified-architecture-phase2/evidence-loader.js",
+              "sha256": "0ccc115d7d82811539c95585af35ffebf7ae9c95d38a8ea69a4a6ed1efd50a8d"
+            },
+            {
+              "path": "src/verified-architecture-phase2/fixed-point.js",
+              "sha256": "88c654f38f8c8df7cd514ab4c6adedd313e723f4e730bef1c6340b3b1e90676d"
+            },
+            {
+              "path": "src/verified-architecture-phase2/geometry-gate-v2.js",
+              "sha256": "b6df4b3df8be45b8d9c2089791ad31c3d0dc0bd8ccd0d358b38be267b0d52889"
+            },
+            {
+              "path": "src/verified-architecture-phase2/geometry-gate.js",
+              "sha256": "d5953ce9505aa9d97cee38c4b82ae2c2dbe6cf36d0221514f1b3598694ec3e80"
+            },
+            {
+              "path": "src/verified-architecture-phase2/index.js",
+              "sha256": "e09a615c1954c01e5b3e9ce27d8e743c451418cb683a2bd2453f8b68c81b1071"
+            },
+            {
+              "path": "src/verified-architecture-phase2/reason-codes.js",
+              "sha256": "e3c9ef08bb74adbe4e56f848d07f02c728f2218f6393f469f44595394ff44672"
+            },
+            {
+              "path": "src/verified-architecture-phase2/surface-model.js",
+              "sha256": "2882791ec23da3623c535cf6ccacd062d765baef9357b4be731627f1f2b80632"
+            }
+          ],
+          "limitations": [
+            "NO_EXECUTE_OR_ADMIT_OR_REGISTRY_WRITE",
+            "ORIGINAL_OWNER_APPROVAL_DOES_NOT_AUTHORIZE_NEW_WORLD",
+            "SEPARATE_AUTHENTICATED_OWNER_DECISION_AND_EXACT_REVIEW_REQUIRED",
+            "NO_CONSUMPTION_OF_88B6E019",
+            "NO_R3_GAMEPLAY_DOOR_CLINICAL_PRODUCTION_OR_AUTHORITY_EXPANSION",
+            "A8_REALISTIC_MESH_AND_B7_GAMEPLAY_MODES_OWNER_RESERVED"
+          ],
+          "canonicalDigest": "15dbeb94e317c32f4dd63dd595c465bcc744254c24c389c85b7a0ef8a8756e58"
+        },
+        "envelope": {
+          "envelopeSchemaVersion": "1.0.0",
+          "envelopeId": "exact-world-88b6e019:camera:r1",
+          "definitionRef": {
+            "definitionType": "SCENE_EXTENSION",
+            "definitionId": "school-world-88b6e019-camera-evidence",
+            "revision": 1,
+            "definitionDigest": "15dbeb94e317c32f4dd63dd595c465bcc744254c24c389c85b7a0ef8a8756e58"
+          },
+          "lifecycleState": "VERIFIED_FOR_SLICE",
+          "validationEvidenceRefs": [
+            "evidence:track-b/world-evidence-equivalence/candidate.json",
+            "evidence:track-b/exact-world-record-preparation/candidate.json",
+            "owner-body-sha256:a18bb937a35118e690102b6ccaab929d4e994af34218eb79f992bf27b1fb6ba8"
+          ],
+          "reviewEvidenceRefs": [
+            "whatsapp:wamid.HBgMOTcyNTMyNDkwMzUxFQIAEhgUM0FBOUNDRkQ2QzU2REJFREFFMTkA",
+            "whatsapp:wamid.HBgMOTcyNTMyNDkwMzUxFQIAERgSMzkwMEE2QUYzMDgxMENBQzg1AA==",
+            "whatsapp:wamid.HBgMOTcyNTMyNDkwMzUxFQIAERgSMENENzZCMEVCMkEwRkEyNEY5AA==",
+            "owner-body-sha256:a18bb937a35118e690102b6ccaab929d4e994af34218eb79f992bf27b1fb6ba8",
+            "evidence:track-b/world-evidence-equivalence/candidate.json",
+            "evidence:track-b/exact-world-record-preparation/candidate.json",
+            "track-b-technical-review:world-evidence-equivalence-transport17-ACCEPT",
+            "track-b-technical-review:exact-world-record-preparation-transport18-ACCEPT",
+            "track-b-technical-review:exact-world-admission-mechanics-input-ACCEPT",
+            "definition-sha256:15dbeb94e317c32f4dd63dd595c465bcc744254c24c389c85b7a0ef8a8756e58",
+            "review-record-sha256:2bab6dd7327536cd03c2c36f0f755a56d61e946601dd408171d2ec246c46d0d4"
+          ],
+          "reviewId": "school-world-88b6e019-camera-evidence-owner-20261001",
+          "reviewDecision": "APPROVED_FOR_SLICE",
+          "reviewedDefinitionDigest": "15dbeb94e317c32f4dd63dd595c465bcc744254c24c389c85b7a0ef8a8756e58",
+          "reviewedDefinitionRevision": 1,
+          "reviewScope": "EXACT_WORLD_88B6E019_CAMERA_EVIDENCE_ONLY",
+          "limitations": [
+            "NO_EXECUTE_OR_ADMIT_OR_REGISTRY_WRITE",
+            "ORIGINAL_OWNER_APPROVAL_DOES_NOT_AUTHORIZE_NEW_WORLD",
+            "SEPARATE_AUTHENTICATED_OWNER_DECISION_AND_EXACT_REVIEW_REQUIRED",
+            "NO_CONSUMPTION_OF_88B6E019",
+            "NO_R3_GAMEPLAY_DOOR_CLINICAL_PRODUCTION_OR_AUTHORITY_EXPANSION",
+            "A8_REALISTIC_MESH_AND_B7_GAMEPLAY_MODES_OWNER_RESERVED",
+            "כל ההחרגות מהאישור הקודם נשארות במלואן:\n\n- לא אישור R3.\n- לא אישור להפעלה במשחק.\n- לא אישור לדלת או לפתיחתה.\n- לא אישור Production World / Production Visual.\n- לא אישור תוכן רפואי.\n- לא Production Promotion.\n- לא הרחבת סמכות.\n- לא אישור אוטומטי לגרסה/זהות עתידית אחרת.\n\n",
+            "ראיות העולם המקורי והלכידות ביניהם מתקבלות כתמיכה בשקילות הסמנטית בלבד; הן אינן מעבירות או מרחיבות אוטומטית סמכות בין זהויות היסטוריות.",
+            "האישור חל על CAMERA-EVIDENCE ONLY של העולם 88b6e019."
+          ],
+          "supersession": null,
+          "ownerDecisionMessageRef": "whatsapp:wamid.HBgMOTcyNTMyNDkwMzUxFQIAEhgUM0FBOUNDRkQ2QzU2REJFREFFMTkA",
+          "ownerDecisionQuestionRef": "whatsapp:wamid.HBgMOTcyNTMyNDkwMzUxFQIAERgSMzkwMEE2QUYzMDgxMENBQzg1AA==",
+          "envelopeDigest": "f9eacff15430c537a9ed7cf89de27b60a5c08ceef50981e6d467a69f77750c3d"
+        },
+        "ownerDecision": {
+          "channel": "WhatsApp",
+          "messageId": "wamid.HBgMOTcyNTMyNDkwMzUxFQIAEhgUM0FBOUNDRkQ2QzU2REJFREFFMTkA",
+          "receivedAt": "2026-10-01T00:18:36+03:00",
+          "questionMessageRef": "wamid.HBgMOTcyNTMyNDkwMzUxFQIAERgSMzkwMEE2QUYzMDgxMENBQzg1AA==",
+          "contextMessageRef": "wamid.HBgMOTcyNTMyNDkwMzUxFQIAERgSMENENzZCMEVCMkEwRkEyNEY5AA==",
+          "originalMessage": "מאשר.\n\nAPPROVED — World 88b6e019 Admission\nScope: CAMERA-EVIDENCE ONLY.\n\nהאישור הוא רישום כניסה נפרד לזהות ההיסטורית החדשה 88b6e019.\n\nראיות העולם המקורי והלכידות ביניהם מתקבלות כתמיכה בשקילות הסמנטית בלבד; הן אינן מעבירות או מרחיבות אוטומטית סמכות בין זהויות היסטוריות.\n\nכל ההחרגות מהאישור הקודם נשארות במלואן:\n\n- לא אישור R3.\n- לא אישור להפעלה במשחק.\n- לא אישור לדלת או לפתיחתה.\n- לא אישור Production World / Production Visual.\n- לא אישור תוכן רפואי.\n- לא Production Promotion.\n- לא הרחבת סמכות.\n- לא אישור אוטומטי לגרסה/זהות עתידית אחרת.\n\nהאישור חל על CAMERA-EVIDENCE ONLY של העולם 88b6e019.\n\nרשום את ההחלטה והמשך מיד בנתיב R3 בתוך ה-integrated shell.\nאין צורך לעצור לאחר הרישום.\n\nAPPROVED.",
+          "ownerMessageBodySha256": "a18bb937a35118e690102b6ccaab929d4e994af34218eb79f992bf27b1fb6ba8",
+          "effectScope": "EVIDENCE_ONLY_CAMERA_COVERAGE",
+          "verbatimExclusions": "כל ההחרגות מהאישור הקודם נשארות במלואן:\n\n- לא אישור R3.\n- לא אישור להפעלה במשחק.\n- לא אישור לדלת או לפתיחתה.\n- לא אישור Production World / Production Visual.\n- לא אישור תוכן רפואי.\n- לא Production Promotion.\n- לא הרחבת סמכות.\n- לא אישור אוטומטי לגרסה/זהות עתידית אחרת.\n\n",
+          "verbatimSemanticSupport": "ראיות העולם המקורי והלכידות ביניהם מתקבלות כתמיכה בשקילות הסמנטית בלבד; הן אינן מעבירות או מרחיבות אוטומטית סמכות בין זהויות היסטוריות.",
+          "verbatimApprovedScope": "האישור חל על CAMERA-EVIDENCE ONLY של העולם 88b6e019."
+        },
+        "reviewRecord": {
+          "reviewId": "school-world-88b6e019-camera-evidence-owner-20261001",
+          "scope": "EXACT_WORLD_88B6E019_CAMERA_EVIDENCE_ONLY",
+          "effectScope": "EVIDENCE_ONLY_CAMERA_COVERAGE",
+          "definitionDigest": "15dbeb94e317c32f4dd63dd595c465bcc744254c24c389c85b7a0ef8a8756e58",
+          "worldDigest": "88b6e0190469a8ba32e02b83bb36d815c90532b889a9ad4786978b3ac1b90385",
+          "genesisDigest": "cc2f27801d48bb1b9a8b813c78a413e50c552d6f11c103843b6acb7afe9bb887",
+          "packetDigest": "0a5c07f33acc94731c6fa01e05a46abf1632dc1f2ebe1e8a413feb4886606735",
+          "eventLogDigest": "f5af2966793abf956b20dde7523954ff7530d663913290ddaeca224569800d8a",
+          "comparisonDigest": "2c38828c35ec4d9400616d5b2e44a3dd535ac7d49a4c7cf5f0b04997ea73f75d",
+          "ownerDecision": "ADMIT",
+          "ownerDecisionObjectDigest": "8979a844b71a036f80b25ca12d4e033280a5062f30b33df1e8fc8ee474d3b837",
+          "ownerMessageBodySha256": "a18bb937a35118e690102b6ccaab929d4e994af34218eb79f992bf27b1fb6ba8",
+          "ownerMessageRef": "whatsapp:wamid.HBgMOTcyNTMyNDkwMzUxFQIAEhgUM0FBOUNDRkQ2QzU2REJFREFFMTkA",
+          "ownerQuestionRef": "whatsapp:wamid.HBgMOTcyNTMyNDkwMzUxFQIAERgSMzkwMEE2QUYzMDgxMENBQzg1AA==",
+          "verbatimExclusions": "כל ההחרגות מהאישור הקודם נשארות במלואן:\n\n- לא אישור R3.\n- לא אישור להפעלה במשחק.\n- לא אישור לדלת או לפתיחתה.\n- לא אישור Production World / Production Visual.\n- לא אישור תוכן רפואי.\n- לא Production Promotion.\n- לא הרחבת סמכות.\n- לא אישור אוטומטי לגרסה/זהות עתידית אחרת.\n\n",
+          "verbatimSemanticSupport": "ראיות העולם המקורי והלכידות ביניהם מתקבלות כתמיכה בשקילות הסמנטית בלבד; הן אינן מעבירות או מרחיבות אוטומטית סמכות בין זהויות היסטוריות.",
+          "verbatimApprovedScope": "האישור חל על CAMERA-EVIDENCE ONLY של העולם 88b6e019.",
+          "semanticEqualityCitation": {
+            "originalCapturedWorldDigest": "c719e83456b3486f56e08588c60e8ec89186652d39c579ad71b7c78131b46513",
+            "newComparedWorldDigest": "88b6e0190469a8ba32e02b83bb36d815c90532b889a9ad4786978b3ac1b90385",
+            "originalReviewRecordDigest": "3d66af4f355e6d8a9e98af72796132b89cd7a20e6036c0eb4111db057d0092aa",
+            "captureRemainsBoundToOriginalWorld": true,
+            "citationRole": "SUPPORTING_EVIDENCE_ONLY_NOT_INHERITED_ADMISSION"
+          },
+          "sourcePinCount": 71,
+          "reviewDecision": "APPROVED_FOR_SLICE",
+          "reviewEvidenceRefs": [
+            "whatsapp:wamid.HBgMOTcyNTMyNDkwMzUxFQIAEhgUM0FBOUNDRkQ2QzU2REJFREFFMTkA",
+            "whatsapp:wamid.HBgMOTcyNTMyNDkwMzUxFQIAERgSMzkwMEE2QUYzMDgxMENBQzg1AA==",
+            "whatsapp:wamid.HBgMOTcyNTMyNDkwMzUxFQIAERgSMENENzZCMEVCMkEwRkEyNEY5AA==",
+            "owner-body-sha256:a18bb937a35118e690102b6ccaab929d4e994af34218eb79f992bf27b1fb6ba8",
+            "evidence:track-b/world-evidence-equivalence/candidate.json",
+            "evidence:track-b/exact-world-record-preparation/candidate.json",
+            "track-b-technical-review:world-evidence-equivalence-transport17-ACCEPT",
+            "track-b-technical-review:exact-world-record-preparation-transport18-ACCEPT",
+            "track-b-technical-review:exact-world-admission-mechanics-input-ACCEPT",
+            "definition-sha256:15dbeb94e317c32f4dd63dd595c465bcc744254c24c389c85b7a0ef8a8756e58"
+          ],
+          "limitations": [
+            "NO_EXECUTE_OR_ADMIT_OR_REGISTRY_WRITE",
+            "ORIGINAL_OWNER_APPROVAL_DOES_NOT_AUTHORIZE_NEW_WORLD",
+            "SEPARATE_AUTHENTICATED_OWNER_DECISION_AND_EXACT_REVIEW_REQUIRED",
+            "NO_CONSUMPTION_OF_88B6E019",
+            "NO_R3_GAMEPLAY_DOOR_CLINICAL_PRODUCTION_OR_AUTHORITY_EXPANSION",
+            "A8_REALISTIC_MESH_AND_B7_GAMEPLAY_MODES_OWNER_RESERVED",
+            "כל ההחרגות מהאישור הקודם נשארות במלואן:\n\n- לא אישור R3.\n- לא אישור להפעלה במשחק.\n- לא אישור לדלת או לפתיחתה.\n- לא אישור Production World / Production Visual.\n- לא אישור תוכן רפואי.\n- לא Production Promotion.\n- לא הרחבת סמכות.\n- לא אישור אוטומטי לגרסה/זהות עתידית אחרת.\n\n",
+            "ראיות העולם המקורי והלכידות ביניהם מתקבלות כתמיכה בשקילות הסמנטית בלבד; הן אינן מעבירות או מרחיבות אוטומטית סמכות בין זהויות היסטוריות.",
+            "האישור חל על CAMERA-EVIDENCE ONLY של העולם 88b6e019."
+          ],
+          "reviewRecordDigest": "2bab6dd7327536cd03c2c36f0f755a56d61e946601dd408171d2ec246c46d0d4"
+        }
+      },
+      "operationalStatus": "UNKNOWN",
+      "captureRemainsBoundToOriginalWorld": true
+    }
+  ],
+  "operationalStatus": "UNKNOWN",
+  "captureRemainsBoundToOriginalWorld": true,
+  "limitations": [
+    "NO_EXECUTE_OR_ADMIT_OR_REGISTRY_WRITE",
+    "ORIGINAL_OWNER_APPROVAL_DOES_NOT_AUTHORIZE_NEW_WORLD",
+    "SEPARATE_AUTHENTICATED_OWNER_DECISION_AND_EXACT_REVIEW_REQUIRED",
+    "NO_CONSUMPTION_OF_88B6E019",
+    "NO_R3_GAMEPLAY_DOOR_CLINICAL_PRODUCTION_OR_AUTHORITY_EXPANSION",
+    "A8_REALISTIC_MESH_AND_B7_GAMEPLAY_MODES_OWNER_RESERVED",
+    "כל ההחרגות מהאישור הקודם נשארות במלואן:\n\n- לא אישור R3.\n- לא אישור להפעלה במשחק.\n- לא אישור לדלת או לפתיחתה.\n- לא אישור Production World / Production Visual.\n- לא אישור תוכן רפואי.\n- לא Production Promotion.\n- לא הרחבת סמכות.\n- לא אישור אוטומטי לגרסה/זהות עתידית אחרת.\n\n",
+    "ראיות העולם המקורי והלכידות ביניהם מתקבלות כתמיכה בשקילות הסמנטית בלבד; הן אינן מעבירות או מרחיבות אוטומטית סמכות בין זהויות היסטוריות.",
+    "האישור חל על CAMERA-EVIDENCE ONLY של העולם 88b6e019.",
+    "INSTANCE_LOCAL_REGISTRY_DURABILITY_IS_COMMITTED_RECORD_AND_SNAPSHOT_NOT_RUNTIME_SERVICE",
+    "NO_RENDER_DOOR_GAMEPLAY_CLINICAL_PRODUCTION_UNLOCK"
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "reviewId": "school-world-88b6e019-camera-evidence-owner-20261001",
+  "scope": "EXACT_WORLD_88B6E019_CAMERA_EVIDENCE_ONLY",
+  "effectScope": "EVIDENCE_ONLY_CAMERA_COVERAGE",
+  "definitionDigest": "15dbeb94e317c32f4dd63dd595c465bcc744254c24c389c85b7a0ef8a8756e58",
+  "worldDigest": "88b6e0190469a8ba32e02b83bb36d815c90532b889a9ad4786978b3ac1b90385",
+  "genesisDigest": "cc2f27801d48bb1b9a8b813c78a413e50c552d6f11c103843b6acb7afe9bb887",
+  "packetDigest": "0a5c07f33acc94731c6fa01e05a46abf1632dc1f2ebe1e8a413feb4886606735",
+  "eventLogDigest": "f5af2966793abf956b20dde7523954ff7530d663913290ddaeca224569800d8a",
+  "comparisonDigest": "2c38828c35ec4d9400616d5b2e44a3dd535ac7d49a4c7cf5f0b04997ea73f75d",
+  "ownerDecision": "ADMIT",
+  "ownerDecisionObjectDigest": "8979a844b71a036f80b25ca12d4e033280a5062f30b33df1e8fc8ee474d3b837",
+  "ownerMessageBodySha256": "a18bb937a35118e690102b6ccaab929d4e994af34218eb79f992bf27b1fb6ba8",
+  "ownerMessageRef": "whatsapp:wamid.HBgMOTcyNTMyNDkwMzUxFQIAEhgUM0FBOUNDRkQ2QzU2REJFREFFMTkA",
+  "ownerQuestionRef": "whatsapp:wamid.HBgMOTcyNTMyNDkwMzUxFQIAERgSMzkwMEE2QUYzMDgxMENBQzg1AA==",
+  "verbatimExclusions": "כל ההחרגות מהאישור הקודם נשארות במלואן:\n\n- לא אישור R3.\n- לא אישור להפעלה במשחק.\n- לא אישור לדלת או לפתיחתה.\n- לא אישור Production World / Production Visual.\n- לא אישור תוכן רפואי.\n- לא Production Promotion.\n- לא הרחבת סמכות.\n- לא אישור אוטומטי לגרסה/זהות עתידית אחרת.\n\n",
+  "verbatimSemanticSupport": "ראיות העולם המקורי והלכידות ביניהם מתקבלות כתמיכה בשקילות הסמנטית בלבד; הן אינן מעבירות או מרחיבות אוטומטית סמכות בין זהויות היסטוריות.",
+  "verbatimApprovedScope": "האישור חל על CAMERA-EVIDENCE ONLY של העולם 88b6e019.",
+  "semanticEqualityCitation": {
+    "originalCapturedWorldDigest": "c719e83456b3486f56e08588c60e8ec89186652d39c579ad71b7c78131b46513",
+    "newComparedWorldDigest": "88b6e0190469a8ba32e02b83bb36d815c90532b889a9ad4786978b3ac1b90385",
+    "originalReviewRecordDigest": "3d66af4f355e6d8a9e98af72796132b89cd7a20e6036c0eb4111db057d0092aa",
+    "captureRemainsBoundToOriginalWorld": true,
+    "citationRole": "SUPPORTING_EVIDENCE_ONLY_NOT_INHERITED_ADMISSION"
+  },
+  "sourcePinCount": 71,
+  "reviewDecision": "APPROVED_FOR_SLICE",
+  "reviewEvidenceRefs": [
+    "whatsapp:wamid.HBgMOTcyNTMyNDkwMzUxFQIAEhgUM0FBOUNDRkQ2QzU2REJFREFFMTkA",
+    "whatsapp:wamid.HBgMOTcyNTMyNDkwMzUxFQIAERgSMzkwMEE2QUYzMDgxMENBQzg1AA==",
+    "whatsapp:wamid.HBgMOTcyNTMyNDkwMzUxFQIAERgSMENENzZCMEVCMkEwRkEyNEY5AA==",
+    "owner-body-sha256:a18bb937a35118e690102b6ccaab929d4e994af34218eb79f992bf27b1fb6ba8",
+    "evidence:track-b/world-evidence-equivalence/candidate.json",
+    "evidence:track-b/exact-world-record-preparation/candidate.json",
+    "track-b-technical-review:world-evidence-equivalence-transport17-ACCEPT",
+    "track-b-technical-review:exact-world-record-preparation-transport18-ACCEPT",
+    "track-b-technical-review:exact-world-admission-mechanics-input-ACCEPT",
+    "definition-sha256:15dbeb94e317c32f4dd63dd595c465bcc744254c24c389c85b7a0ef8a8756e58"
+  ],
+  "limitations": [
+    "NO_EXECUTE_OR_ADMIT_OR_REGISTRY_WRITE",
+    "ORIGINAL_OWNER_APPROVAL_DOES_NOT_AUTHORIZE_NEW_WORLD",
+    "SEPARATE_AUTHENTICATED_OWNER_DECISION_AND_EXACT_REVIEW_REQUIRED",
+    "NO_CONSUMPTION_OF_88B6E019",
+    "NO_R3_GAMEPLAY_DOOR_CLINICAL_PRODUCTION_OR_AUTHORITY_EXPANSION",
+    "A8_REALISTIC_MESH_AND_B7_GAMEPLAY_MODES_OWNER_RESERVED",
+    "כל ההחרגות מהאישור הקודם נשארות במלואן:\n\n- לא אישור R3.\n- לא אישור להפעלה במשחק.\n- לא אישור לדלת או לפתיחתה.\n- לא אישור Production World / Production Visual.\n- לא אישור תוכן רפואי.\n- לא Production Promotion.\n- לא הרחבת סמכות.\n- לא אישור אוטומטי לגרסה/זהות עתידית אחרת.\n\n",
+    "ראיות העולם המקורי והלכידות ביניהם מתקבלות כתמיכה בשקילות הסמנטית בלבד; הן אינן מעבירות או מרחיבות אוטומטית סמכות בין זהויות היסטוריות.",
+    "האישור חל על CAMERA-EVIDENCE ONLY של העולם 88b6e019."
+  ],
+  "reviewRecordDigest": "2bab6dd7327536cd03c2c36f0f755a56d61e946601dd408171d2ec246c46d0d4"
+}
