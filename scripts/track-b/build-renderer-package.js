@@ -39,7 +39,8 @@ const manifest={manifestVersion:'1.0.0',kind:'TRACK_B_PACKAGE_ASSET_MANIFEST',
   {url:'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js',note:'host importmap, version-pinned'}]};
 fs.writeFileSync(path.join(PKG,'asset-manifest.json'),JSON.stringify(manifest,null,1));
 // 3. Build stamp.
-const build={kind:'TRACK_B_PACKAGE_BUILD',apiVersion:'1.0.0',commit:git('rev-parse HEAD'),branch:git('rev-parse --abbrev-ref HEAD'),
+const pkgApi=(fs.readFileSync(path.join(PKG,'renderer-package.mjs'),'utf8').match(/PACKAGE_API_VERSION='([^']+)'/)||[])[1]||'UNKNOWN';
+const build={kind:'TRACK_B_PACKAGE_BUILD',apiVersion:pkgApi,commit:git('rev-parse HEAD'),branch:git('rev-parse --abbrev-ref HEAD'),
  builtAt:new Date().toISOString(),moduleSha256:shaRel('package/renderer-package.mjs'),manifestSha256:shaRel('package/asset-manifest.json')};
 fs.writeFileSync(path.join(PKG,'package-build.json'),JSON.stringify(build,null,1));
 console.log('READY package artifacts:',build.commit.slice(0,8),'assets:',assets.length);
