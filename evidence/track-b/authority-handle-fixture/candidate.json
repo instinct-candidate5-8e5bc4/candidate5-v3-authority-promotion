@@ -1,0 +1,27 @@
+{
+  "classification": "FIXTURE_NOT_LIVE",
+  "reuse": {
+    "status": "FIXTURE_NOT_LIVE_EXACT_SNAPSHOT_EVIDENCE_REUSED",
+    "epoch": 1,
+    "worldDigest": "88b6e0190469a8ba32e02b83bb36d815c90532b889a9ad4786978b3ac1b90385",
+    "recordDigest": "2bab6dd7327536cd03c2c36f0f755a56d61e946601dd408171d2ec246c46d0d4",
+    "cameraEvidenceDigest": "17395af7e4936f2d14f0837cadae35a8649253bad4a633f72513836b4407d42a",
+    "operationalStatus": "UNKNOWN",
+    "limitations": [
+      "PROCESS_LOCAL_ONLY_NO_DURABLE_CROSS_PROCESS_REVOCATION",
+      "NO_RUNTIME_CONNECTION_OR_MOVEMENT",
+      "RESTART_REPLAY_REQUIRED_NOT_IMPLEMENTED",
+      "NO_ADMISSION_OR_RENDER_DOOR_GAMEPLAY_CLINICAL_PRODUCTION_UNLOCK"
+    ]
+  },
+  "revocation": {
+    "classification": "FIXTURE_NOT_LIVE",
+    "epoch": 2
+  },
+  "afterRevocation": {
+    "status": "UNKNOWN",
+    "reason": "AUTHORITY_EPOCH_CONTEXT_OR_DECISION_CHANGED",
+    "classification": "FIXTURE_NOT_LIVE",
+    "operationalStatus": "UNKNOWN"
+  }
+}
