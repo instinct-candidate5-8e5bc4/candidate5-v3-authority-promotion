@@ -1,65 +1,132 @@
 'use strict';
 // TRACK B / Gate A R1: generate the ONE canonical review-records document.
-// Every id, revision and digest below is read from the executable sources
-// (definitions module + engine pins), never hand-typed. Regenerate:
-//   node scripts/track-b/gate-a-canonical-records.js
+// Every id, revision and digest is read from EXECUTABLE sources at generation
+// time: the definitions module (validated at load), the certified v2.0.0
+// PACKAGE + its live instantiation + the Node visual descriptor, and the
+// R1 proposal builder's v2.1.0 package + its live instantiation. Nothing is
+// hand-typed; a malformed or unvalidated record throws.
+// Usage:
+//   node scripts/track-b/gate-a-canonical-records.js          (rewrite doc)
+//   node scripts/track-b/gate-a-canonical-records.js --check  (fail on drift)
+// Output is deterministic: no timestamps, no environment data.
 const fs=require('node:fs'),path=require('node:path');
 const ROOT=path.join(__dirname,'../..');
 const SYN=require(path.join(ROOT,'src/clean-runtime/school/definitions/synthetic-training-unit-v1.js'));
-const pinsSrc=fs.readFileSync(path.join(ROOT,'scripts/track-b/build-engine-bundle.js'),'utf8');
-const pin=k=>{const m=pinsSrc.match(new RegExp(k+":'([0-9a-f]{64})'"));if(!m)throw Error('pin missing: '+k);return m[1]};
+const {PACKAGE}=require(path.join(ROOT,'src/clean-runtime/school/scene-v2/package.js'));
+const {instantiate}=require(path.join(ROOT,'src/clean-runtime/school/scene-v2/instantiate.js'));
+const {buildVisualSceneDescriptor}=require(path.join(ROOT,'src/clean-runtime/school/scene-v2/visual-descriptor.js'));
+const {buildV21}=require(path.join(ROOT,'scripts/track-b/gate-a-r1v4-package-builder.js'));
+
+const hex64=v=>typeof v==='string'&&/^[0-9a-f]{64}$/.test(v);
+const need=(cond,msg)=>{if(!cond)throw Error('CANONICAL RECORDS: '+msg)};
+
+// Section 1: six proposed records - identity fields read live.
+const D={
+ unit:SYN.UNIT_BODY.definition,
+ ownerBody:SYN.OWNER_BODY.definition,
+ ownerEntity:SYN.OWNER_ENTITY.definition,
+ floor:SYN.INTERIOR_FLOOR.definition,
+ volume:SYN.CONTAINMENT_VOLUME.definition,
+ binding:SYN.OWNER_BODY_BINDING.binding,
+};
 const rows=[
- ['Physical body (unit)','synthetic-training-unit-body-v1',SYN.UNIT_BODY.definition.bodyRevision,SYN.UNIT_BODY.definition.canonicalDigest,SYN.UNIT_BODY.status],
- ['Bag owner body','school/medical-bag-owner-body',SYN.OWNER_BODY.definition.bodyRevision,SYN.OWNER_BODY.definition.canonicalDigest,SYN.OWNER_BODY.status],
- ['Bag owner entity','school/medical-bag-entity',SYN.OWNER_ENTITY.definition.entityRevision,SYN.OWNER_ENTITY.definition.entityDigest,SYN.OWNER_ENTITY.status],
- ['Interior support floor (layer 1)','school/medical-bag-interior-floor',SYN.INTERIOR_FLOOR.definition.supportSurfaceRevision??SYN.INTERIOR_FLOOR.definition.surfaceRevision,SYN.INTERIOR_FLOOR.definition.canonicalDigest??SYN.INTERIOR_FLOOR.definition.surfaceDigest,SYN.INTERIOR_FLOOR.status],
- ['Containment volume (layer 2)','school/medical-bag-containment-interior',SYN.CONTAINMENT_VOLUME.definition.volumeRevision,SYN.CONTAINMENT_VOLUME.definition.volumeDigest??SYN.CONTAINMENT_VOLUME.definition.canonicalDigest,SYN.CONTAINMENT_VOLUME.status],
- ['Owner-body binding','school/medical-bag-owner-body-binding',SYN.OWNER_BODY_BINDING.binding.bindingRevision,SYN.OWNER_BODY_BINDING.binding.canonicalDigest,SYN.OWNER_BODY_BINDING.status],
+ ['Physical body (unit)',D.unit.bodyDefinitionId,D.unit.bodyRevision,D.unit.canonicalDigest,SYN.UNIT_BODY.status],
+ ['Bag owner body',D.ownerBody.bodyDefinitionId,D.ownerBody.bodyRevision,D.ownerBody.canonicalDigest,SYN.OWNER_BODY.status],
+ ['Bag owner entity',D.ownerEntity.entityDefinitionId,D.ownerEntity.entityRevision,D.ownerEntity.entityDigest,SYN.OWNER_ENTITY.status],
+ ['Interior support floor (layer 1)',D.floor.supportSurfaceId,D.floor.surfaceRevision,D.floor.canonicalDigest,SYN.INTERIOR_FLOOR.status],
+ ['Containment volume (layer 2)',D.volume.supportVolumeId,D.volume.volumeRevision,D.volume.canonicalDigest,SYN.CONTAINMENT_VOLUME.status],
+ ['Owner-body binding',D.binding.bindingId,D.binding.bindingRevision,D.binding.canonicalDigest,SYN.OWNER_BODY_BINDING.status],
 ];
-for(const r of rows){if(!r[3]||!/^[0-9a-f]{64}$/.test(r[3]))throw Error('bad digest for '+r[1]);if(r[4]!=='VALIDATED')throw Error('not VALIDATED: '+r[1]);}
-const floorDef=SYN.INTERIOR_FLOOR.definition;
-const floorDigest=floorDef.canonicalDigest||floorDef.surfaceDigest;
-rows[3]=['Interior support floor (layer 1)','school/medical-bag-interior-floor',floorDef.surfaceRevision??floorDef.supportSurfaceRevision,floorDigest,'VALIDATED'];
-const now=new Date().toISOString();
+for(const r of rows){need(r[1],'missing id in a record row');need(Number.isInteger(r[2]),'missing revision for '+r[1]);need(hex64(r[3]),'bad digest for '+r[1]);need(r[4]==='VALIDATED','not VALIDATED: '+r[1]);}
+
+// Section 2: certified v2.0.0 anchors, derived live (three-entity scene).
+need(PACKAGE.scenePackageVersion==='2.0.0','certified PACKAGE is not v2.0.0');
+const w20=instantiate(PACKAGE);
+need(w20.status==='COMMITTED','v2.0.0 instantiation did not COMMIT');
+const descriptor=buildVisualSceneDescriptor();
+need(descriptor.status==='COMMITTED','visual descriptor not COMMITTED: '+descriptor.status);
+need(hex64(PACKAGE.scenePackageDigest)&&hex64(w20.after.stateDigest)&&hex64(descriptor.descriptorDigest),'v2.0.0 anchor digests malformed');
+
+// Section 3: proposed v2.1.0 anchors, derived live from the proposal builder.
+const v21=buildV21();
+need(v21.scenePackageVersion==='2.1.0','proposal package is not v2.1.0');
+need(hex64(v21.scenePackageDigest),'v2.1.0 package digest malformed');
+const w21=instantiate(v21);
+need(w21.status==='COMMITTED','v2.1.0 instantiation did not COMMIT');
+need(hex64(w21.after.stateDigest),'v2.1.0 world digest malformed');
+need(w21.after.entities['synthetic-training-unit-v1'],'unit missing from v2.1.0 world');
+const unitEntity=v21.entities.find(e=>e.entityId==='synthetic-training-unit-v1');
+const unitRel=v21.supportRelations.find(r=>r.supportedEntityId==='synthetic-training-unit-v1');
+need(unitEntity&&unitRel,'unit entity/relation missing from v2.1.0 package');
+
 const md=`# Gate A R1: Canonical Review Records (generated)
 
-Generated by scripts/track-b/gate-a-canonical-records.js at ${now}.
-Every id, revision and digest is read from the executable sources; nothing is
-hand-typed. This document SUPERSEDES the identity table and section-4 record
-identity in docs/track-b/gate-a-synthetic-unit-visual-asset-proposal.md (that
-document remains the design history; its stale rows named
+Generated by scripts/track-b/gate-a-canonical-records.js (deterministic - no
+timestamps; \`--check\` fails on any drift from the committed document).
+Every id, revision and digest below is read from EXECUTABLE sources at
+generation time: the validated definitions module, the certified v2.0.0
+PACKAGE with a live instantiation and the Node visual descriptor, and the R1
+proposal builder's v2.1.0 package with a live throwaway instantiation.
+Nothing is hand-typed. This document SUPERSEDES the identity table and
+section-4 record identity in docs/track-b/gate-a-synthetic-unit-visual-asset-proposal.md
+(that document remains the design history; its stale rows named
 synthetic-training-unit-1 and school/medical-bag-interior-volume-v1 rev 1).
 
-Status vocabulary: every record below is PROPOSED_NOT_ADMITTED. Admission is
-the formal Gate A review's call; nothing here asserts admission.
+Status vocabulary: every proposed record below is PROPOSED_NOT_ADMITTED.
+Admission is the formal Gate A review's call; nothing here asserts admission.
 
-## 1. Executable records (all validated at module load; a broken record throws)
+## 1. Proposed records (validated at module load; a broken record throws)
 
 | Record | Id | Revision | Digest (sha256, full) | Validator status | Admission |
 |---|---|---|---|---|---|
 ${rows.map(r=>'| '+r[0]+' | \`'+r[1]+'\` | '+r[2]+' | \`'+r[3]+'\` | '+r[4]+' | PROPOSED_NOT_ADMITTED |').join('\n')}
 
-## 2. Consumed certified package anchors (v2.1.0, read-only)
+## 2. Certified v2.0.0 anchors (prior three-entity scene ONLY, read-only)
 
-| Anchor | Digest (sha256, full) | Source |
+These anchor the ALREADY-CERTIFIED v2.0.0 three-entity scene (casualty, bag,
+chair). They do NOT cover the proposed synthetic unit and must not be read as
+certifying it. There is NOT yet a certified v2.1.0 world.
+
+| Anchor | Digest (sha256, full) | Derived from |
 |---|---|---|
-| Source package | \`${pin('packageDigest')}\` | scripts/track-b/build-engine-bundle.js expectedPins |
-| World state | \`${pin('worldDigest')}\` | same |
-| Node descriptor | \`${pin('nodeDescriptorDigest')}\` | same |
-| Certified bag body (recovered) | \`${SYN.OWNER_BODY_BINDING.binding.recoveredBodyRef.digest}\` | school-medical-bag-body revision ${SYN.OWNER_BODY_BINDING.binding.recoveredBodyRef.revision} |
+| Certified v2.0.0 scene package | \`${PACKAGE.scenePackageDigest}\` | scene-v2/package.js PACKAGE.scenePackageDigest |
+| Certified v2.0.0 world state | \`${w20.after.stateDigest}\` | live instantiate(PACKAGE), COMMITTED |
+| Certified v2.0.0 node descriptor | \`${descriptor.descriptorDigest}\` | buildVisualSceneDescriptor() |
+| Certified bag body (recovered) | \`${D.binding.recoveredBodyRef.digest}\` | school-medical-bag-body revision ${D.binding.recoveredBodyRef.revision} |
 
-## 3. World-level identity refs
+## 3. Proposed v2.1.0 anchors (four-entity scene, PROPOSED_NOT_ADMITTED)
 
-| Ref | Value |
-|---|---|
-| World entity id | \`synthetic-training-unit-v1\` |
-| Support relation id | \`synthetic:unit:bag-interior-floor\` (ENTITY_OWNED, ownerEntityRef school-medical-bag) |
-| Containment volume (executable) | \`school/medical-bag-containment-interior\` revision ${SYN.CONTAINMENT_VOLUME.definition.volumeRevision} |
-| Gate A runtime status | PROPOSED_NOT_ADMITTED (host table; renderer tracks the unit separately) |
+Computed by executing the R1 proposal builder and a throwaway instantiation.
+Neither value is certified; admission is the formal review's call.
+
+| Anchor | Digest (sha256, full) | Status |
+|---|---|---|
+| Proposed v2.1.0 scene package | \`${v21.scenePackageDigest}\` | PROPOSED_NOT_ADMITTED |
+| Proposed v2.1.0 world state (throwaway instantiation) | \`${w21.after.stateDigest}\` | PROPOSED_NOT_ADMITTED |
+
+## 4. World-level identity refs (read from the built v2.1.0 package)
+
+| Ref | Value | Status |
+|---|---|---|
+| World entity id | \`${unitEntity.entityId}\` (entityTypeId \`${unitEntity.entityTypeId}\`, revision ${unitEntity.revision}) | PROPOSED_NOT_ADMITTED |
+| Support relation id | \`${unitRel.relationId}\` (${unitRel.supportSourceKind}, ownerEntityRef ${unitRel.ownerEntityRef.id}) | PROPOSED_NOT_ADMITTED |
+| Containment volume (executable) | \`${D.volume.supportVolumeId}\` revision ${D.volume.volumeRevision} | PROPOSED_NOT_ADMITTED |
+| Gate A runtime status | PROPOSED_NOT_ADMITTED (host table; renderer tracks the unit separately) | current |
+
+## 5. Cross-domain identity binding (PROPOSED - NOT a committed engine fact)
+
+| Engine inventory identity | World entity | Status |
+|---|---|---|
+| \`unit-1\` / \`SYNTHETIC_ITEM_A\` (existing V2, engine-owned) | \`${unitEntity.entityId}\` | PROPOSED relation. R2 implements and verifies this cross-domain binding; it is not claimed as a committed engine fact here. |
 
 Review rule: sign off only against this list plus the R1 v7 harness
 (scripts/track-b/gate-a-r1v7-contract-check.mjs, 38/38) and the v7 contract
 additions doc (docs/track-b/gate-a-r1-v7-contract-additions.md).
 `;
-fs.writeFileSync(path.join(ROOT,'docs/track-b/gate-a-r1-canonical-review-records.md'),md);
+const out=path.join(ROOT,'docs/track-b/gate-a-r1-canonical-review-records.md');
+if(process.argv.includes('--check')){
+ const cur=fs.existsSync(out)?fs.readFileSync(out,'utf8'):'';
+ if(cur!==md){console.error('DRIFT: docs/track-b/gate-a-r1-canonical-review-records.md differs from generated bytes');process.exit(1)}
+ console.log('CHECK OK: committed doc matches generated bytes');process.exit(0)}
+fs.writeFileSync(out,md);
 console.log('WROTE docs/track-b/gate-a-r1-canonical-review-records.md');
