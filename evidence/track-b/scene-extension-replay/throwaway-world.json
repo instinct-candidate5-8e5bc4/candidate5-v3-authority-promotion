@@ -1,0 +1,1059 @@
+{
+  "kind": "THROWAWAY_EXTENDED_WORLD_REPLAY_CANDIDATE",
+  "sourcePacketDigest": "0a5c07f33acc94731c6fa01e05a46abf1632dc1f2ebe1e8a413feb4886606735",
+  "cameraEvidenceApprovedOverlayWorldDigest": "c719e83456b3486f56e08588c60e8ec89186652d39c579ad71b7c78131b46513",
+  "genesis": {
+    "stateSchemaVersion": "2.0.0",
+    "worldId": "school-treatment-room-v2",
+    "sceneDefinitionRef": {
+      "sceneId": "school"
+    },
+    "revision": 0,
+    "priorStateDigest": null,
+    "lifecycleState": "ACTIVE",
+    "entities": {},
+    "physicalRelations": [],
+    "supportRelations": [],
+    "surfaces": {
+      "id": "school-surface-v1",
+      "revision": 1,
+      "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf"
+    },
+    "environmentPhysicalState": {
+      "sceneBounds": {
+        "minX": -6920000,
+        "maxX": 6920000,
+        "minY": 0,
+        "maxY": 6000000,
+        "minZ": -3920000,
+        "maxZ": 6000000
+      },
+      "doorStates": [
+        {
+          "surfaceId": "door",
+          "state": "CLOSED",
+          "geometryDigest": "0808698899ba2cb6ab415350ee3cadd1796bf90388996cb59e183cbcb56c1f7d"
+        }
+      ]
+    },
+    "committedEventSequence": 0,
+    "stateDigest": "cc2f27801d48bb1b9a8b813c78a413e50c552d6f11c103843b6acb7afe9bb887"
+  },
+  "after": {
+    "stateSchemaVersion": "2.0.0",
+    "worldId": "school-treatment-room-v2",
+    "sceneDefinitionRef": {
+      "sceneId": "school"
+    },
+    "revision": 1,
+    "priorStateDigest": "cc2f27801d48bb1b9a8b813c78a413e50c552d6f11c103843b6acb7afe9bb887",
+    "lifecycleState": "ACTIVE",
+    "entities": {
+      "school-casualty-adult-v1": {
+        "entityId": "school-casualty-adult-v1",
+        "entityTypeId": "school/casualty",
+        "revision": 1,
+        "lifecycleState": "ACTIVE",
+        "transform": {
+          "positionMicrounits": [
+            0,
+            0,
+            1000000
+          ],
+          "orientation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scaleMicrounits": [
+            1000000,
+            1000000,
+            1000000
+          ]
+        },
+        "parentEntityId": null,
+        "physicalBodyRef": {
+          "recordId": "casualty/adult-v1/supine-floor",
+          "revision": 1,
+          "digest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3",
+          "proofGeometryDigest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+        },
+        "geometrySourceRef": {
+          "recordId": "DA-ADULT-V1-MALE-SUPINE-001",
+          "revision": 1,
+          "digest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3",
+          "classification": "AUTHORED_NEW",
+          "lineageStatus": "AUTHORED_NEW"
+        },
+        "participatesIn": [
+          "collision",
+          "support"
+        ],
+        "postureStateId": "adult-v1/supine-floor",
+        "physicalState": {
+          "active": true,
+          "surfaceId": "floor",
+          "orientationUpDot": 1,
+          "supportNormalUpDot": 1,
+          "profileRef": {
+            "id": "adult-v1",
+            "revision": 1,
+            "digest": "f1d973b4cfbebdfa230fe0257ccfe9c11056a7d07e52c3701d1e6772311bcc41",
+            "subjectSex": "MALE"
+          },
+          "postureRef": {
+            "id": "adult-v1/supine-floor",
+            "semanticType": "SUPINE_FLOOR",
+            "revision": 1,
+            "digest": "197a806537a3c9d9f629cf2a57d6db4031fa93ebea0618c2e18603f48301745e"
+          },
+          "supportCategory": {
+            "supportCategoryId": "school/floor-v1",
+            "supportSemanticType": "FLOOR",
+            "provenanceStatus": "RECOVERED",
+            "fixtureOnly": false
+          }
+        }
+      },
+      "school-medical-bag": {
+        "entityId": "school-medical-bag",
+        "entityTypeId": "school/medical-bag",
+        "revision": 1,
+        "lifecycleState": "ACTIVE",
+        "transform": {
+          "positionMicrounits": [
+            -3000000,
+            175000,
+            1000000
+          ],
+          "orientation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scaleMicrounits": [
+            1000000,
+            1000000,
+            1000000
+          ]
+        },
+        "parentEntityId": null,
+        "physicalBodyRef": {
+          "recordId": "school-medical-bag-body",
+          "revision": 1,
+          "digest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+          "proofGeometryDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a"
+        },
+        "geometrySourceRef": {
+          "recordId": "index.html#school-bag-lockers",
+          "revision": 1,
+          "digest": "21ba7567961cbb9c022ab8a1f11359bf07049c506519a7656394cfc48fcc11ea",
+          "classification": "RECOVERED",
+          "lineageStatus": "RECOVERED"
+        },
+        "participatesIn": [
+          "collision",
+          "support"
+        ],
+        "postureStateId": "rigid",
+        "physicalState": {
+          "active": true,
+          "surfaceId": "floor",
+          "orientationUpDot": 1,
+          "supportNormalUpDot": 1,
+          "supportSurface": {
+            "supportSurfaceId": "school/medical-bag-interior-floor",
+            "surfaceRevision": 1,
+            "canonicalDigest": "d41d496181c4554f3dd9a7c01f2b408b4a4c2c1ae50d0af76fe0f574e2ee2427"
+          },
+          "supportVolume": {
+            "supportVolumeId": "school/medical-bag-containment-interior",
+            "volumeRevision": 2,
+            "canonicalDigest": "e0af9d06c4b2956abf6ea3f733db9fce7862e221b532e4f4ec095925db35ec6d"
+          }
+        }
+      },
+      "school-treatment-chair": {
+        "entityId": "school-treatment-chair",
+        "entityTypeId": "school/treatment-chair",
+        "revision": 1,
+        "lifecycleState": "ACTIVE",
+        "transform": {
+          "positionMicrounits": [
+            -2000000,
+            0,
+            1000000
+          ],
+          "orientation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scaleMicrounits": [
+            1000000,
+            1000000,
+            1000000
+          ]
+        },
+        "parentEntityId": null,
+        "physicalBodyRef": {
+          "recordId": "school/treatment-chair",
+          "revision": 1,
+          "digest": "1e78439ad5977c6c050475b4ac692cee9fce7da034725ea88a7ed4f0b0803247",
+          "proofGeometryDigest": "1e78439ad5977c6c050475b4ac692cee9fce7da034725ea88a7ed4f0b0803247"
+        },
+        "geometrySourceRef": {
+          "recordId": "gate-c-chair-authoring-001",
+          "revision": 1,
+          "digest": "1e78439ad5977c6c050475b4ac692cee9fce7da034725ea88a7ed4f0b0803247",
+          "classification": "AUTHORED_NEW",
+          "lineageStatus": "AUTHORED_NEW"
+        },
+        "participatesIn": [
+          "collision",
+          "support-owner"
+        ],
+        "postureStateId": "rigid-upright",
+        "physicalState": {
+          "active": true,
+          "surfaceId": "floor",
+          "orientationUpDot": 1,
+          "supportNormalUpDot": 1,
+          "supportSurface": {
+            "schemaVersion": "1.0.0",
+            "supportSurfaceId": "school/treatment-chair-seat",
+            "surfaceRevision": 1,
+            "ownerDefinitionRef": {
+              "id": "school/treatment-chair-entity",
+              "revision": 1,
+              "digest": "f41d2b14b2663930f7643bd986286de0d0b48d4652d0ec29dbf9b5f71a1ac61e"
+            },
+            "supportSemanticType": "SUPPORT_SURFACE",
+            "transformBinding": "OWNER_TRANSLATION_IDENTITY_ORIENTATION",
+            "localPlane": {
+              "normal": [
+                0,
+                1000000,
+                0
+              ],
+              "offsetMicrounits": 490000
+            },
+            "localRegion": {
+              "minX": -240000,
+              "maxX": 240000,
+              "minZ": -240000,
+              "maxZ": 240000
+            },
+            "contactRule": {
+              "contactRuleId": "full-footprint-chair-seat",
+              "policy": "FULL_FOOTPRINT"
+            },
+            "provenance": {
+              "classification": "AUTHORED_NEW",
+              "decisionId": "gate-c-chair-authoring-001"
+            },
+            "canonicalDigest": "08028ddd3faa51edaba2c202b44f91c18e3f60ac5c74b353a14d4ab89ba5501d"
+          }
+        }
+      },
+      "synthetic-training-unit-v1": {
+        "entityId": "synthetic-training-unit-v1",
+        "entityTypeId": "synthetic/training-unit",
+        "revision": 1,
+        "lifecycleState": "ACTIVE",
+        "transform": {
+          "positionMicrounits": [
+            -3000000,
+            25000,
+            1000000
+          ],
+          "orientation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scaleMicrounits": [
+            1000000,
+            1000000,
+            1000000
+          ]
+        },
+        "parentEntityId": null,
+        "physicalBodyRef": {
+          "recordId": "synthetic-training-unit-body-v1",
+          "revision": 1,
+          "digest": "ddd80d4c6fd66ae59ab9b9d4deb33f0a453cde069c184582963d73a8472bc94c",
+          "proofGeometryDigest": "ddd80d4c6fd66ae59ab9b9d4deb33f0a453cde069c184582963d73a8472bc94c"
+        },
+        "geometrySourceRef": {
+          "recordId": "gate-a-unit-authoring-001",
+          "revision": 1,
+          "digest": "ddd80d4c6fd66ae59ab9b9d4deb33f0a453cde069c184582963d73a8472bc94c",
+          "classification": "AUTHORED_NEW",
+          "lineageStatus": "AUTHORED_NEW"
+        },
+        "participatesIn": [
+          "collision",
+          "support"
+        ],
+        "postureStateId": "rigid",
+        "physicalState": {
+          "active": true,
+          "surfaceId": "school/medical-bag-interior-floor",
+          "orientationUpDot": 1,
+          "supportNormalUpDot": 1
+        }
+      }
+    },
+    "physicalRelations": [],
+    "supportRelations": [
+      {
+        "relationId": "school:bag:floor",
+        "supportedEntityId": "school-medical-bag",
+        "supportedBodyRef": {
+          "id": "school-medical-bag-body",
+          "revision": 1,
+          "digest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a"
+        },
+        "contactRegionRef": {
+          "bodyId": "school-medical-bag-body",
+          "bodyRevision": 1,
+          "bodyDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+          "contactRegionId": "bag-full-footprint"
+        },
+        "contactRegionGeometry": {
+          "minX": -0.275,
+          "maxX": 0.275,
+          "minY": -0.175,
+          "maxY": 0.175,
+          "minZ": -0.175,
+          "maxZ": 0.175
+        },
+        "contactRegionDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+        "contactRole": "FULL_BODY",
+        "requirement": "REQUIRED",
+        "supportSourceKind": "STATIC_WORLD",
+        "boundWorldRevision": 1,
+        "surfaceModelRef": {
+          "id": "school-surface-v1",
+          "revision": 1,
+          "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf"
+        },
+        "surfaceId": "floor",
+        "expectedSurfaceType": "FLOOR",
+        "capabilityId": "full-footprint-floor",
+        "contactNormal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "evidenceRefs": [
+          "school-surface-model",
+          "phase2-v1-full-body-contact"
+        ]
+      },
+      {
+        "relationId": "school:casualty:floor",
+        "supportedEntityId": "school-casualty-adult-v1",
+        "supportedBodyRef": {
+          "id": "casualty/adult-v1/supine-floor",
+          "revision": 1,
+          "digest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+        },
+        "contactRegionRef": {
+          "bodyId": "casualty/adult-v1/supine-floor",
+          "bodyRevision": 1,
+          "bodyDigest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3",
+          "contactRegionId": "torso-floor-contact"
+        },
+        "contactRegionGeometry": {
+          "contactRegionId": "torso-floor-contact",
+          "kind": "HORIZONTAL_XZ_RECT",
+          "planeY": 0,
+          "region": {
+            "minX": -280000,
+            "maxX": 280000,
+            "minZ": -123000,
+            "maxZ": 527000
+          }
+        },
+        "contactRegionDigest": "a81faa1437446944e978e3d79a3b6dcdaa113415d11db5a1ca6207085b4601de",
+        "contactRole": "FULL_BODY",
+        "requirement": "REQUIRED",
+        "supportSourceKind": "STATIC_WORLD",
+        "boundWorldRevision": 1,
+        "surfaceModelRef": {
+          "id": "school-surface-v1",
+          "revision": 1,
+          "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf"
+        },
+        "surfaceId": "floor",
+        "expectedSurfaceType": "FLOOR",
+        "capabilityId": "full-footprint-floor",
+        "contactNormal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "evidenceRefs": [
+          "school-surface-model",
+          "phase2-v1-full-body-contact"
+        ]
+      },
+      {
+        "relationId": "school:chair:floor",
+        "supportedEntityId": "school-treatment-chair",
+        "supportedBodyRef": {
+          "id": "school/treatment-chair",
+          "revision": 1,
+          "digest": "1e78439ad5977c6c050475b4ac692cee9fce7da034725ea88a7ed4f0b0803247"
+        },
+        "contactRegionRef": {
+          "bodyId": "school/treatment-chair",
+          "bodyRevision": 1,
+          "bodyDigest": "1e78439ad5977c6c050475b4ac692cee9fce7da034725ea88a7ed4f0b0803247",
+          "contactRegionId": "chair-floor-contact"
+        },
+        "contactRegionGeometry": {
+          "contactRegionId": "chair-floor-contact",
+          "kind": "HORIZONTAL_XZ_RECT",
+          "planeY": 0,
+          "region": {
+            "minX": -250000,
+            "maxX": 250000,
+            "minZ": -250000,
+            "maxZ": 250000
+          }
+        },
+        "contactRegionDigest": "7bf790b12383cd8161dff560ae3e901aec003dd2a17c86423fd68f3f9b7698d1",
+        "contactRole": "FULL_BODY",
+        "requirement": "REQUIRED",
+        "supportSourceKind": "STATIC_WORLD",
+        "boundWorldRevision": 1,
+        "surfaceModelRef": {
+          "id": "school-surface-v1",
+          "revision": 1,
+          "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf"
+        },
+        "surfaceId": "floor",
+        "expectedSurfaceType": "FLOOR",
+        "capabilityId": "full-footprint-floor",
+        "contactNormal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "evidenceRefs": [
+          "school-surface-model",
+          "phase2-v1-full-body-contact"
+        ]
+      },
+      {
+        "relationId": "synthetic:unit:bag-interior-floor",
+        "supportedEntityId": "synthetic-training-unit-v1",
+        "supportedBodyRef": {
+          "id": "synthetic-training-unit-body-v1",
+          "revision": 1,
+          "digest": "ddd80d4c6fd66ae59ab9b9d4deb33f0a453cde069c184582963d73a8472bc94c"
+        },
+        "contactRegionRef": {
+          "bodyId": "synthetic-training-unit-body-v1",
+          "bodyRevision": 1,
+          "bodyDigest": "ddd80d4c6fd66ae59ab9b9d4deb33f0a453cde069c184582963d73a8472bc94c",
+          "contactRegionId": "unit-bottom-contact"
+        },
+        "contactRegionGeometry": {
+          "contactRegionId": "unit-bottom-contact",
+          "kind": "HORIZONTAL_XZ_RECT",
+          "planeY": 0,
+          "region": {
+            "minX": -100000,
+            "maxX": 100000,
+            "minZ": -40000,
+            "maxZ": 40000
+          }
+        },
+        "contactRegionDigest": "0b9adac1d74c924976980bc9c55e72a93454c129fd82dd89b52d8eb282c9d6fa",
+        "contactRole": "GENERIC",
+        "requirement": "REQUIRED",
+        "supportSourceKind": "ENTITY_OWNED",
+        "boundWorldRevision": 1,
+        "ownerEntityRef": {
+          "id": "school-medical-bag",
+          "revision": 1
+        },
+        "ownerBodyRef": {
+          "id": "school/medical-bag-owner-body",
+          "revision": 1,
+          "digest": "2409eedc6840f26c886128c0698c35cee266a087f1fca46f1b676a582514e070"
+        },
+        "supportSurfaceRef": {
+          "id": "school/medical-bag-interior-floor",
+          "revision": 1,
+          "digest": "d41d496181c4554f3dd9a7c01f2b408b4a4c2c1ae50d0af76fe0f574e2ee2427"
+        },
+        "supportVolumeRef": {
+          "id": "school/medical-bag-containment-interior",
+          "revision": 2,
+          "digest": "e0af9d06c4b2956abf6ea3f733db9fce7862e221b532e4f4ec095925db35ec6d"
+        },
+        "surfaceId": "school/medical-bag-interior-floor",
+        "contactNormal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "evidenceRefs": [
+          "gate-a-r1-v5-proposal",
+          "gate-a-r1-v4-proposal",
+          "owner-r1-q1:wamid.HBgMOTcyNTMyNDkwMzUxFQIAEhgUM0EwRTNFRDUxRDZDQzAwNEU2NjcA"
+        ]
+      }
+    ],
+    "surfaces": {
+      "id": "school-surface-v1",
+      "revision": 1,
+      "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf"
+    },
+    "environmentPhysicalState": {
+      "sceneBounds": {
+        "minX": -6920000,
+        "maxX": 6920000,
+        "minY": 0,
+        "maxY": 6000000,
+        "minZ": -3920000,
+        "maxZ": 6000000
+      },
+      "doorStates": [
+        {
+          "surfaceId": "door",
+          "state": "CLOSED",
+          "geometryDigest": "0808698899ba2cb6ab415350ee3cadd1796bf90388996cb59e183cbcb56c1f7d"
+        }
+      ]
+    },
+    "committedEventSequence": 1,
+    "stateDigest": "88b6e0190469a8ba32e02b83bb36d815c90532b889a9ad4786978b3ac1b90385"
+  },
+  "events": [
+    {
+      "eventType": "MutationCommitted",
+      "kind": "multi-support-transaction",
+      "id": "candidate:extended-genesis:9b2659ed5ede96488bdb555925b120bd95506f61e234f34e3058ddfd9c98a6eb",
+      "worldId": "school-treatment-room-v2",
+      "priorWorldRevision": 0,
+      "priorStateDigest": "cc2f27801d48bb1b9a8b813c78a413e50c552d6f11c103843b6acb7afe9bb887",
+      "commandDigest": "2f3610ffc7cf8ce23a8316f15d1d8285aa684f6057cf4a66846ff8524fc02d3e",
+      "newWorldRevision": 1,
+      "newStateDigest": "88b6e0190469a8ba32e02b83bb36d815c90532b889a9ad4786978b3ac1b90385",
+      "stateDelta": {
+        "entities": {
+          "school-casualty-adult-v1": {
+            "entityId": "school-casualty-adult-v1",
+            "entityTypeId": "school/casualty",
+            "revision": 1,
+            "lifecycleState": "ACTIVE",
+            "transform": {
+              "positionMicrounits": [
+                0,
+                0,
+                1000000
+              ],
+              "orientation": [
+                0,
+                0,
+                0,
+                1
+              ],
+              "scaleMicrounits": [
+                1000000,
+                1000000,
+                1000000
+              ]
+            },
+            "parentEntityId": null,
+            "physicalBodyRef": {
+              "recordId": "casualty/adult-v1/supine-floor",
+              "revision": 1,
+              "digest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3",
+              "proofGeometryDigest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+            },
+            "geometrySourceRef": {
+              "recordId": "DA-ADULT-V1-MALE-SUPINE-001",
+              "revision": 1,
+              "digest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3",
+              "classification": "AUTHORED_NEW",
+              "lineageStatus": "AUTHORED_NEW"
+            },
+            "participatesIn": [
+              "collision",
+              "support"
+            ],
+            "postureStateId": "adult-v1/supine-floor",
+            "physicalState": {
+              "active": true,
+              "surfaceId": "floor",
+              "orientationUpDot": 1,
+              "supportNormalUpDot": 1,
+              "profileRef": {
+                "id": "adult-v1",
+                "revision": 1,
+                "digest": "f1d973b4cfbebdfa230fe0257ccfe9c11056a7d07e52c3701d1e6772311bcc41",
+                "subjectSex": "MALE"
+              },
+              "postureRef": {
+                "id": "adult-v1/supine-floor",
+                "semanticType": "SUPINE_FLOOR",
+                "revision": 1,
+                "digest": "197a806537a3c9d9f629cf2a57d6db4031fa93ebea0618c2e18603f48301745e"
+              },
+              "supportCategory": {
+                "supportCategoryId": "school/floor-v1",
+                "supportSemanticType": "FLOOR",
+                "provenanceStatus": "RECOVERED",
+                "fixtureOnly": false
+              }
+            }
+          },
+          "school-medical-bag": {
+            "entityId": "school-medical-bag",
+            "entityTypeId": "school/medical-bag",
+            "revision": 1,
+            "lifecycleState": "ACTIVE",
+            "transform": {
+              "positionMicrounits": [
+                -3000000,
+                175000,
+                1000000
+              ],
+              "orientation": [
+                0,
+                0,
+                0,
+                1
+              ],
+              "scaleMicrounits": [
+                1000000,
+                1000000,
+                1000000
+              ]
+            },
+            "parentEntityId": null,
+            "physicalBodyRef": {
+              "recordId": "school-medical-bag-body",
+              "revision": 1,
+              "digest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+              "proofGeometryDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a"
+            },
+            "geometrySourceRef": {
+              "recordId": "index.html#school-bag-lockers",
+              "revision": 1,
+              "digest": "21ba7567961cbb9c022ab8a1f11359bf07049c506519a7656394cfc48fcc11ea",
+              "classification": "RECOVERED",
+              "lineageStatus": "RECOVERED"
+            },
+            "participatesIn": [
+              "collision",
+              "support"
+            ],
+            "postureStateId": "rigid",
+            "physicalState": {
+              "active": true,
+              "surfaceId": "floor",
+              "orientationUpDot": 1,
+              "supportNormalUpDot": 1,
+              "supportSurface": {
+                "supportSurfaceId": "school/medical-bag-interior-floor",
+                "surfaceRevision": 1,
+                "canonicalDigest": "d41d496181c4554f3dd9a7c01f2b408b4a4c2c1ae50d0af76fe0f574e2ee2427"
+              },
+              "supportVolume": {
+                "supportVolumeId": "school/medical-bag-containment-interior",
+                "volumeRevision": 2,
+                "canonicalDigest": "e0af9d06c4b2956abf6ea3f733db9fce7862e221b532e4f4ec095925db35ec6d"
+              }
+            }
+          },
+          "school-treatment-chair": {
+            "entityId": "school-treatment-chair",
+            "entityTypeId": "school/treatment-chair",
+            "revision": 1,
+            "lifecycleState": "ACTIVE",
+            "transform": {
+              "positionMicrounits": [
+                -2000000,
+                0,
+                1000000
+              ],
+              "orientation": [
+                0,
+                0,
+                0,
+                1
+              ],
+              "scaleMicrounits": [
+                1000000,
+                1000000,
+                1000000
+              ]
+            },
+            "parentEntityId": null,
+            "physicalBodyRef": {
+              "recordId": "school/treatment-chair",
+              "revision": 1,
+              "digest": "1e78439ad5977c6c050475b4ac692cee9fce7da034725ea88a7ed4f0b0803247",
+              "proofGeometryDigest": "1e78439ad5977c6c050475b4ac692cee9fce7da034725ea88a7ed4f0b0803247"
+            },
+            "geometrySourceRef": {
+              "recordId": "gate-c-chair-authoring-001",
+              "revision": 1,
+              "digest": "1e78439ad5977c6c050475b4ac692cee9fce7da034725ea88a7ed4f0b0803247",
+              "classification": "AUTHORED_NEW",
+              "lineageStatus": "AUTHORED_NEW"
+            },
+            "participatesIn": [
+              "collision",
+              "support-owner"
+            ],
+            "postureStateId": "rigid-upright",
+            "physicalState": {
+              "active": true,
+              "surfaceId": "floor",
+              "orientationUpDot": 1,
+              "supportNormalUpDot": 1,
+              "supportSurface": {
+                "schemaVersion": "1.0.0",
+                "supportSurfaceId": "school/treatment-chair-seat",
+                "surfaceRevision": 1,
+                "ownerDefinitionRef": {
+                  "id": "school/treatment-chair-entity",
+                  "revision": 1,
+                  "digest": "f41d2b14b2663930f7643bd986286de0d0b48d4652d0ec29dbf9b5f71a1ac61e"
+                },
+                "supportSemanticType": "SUPPORT_SURFACE",
+                "transformBinding": "OWNER_TRANSLATION_IDENTITY_ORIENTATION",
+                "localPlane": {
+                  "normal": [
+                    0,
+                    1000000,
+                    0
+                  ],
+                  "offsetMicrounits": 490000
+                },
+                "localRegion": {
+                  "minX": -240000,
+                  "maxX": 240000,
+                  "minZ": -240000,
+                  "maxZ": 240000
+                },
+                "contactRule": {
+                  "contactRuleId": "full-footprint-chair-seat",
+                  "policy": "FULL_FOOTPRINT"
+                },
+                "provenance": {
+                  "classification": "AUTHORED_NEW",
+                  "decisionId": "gate-c-chair-authoring-001"
+                },
+                "canonicalDigest": "08028ddd3faa51edaba2c202b44f91c18e3f60ac5c74b353a14d4ab89ba5501d"
+              }
+            }
+          },
+          "synthetic-training-unit-v1": {
+            "entityId": "synthetic-training-unit-v1",
+            "entityTypeId": "synthetic/training-unit",
+            "revision": 1,
+            "lifecycleState": "ACTIVE",
+            "transform": {
+              "positionMicrounits": [
+                -3000000,
+                25000,
+                1000000
+              ],
+              "orientation": [
+                0,
+                0,
+                0,
+                1
+              ],
+              "scaleMicrounits": [
+                1000000,
+                1000000,
+                1000000
+              ]
+            },
+            "parentEntityId": null,
+            "physicalBodyRef": {
+              "recordId": "synthetic-training-unit-body-v1",
+              "revision": 1,
+              "digest": "ddd80d4c6fd66ae59ab9b9d4deb33f0a453cde069c184582963d73a8472bc94c",
+              "proofGeometryDigest": "ddd80d4c6fd66ae59ab9b9d4deb33f0a453cde069c184582963d73a8472bc94c"
+            },
+            "geometrySourceRef": {
+              "recordId": "gate-a-unit-authoring-001",
+              "revision": 1,
+              "digest": "ddd80d4c6fd66ae59ab9b9d4deb33f0a453cde069c184582963d73a8472bc94c",
+              "classification": "AUTHORED_NEW",
+              "lineageStatus": "AUTHORED_NEW"
+            },
+            "participatesIn": [
+              "collision",
+              "support"
+            ],
+            "postureStateId": "rigid",
+            "physicalState": {
+              "active": true,
+              "surfaceId": "school/medical-bag-interior-floor",
+              "orientationUpDot": 1,
+              "supportNormalUpDot": 1
+            }
+          }
+        },
+        "supportRelations": [
+          {
+            "relationId": "school:bag:floor",
+            "supportedEntityId": "school-medical-bag",
+            "supportedBodyRef": {
+              "id": "school-medical-bag-body",
+              "revision": 1,
+              "digest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a"
+            },
+            "contactRegionRef": {
+              "bodyId": "school-medical-bag-body",
+              "bodyRevision": 1,
+              "bodyDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+              "contactRegionId": "bag-full-footprint"
+            },
+            "contactRegionGeometry": {
+              "minX": -0.275,
+              "maxX": 0.275,
+              "minY": -0.175,
+              "maxY": 0.175,
+              "minZ": -0.175,
+              "maxZ": 0.175
+            },
+            "contactRegionDigest": "f3630d860bbd1900c026aa392632cf73097273c4b7894745d92ac31bf75f2c5a",
+            "contactRole": "FULL_BODY",
+            "requirement": "REQUIRED",
+            "supportSourceKind": "STATIC_WORLD",
+            "boundWorldRevision": 1,
+            "surfaceModelRef": {
+              "id": "school-surface-v1",
+              "revision": 1,
+              "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf"
+            },
+            "surfaceId": "floor",
+            "expectedSurfaceType": "FLOOR",
+            "capabilityId": "full-footprint-floor",
+            "contactNormal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "evidenceRefs": [
+              "school-surface-model",
+              "phase2-v1-full-body-contact"
+            ]
+          },
+          {
+            "relationId": "school:casualty:floor",
+            "supportedEntityId": "school-casualty-adult-v1",
+            "supportedBodyRef": {
+              "id": "casualty/adult-v1/supine-floor",
+              "revision": 1,
+              "digest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+            },
+            "contactRegionRef": {
+              "bodyId": "casualty/adult-v1/supine-floor",
+              "bodyRevision": 1,
+              "bodyDigest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3",
+              "contactRegionId": "torso-floor-contact"
+            },
+            "contactRegionGeometry": {
+              "contactRegionId": "torso-floor-contact",
+              "kind": "HORIZONTAL_XZ_RECT",
+              "planeY": 0,
+              "region": {
+                "minX": -280000,
+                "maxX": 280000,
+                "minZ": -123000,
+                "maxZ": 527000
+              }
+            },
+            "contactRegionDigest": "a81faa1437446944e978e3d79a3b6dcdaa113415d11db5a1ca6207085b4601de",
+            "contactRole": "FULL_BODY",
+            "requirement": "REQUIRED",
+            "supportSourceKind": "STATIC_WORLD",
+            "boundWorldRevision": 1,
+            "surfaceModelRef": {
+              "id": "school-surface-v1",
+              "revision": 1,
+              "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf"
+            },
+            "surfaceId": "floor",
+            "expectedSurfaceType": "FLOOR",
+            "capabilityId": "full-footprint-floor",
+            "contactNormal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "evidenceRefs": [
+              "school-surface-model",
+              "phase2-v1-full-body-contact"
+            ]
+          },
+          {
+            "relationId": "school:chair:floor",
+            "supportedEntityId": "school-treatment-chair",
+            "supportedBodyRef": {
+              "id": "school/treatment-chair",
+              "revision": 1,
+              "digest": "1e78439ad5977c6c050475b4ac692cee9fce7da034725ea88a7ed4f0b0803247"
+            },
+            "contactRegionRef": {
+              "bodyId": "school/treatment-chair",
+              "bodyRevision": 1,
+              "bodyDigest": "1e78439ad5977c6c050475b4ac692cee9fce7da034725ea88a7ed4f0b0803247",
+              "contactRegionId": "chair-floor-contact"
+            },
+            "contactRegionGeometry": {
+              "contactRegionId": "chair-floor-contact",
+              "kind": "HORIZONTAL_XZ_RECT",
+              "planeY": 0,
+              "region": {
+                "minX": -250000,
+                "maxX": 250000,
+                "minZ": -250000,
+                "maxZ": 250000
+              }
+            },
+            "contactRegionDigest": "7bf790b12383cd8161dff560ae3e901aec003dd2a17c86423fd68f3f9b7698d1",
+            "contactRole": "FULL_BODY",
+            "requirement": "REQUIRED",
+            "supportSourceKind": "STATIC_WORLD",
+            "boundWorldRevision": 1,
+            "surfaceModelRef": {
+              "id": "school-surface-v1",
+              "revision": 1,
+              "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf"
+            },
+            "surfaceId": "floor",
+            "expectedSurfaceType": "FLOOR",
+            "capabilityId": "full-footprint-floor",
+            "contactNormal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "evidenceRefs": [
+              "school-surface-model",
+              "phase2-v1-full-body-contact"
+            ]
+          },
+          {
+            "relationId": "synthetic:unit:bag-interior-floor",
+            "supportedEntityId": "synthetic-training-unit-v1",
+            "supportedBodyRef": {
+              "id": "synthetic-training-unit-body-v1",
+              "revision": 1,
+              "digest": "ddd80d4c6fd66ae59ab9b9d4deb33f0a453cde069c184582963d73a8472bc94c"
+            },
+            "contactRegionRef": {
+              "bodyId": "synthetic-training-unit-body-v1",
+              "bodyRevision": 1,
+              "bodyDigest": "ddd80d4c6fd66ae59ab9b9d4deb33f0a453cde069c184582963d73a8472bc94c",
+              "contactRegionId": "unit-bottom-contact"
+            },
+            "contactRegionGeometry": {
+              "contactRegionId": "unit-bottom-contact",
+              "kind": "HORIZONTAL_XZ_RECT",
+              "planeY": 0,
+              "region": {
+                "minX": -100000,
+                "maxX": 100000,
+                "minZ": -40000,
+                "maxZ": 40000
+              }
+            },
+            "contactRegionDigest": "0b9adac1d74c924976980bc9c55e72a93454c129fd82dd89b52d8eb282c9d6fa",
+            "contactRole": "GENERIC",
+            "requirement": "REQUIRED",
+            "supportSourceKind": "ENTITY_OWNED",
+            "boundWorldRevision": 1,
+            "ownerEntityRef": {
+              "id": "school-medical-bag",
+              "revision": 1
+            },
+            "ownerBodyRef": {
+              "id": "school/medical-bag-owner-body",
+              "revision": 1,
+              "digest": "2409eedc6840f26c886128c0698c35cee266a087f1fca46f1b676a582514e070"
+            },
+            "supportSurfaceRef": {
+              "id": "school/medical-bag-interior-floor",
+              "revision": 1,
+              "digest": "d41d496181c4554f3dd9a7c01f2b408b4a4c2c1ae50d0af76fe0f574e2ee2427"
+            },
+            "supportVolumeRef": {
+              "id": "school/medical-bag-containment-interior",
+              "revision": 2,
+              "digest": "e0af9d06c4b2956abf6ea3f733db9fce7862e221b532e4f4ec095925db35ec6d"
+            },
+            "surfaceId": "school/medical-bag-interior-floor",
+            "contactNormal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "evidenceRefs": [
+              "gate-a-r1-v5-proposal",
+              "gate-a-r1-v4-proposal",
+              "owner-r1-q1:wamid.HBgMOTcyNTMyNDkwMzUxFQIAEhgUM0EwRTNFRDUxRDZDQzAwNEU2NjcA"
+            ]
+          }
+        ],
+        "lifecycleState": "ACTIVE",
+        "surfaces": {
+          "id": "school-surface-v1",
+          "revision": 1,
+          "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf"
+        },
+        "environmentPhysicalState": {
+          "sceneBounds": {
+            "minX": -6920000,
+            "maxX": 6920000,
+            "minY": 0,
+            "maxY": 6000000,
+            "minZ": -3920000,
+            "maxZ": 6000000
+          },
+          "doorStates": [
+            {
+              "surfaceId": "door",
+              "state": "CLOSED",
+              "geometryDigest": "0808698899ba2cb6ab415350ee3cadd1796bf90388996cb59e183cbcb56c1f7d"
+            }
+          ]
+        }
+      },
+      "sequence": 1,
+      "priorEventDigest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "eventDigest": "770adf6b8c1783b604a307fc9bf0d92288cf7d7bd68ef92b11f061976ebd0899"
+    }
+  ],
+  "replayedWorldDigest": "88b6e0190469a8ba32e02b83bb36d815c90532b889a9ad4786978b3ac1b90385",
+  "semanticContentMatchesOverlay": true,
+  "historyIdentityMatchesOverlay": false,
+  "limitations": [
+    "NOT_OPERATIONALLY_ADMITTED",
+    "ENVIRONMENT_IS_GENESIS_NOT_LEDGER_EVENT_CONSUMER_MUST_PIN_GENESIS_DIGEST",
+    "NOT_REGISTERED_OR_CONSUMED",
+    "NO_DOOR_PORT_OR_OPEN_PROOF",
+    "NO_DISPLAY_OPTICS_OR_MESH_OR_GAMEPLAY",
+    "NEW_HISTORY_DIGEST_REQUIRES_OWN_REVIEW_AND_ADMISSION_NOT_INHERITED"
+  ]
+}
