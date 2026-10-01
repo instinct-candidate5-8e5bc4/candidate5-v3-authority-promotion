@@ -1,0 +1,56 @@
+{
+  "closed": {
+    "status": "BLOCKED_EVIDENCE_ONLY",
+    "reason": "SWEPT_ENVELOPE_SOLID_CONTACT",
+    "classification": "NAVIGATION_PREPARATION_NOT_ADMITTED",
+    "operationalStatus": "UNKNOWN",
+    "hitSolid": "declared-door:CLOSED",
+    "pathBoundsMicrounits": {
+      "minX": 4965049,
+      "maxX": 5774951,
+      "minY": 1195049,
+      "maxY": 2004951,
+      "minZ": -4904951,
+      "maxZ": -2395049
+    },
+    "cameraEnvelopeRadiusMicrounits": 404951,
+    "floorPlaneMicrounits": 0,
+    "declaredDoorState": "CLOSED",
+    "doorStateAuthority": "CLOSED_PREPARATION_BASELINE",
+    "limitations": [
+      "NEW_GEOMETRY_NOT_REGISTERED_OR_WORLD_ADMITTED",
+      "CALLER_DECLARED_PATH_STATE_NOT_COMMITTED_NAVIGATION",
+      "CONSERVATIVE_AABB_FALSE_REJECTION_POSSIBLE",
+      "NO_CONTROL_INPUT_RENDER_CLIPPING_PIXEL_OR_GENERAL_GAMEPLAY_PROOF",
+      "OPEN_HYPOTHETICAL_ONLY_OWNER_ACTIVATION_PENDING",
+      "NO_RUNTIME_CONSUMER_OR_PRODUCTION_CLINICAL_UNLOCK"
+    ]
+  },
+  "hypotheticalOpen": {
+    "status": "PATH_CLEAR_EVIDENCE_ONLY_NOT_ADMITTED",
+    "reason": "CONSERVATIVE_SWEPT_ENVELOPE_CLEAR",
+    "classification": "NAVIGATION_PREPARATION_NOT_ADMITTED",
+    "operationalStatus": "UNKNOWN",
+    "hitSolid": null,
+    "pathBoundsMicrounits": {
+      "minX": 4965049,
+      "maxX": 5774951,
+      "minY": 1195049,
+      "maxY": 2004951,
+      "minZ": -4904951,
+      "maxZ": -2395049
+    },
+    "cameraEnvelopeRadiusMicrounits": 404951,
+    "floorPlaneMicrounits": 0,
+    "declaredDoorState": "OPEN",
+    "doorStateAuthority": "HYPOTHETICAL_NOT_APPROVED_ACTIVATION",
+    "limitations": [
+      "NEW_GEOMETRY_NOT_REGISTERED_OR_WORLD_ADMITTED",
+      "CALLER_DECLARED_PATH_STATE_NOT_COMMITTED_NAVIGATION",
+      "CONSERVATIVE_AABB_FALSE_REJECTION_POSSIBLE",
+      "NO_CONTROL_INPUT_RENDER_CLIPPING_PIXEL_OR_GENERAL_GAMEPLAY_PROOF",
+      "OPEN_HYPOTHETICAL_ONLY_OWNER_ACTIVATION_PENDING",
+      "NO_RUNTIME_CONSUMER_OR_PRODUCTION_CLINICAL_UNLOCK"
+    ]
+  }
+}
