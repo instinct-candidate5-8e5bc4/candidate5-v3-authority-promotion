@@ -1,0 +1,467 @@
+{
+  "preparation": {
+    "kind": "EMPTY_TREATMENT_WORLD_GENESIS_PREPARATION_NOT_ADMITTED",
+    "surfaceModel": {
+      "surfaceModelId": "school-passable-door-proposal",
+      "revision": 1,
+      "units": "METERS",
+      "surfaces": [
+        {
+          "surfaceId": "floor",
+          "type": "FLOOR",
+          "region": {
+            "allowed": [
+              {
+                "regionId": "floor-positive",
+                "minX": -7,
+                "maxX": 7,
+                "minZ": -4,
+                "maxZ": 6
+              },
+              {
+                "regionId": "proposed-landing-apron",
+                "minX": 4.565,
+                "maxX": 6.175,
+                "minZ": -5.69,
+                "maxZ": -3.92
+              }
+            ],
+            "volumes": []
+          },
+          "planeOrDepth": {
+            "kind": "PLANE",
+            "planeY": 0
+          },
+          "contactRules": [
+            {
+              "contactRuleId": "full-footprint-floor",
+              "policy": "FULL_FOOTPRINT"
+            }
+          ],
+          "confidence": "AUTHORED_GEOMETRY_EXACT",
+          "provenance": {
+            "artifact": "index.html",
+            "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+            "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+            "verification": "exact bytes at locked commit 30cb23e"
+          }
+        },
+        {
+          "surfaceId": "left-wall",
+          "type": "WALL",
+          "region": {
+            "allowed": [],
+            "volumes": [
+              {
+                "volumeId": "left-wall-box",
+                "minX": -7.08,
+                "maxX": -6.92,
+                "minY": 0,
+                "maxY": 6,
+                "minZ": -6,
+                "maxZ": 6
+              }
+            ]
+          },
+          "planeOrDepth": {
+            "kind": "BOX_DEPTH",
+            "planeY": 0
+          },
+          "contactRules": [],
+          "confidence": "AUTHORED_GEOMETRY_EXACT",
+          "provenance": {
+            "artifact": "index.html",
+            "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+            "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+            "verification": "exact bytes at locked commit 30cb23e"
+          }
+        },
+        {
+          "surfaceId": "right-wall",
+          "type": "WALL",
+          "region": {
+            "allowed": [],
+            "volumes": [
+              {
+                "volumeId": "right-wall-box",
+                "minX": 6.92,
+                "maxX": 7.08,
+                "minY": 0,
+                "maxY": 6,
+                "minZ": -6,
+                "maxZ": 6
+              }
+            ]
+          },
+          "planeOrDepth": {
+            "kind": "BOX_DEPTH",
+            "planeY": 0
+          },
+          "contactRules": [],
+          "confidence": "AUTHORED_GEOMETRY_EXACT",
+          "provenance": {
+            "artifact": "index.html",
+            "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+            "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+            "verification": "exact bytes at locked commit 30cb23e"
+          }
+        },
+        {
+          "surfaceId": "locker-0",
+          "type": "OBSTACLE",
+          "region": {
+            "allowed": [],
+            "volumes": [
+              {
+                "volumeId": "locker-0-box",
+                "minX": -4.5,
+                "maxX": -3.5,
+                "minY": 0,
+                "maxY": 2.4,
+                "minZ": -3.775,
+                "maxZ": -3.225
+              }
+            ]
+          },
+          "planeOrDepth": {
+            "kind": "BOX_DEPTH",
+            "planeY": 0
+          },
+          "contactRules": [],
+          "confidence": "AUTHORED_GEOMETRY_EXACT",
+          "provenance": {
+            "artifact": "index.html",
+            "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+            "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+            "verification": "exact bytes at locked commit 30cb23e"
+          }
+        },
+        {
+          "surfaceId": "locker-1",
+          "type": "OBSTACLE",
+          "region": {
+            "allowed": [],
+            "volumes": [
+              {
+                "volumeId": "locker-1-box",
+                "minX": -2.5,
+                "maxX": -1.5,
+                "minY": 0,
+                "maxY": 2.4,
+                "minZ": -3.775,
+                "maxZ": -3.225
+              }
+            ]
+          },
+          "planeOrDepth": {
+            "kind": "BOX_DEPTH",
+            "planeY": 0
+          },
+          "contactRules": [],
+          "confidence": "AUTHORED_GEOMETRY_EXACT",
+          "provenance": {
+            "artifact": "index.html",
+            "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+            "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+            "verification": "exact bytes at locked commit 30cb23e"
+          }
+        },
+        {
+          "surfaceId": "locker-2",
+          "type": "OBSTACLE",
+          "region": {
+            "allowed": [],
+            "volumes": [
+              {
+                "volumeId": "locker-2-box",
+                "minX": -0.5,
+                "maxX": 0.5,
+                "minY": 0,
+                "maxY": 2.4,
+                "minZ": -3.775,
+                "maxZ": -3.225
+              }
+            ]
+          },
+          "planeOrDepth": {
+            "kind": "BOX_DEPTH",
+            "planeY": 0
+          },
+          "contactRules": [],
+          "confidence": "AUTHORED_GEOMETRY_EXACT",
+          "provenance": {
+            "artifact": "index.html",
+            "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+            "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+            "verification": "exact bytes at locked commit 30cb23e"
+          }
+        },
+        {
+          "surfaceId": "locker-3",
+          "type": "OBSTACLE",
+          "region": {
+            "allowed": [],
+            "volumes": [
+              {
+                "volumeId": "locker-3-box",
+                "minX": 1.5,
+                "maxX": 2.5,
+                "minY": 0,
+                "maxY": 2.4,
+                "minZ": -3.775,
+                "maxZ": -3.225
+              }
+            ]
+          },
+          "planeOrDepth": {
+            "kind": "BOX_DEPTH",
+            "planeY": 0
+          },
+          "contactRules": [],
+          "confidence": "AUTHORED_GEOMETRY_EXACT",
+          "provenance": {
+            "artifact": "index.html",
+            "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+            "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+            "verification": "exact bytes at locked commit 30cb23e"
+          }
+        },
+        {
+          "surfaceId": "locker-4",
+          "type": "OBSTACLE",
+          "region": {
+            "allowed": [],
+            "volumes": [
+              {
+                "volumeId": "locker-4-box",
+                "minX": 3.5,
+                "maxX": 4.5,
+                "minY": 0,
+                "maxY": 2.4,
+                "minZ": -3.775,
+                "maxZ": -3.225
+              }
+            ]
+          },
+          "planeOrDepth": {
+            "kind": "BOX_DEPTH",
+            "planeY": 0
+          },
+          "contactRules": [],
+          "confidence": "AUTHORED_GEOMETRY_EXACT",
+          "provenance": {
+            "artifact": "index.html",
+            "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+            "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+            "verification": "exact bytes at locked commit 30cb23e"
+          }
+        },
+        {
+          "surfaceId": "back-wall-opening",
+          "type": "WALL",
+          "region": {
+            "allowed": [],
+            "volumes": [
+              {
+                "volumeId": "back-wall-opening:0",
+                "minX": -9,
+                "maxX": 4.565,
+                "minY": 0,
+                "maxY": 6,
+                "minZ": -4.08,
+                "maxZ": -3.92
+              },
+              {
+                "volumeId": "back-wall-opening:1",
+                "minX": 6.175,
+                "maxX": 9,
+                "minY": 0,
+                "maxY": 6,
+                "minZ": -4.08,
+                "maxZ": -3.92
+              },
+              {
+                "volumeId": "back-wall-opening:2",
+                "minX": 4.565,
+                "maxX": 6.175,
+                "minY": 3,
+                "maxY": 6,
+                "minZ": -4.08,
+                "maxZ": -3.92
+              }
+            ]
+          },
+          "confidence": "NEW_AUTHORED_PROPOSAL_NOT_ADMITTED"
+        },
+        {
+          "surfaceId": "door-frame",
+          "type": "OBSTACLE",
+          "region": {
+            "allowed": [],
+            "volumes": [
+              {
+                "volumeId": "door-frame:0",
+                "minX": 4.565,
+                "maxX": 4.645,
+                "minY": 0,
+                "maxY": 3,
+                "minZ": -4.08,
+                "maxZ": -3.92
+              },
+              {
+                "volumeId": "door-frame:1",
+                "minX": 6.095,
+                "maxX": 6.175,
+                "minY": 0,
+                "maxY": 3,
+                "minZ": -4.08,
+                "maxZ": -3.92
+              },
+              {
+                "volumeId": "door-frame:2",
+                "minX": 4.565,
+                "maxX": 6.175,
+                "minY": 2.92,
+                "maxY": 3,
+                "minZ": -4.08,
+                "maxZ": -3.92
+              }
+            ]
+          },
+          "confidence": "NEW_AUTHORED_PROPOSAL_NOT_ADMITTED"
+        }
+      ],
+      "doorDefinition": {
+        "doorId": "school-authoritative-door-proposal",
+        "pivot": {
+          "xMicrounits": 4725000,
+          "yMicrounits": 0,
+          "zMicrounits": -4000000
+        },
+        "closedLeaf": {
+          "minX": 4725000,
+          "maxX": 6075000,
+          "minY": 0,
+          "maxY": 2900000,
+          "minZ": -4060000,
+          "maxZ": -3940000
+        },
+        "openLeaf": {
+          "minX": 4665000,
+          "maxX": 4785000,
+          "minY": 0,
+          "maxY": 2900000,
+          "minZ": -4000000,
+          "maxZ": -2650000
+        },
+        "designDimensionsMicrounits": {
+          "frameThickness": 80000,
+          "oppositeAndHeaderMargin": 100000,
+          "hingeSideMargin": 160000,
+          "openLeafToJambClearance": 20000
+        }
+      },
+      "provenance": {
+        "kind": "NEW_SCENE_SEMANTIC_PROPOSAL",
+        "originalSurfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+        "doorProposalDigest": "ecdab627b32dc39655c78538fb8bdf9ee89ce53ae54623124593265531a17ccf"
+      },
+      "limitations": [
+        "NO_ADMISSION_INHERITANCE",
+        "NO_PATIENT_ENTITY_SUPPORT_COMMIT_PROOF",
+        "NO_OPEN_COMMAND_SWING_OR_CONCURRENT_CAMERA_PROOF",
+        "APRON_DESTINATION_PROPOSED_OWNER_DECISION_OPEN",
+        "NO_RUNTIME_RENDER_NAVIGATION_OR_PRODUCTION_ACTIVATION"
+      ],
+      "surfaceModelDigest": "c6421891f041c8b0eefc543aaa7296249f07bbeeeaca852b5aa44bc31f2fb655"
+    },
+    "genesis": {
+      "stateSchemaVersion": "2.0.0",
+      "worldId": "school-passable-door-empty-proposal",
+      "sceneDefinitionRef": {
+        "sceneId": "school-passable-door-proposal",
+        "revision": 1,
+        "digest": "c6421891f041c8b0eefc543aaa7296249f07bbeeeaca852b5aa44bc31f2fb655"
+      },
+      "revision": 0,
+      "priorStateDigest": null,
+      "lifecycleState": "INITIALIZING",
+      "entities": {},
+      "physicalRelations": [],
+      "supportRelations": [],
+      "surfaces": {
+        "id": "school-passable-door-proposal",
+        "revision": 1,
+        "digest": "c6421891f041c8b0eefc543aaa7296249f07bbeeeaca852b5aa44bc31f2fb655"
+      },
+      "environmentPhysicalState": {
+        "surfaceModelDigest": "c6421891f041c8b0eefc543aaa7296249f07bbeeeaca852b5aa44bc31f2fb655",
+        "doorEntities": [
+          {
+            "entityId": "school-authoritative-door-proposal",
+            "definitionDigest": "61ae6c1f250594a97013b32a2e8556921694000e792fd2c761543545233bf6ed",
+            "state": "CLOSED",
+            "transform": {
+              "pivot": {
+                "xMicrounits": 4725000,
+                "yMicrounits": 0,
+                "zMicrounits": -4000000
+              },
+              "rotationDegrees": 0
+            },
+            "collisionBoundsMicrounits": {
+              "minX": 4725000,
+              "maxX": 6075000,
+              "minY": 0,
+              "maxY": 2900000,
+              "minZ": -4060000,
+              "maxZ": -3940000
+            }
+          }
+        ],
+        "landingApronClassification": "NEW_PROPOSED_DESTINATION_NOT_EXISTING_CORRIDOR"
+      },
+      "committedEventSequence": 0,
+      "stateDigest": "0ef7df8329b35f7e6cb75ebc9a29302d650c68d585c79611d08fc0c403698cd0"
+    },
+    "events": [],
+    "replayedWorldDigest": "0ef7df8329b35f7e6cb75ebc9a29302d650c68d585c79611d08fc0c403698cd0",
+    "limitations": [
+      "NO_ADMISSION_INHERITANCE",
+      "NO_PATIENT_ENTITY_SUPPORT_COMMIT_PROOF",
+      "NO_OPEN_COMMAND_SWING_OR_CONCURRENT_CAMERA_PROOF",
+      "APRON_DESTINATION_PROPOSED_OWNER_DECISION_OPEN",
+      "NO_RUNTIME_RENDER_NAVIGATION_OR_PRODUCTION_ACTIVATION"
+    ]
+  },
+  "closedProjection": {
+    "status": "CLOSED_GENESIS_COLLISION_PROJECTION_PREPARED_NOT_ADMITTED",
+    "worldDigest": "0ef7df8329b35f7e6cb75ebc9a29302d650c68d585c79611d08fc0c403698cd0",
+    "modelDigest": "c6421891f041c8b0eefc543aaa7296249f07bbeeeaca852b5aa44bc31f2fb655",
+    "doorEntityId": "school-authoritative-door-proposal",
+    "leafCollisionBoundsMicrounits": {
+      "minX": 4725000,
+      "maxX": 6075000,
+      "minY": 0,
+      "maxY": 2900000,
+      "minZ": -4060000,
+      "maxZ": -3940000
+    },
+    "doorTransform": {
+      "pivot": {
+        "xMicrounits": 4725000,
+        "yMicrounits": 0,
+        "zMicrounits": -4000000
+      },
+      "rotationDegrees": 0
+    },
+    "operationalStatus": "UNKNOWN",
+    "limitations": [
+      "NO_ADMISSION_INHERITANCE",
+      "NO_PATIENT_ENTITY_SUPPORT_COMMIT_PROOF",
+      "NO_OPEN_COMMAND_SWING_OR_CONCURRENT_CAMERA_PROOF",
+      "APRON_DESTINATION_PROPOSED_OWNER_DECISION_OPEN",
+      "NO_RUNTIME_RENDER_NAVIGATION_OR_PRODUCTION_ACTIVATION"
+    ]
+  }
+}
