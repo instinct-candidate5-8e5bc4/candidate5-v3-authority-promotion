@@ -1,0 +1,405 @@
+{
+  "kind": "ACTUAL_MUTATION_REJECTION_READINESS_NOT_ADMITTED",
+  "transaction": {
+    "transactionId": "new-world-preparation-rejection",
+    "expectedWorldRevision": 0,
+    "commands": [
+      {
+        "type": "SpawnEntity",
+        "commandId": "rejection:spawn",
+        "expectedWorldRevision": 0,
+        "entity": {
+          "entityId": "school-casualty-adult-v1",
+          "entityTypeId": "school/casualty",
+          "revision": 1,
+          "lifecycleState": "ACTIVE",
+          "transform": {
+            "positionMicrounits": [
+              0,
+              0,
+              1000000
+            ],
+            "orientation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scaleMicrounits": [
+              1000000,
+              1000000,
+              1000000
+            ]
+          },
+          "parentEntityId": null,
+          "physicalBodyRef": {
+            "recordId": "casualty/adult-v1/supine-floor",
+            "revision": 1,
+            "digest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3",
+            "proofGeometryDigest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+          },
+          "geometrySourceRef": {
+            "recordId": "DA-ADULT-V1-MALE-SUPINE-001",
+            "revision": 1,
+            "digest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3",
+            "classification": "AUTHORED_NEW",
+            "lineageStatus": "AUTHORED_NEW"
+          },
+          "participatesIn": [
+            "collision",
+            "support"
+          ],
+          "postureStateId": "adult-v1/supine-floor",
+          "physicalState": {
+            "active": true,
+            "surfaceId": "floor",
+            "orientationUpDot": 1,
+            "supportNormalUpDot": 1,
+            "profileRef": {
+              "id": "adult-v1",
+              "revision": 1,
+              "digest": "f1d973b4cfbebdfa230fe0257ccfe9c11056a7d07e52c3701d1e6772311bcc41",
+              "subjectSex": "MALE"
+            },
+            "postureRef": {
+              "id": "adult-v1/supine-floor",
+              "semanticType": "SUPINE_FLOOR",
+              "revision": 1,
+              "digest": "197a806537a3c9d9f629cf2a57d6db4031fa93ebea0618c2e18603f48301745e"
+            },
+            "supportCategory": {
+              "supportCategoryId": "school/floor-v1",
+              "supportSemanticType": "FLOOR",
+              "provenanceStatus": "RECOVERED",
+              "fixtureOnly": false
+            }
+          }
+        }
+      },
+      {
+        "type": "AttachSupportRelation",
+        "commandId": "rejection:support",
+        "expectedWorldRevision": 0,
+        "relation": {
+          "relationId": "school:casualty:floor",
+          "supportedEntityId": "school-casualty-adult-v1",
+          "supportedBodyRef": {
+            "id": "casualty/adult-v1/supine-floor",
+            "revision": 1,
+            "digest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+          },
+          "contactRegionRef": {
+            "bodyId": "casualty/adult-v1/supine-floor",
+            "bodyRevision": 1,
+            "bodyDigest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3",
+            "contactRegionId": "torso-floor-contact"
+          },
+          "contactRegionGeometry": {
+            "contactRegionId": "torso-floor-contact",
+            "kind": "HORIZONTAL_XZ_RECT",
+            "planeY": 0,
+            "region": {
+              "minX": -280000,
+              "maxX": 280000,
+              "minZ": -123000,
+              "maxZ": 527000
+            }
+          },
+          "contactRegionDigest": "a81faa1437446944e978e3d79a3b6dcdaa113415d11db5a1ca6207085b4601de",
+          "contactRole": "FULL_BODY",
+          "requirement": "REQUIRED",
+          "supportSourceKind": "STATIC_WORLD",
+          "boundWorldRevision": 1,
+          "surfaceModelRef": {
+            "id": "school-passable-door-proposal",
+            "revision": 1,
+            "digest": "c6421891f041c8b0eefc543aaa7296249f07bbeeeaca852b5aa44bc31f2fb655"
+          },
+          "surfaceId": "floor",
+          "expectedSurfaceType": "FLOOR",
+          "capabilityId": "full-footprint-floor",
+          "contactNormal": {
+            "x": 0,
+            "y": 1,
+            "z": 0
+          },
+          "evidenceRefs": [
+            "school-surface-model",
+            "phase2-v1-full-body-contact"
+          ]
+        }
+      }
+    ]
+  },
+  "result": {
+    "status": "REJECTED",
+    "code": "LEGALITY_OLD_EVIDENCE_REUSE_CLEAR_NOT_ADMITTED",
+    "evidence": {
+      "detail": {
+        "outcome": "OLD_EVIDENCE_REUSE_CLEAR_NOT_ADMITTED",
+        "reason": "QUERY_SCOPED_IDENTICAL_FLOOR_LOCKER_EVIDENCE_PLUS_NEW_SOLID_CHECK",
+        "classification": "NEW_WORLD_LEGALITY_PREPARATION_NOT_ADMITTED",
+        "reuseRegionProofDigest": "baf91b2083b03abc67f55d91e54385fa0270f1c16d06afa8ad76f86c93d357ed",
+        "oldEvidence": {
+          "adapterKind": "SCHOOL_PHASE2_GEOMETRY_ADAPTER",
+          "request": {
+            "requestId": "tx:new-world-preparation-rejection:school-casualty-adult-v1",
+            "surfaceId": "floor",
+            "surfaceModelRef": {
+              "id": "school-surface-v1",
+              "revision": 1,
+              "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf"
+            },
+            "geometry": {
+              "minX": -0.33,
+              "maxX": 0.33,
+              "minY": 0,
+              "maxY": 0.302,
+              "minZ": -1.179,
+              "maxZ": 0.767
+            },
+            "geometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+            "proofGeometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+            "transform": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "orientationUpDot": 1,
+            "supportNormalUpDot": 1,
+            "evidenceRefs": [
+              "authoring-decision:DA-ADULT-V1-MALE-SUPINE-001",
+              "body-digest:5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+            ]
+          },
+          "requestDigest": "629735b536fc08037dbbd27a9db86b21b030f24c673f51ca54520110731f761f",
+          "requestBytes": "{\"evidenceRefs\":[\"authoring-decision:DA-ADULT-V1-MALE-SUPINE-001\",\"body-digest:5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3\"],\"geometry\":{\"maxX\":0.33,\"maxY\":0.302,\"maxZ\":0.767,\"minX\":-0.33,\"minY\":0,\"minZ\":-1.179},\"geometryDigest\":\"d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff\",\"orientationUpDot\":1,\"proofGeometryDigest\":\"d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff\",\"requestId\":\"tx:new-world-preparation-rejection:school-casualty-adult-v1\",\"supportNormalUpDot\":1,\"surfaceId\":\"floor\",\"surfaceModelRef\":{\"digest\":\"308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf\",\"id\":\"school-surface-v1\",\"revision\":1},\"transform\":{\"x\":0,\"y\":0,\"z\":1}}",
+          "sceneProvenance": {
+            "sceneId": "school",
+            "classification": "RECOVERED",
+            "lineageStatus": "RECOVERED",
+            "sourceId": "index.html",
+            "revision": 1,
+            "digest": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+            "sourceRangeId": "school-bag-lockers"
+          },
+          "bodyProvenance": {
+            "classification": "AUTHORED_NEW",
+            "lineageStatus": "AUTHORED_NEW",
+            "sourceId": "DA-ADULT-V1-MALE-SUPINE-001",
+            "revision": 1,
+            "digest": "5c3eaa82412038d16cde2bafe5547a5db0c58fdb237da85fce478679063981d3"
+          },
+          "surfaceProvenance": {
+            "classification": "RECOVERED",
+            "lineageStatus": "RECOVERED",
+            "sourceId": "evidence/verified-architecture-phase2/surface-models/school.json",
+            "revision": 1,
+            "digest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+            "sourceEvidence": {
+              "source": {
+                "artifact": "index.html",
+                "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+                "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+                "verification": "exact bytes at locked commit 30cb23e"
+              },
+              "panorama": "c85dc927ac565ed863f7f8e0bbaddd0fc66120b542630d3aa57e6163a5684361",
+              "panoramaRole": "PIXEL_DIAGNOSTIC_ONLY",
+              "geometryBindingStatus": "UNKNOWN"
+            },
+            "resolvedSurface": {
+              "artifact": "index.html",
+              "sha256": "e1955f80d07ae2660b48fc2fce6cca68da30e9de4848e691e4fa3fa052191618",
+              "origin": "RECOVERED canonical production source committed at Recovery Baseline 11c5ba0",
+              "verification": "exact bytes at locked commit 30cb23e"
+            }
+          },
+          "phase2ReasonCode": "GEOMETRY_GATE_PASS",
+          "phase2Evidence": {
+            "requestId": "tx:new-world-preparation-rejection:school-casualty-adult-v1",
+            "sceneId": "school",
+            "surfaceId": "floor",
+            "checkedGeometryDigest": "d8b4c795ddddf4bd6273c26b2f95e4b13b06ede227485bfef461314aed4405ff",
+            "surfaceModelDigest": "308951f841bd9be7a56d5d14ee1852c0cffe66b30d29d6a34f7a7da6bb0555cf",
+            "pixelEvidenceUsedAsAuthority": false,
+            "autoFixed": false,
+            "bounds": {
+              "minX": -0.33,
+              "maxX": 0.33,
+              "minY": 0,
+              "maxY": 0.302,
+              "minZ": -0.17900000000000005,
+              "maxZ": 1.767
+            },
+            "allowedRegionIds": [
+              "floor-positive"
+            ],
+            "contactRuleId": "full-footprint-floor",
+            "fullFootprintEvaluated": true,
+            "geometryGateBinding": true
+          },
+          "phase2ProofDigest": "02f31e09c69fa3a4682b0c2e17fc70617f76555ff4d0395ee331dd2ac4c05cd8"
+        },
+        "limitations": [
+          "OLD_QUERY_EVIDENCE_ONLY_NOT_NEW_MODEL_ADMISSION",
+          "CHANGED_REGION_AND_APRON_QUERIES_UNKNOWN",
+          "NO_RUNTIME_COMMIT_RENDER_OR_MOVEMENT_ACTIVATION"
+        ]
+      }
+    },
+    "state": {
+      "stateSchemaVersion": "2.0.0",
+      "worldId": "school-passable-door-empty-proposal",
+      "sceneDefinitionRef": {
+        "sceneId": "school-passable-door-proposal",
+        "revision": 1,
+        "digest": "c6421891f041c8b0eefc543aaa7296249f07bbeeeaca852b5aa44bc31f2fb655"
+      },
+      "revision": 0,
+      "priorStateDigest": null,
+      "lifecycleState": "INITIALIZING",
+      "entities": {},
+      "physicalRelations": [],
+      "supportRelations": [],
+      "surfaces": {
+        "id": "school-passable-door-proposal",
+        "revision": 1,
+        "digest": "c6421891f041c8b0eefc543aaa7296249f07bbeeeaca852b5aa44bc31f2fb655"
+      },
+      "environmentPhysicalState": {
+        "surfaceModelDigest": "c6421891f041c8b0eefc543aaa7296249f07bbeeeaca852b5aa44bc31f2fb655",
+        "doorEntities": [
+          {
+            "entityId": "school-authoritative-door-proposal",
+            "definitionDigest": "61ae6c1f250594a97013b32a2e8556921694000e792fd2c761543545233bf6ed",
+            "state": "CLOSED",
+            "transform": {
+              "pivot": {
+                "xMicrounits": 4725000,
+                "yMicrounits": 0,
+                "zMicrounits": -4000000
+              },
+              "rotationDegrees": 0
+            },
+            "collisionBoundsMicrounits": {
+              "minX": 4725000,
+              "maxX": 6075000,
+              "minY": 0,
+              "maxY": 2900000,
+              "minZ": -4060000,
+              "maxZ": -3940000
+            }
+          }
+        ],
+        "landingApronClassification": "NEW_PROPOSED_DESTINATION_NOT_EXISTING_CORRIDOR"
+      },
+      "committedEventSequence": 0,
+      "stateDigest": "0ef7df8329b35f7e6cb75ebc9a29302d650c68d585c79611d08fc0c403698cd0"
+    }
+  },
+  "genesis": {
+    "stateSchemaVersion": "2.0.0",
+    "worldId": "school-passable-door-empty-proposal",
+    "sceneDefinitionRef": {
+      "sceneId": "school-passable-door-proposal",
+      "revision": 1,
+      "digest": "c6421891f041c8b0eefc543aaa7296249f07bbeeeaca852b5aa44bc31f2fb655"
+    },
+    "revision": 0,
+    "priorStateDigest": null,
+    "lifecycleState": "INITIALIZING",
+    "entities": {},
+    "physicalRelations": [],
+    "supportRelations": [],
+    "surfaces": {
+      "id": "school-passable-door-proposal",
+      "revision": 1,
+      "digest": "c6421891f041c8b0eefc543aaa7296249f07bbeeeaca852b5aa44bc31f2fb655"
+    },
+    "environmentPhysicalState": {
+      "surfaceModelDigest": "c6421891f041c8b0eefc543aaa7296249f07bbeeeaca852b5aa44bc31f2fb655",
+      "doorEntities": [
+        {
+          "entityId": "school-authoritative-door-proposal",
+          "definitionDigest": "61ae6c1f250594a97013b32a2e8556921694000e792fd2c761543545233bf6ed",
+          "state": "CLOSED",
+          "transform": {
+            "pivot": {
+              "xMicrounits": 4725000,
+              "yMicrounits": 0,
+              "zMicrounits": -4000000
+            },
+            "rotationDegrees": 0
+          },
+          "collisionBoundsMicrounits": {
+            "minX": 4725000,
+            "maxX": 6075000,
+            "minY": 0,
+            "maxY": 2900000,
+            "minZ": -4060000,
+            "maxZ": -3940000
+          }
+        }
+      ],
+      "landingApronClassification": "NEW_PROPOSED_DESTINATION_NOT_EXISTING_CORRIDOR"
+    },
+    "committedEventSequence": 0,
+    "stateDigest": "0ef7df8329b35f7e6cb75ebc9a29302d650c68d585c79611d08fc0c403698cd0"
+  },
+  "after": {
+    "stateSchemaVersion": "2.0.0",
+    "worldId": "school-passable-door-empty-proposal",
+    "sceneDefinitionRef": {
+      "sceneId": "school-passable-door-proposal",
+      "revision": 1,
+      "digest": "c6421891f041c8b0eefc543aaa7296249f07bbeeeaca852b5aa44bc31f2fb655"
+    },
+    "revision": 0,
+    "priorStateDigest": null,
+    "lifecycleState": "INITIALIZING",
+    "entities": {},
+    "physicalRelations": [],
+    "supportRelations": [],
+    "surfaces": {
+      "id": "school-passable-door-proposal",
+      "revision": 1,
+      "digest": "c6421891f041c8b0eefc543aaa7296249f07bbeeeaca852b5aa44bc31f2fb655"
+    },
+    "environmentPhysicalState": {
+      "surfaceModelDigest": "c6421891f041c8b0eefc543aaa7296249f07bbeeeaca852b5aa44bc31f2fb655",
+      "doorEntities": [
+        {
+          "entityId": "school-authoritative-door-proposal",
+          "definitionDigest": "61ae6c1f250594a97013b32a2e8556921694000e792fd2c761543545233bf6ed",
+          "state": "CLOSED",
+          "transform": {
+            "pivot": {
+              "xMicrounits": 4725000,
+              "yMicrounits": 0,
+              "zMicrounits": -4000000
+            },
+            "rotationDegrees": 0
+          },
+          "collisionBoundsMicrounits": {
+            "minX": 4725000,
+            "maxX": 6075000,
+            "minY": 0,
+            "maxY": 2900000,
+            "minZ": -4060000,
+            "maxZ": -3940000
+          }
+        }
+      ],
+      "landingApronClassification": "NEW_PROPOSED_DESTINATION_NOT_EXISTING_CORRIDOR"
+    },
+    "committedEventSequence": 0,
+    "stateDigest": "0ef7df8329b35f7e6cb75ebc9a29302d650c68d585c79611d08fc0c403698cd0"
+  },
+  "events": [],
+  "replayedWorldDigest": "0ef7df8329b35f7e6cb75ebc9a29302d650c68d585c79611d08fc0c403698cd0",
+  "limitations": [
+    "NO_POSITIVE_COMMIT",
+    "SUPPORT_MODEL_REF_IS_PROPOSAL_ONLY",
+    "NO_ADMISSION_RENDER_MOVEMENT_OR_DOOR_ACTIVATION"
+  ]
+}
