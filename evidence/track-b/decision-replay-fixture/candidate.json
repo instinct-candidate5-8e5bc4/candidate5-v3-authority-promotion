@@ -1,0 +1,53 @@
+{
+  "classification": "FIXTURE_NOT_LIVE",
+  "log": [
+    {
+      "sequence": 1,
+      "epoch": 1,
+      "priorDecisionDigest": null,
+      "worldDigest": "88b6e0190469a8ba32e02b83bb36d815c90532b889a9ad4786978b3ac1b90385",
+      "recordDigest": "2bab6dd7327536cd03c2c36f0f755a56d61e946601dd408171d2ec246c46d0d4",
+      "identityRevision": 1,
+      "decision": "ADMITTED",
+      "author": "TEST_OWNED_CHECKPOINT_AUTHORITY_NOT_OWNER_AUTHENTICATION",
+      "entryDigest": "32dbba81e86917919d74ed6418d027824442400f14e756961bae18330949612b"
+    },
+    {
+      "sequence": 2,
+      "epoch": 2,
+      "priorDecisionDigest": "32dbba81e86917919d74ed6418d027824442400f14e756961bae18330949612b",
+      "worldDigest": "88b6e0190469a8ba32e02b83bb36d815c90532b889a9ad4786978b3ac1b90385",
+      "recordDigest": "2bab6dd7327536cd03c2c36f0f755a56d61e946601dd408171d2ec246c46d0d4",
+      "identityRevision": 1,
+      "decision": "REVOKED",
+      "author": "TEST_OWNED_CHECKPOINT_AUTHORITY_NOT_OWNER_AUTHENTICATION",
+      "entryDigest": "bd9b3cf71910fa3f741477dba3eae4ee8d513de6fd4209043a7b6bcb2c962b34"
+    }
+  ],
+  "checkpoint": {
+    "sequence": 2,
+    "headDigest": "bd9b3cf71910fa3f741477dba3eae4ee8d513de6fd4209043a7b6bcb2c962b34",
+    "epoch": 2
+  },
+  "replay": {
+    "status": "FIXTURE_NOT_LIVE_REPLAY_VALIDATED",
+    "decision": "REVOKED",
+    "worldDigest": "88b6e0190469a8ba32e02b83bb36d815c90532b889a9ad4786978b3ac1b90385",
+    "recordDigest": "2bab6dd7327536cd03c2c36f0f755a56d61e946601dd408171d2ec246c46d0d4",
+    "sequence": 2,
+    "epoch": 2,
+    "operationalStatus": "UNKNOWN"
+  },
+  "truncated": {
+    "status": "UNKNOWN",
+    "reason": "CHECKPOINT_HIGHER_THAN_LOG_OR_LOG_NOT_EXACT",
+    "classification": "FIXTURE_NOT_LIVE",
+    "operationalStatus": "UNKNOWN"
+  },
+  "limitations": [
+    "TEST_CHECKPOINT_ONLY_NO_DURABLE_STORE_OR_OWNER_AUTHENTICATION",
+    "DECISION_CHAIN_ONLY_WORLD_LEDGER_CHAIN_CONNECTION_NOT_IMPLEMENTED",
+    "NO_RUNTIME_SESSION_OR_COORDINATOR_CONNECTION",
+    "NO_OPERATIONAL_ACTIVATION"
+  ]
+}
