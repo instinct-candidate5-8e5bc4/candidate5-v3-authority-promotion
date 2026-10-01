@@ -1,0 +1,102 @@
+{
+  "validation": {
+    "status": "VALIDATED_PREPARATION_NOT_ADMITTED",
+    "modelDigest": "c6421891f041c8b0eefc543aaa7296249f07bbeeeaca852b5aa44bc31f2fb655"
+  },
+  "changedRegions": [
+    {
+      "minX": 4565000,
+      "maxX": 6175000,
+      "minZ": -5690000,
+      "maxZ": -3920000,
+      "minY": -9007199254740991,
+      "maxY": 9007199254740991
+    },
+    {
+      "minX": -9000000,
+      "maxX": 9000000,
+      "minY": 0,
+      "maxY": 6000000,
+      "minZ": -4080000,
+      "maxZ": -3920000
+    },
+    {
+      "minX": 4725000,
+      "maxX": 6075000,
+      "minY": 0,
+      "maxY": 2900000,
+      "minZ": -3900000,
+      "maxZ": -3780000
+    },
+    {
+      "minX": -9000000,
+      "maxX": 4565000,
+      "minY": 0,
+      "maxY": 6000000,
+      "minZ": -4080000,
+      "maxZ": -3920000
+    },
+    {
+      "minX": 6175000,
+      "maxX": 9000000,
+      "minY": 0,
+      "maxY": 6000000,
+      "minZ": -4080000,
+      "maxZ": -3920000
+    },
+    {
+      "minX": 4565000,
+      "maxX": 6175000,
+      "minY": 3000000,
+      "maxY": 6000000,
+      "minZ": -4080000,
+      "maxZ": -3920000
+    },
+    {
+      "minX": 4565000,
+      "maxX": 4645000,
+      "minY": 0,
+      "maxY": 3000000,
+      "minZ": -4080000,
+      "maxZ": -3920000
+    },
+    {
+      "minX": 6095000,
+      "maxX": 6175000,
+      "minY": 0,
+      "maxY": 3000000,
+      "minZ": -4080000,
+      "maxZ": -3920000
+    },
+    {
+      "minX": 4565000,
+      "maxX": 6175000,
+      "minY": 2920000,
+      "maxY": 3000000,
+      "minZ": -4080000,
+      "maxZ": -3920000
+    },
+    {
+      "minX": 4725000,
+      "maxX": 6075000,
+      "minY": 0,
+      "maxY": 2900000,
+      "minZ": -4060000,
+      "maxZ": -3940000
+    },
+    {
+      "minX": 4665000,
+      "maxX": 4785000,
+      "minY": 0,
+      "maxY": 2900000,
+      "minZ": -4000000,
+      "maxZ": -2650000
+    }
+  ],
+  "scope": "EXACT_VALIDATOR_AND_RESTRICTED_QUERY_PORT_PREPARATION_NOT_ADMITTED",
+  "limitations": [
+    "NO_COMMIT_OR_NEW_WORLD_ADMISSION",
+    "CHANGED_REGION_APRON_SUPPORT_UNIMPLEMENTED_UNKNOWN",
+    "OLD_ADAPTER_USED_ONLY_FOR_EXPLICIT_OLD_MODEL_QUERY_OUTSIDE_DIFF_REGION"
+  ]
+}
